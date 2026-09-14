@@ -1,16 +1,28 @@
 import React from 'react';
 
 interface WindowArchProps {
+  masterOn?: boolean;
   sunlightIntensity: number;
   timeOfDay: 'day' | 'sunset' | 'night';
   sunAngle: number;
 }
 
 export const WindowArch: React.FC<WindowArchProps> = ({
+  masterOn = true,
   sunlightIntensity,
   timeOfDay,
 }) => {
   const getSkyColors = () => {
+    if (!masterOn) {
+      return {
+        glow: 'from-[#0a0908] via-[#120f0d] to-[#0c0a08]',
+        nicheBevel: '#221c17',
+        archBorder: '#2d251f',
+        archInner: '#1f1915',
+        mullion: '#26201a',
+        halo: 'rgba(0, 0, 0, 0)',
+      };
+    }
     switch (timeOfDay) {
       case 'sunset':
         return {
@@ -44,37 +56,41 @@ export const WindowArch: React.FC<WindowArchProps> = ({
   };
 
   const colors = getSkyColors();
-  const effectiveOpacity = Math.max(0.2, sunlightIntensity);
+  const effectiveOpacity = masterOn ? Math.max(0.35, sunlightIntensity) : 0.45;
 
   return (
     <div className="absolute inset-x-0 top-0 bottom-0 flex flex-col items-center pointer-events-none select-none z-0 overflow-hidden">
       {/* 1. Dramatic Volumetric Spotlight Cone from Window illuminating the room wall */}
-      <div 
-        className="absolute top-2 left-1/2 -translate-x-1/2 w-[720px] h-[780px] pointer-events-none transition-all duration-700"
-        style={{
-          background: `radial-gradient(ellipse at 50% 30%, ${colors.halo} 0%, rgba(255,245,220,0.2) 35%, rgba(255,245,220,0) 70%)`,
-          opacity: effectiveOpacity,
-        }}
-      />
+      {masterOn && (
+        <div 
+          className="absolute top-2 left-1/2 -translate-x-1/2 w-[720px] h-[780px] pointer-events-none transition-all duration-700"
+          style={{
+            background: `radial-gradient(ellipse at 50% 30%, ${colors.halo} 0%, rgba(255,245,220,0.2) 35%, rgba(255,245,220,0) 70%)`,
+            opacity: effectiveOpacity,
+          }}
+        />
+      )}
 
-      {/* 2. Recessed Architectural Arch Niche & Window Structure */}
+      {/* 2. Recessed Architectural Arch Niche & Window Structure with seamless bottom fade mask */}
       <div 
         className="relative w-[360px] sm:w-[420px] h-[540px] sm:h-[620px] mt-2 flex flex-col items-center overflow-visible"
         style={{
           opacity: effectiveOpacity,
+          maskImage: 'linear-gradient(to bottom, black 0%, black 58%, rgba(0,0,0,0.6) 78%, transparent 98%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 58%, rgba(0,0,0,0.6) 78%, transparent 98%)',
           transition: 'opacity 0.6s ease',
         }}
       >
         <svg 
           viewBox="0 0 420 620" 
-          className="w-full h-full filter drop-shadow-xl"
+          className="w-full h-full"
           preserveAspectRatio="none"
         >
           <defs>
             <linearGradient id="windowLightGradV2" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor={timeOfDay === 'night' ? '#1a2336' : '#fffcf5'} stopOpacity="0.95" />
-              <stop offset="45%" stopColor={timeOfDay === 'night' ? '#0f172a' : '#fef4dc'} stopOpacity="0.9" />
-              <stop offset="100%" stopColor={timeOfDay === 'night' ? '#040814' : '#fae4c2'} stopOpacity="0.85" />
+              <stop offset="0%" stopColor={!masterOn ? '#100d0b' : timeOfDay === 'night' ? '#1a2336' : '#fffcf5'} stopOpacity={!masterOn ? 0.6 : 0.95} />
+              <stop offset="45%" stopColor={!masterOn ? '#171410' : timeOfDay === 'night' ? '#0f172a' : '#fef4dc'} stopOpacity={!masterOn ? 0.5 : 0.9} />
+              <stop offset="100%" stopColor={!masterOn ? '#0f0d0b' : timeOfDay === 'night' ? '#040814' : '#fae4c2'} stopOpacity={!masterOn ? 0.3 : 0.85} />
             </linearGradient>
 
             <linearGradient id="archBevelShading" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -142,11 +158,12 @@ export const WindowArch: React.FC<WindowArchProps> = ({
           <line x1="140" y1="230" x2="180" y2="320" stroke="#ffffff" strokeWidth="2.5" opacity="0.45" strokeLinecap="round" />
         </svg>
 
-        {/* Soft Golden Sun Orb behind window */}
+        {/* Soft Golden Sun Orb behind window (Zero blur penalty) */}
         {timeOfDay !== 'night' && (
           <div 
-            className="absolute top-12 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-amber-100/80 blur-3xl pointer-events-none mix-blend-screen"
+            className="absolute top-12 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full pointer-events-none"
             style={{
+              background: 'radial-gradient(circle, rgba(255, 245, 215, 0.85) 0%, rgba(254, 235, 175, 0.45) 35%, rgba(254, 225, 145, 0.12) 65%, transparent 80%)',
               transform: `scale(${0.9 + sunlightIntensity * 0.4})`,
             }}
           />

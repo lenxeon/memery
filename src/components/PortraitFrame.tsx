@@ -60,22 +60,23 @@ export const PortraitFrame: React.FC<PortraitFrameProps> = ({
         className="group relative flex flex-col items-center cursor-pointer select-none transition-transform hover:scale-[1.02] active:scale-95"
         title="点击更换照片或编辑标题寄语"
       >
-        {/* Golden Aura behind portrait */}
+        {/* Golden Aura behind portrait (Zero blur penalty) */}
         <div 
-          className="absolute -inset-4 rounded-full blur-xl pointer-events-none transition-opacity duration-700"
+          className="absolute -inset-4 rounded-full pointer-events-none transition-opacity duration-700"
           style={{
             background: timeOfDay === 'night' 
-              ? 'radial-gradient(circle, rgba(240, 200, 120, 0.25) 0%, rgba(200, 150, 50, 0) 70%)'
-              : 'radial-gradient(circle, rgba(255, 230, 150, 0.45) 0%, rgba(255, 190, 80, 0.15) 50%, rgba(255, 180, 50, 0) 70%)',
+              ? 'radial-gradient(circle, rgba(240, 200, 120, 0.25) 0%, rgba(200, 150, 50, 0.1) 45%, transparent 70%)'
+              : 'radial-gradient(circle, rgba(255, 230, 150, 0.45) 0%, rgba(255, 190, 80, 0.18) 45%, rgba(255, 180, 50, 0.05) 65%, transparent 80%)',
             opacity: 0.6 + sunlightIntensity * 0.4,
           }}
         />
 
-        {/* Circular Golden Filigree Ring */}
+        {/* Circular Golden Filigree Ring with GPU layer promotion */}
         <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
           <svg 
             viewBox="0 0 200 200" 
             className="absolute inset-0 w-full h-full animate-[spin_120s_linear_infinite]"
+            style={{ willChange: 'transform', transform: 'translateZ(0)' }}
           >
             <defs>
               <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">

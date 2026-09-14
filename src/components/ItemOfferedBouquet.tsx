@@ -126,23 +126,32 @@ export const ItemOfferedBouquet: React.FC<ItemOfferedBouquetProps> = ({
         {/* 3. Specific Flowers rendered */}
         {flowerType === 'peonies' && (
           <g transform="translate(72, 34)">
-            {/* Peony Blossom 1 */}
-            <circle cx="16" cy="2" r="15" fill="#f472b6" />
-            <circle cx="16" cy="2" r="11" fill="#fda4af" />
-            <circle cx="16" cy="2" r="7" fill="#ffe4e6" />
-            <circle cx="16" cy="2" r="2.5" fill="#f59e0b" />
+            {/* Peony Blossom 1 (Right) */}
+            <circle cx="16" cy="2" r="14" fill="#f472b6" />
+            <circle cx="16" cy="2" r="10" fill="#fda4af" />
+            <circle cx="16" cy="2" r="6" fill="#ffe4e6" />
+            <circle cx="16" cy="2" r="2.2" fill="#f59e0b" />
 
-            {/* Peony Blossom 2 */}
-            <circle cx="-12" cy="5" r="13" fill="#f43f5e" />
-            <circle cx="-12" cy="5" r="9" fill="#fb7185" />
-            <circle cx="-12" cy="5" r="5" fill="#fff1f2" />
-            <circle cx="-12" cy="5" r="2" fill="#f59e0b" />
+            {/* Peony Blossom 2 (Left) */}
+            <circle cx="-14" cy="5" r="12" fill="#f43f5e" />
+            <circle cx="-14" cy="5" r="8.5" fill="#fb7185" />
+            <circle cx="-14" cy="5" r="5" fill="#fff1f2" />
+            <circle cx="-14" cy="5" r="2" fill="#f59e0b" />
+
+            {/* Peony Blossom 3 (Top Crown) */}
+            <circle cx="2" cy="-8" r="11" fill="#ec4899" />
+            <circle cx="2" cy="-8" r="7.5" fill="#fbcfe8" />
+            <circle cx="2" cy="-8" r="2" fill="#fcd34d" />
+
+            {/* Peony Bud (Side) */}
+            <ellipse cx="-24" cy="-2" rx="6" ry="8" fill="#f472b6" transform="rotate(-20 -24 -2)" />
+            <ellipse cx="26" cy="-4" rx="5" ry="7" fill="#fda4af" transform="rotate(25 26 -4)" />
           </g>
         )}
 
         {flowerType === 'lilies' && (
           <g transform="translate(74, 34)">
-            {/* Pure White Lily 1 */}
+            {/* Pure White Lily 1 (Right) */}
             <g transform="translate(14, 0) scale(0.65)">
               <path d="M 0 0 C 12 -30 28 -24 30 -14 C 20 -2 10 4 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
               <path d="M 0 0 C 4 -32 -12 -34 -20 -22 C -12 -10 -4 -2 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
@@ -153,61 +162,106 @@ export const ItemOfferedBouquet: React.FC<ItemOfferedBouquetProps> = ({
               <circle cx="2" cy="-2" r="2" fill="#d97706" />
             </g>
 
-            {/* Pure White Lily 2 */}
+            {/* Pure White Lily 2 (Left) */}
             <g transform="translate(-14, 4) scale(0.55)">
               <path d="M 0 0 C 10 -25 24 -20 25 -12 C 16 -2 8 3 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
               <path d="M 0 0 C 3 -26 -10 -28 -16 -18 C -10 -8 -3 -2 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
               <path d="M 0 0 C -25 -14 -28 -3 -22 6 C -13 6 -3 2 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
               <circle cx="0" cy="0" r="5" fill="#bef264" />
             </g>
+
+            {/* Pure White Lily 3 (Top Crown) */}
+            <g transform="translate(1, -10) scale(0.58)">
+              <path d="M 0 0 C 12 -28 26 -22 28 -12 C 18 -2 8 4 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
+              <path d="M 0 0 C 4 -30 -10 -32 -18 -20 C -10 -8 -3 -2 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
+              <path d="M 0 0 C -26 -16 -30 -4 -22 6 C -14 6 -3 2 0 0 Z" fill="#ffffff" stroke="#e2e8f0" strokeWidth="0.8" />
+              <circle cx="0" cy="0" r="5" fill="#bef264" />
+              <ellipse cx="6" cy="-10" rx="2.5" ry="1.2" fill="#d97706" transform="rotate(-20 6 -10)" />
+            </g>
+
+            {/* Lily Bud */}
+            <ellipse cx="28" cy="-6" rx="3.5" ry="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="0.6" transform="rotate(35 28 -6)" />
           </g>
         )}
 
         {flowerType === 'lotus' && (
           <g transform="translate(74, 34)">
-            {/* Sacred Lotus Blossom */}
-            <g transform="translate(10, 2) scale(0.68)">
+            {/* Sacred Lotus Blossom 1 (Right) */}
+            <g transform="translate(10, 2) scale(0.66)">
               <path d="M 0 10 C -20 2 -28 -18 -16 -30 C -4 -20 0 -8 0 10 Z" fill="#f472b6" />
               <path d="M 0 10 C 20 2 28 -18 16 -30 C 4 -20 0 -8 0 10 Z" fill="#f472b6" />
               <path d="M 0 10 C -12 -4 -16 -30 0 -35 C 16 -30 12 -4 0 10 Z" fill="#fbcfe8" />
               <circle cx="0" cy="-4" r="6" fill="#a3e635" />
             </g>
-            {/* Lotus Pad / Bud */}
-            <ellipse cx="-16" cy="4" rx="14" ry="7" fill="#4d7c0f" transform="rotate(-10 -16 4)" />
+            {/* Sacred Lotus Blossom 2 (Top-Left) */}
+            <g transform="translate(-8, -8) scale(0.56)">
+              <path d="M 0 10 C -18 2 -24 -16 -14 -26 C -4 -18 0 -6 0 10 Z" fill="#ec4899" />
+              <path d="M 0 10 C 18 2 24 -16 14 -26 C 4 -18 0 -6 0 10 Z" fill="#ec4899" />
+              <path d="M 0 10 C -10 -4 -14 -26 0 -30 C 14 -26 10 -4 0 10 Z" fill="#fce7f3" />
+              <circle cx="0" cy="-3" r="5" fill="#a3e635" />
+            </g>
+            {/* Lotus Pad & Buds */}
+            <ellipse cx="-20" cy="6" rx="14" ry="7" fill="#4d7c0f" transform="rotate(-10 -20 6)" />
+            <ellipse cx="26" cy="-4" rx="6" ry="11" fill="#f472b6" transform="rotate(30 26 -4)" />
           </g>
         )}
 
         {flowerType === 'chrysanthemum' && (
           <g transform="translate(74, 34)">
-            {/* White Chrysanthemum 1 */}
-            <g transform="translate(12, 0) scale(0.65)">
+            {/* White Chrysanthemum 1 (Right) */}
+            <g transform="translate(14, 0) scale(0.62)">
               {Array.from({ length: 12 }).map((_, i) => (
                 <ellipse key={i} cx="0" cy="-14" rx="3" ry="12" fill="#ffffff" stroke="#cbd5e1" strokeWidth="0.5" transform={`rotate(${i * 30})`} />
               ))}
               <circle cx="0" cy="0" r="6" fill="#eab308" />
             </g>
-            {/* White Chrysanthemum 2 */}
-            <g transform="translate(-14, 4) scale(0.55)">
+            {/* White Chrysanthemum 2 (Left) */}
+            <g transform="translate(-14, 4) scale(0.52)">
               {Array.from({ length: 12 }).map((_, i) => (
                 <ellipse key={i} cx="0" cy="-14" rx="3" ry="12" fill="#ffffff" stroke="#cbd5e1" strokeWidth="0.5" transform={`rotate(${i * 30 + 15})`} />
               ))}
               <circle cx="0" cy="0" r="5" fill="#eab308" />
+            </g>
+            {/* White Chrysanthemum 3 (Top Crown) */}
+            <g transform="translate(1, -10) scale(0.55)">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <ellipse key={i} cx="0" cy="-13" rx="2.8" ry="11" fill="#ffffff" stroke="#cbd5e1" strokeWidth="0.5" transform={`rotate(${i * 30})`} />
+              ))}
+              <circle cx="0" cy="0" r="5.5" fill="#eab308" />
+            </g>
+            {/* Small Side Bloom */}
+            <g transform="translate(26, 4) scale(0.42)">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <ellipse key={i} cx="0" cy="-12" rx="2.5" ry="10" fill="#ffffff" stroke="#cbd5e1" strokeWidth="0.5" transform={`rotate(${i * 36})`} />
+              ))}
+              <circle cx="0" cy="0" r="4.5" fill="#facc15" />
             </g>
           </g>
         )}
 
         {flowerType === 'roses' && (
           <g transform="translate(74, 34)">
-            {/* Champagne Rose 1 */}
-            <g transform="translate(14, 0) scale(0.68)">
+            {/* Champagne Rose 1 (Right) */}
+            <g transform="translate(14, 0) scale(0.66)">
               <circle cx="0" cy="0" r="18" fill="#fed7aa" />
               <path d="M -12 -6 C -14 -16 2 -18 10 -10 C 16 -2 14 10 6 14 C -4 16 -10 6 -12 -6 Z" fill="#fb923c" />
               <path d="M -6 -8 C 0 -14 8 -8 8 0 C 6 6 0 6 -4 4 Z" fill="#fff7ed" />
             </g>
-            {/* Champagne Rose 2 */}
-            <g transform="translate(-14, 4) scale(0.58)">
+            {/* Champagne Rose 2 (Left) */}
+            <g transform="translate(-14, 4) scale(0.56)">
               <circle cx="0" cy="0" r="16" fill="#fed7aa" />
               <path d="M -10 -4 C -12 -12 2 -14 8 -8 C 12 -2 10 8 4 10 C -2 12 -8 4 -10 -4 Z" fill="#fb923c" />
+            </g>
+            {/* Champagne Rose 3 (Top Crown) */}
+            <g transform="translate(1, -9) scale(0.58)">
+              <circle cx="0" cy="0" r="16" fill="#fed7aa" />
+              <path d="M -10 -5 C -12 -14 2 -14 8 -8 C 12 -2 10 6 4 9 C -2 11 -8 4 -10 -5 Z" fill="#fb923c" />
+              <path d="M -4 -6 C 0 -10 6 -6 6 0 C 4 4 0 4 -2 2 Z" fill="#fff7ed" />
+            </g>
+            {/* Rosebud (Right-Top) */}
+            <g transform="translate(26, -6) scale(0.48)">
+              <ellipse cx="0" cy="0" rx="8" ry="12" fill="#fb923c" transform="rotate(30)" />
+              <ellipse cx="-1" cy="-1" rx="5" ry="9" fill="#ffedd5" transform="rotate(30)" />
             </g>
           </g>
         )}

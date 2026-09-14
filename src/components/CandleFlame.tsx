@@ -20,13 +20,20 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animFrameId = useRef<number | null>(null);
+  const idleTimerId = useRef<ReturnType<typeof setTimeout> | null>(null);
   const smokeParticles = useRef<Array<{ x: number; y: number; vx: number; vy: number; alpha: number; size: number }>>([]);
   const emberAlpha = useRef<number>(0);
+  const renderRef = useRef<(() => void) | null>(null);
+
+  const propsRef = useRef({ isLit, windForce, glowIntensity, scale });
+  useEffect(() => {
+    propsRef.current = { isLit, windForce, glowIntensity, scale };
+  }, [isLit, windForce, glowIntensity, scale]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
     let time = Math.random() * 100;
@@ -37,47 +44,51 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
 
     const render = () => {
       time += 0.05;
+      const { isLit: lit, windForce: wind, glowIntensity: glow, scale: sc } = propsRef.current;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       ctx.scale(2, 2);
 
-      const centerX = width / 2;
-      const baseY = height - 16;
+      const centerX = width / 2; // 40
+      const baseY = height - 16;  // 94
 
-      if (isLit) {
+      if (lit) {
         emberAlpha.current = 1;
 
         const microFlicker = Math.sin(time * 12) * 0.5 + Math.cos(time * 23) * 0.3;
-        const windTilt = (windForce * 12) + (Math.sin(time * 3) * 2);
-        const flameHeight = (38 + Math.sin(time * 7) * 3 + microFlicker * 2) * scale;
-        const flameWidth = (14 + Math.cos(time * 5) * 1.5) * scale;
+        const windTilt = wind * 12 + Math.sin(time * 3) * 2;
+        const flameHeight = (38 + Math.sin(time * 7) * 3 + microFlicker * 2) * sc;
+        const flameWidth = (14 + Math.cos(time * 5) * 1.5) * sc;
 
-        // 1. Radial ambient heat glow
-        const glowRadius = (55 + Math.sin(time * 6) * 5) * glowIntensity * scale;
+        // 1. Soft Warm Ambient Glow
+        // IMPORTANT: glowRadius MUST stay within canvas bounds (width 80, centerX 40)
+        // so alpha reaches 0 well before canvas borders to eliminate ANY rectangular edge clipping!
+        const maxGlowRadius = 28 * sc;
+        const glowCenterY = baseY - flameHeight * 0.45;
         const radialGlow = ctx.createRadialGradient(
           centerX + windTilt * 0.3,
-          baseY - flameHeight * 0.4,
-          2,
+          glowCenterY,
+          1,
           centerX,
-          baseY - flameHeight * 0.3,
-          glowRadius
+          glowCenterY,
+          maxGlowRadius
         );
-        radialGlow.addColorStop(0, `rgba(255, 170, 50, ${0.45 * glowIntensity})`);
-        radialGlow.addColorStop(0.3, `rgba(255, 120, 20, ${0.22 * glowIntensity})`);
-        radialGlow.addColorStop(0.7, `rgba(255, 80, 0, ${0.08 * glowIntensity})`);
-        radialGlow.addColorStop(1, 'rgba(255, 80, 0, 0)');
+        radialGlow.addColorStop(0, `rgba(255, 180, 50, ${0.4 * glow})`);
+        radialGlow.addColorStop(0.4, `rgba(255, 130, 20, ${0.18 * glow})`);
+        radialGlow.addColorStop(0.75, `rgba(255, 90, 0, ${0.04 * glow})`);
+        radialGlow.addColorStop(1, 'rgba(255, 90, 0, 0)');
 
         ctx.fillStyle = radialGlow;
         ctx.beginPath();
-        ctx.arc(centerX, baseY - flameHeight * 0.3, glowRadius, 0, Math.PI * 2);
+        ctx.arc(centerX, glowCenterY, maxGlowRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        // 2. Outer Flame (Warm Orange/Red teardrop)
-        ctx.save();
-        ctx.beginPath();
+        // 2. Outer Flame Teardrop (Warm Golden Orange)
         const tipX = centerX + windTilt;
         const tipY = baseY - flameHeight;
 
+        ctx.beginPath();
         ctx.moveTo(centerX - flameWidth * 0.5, baseY);
         ctx.bezierCurveTo(
           centerX - flameWidth * 0.9, baseY - flameHeight * 0.35,
@@ -92,25 +103,20 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
         ctx.closePath();
 
         const outerGrad = ctx.createLinearGradient(centerX, baseY, tipX, tipY);
-        outerGrad.addColorStop(0, 'rgba(255, 90, 0, 0.95)');
-        outerGrad.addColorStop(0.35, 'rgba(255, 140, 10, 0.9)');
-        outerGrad.addColorStop(0.8, 'rgba(255, 210, 50, 0.85)');
-        outerGrad.addColorStop(1, 'rgba(255, 240, 150, 0.3)');
-
+        outerGrad.addColorStop(0, 'rgba(255, 80, 0, 0.95)');
+        outerGrad.addColorStop(0.3, 'rgba(255, 140, 10, 0.92)');
+        outerGrad.addColorStop(0.75, 'rgba(255, 215, 60, 0.9)');
+        outerGrad.addColorStop(1, 'rgba(255, 245, 180, 0.4)');
         ctx.fillStyle = outerGrad;
-        ctx.shadowColor = '#ff8800';
-        ctx.shadowBlur = 12 * glowIntensity;
         ctx.fill();
-        ctx.restore();
 
-        // 3. Inner Core Flame (Luminous Yellow-White)
-        ctx.save();
-        ctx.beginPath();
+        // 3. Inner Core Flame (Luminous Pure Yellow-White)
         const innerH = flameHeight * 0.65;
         const innerW = flameWidth * 0.55;
         const innerTipX = centerX + windTilt * 0.75;
         const innerTipY = baseY - innerH;
 
+        ctx.beginPath();
         ctx.moveTo(centerX - innerW * 0.5, baseY - 2);
         ctx.bezierCurveTo(
           centerX - innerW * 0.8, baseY - innerH * 0.35,
@@ -125,37 +131,31 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
         ctx.closePath();
 
         const innerGrad = ctx.createLinearGradient(centerX, baseY, innerTipX, innerTipY);
-        innerGrad.addColorStop(0, '#ff9900');
-        innerGrad.addColorStop(0.4, '#ffee55');
-        innerGrad.addColorStop(0.85, '#ffffff');
+        innerGrad.addColorStop(0, '#ff9500');
+        innerGrad.addColorStop(0.35, '#ffee55');
+        innerGrad.addColorStop(0.75, '#ffffff');
         innerGrad.addColorStop(1, '#ffffff');
-
         ctx.fillStyle = innerGrad;
-        ctx.shadowColor = '#ffee88';
-        ctx.shadowBlur = 8;
         ctx.fill();
-        ctx.restore();
 
-        // 4. Blue Flame Base
-        ctx.save();
+        // 4. Blue Flame Base (Clean natural candle combustion)
         ctx.beginPath();
-        ctx.ellipse(centerX, baseY + 1, flameWidth * 0.38, 3.5, 0, 0, Math.PI * 2);
-        const blueGrad = ctx.createRadialGradient(centerX, baseY + 1, 0, centerX, baseY + 1, flameWidth * 0.4);
-        blueGrad.addColorStop(0, 'rgba(50, 120, 255, 0.75)');
-        blueGrad.addColorStop(0.7, 'rgba(30, 80, 220, 0.4)');
-        blueGrad.addColorStop(1, 'rgba(20, 40, 180, 0)');
+        ctx.ellipse(centerX, baseY + 1, flameWidth * 0.35, 3, 0, 0, Math.PI * 2);
+        const blueGrad = ctx.createRadialGradient(centerX, baseY + 1, 0, centerX, baseY + 1, flameWidth * 0.35);
+        blueGrad.addColorStop(0, 'rgba(60, 130, 255, 0.75)');
+        blueGrad.addColorStop(0.7, 'rgba(40, 90, 230, 0.35)');
+        blueGrad.addColorStop(1, 'rgba(20, 50, 180, 0)');
         ctx.fillStyle = blueGrad;
         ctx.fill();
-        ctx.restore();
 
       } else {
         if (emberAlpha.current > 0.01) {
           emberAlpha.current *= 0.985;
-          if (Math.random() < 0.4) {
+          if (Math.random() < 0.35) {
             smokeParticles.current.push({
               x: centerX + (Math.random() - 0.5) * 4,
               y: baseY - 4,
-              vx: (windForce * 0.5) + (Math.random() - 0.5) * 0.6,
+              vx: wind * 0.5 + (Math.random() - 0.5) * 0.6,
               vy: -0.8 - Math.random() * 0.6,
               alpha: 0.6 * emberAlpha.current,
               size: 2 + Math.random() * 2,
@@ -165,12 +165,11 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
           ctx.beginPath();
           ctx.arc(centerX, baseY - 3, 2, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 80, 20, ${emberAlpha.current})`;
-          ctx.shadowColor = '#ff4400';
-          ctx.shadowBlur = 6 * emberAlpha.current;
           ctx.fill();
         }
       }
 
+      // Render smoke after extinguishing
       for (let i = smokeParticles.current.length - 1; i >= 0; i--) {
         const p = smokeParticles.current[i];
         p.x += p.vx;
@@ -181,38 +180,53 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
         if (p.alpha <= 0.02 || p.y < 0) {
           smokeParticles.current.splice(i, 1);
         } else {
-          ctx.save();
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(220, 220, 220, ${p.alpha})`;
           ctx.fill();
-          ctx.restore();
         }
       }
 
       // Candle Wick
-      ctx.save();
       ctx.beginPath();
       ctx.moveTo(centerX, baseY + 6);
-      ctx.quadraticCurveTo(centerX + (isLit ? 1.5 : 0.5), baseY + 1, centerX + 1, baseY - 3);
+      ctx.quadraticCurveTo(centerX + (lit ? 1.5 : 0.5), baseY + 1, centerX + 1, baseY - 3);
       ctx.lineWidth = 1.8;
       ctx.strokeStyle = '#2d1f14';
       ctx.lineCap = 'round';
       ctx.stroke();
-      ctx.restore();
 
       ctx.restore();
-      animFrameId.current = requestAnimationFrame(render);
+
+      // Throttle: once unlit + ember gone + no particles → idle poll at 500ms
+      const fullyIdle =
+        !propsRef.current.isLit &&
+        emberAlpha.current <= 0.01 &&
+        smokeParticles.current.length === 0;
+
+      if (fullyIdle) {
+        idleTimerId.current = setTimeout(() => {
+          if (renderRef.current) renderRef.current();
+        }, 500);
+      } else {
+        animFrameId.current = requestAnimationFrame(render);
+      }
     };
 
+    renderRef.current = render;
     render();
 
     return () => {
       if (animFrameId.current) {
         cancelAnimationFrame(animFrameId.current);
+        animFrameId.current = null;
+      }
+      if (idleTimerId.current) {
+        clearTimeout(idleTimerId.current);
+        idleTimerId.current = null;
       }
     };
-  }, [isLit, windForce, glowIntensity, scale]);
+  }, []);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -236,6 +250,7 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
       <canvas
         ref={canvasRef}
         className="w-full h-full pointer-events-none"
+        style={{ transform: 'translateZ(0)', willChange: 'transform' }}
       />
     </div>
   );

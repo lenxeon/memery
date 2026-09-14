@@ -22,6 +22,7 @@ import { LightingPanel } from './components/LightingPanel';
 import { FlowerPickerModal } from './components/FlowerPickerModal';
 import { BlessingModal } from './components/BlessingModal';
 import { BottomDock } from './components/BottomDock';
+import { FpsMonitor } from './components/FpsMonitor';
 import { sound } from './utils/audio';
 import { 
   Sun, 
@@ -36,35 +37,107 @@ import {
 } from 'lucide-react';
 
 const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = {
+  // ── Symmetrical Pillars: Vases, Candles, Censer ──
   vase_left: {
     id: 'vase_left',
-    name: '牡丹花瓶 (左)',
-    position: { x: -165, y: -6 },
+    name: '富贵牡丹花瓶 (左)',
+    position: { x: -164, y: -4 },
     flowerType: 'peonies',
   },
   vase_right: {
     id: 'vase_right',
-    name: '百合花瓶 (右)',
-    position: { x: 165, y: -6 },
+    name: '纯洁百合花瓶 (右)',
+    position: { x: 164, y: -4 },
     flowerType: 'lilies',
   },
   candle_left: {
     id: 'candle_left',
     name: '祈愿烛台 (左)',
-    position: { x: -75, y: 8 },
+    position: { x: -74, y: 3 },
     isLit: true,
   },
   candle_right: {
     id: 'candle_right',
     name: '祈愿烛台 (右)',
-    position: { x: 75, y: 8 },
+    position: { x: 74, y: 3 },
     isLit: true,
   },
   censer: {
     id: 'censer',
     name: '青瓷清香香炉 (中)',
-    position: { x: 0, y: 10 },
+    position: { x: 0, y: 6 },
     isLit: true,
+  },
+
+  // ── Ten Fresh Flower Offerings (十景香花盛供 · 繁花锦簇) ──
+  // 1 & 2: Outer Wings (两侧后翼)
+  offered_flower_1: {
+    id: 'offered_flower_1',
+    name: '敬献 · 重瓣粉牡丹 (左翼)',
+    position: { x: -192, y: 14 },
+    flowerType: 'peonies',
+  },
+  offered_flower_2: {
+    id: 'offered_flower_2',
+    name: '敬献 · 纯白东方百合 (右翼)',
+    position: { x: 192, y: 14 },
+    flowerType: 'lilies',
+  },
+
+  // 3 & 4: Mid Flanks (瓶烛之间)
+  offered_flower_3: {
+    id: 'offered_flower_3',
+    name: '敬献 · 出尘清莲 (左侧)',
+    position: { x: -124, y: 18 },
+    flowerType: 'lotus',
+  },
+  offered_flower_4: {
+    id: 'offered_flower_4',
+    name: '敬献 · 淡雅香槟玫瑰 (右侧)',
+    position: { x: 124, y: 18 },
+    flowerType: 'roses',
+  },
+
+  // 5 & 6: Mid Outer Arc (中景两侧)
+  offered_flower_5: {
+    id: 'offered_flower_5',
+    name: '敬献 · 高洁白菊 (左中)',
+    position: { x: -160, y: 28 },
+    flowerType: 'chrysanthemum',
+  },
+  offered_flower_6: {
+    id: 'offered_flower_6',
+    name: '敬献 · 淡雅香槟玫瑰 (右中)',
+    position: { x: 160, y: 28 },
+    flowerType: 'roses',
+  },
+
+  // 7 & 8: Candle Flanks (烛台身侧)
+  offered_flower_7: {
+    id: 'offered_flower_7',
+    name: '敬献 · 重瓣粉牡丹 (左身)',
+    position: { x: -82, y: 25 },
+    flowerType: 'peonies',
+  },
+  offered_flower_8: {
+    id: 'offered_flower_8',
+    name: '敬献 · 高洁白菊 (右身)',
+    position: { x: 82, y: 25 },
+    flowerType: 'chrysanthemum',
+  },
+
+  // 9 & 10: Front Center Arc (案台前沿两束)
+  offered_flower_9: {
+    id: 'offered_flower_9',
+    name: '敬献 · 纯白东方百合 (左前)',
+    position: { x: -35, y: 34 },
+    flowerType: 'lilies',
+  },
+  offered_flower_10: {
+    id: 'offered_flower_10',
+    name: '敬献 · 出尘清莲 (右前)',
+    position: { x: 35, y: 34 },
+    flowerType: 'lotus',
   },
 };
 
@@ -134,8 +207,8 @@ export default function App() {
 
   const resetTableLayout = () => {
     sound.playWoodPlacement();
-    setItems(INITIAL_ITEMS);
-    showToast('已重置供案摆设为标准对称布局');
+    setItems(JSON.parse(JSON.stringify(INITIAL_ITEMS)));
+    showToast('已依中轴规范对齐（花、烛、香严格对称）');
   };
 
   const toggleAllCandles = () => {
@@ -249,6 +322,13 @@ export default function App() {
     showToast('已清空供案上的全部献花捧束');
   };
 
+  const handleFillTenFlowers = () => {
+    sound.playBell(528, 2.5);
+    setPetalTrigger(Date.now());
+    setItems(JSON.parse(JSON.stringify(INITIAL_ITEMS)));
+    showToast('已一键布设十捧香花盛供，案前繁花锦簇');
+  };
+
   const handleBlessingSubmit = (blessingText: string) => {
     // Also light candles if not lit
     setItems((prev) => ({
@@ -287,24 +367,25 @@ export default function App() {
     <main 
       className={`relative w-full h-screen overflow-hidden flex flex-col items-center justify-between select-none transition-colors duration-700 font-sans ${getSceneBackgroundClass()}`}
     >
-      {/* Wall Texture Effect */}
+      {/* Wall Texture Effect (Hardware accelerated, zero blend cost) */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-40 mix-blend-overlay"
+        className="absolute inset-0 pointer-events-none opacity-50"
         style={{
-          backgroundImage: `radial-gradient(circle at 50% 35%, transparent 20%, rgba(0,0,0,0.3) 100%)`,
+          background: `radial-gradient(circle at 50% 35%, transparent 25%, rgba(60, 40, 20, 0.12) 100%)`,
         }}
       />
 
       {/* Top Header & Quick Environment Bar */}
       <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
-        {/* Brand & Concept badge */}
+        {/* Brand & Concept badge & FPS Monitor */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-amber-200/70 shadow-xs">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 border border-amber-200/70 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
             <h1 className="font-serif text-xs sm:text-sm font-semibold tracking-wide text-stone-800">
               暖念 · 真实光影与场景模拟
             </h1>
           </div>
+          {import.meta.env.DEV && <FpsMonitor />}
         </div>
 
         {/* Quick controls on right */}
@@ -329,7 +410,7 @@ export default function App() {
           </button>
 
           {/* Time presets quick switch */}
-          <div className="hidden sm:flex items-center bg-white/70 backdrop-blur-md rounded-full p-0.5 border border-amber-200/60 shadow-xs text-xs">
+          <div className="hidden sm:flex items-center bg-white/90 rounded-full p-0.5 border border-amber-200/60 shadow-xs text-xs">
             <button
               type="button"
               onClick={() => {
@@ -376,7 +457,7 @@ export default function App() {
             type="button"
             onClick={toggleSound}
             title={soundEnabled ? '静音' : '开启颂钵音效'}
-            className="p-1.5 sm:p-2 rounded-full bg-white/70 backdrop-blur-md border border-amber-200/60 text-stone-700 hover:bg-white shadow-xs cursor-pointer transition-colors"
+            className="p-1.5 sm:p-2 rounded-full bg-white/90 border border-amber-200/60 text-stone-700 hover:bg-white shadow-xs cursor-pointer transition-colors"
           >
             {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} className="text-stone-400" />}
           </button>
@@ -385,7 +466,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => setIsLightingOpen(true)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-amber-200/60 text-stone-700 hover:bg-white shadow-xs text-xs cursor-pointer transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/90 border border-amber-200/60 text-stone-700 hover:bg-white shadow-xs text-xs cursor-pointer transition-colors"
           >
             <SlidersHorizontal size={13} className="text-amber-700" />
             <span className="hidden sm:inline font-medium">调光</span>
@@ -405,6 +486,7 @@ export default function App() {
       <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden">
         {/* Layer 1: Cathedral Window with Sky */}
         <WindowArch
+          masterOn={lighting.masterOn}
           sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
           timeOfDay={lighting.timeOfDay}
           sunAngle={lighting.sunAngle}
@@ -468,6 +550,7 @@ export default function App() {
       />
 
       {/* Modals */}
+
       <LightingPanel
         isOpen={isLightingOpen}
         onClose={() => setIsLightingOpen(false)}
@@ -487,6 +570,7 @@ export default function App() {
         rightVaseFlower={items.vase_right?.flowerType || 'lilies'}
         offeredCount={Object.keys(items).filter((k) => k.startsWith('offered_flower_')).length}
         onClearOfferedFlowers={handleClearOfferedFlowers}
+        onFillTenFlowers={handleFillTenFlowers}
       />
 
       <BlessingModal

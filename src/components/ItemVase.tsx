@@ -117,14 +117,16 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
             {/* Stems & Foliage */}
             <path d="M 74 125 Q 70 85 54 48" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.6" fill="none" strokeLinecap="round" />
             <path d="M 76 125 Q 82 82 102 62" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.4" fill="none" strokeLinecap="round" />
-            <path d="M 74 125 Q 74 65 68 34" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M 74 125 Q 75 65 76 28" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M 73 125 Q 58 85 36 52" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.0" fill="none" strokeLinecap="round" />
+            <path d="M 77 125 Q 96 78 116 46" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
             <path d="M 52 78 C 30 68 14 76 8 86 C 22 92 42 90 54 81 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
             <path d="M 90 88 C 112 80 130 86 138 96 C 122 102 104 98 90 90 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
             <path d="M 42 46 C 24 34 12 42 8 52 C 20 58 36 54 44 48 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
             <path d="M 94 58 C 114 48 128 54 134 64 C 120 70 106 66 94 60 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
 
-            {/* Main Double Peony */}
-            <g transform="translate(54, 42) scale(0.98)">
+            {/* Main Double Peony (Left) */}
+            <g transform="translate(54, 46) scale(0.95)">
               <circle cx="0" cy="0" r="28" fill={`url(#peonyDeep_${isRightSide})`} opacity="0.95" />
               <path d="M -22 -10 C -26 -26 2 -32 16 -22 C 28 -8 24 16 10 24 C -8 28 -18 12 -22 -10 Z" fill={`url(#peonySoft_${isRightSide})`} />
               <path d="M -16 -18 C -4 -26 18 -20 20 -8 C 22 8 6 20 -6 18 C -18 14 -20 -2 -16 -18 Z" fill={`url(#peonyDeep_${isRightSide})`} />
@@ -133,25 +135,51 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
               <circle cx="3" cy="1" r="2.4" fill="#f59e0b" opacity="0.95" />
             </g>
 
-            {/* Secondary Peony */}
-            <g transform="translate(94, 62) scale(0.92)">
+            {/* Top Crown Peony (Center-Top) */}
+            <g transform="translate(76, 26) scale(0.92)">
               <circle cx="0" cy="0" r="26" fill={`url(#peonyDeep_${isRightSide})`} />
+              <path d="M -20 -10 C -24 -24 4 -28 16 -18 C 26 -6 22 14 8 22 C -6 26 -16 12 -20 -10 Z" fill={`url(#peonySoft_${isRightSide})`} />
+              <path d="M -14 -14 C 0 -22 16 -16 16 -4 C 16 10 2 18 -8 14 C -18 10 -18 -2 -14 -14 Z" fill="#ffe2ed" />
+              <circle cx="0" cy="-1" r="2.6" fill="#fcd34d" />
+            </g>
+
+            {/* Secondary Peony (Right) */}
+            <g transform="translate(98, 64) scale(0.88)">
+              <circle cx="0" cy="0" r="25" fill={`url(#peonyDeep_${isRightSide})`} />
               <path d="M -18 -8 C -22 -22 2 -26 12 -18 C 22 -6 20 12 8 20 C -6 24 -14 10 -18 -8 Z" fill={`url(#peonySoft_${isRightSide})`} />
               <path d="M -12 -14 C 0 -22 14 -16 16 -6 C 18 8 5 16 -5 14 C -15 10 -15 -2 -12 -14 Z" fill="#ffe2ed" />
               <circle cx="1" cy="-1" r="2.5" fill="#fcd34d" />
+            </g>
+
+            {/* Side Peony Bloom (Left-Low) */}
+            <g transform="translate(34, 56) scale(0.75)">
+              <circle cx="0" cy="0" r="20" fill={`url(#peonyDeep_${isRightSide})`} />
+              <path d="M -14 -6 C -18 -18 2 -20 10 -14 C 18 -4 16 10 6 16 C -6 18 -12 8 -14 -6 Z" fill={`url(#peonySoft_${isRightSide})`} />
+              <circle cx="0" cy="0" r="2.0" fill="#fcd34d" />
+            </g>
+
+            {/* Elegant Pink Peony Bud (Right-Top) */}
+            <g transform="translate(116, 46) scale(0.68)">
+              <ellipse cx="0" cy="0" rx="12" ry="16" fill={`url(#peonyDeep_${isRightSide})`} transform="rotate(25)" />
+              <ellipse cx="-2" cy="-2" rx="8" ry="12" fill={`url(#peonySoft_${isRightSide})`} transform="rotate(25)" />
             </g>
           </g>
         )}
 
         {flowerType === 'lilies' && (
           <g id="liliesArt">
+            {/* Stems */}
             <path d="M 76 128 Q 78 95 64 48" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.4" fill="none" strokeLinecap="round" />
             <path d="M 78 128 Q 86 85 102 45" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.6" fill="none" strokeLinecap="round" />
+            <path d="M 75 128 Q 74 72 75 26" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M 74 128 Q 58 88 36 56" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
+            <path d="M 78 128 Q 98 76 118 36" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
             <path d="M 64 88 C 42 76 24 88 18 98 C 30 102 52 96 64 90 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
             <path d="M 90 84 C 112 74 132 82 140 92 C 126 96 106 92 90 86 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
+            <path d="M 38 72 C 18 64 8 74 6 84 C 20 86 36 82 42 76 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
 
-            {/* Lily 1 */}
-            <g transform="translate(94, 52) scale(0.98)">
+            {/* Lily 1 (Right Blooming) */}
+            <g transform="translate(98, 52) scale(0.96)">
               <path d="M 0 0 C 16 -38 34 -32 40 -18 C 28 -4 15 6 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
               <path d="M 0 0 C 6 -42 -14 -44 -24 -30 C -16 -14 -6 -2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
               <path d="M 0 0 C -38 -22 -44 -6 -34 10 C -20 10 -6 3 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
@@ -164,12 +192,34 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
               <ellipse cx="-12" cy="-20" rx="4" ry="1.6" fill="#f59e0b" transform="rotate(40 -12 -20)" />
             </g>
 
-            {/* Lily 2 */}
-            <g transform="translate(52, 68) scale(0.86)">
+            {/* Lily 2 (Center-Top Star) */}
+            <g transform="translate(75, 26) scale(0.90)">
+              <path d="M 0 0 C 14 -36 30 -30 36 -16 C 26 -4 14 6 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
+              <path d="M 0 0 C 4 -38 -12 -40 -20 -28 C -14 -12 -4 -2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
+              <path d="M 0 0 C -34 -18 -38 -4 -30 8 C -18 8 -4 2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
+              <path d="M 0 0 C 20 18 32 30 38 18 C 24 8 12 2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
+              <circle cx="0" cy="0" r="8" fill={`url(#lilyThroat_${isRightSide})`} opacity="0.9" />
+              <ellipse cx="12" cy="-14" rx="3.5" ry="1.4" fill="#d97706" transform="rotate(-25 12 -14)" />
+            </g>
+
+            {/* Lily 3 (Left Mid) */}
+            <g transform="translate(52, 68) scale(0.85)">
               <path d="M 0 0 C -14 -32 2 -40 14 -30 C 9 -16 3 -2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
               <path d="M 0 0 C -32 -16 -38 2 -28 16 C -14 11 -2 3 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
               <path d="M 0 0 C -16 26 6 34 20 26 C 13 16 6 5 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
               <circle cx="0" cy="0" r="8" fill={`url(#lilyThroat_${isRightSide})`} opacity="0.9" />
+            </g>
+
+            {/* Lily 4 (Left Side Flower) */}
+            <g transform="translate(34, 54) scale(0.72)">
+              <path d="M 0 0 C -16 -28 -30 -18 -26 -6 C -18 2 -6 2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
+              <path d="M 0 0 C -12 20 4 28 16 20 C 10 10 4 2 0 0 Z" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#ded9c7" strokeWidth="0.8" />
+              <circle cx="0" cy="0" r="6" fill={`url(#lilyThroat_${isRightSide})`} opacity="0.85" />
+            </g>
+
+            {/* Lily Bud (Right Tip) */}
+            <g transform="translate(118, 36) scale(0.65)">
+              <ellipse cx="0" cy="0" rx="6" ry="18" fill={`url(#whiteLilyPetal_${isRightSide})`} stroke="#c6d6a5" strokeWidth="0.8" transform="rotate(35)" />
             </g>
           </g>
         )}
@@ -179,26 +229,41 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
             {/* Elegant Lotus Stems */}
             <path d="M 76 128 Q 72 80 50 48" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.6" fill="none" strokeLinecap="round" />
             <path d="M 76 128 Q 85 85 106 55" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.4" fill="none" strokeLinecap="round" />
+            <path d="M 75 128 Q 76 72 78 28" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M 74 128 Q 54 84 32 60" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
             {/* Rounded Lotus Leaf / Pad */}
             <ellipse cx="108" cy="85" rx="30" ry="14" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} transform="rotate(15 108 85)" />
             <ellipse cx="40" cy="88" rx="26" ry="12" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} transform="rotate(-20 40 88)" />
 
-            {/* Main Sacred Lotus Blossom */}
+            {/* Main Sacred Lotus Blossom (Left) */}
             <g transform="translate(50, 48) scale(0.95)">
-              {/* Petals */}
               <path d="M 0 15 C -25 5 -35 -20 -20 -35 C -5 -25 0 -10 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
               <path d="M 0 15 C 25 5 35 -20 20 -35 C 5 -25 0 -10 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
               <path d="M 0 15 C -15 -5 -20 -38 0 -44 C 20 -38 15 -5 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
               <path d="M 0 15 C -8 -8 -10 -35 0 -40 C 10 -35 8 -8 0 15 Z" fill="#ffffff" opacity="0.9" />
-              {/* Lotus Pod Center */}
               <circle cx="0" cy="-5" r="7" fill={`url(#lotusPod_${isRightSide})`} />
               <circle cx="-2" cy="-6" r="1.2" fill="#3f6212" />
               <circle cx="2" cy="-6" r="1.2" fill="#3f6212" />
               <circle cx="0" cy="-3" r="1.2" fill="#3f6212" />
             </g>
 
-            {/* Lotus Bud / Pod */}
-            <g transform="translate(104, 52) scale(0.78)">
+            {/* Second Sacred Lotus Bloom (Center-Top) */}
+            <g transform="translate(78, 28) scale(0.90)">
+              <path d="M 0 15 C -22 5 -30 -18 -18 -32 C -5 -22 0 -10 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
+              <path d="M 0 15 C 22 5 30 -18 18 -32 C 5 -22 0 -10 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
+              <path d="M 0 15 C -12 -5 -16 -34 0 -40 C 16 -34 12 -5 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
+              <circle cx="0" cy="-5" r="6" fill={`url(#lotusPod_${isRightSide})`} />
+            </g>
+
+            {/* Third Lotus Bloom (Left Side) */}
+            <g transform="translate(32, 60) scale(0.75)">
+              <path d="M 0 12 C -18 4 -24 -15 -14 -26 C -4 -18 0 -8 0 12 Z" fill={`url(#lotusPetal_${isRightSide})`} />
+              <path d="M 0 12 C 18 4 24 -15 14 -26 C 4 -18 0 -8 0 12 Z" fill={`url(#lotusPetal_${isRightSide})`} />
+              <path d="M 0 12 C -10 -4 -12 -28 0 -34 C 12 -28 10 -4 0 12 Z" fill={`url(#lotusPetal_${isRightSide})`} />
+            </g>
+
+            {/* Lotus Bud (Right) */}
+            <g transform="translate(106, 52) scale(0.78)">
               <path d="M 0 15 C -14 0 -15 -28 0 -35 C 15 -28 14 0 0 15 Z" fill={`url(#lotusPetal_${isRightSide})`} />
               <path d="M 0 15 C -6 0 -8 -25 0 -30 C 8 -25 6 0 0 15 Z" fill="#ffffff" opacity="0.8" />
             </g>
@@ -209,11 +274,13 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
           <g id="chrysanthemumArt">
             <path d="M 75 128 Q 72 85 58 48" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.2" fill="none" strokeLinecap="round" />
             <path d="M 77 128 Q 85 82 98 56" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M 75 128 Q 76 70 78 28" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.0" fill="none" strokeLinecap="round" />
+            <path d="M 74 128 Q 56 86 34 60" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
             {/* Serrated Leaves */}
             <path d="M 50 82 C 32 72 18 80 14 90 C 26 94 44 90 52 84 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
             <path d="M 90 86 C 110 78 126 84 132 94 C 118 98 102 94 88 88 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
 
-            {/* Radiant White Chrysanthemum 1 */}
+            {/* Radiant White Chrysanthemum 1 (Left) */}
             <g transform="translate(58, 48) scale(0.92)">
               {Array.from({ length: 16 }).map((_, i) => (
                 <ellipse 
@@ -243,7 +310,15 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
               <circle cx="0" cy="0" r="5" fill="#ca8a04" />
             </g>
 
-            {/* Radiant White Chrysanthemum 2 */}
+            {/* Radiant White Chrysanthemum 2 (Top Crown) */}
+            <g transform="translate(78, 28) scale(0.88)">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <ellipse key={i} cx="0" cy="-16" rx="3.2" ry="15" fill={`url(#chrysPetal_${isRightSide})`} stroke="#e2e8f0" strokeWidth="0.5" transform={`rotate(${i * 22.5})`} />
+              ))}
+              <circle cx="0" cy="0" r="7" fill="#eab308" />
+            </g>
+
+            {/* Radiant White Chrysanthemum 3 (Right) */}
             <g transform="translate(98, 56) scale(0.82)">
               {Array.from({ length: 14 }).map((_, i) => (
                 <ellipse 
@@ -260,6 +335,14 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
               ))}
               <circle cx="0" cy="0" r="7" fill="#eab308" />
             </g>
+
+            {/* Radiant White Chrysanthemum 4 (Left Side) */}
+            <g transform="translate(34, 60) scale(0.70)">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <ellipse key={i} cx="0" cy="-14" rx="3.0" ry="12" fill={`url(#chrysPetal_${isRightSide})`} stroke="#e2e8f0" strokeWidth="0.5" transform={`rotate(${i * 30})`} />
+              ))}
+              <circle cx="0" cy="0" r="5" fill="#eab308" />
+            </g>
           </g>
         )}
 
@@ -267,11 +350,13 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
           <g id="rosesArt">
             <path d="M 75 128 Q 71 85 55 48" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.4" fill="none" strokeLinecap="round" />
             <path d="M 77 128 Q 86 85 100 58" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.4" fill="none" strokeLinecap="round" />
+            <path d="M 75 128 Q 75 70 76 26" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="3.0" fill="none" strokeLinecap="round" />
+            <path d="M 74 128 Q 56 86 36 56" stroke={`url(#stemGrad_${flowerType}_${isRightSide})`} strokeWidth="2.8" fill="none" strokeLinecap="round" />
             {/* Rose Leaves */}
             <path d="M 48 76 C 30 68 20 76 16 86 C 28 90 44 86 52 80 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
             <path d="M 92 84 C 112 78 124 84 130 94 C 116 96 102 92 90 86 Z" fill={`url(#leafGrad_${flowerType}_${isRightSide})`} />
 
-            {/* Main Champagne Rose */}
+            {/* Main Champagne Rose (Left) */}
             <g transform="translate(55, 48) scale(0.95)">
               <circle cx="0" cy="0" r="24" fill={`url(#roseChampagne_${isRightSide})`} />
               <path d="M -16 -8 C -18 -20 4 -22 14 -14 C 22 -4 18 12 8 18 C -6 20 -14 8 -16 -8 Z" fill="#fed7aa" />
@@ -279,11 +364,24 @@ export const ItemVase: React.FC<ItemVaseProps> = ({
               <path d="M -4 -6 C 2 -10 8 -4 6 2 C 4 6 0 6 -2 4 Z" fill="#ffedd5" />
             </g>
 
-            {/* Secondary Champagne Rose */}
+            {/* Top Crown Champagne Rose (Center-Top) */}
+            <g transform="translate(76, 26) scale(0.90)">
+              <circle cx="0" cy="0" r="22" fill={`url(#roseChampagne_${isRightSide})`} />
+              <path d="M -14 -6 C -16 -18 2 -18 10 -10 C 16 -2 14 10 6 14 C -4 16 -12 6 -14 -6 Z" fill="#fed7aa" />
+              <path d="M -6 -8 C 0 -14 8 -8 8 0 C 6 6 0 6 -4 4 Z" fill="#fff7ed" />
+            </g>
+
+            {/* Secondary Champagne Rose (Right) */}
             <g transform="translate(100, 58) scale(0.82)">
               <circle cx="0" cy="0" r="22" fill={`url(#roseChampagne_${isRightSide})`} />
               <path d="M -14 -6 C -16 -18 2 -18 10 -10 C 16 -2 14 10 6 14 C -4 16 -12 6 -14 -6 Z" fill="#fed7aa" />
               <path d="M -6 -8 C 0 -14 8 -8 8 0 C 6 6 0 6 -4 4 Z" fill="#fff7ed" />
+            </g>
+
+            {/* Rose Blossom 4 (Left Side) */}
+            <g transform="translate(36, 56) scale(0.72)">
+              <circle cx="0" cy="0" r="18" fill={`url(#roseChampagne_${isRightSide})`} />
+              <path d="M -10 -4 C -12 -14 2 -14 8 -8 C 12 -2 10 8 4 10 C -4 12 -8 4 -10 -4 Z" fill="#fed7aa" />
             </g>
           </g>
         )}

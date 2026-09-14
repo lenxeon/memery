@@ -21,6 +21,7 @@ interface FlowerPickerModalProps {
   rightVaseFlower?: FlowerType;
   offeredCount?: number;
   onClearOfferedFlowers?: () => void;
+  onFillTenFlowers?: () => void;
 }
 
 export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
@@ -32,6 +33,7 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
   rightVaseFlower = 'lilies',
   offeredCount = 0,
   onClearOfferedFlowers,
+  onFillTenFlowers,
 }) => {
   const [activeTab, setActiveTab] = useState<'offer' | 'vases'>('offer');
   const [selectedFlower, setSelectedFlower] = useState<FlowerType>('peonies');
@@ -162,23 +164,39 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
         {/* TAB 1: 献花到供案桌面 */}
         {activeTab === 'offer' && (
           <div>
-            <div className="flex items-center justify-between mb-2 px-1">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 px-1">
               <span className="text-xs text-stone-600 font-medium">
-                点击下列任一花束，即刻敬献至案前（可在案上自由拖动）：
+                点击花束即刻敬献，或一键布设花海：
               </span>
-              {offeredCount > 0 && onClearOfferedFlowers && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    sound.playWoodPlacement();
-                    onClearOfferedFlowers();
-                  }}
-                  className="text-[11px] text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer hover:underline"
-                >
-                  <Trash2 size={12} />
-                  <span>撤下案上捧花</span>
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {onFillTenFlowers && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFillTenFlowers();
+                      onClose();
+                    }}
+                    className="text-[11px] text-amber-800 bg-amber-100/90 hover:bg-amber-200/90 border border-amber-300/80 px-2.5 py-1 rounded-lg flex items-center gap-1 cursor-pointer transition-all active:scale-95 font-medium shadow-2xs"
+                    title="一键将供案布满十捧繁花锦簇"
+                  >
+                    <Sparkles size={12} className="text-amber-600" />
+                    <span>一键布设十捧花海</span>
+                  </button>
+                )}
+                {offeredCount > 0 && onClearOfferedFlowers && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playWoodPlacement();
+                      onClearOfferedFlowers();
+                    }}
+                    className="text-[11px] text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer hover:underline"
+                  >
+                    <Trash2 size={12} />
+                    <span>清空桌面</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">

@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SceneItem, SceneItemId, LightingSettings } from '../types';
 import { ItemVase } from './ItemVase';
 import { ItemOfferedBouquet } from './ItemOfferedBouquet';
 import { ItemCenser } from './ItemCenser';
 import { ItemCandle } from './ItemCandle';
 import { sound } from '../utils/audio';
-import { RotateCcw, Move } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 interface DraggableAltarTableProps {
   items: Record<SceneItemId, SceneItem>;
@@ -28,11 +28,38 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
 }) => {
   const [activeDragId, setActiveDragId] = useState<SceneItemId | null>(null);
   const dragStartRef = useRef<{ startX: number; startY: number; itemX: number; itemY: number } | null>(null);
+  const tableRef = useRef<HTMLDivElement | null>(null);
+  const [tableScale, setTableScale] = useState(1);
+
+  // Responsive scale tracker ensures items stay locked to the tabletop across all screen widths
+  useEffect(() => {
+    if (!tableRef.current) return;
+    const el = tableRef.current;
+    const updateScale = () => {
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) {
+        setTableScale(Math.min(1, w / 560));
+      }
+    };
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Table surface limits in px
   const BOUNDS_X = 220;
   const BOUNDS_Y_MIN = -18; // further back on the 3D table surface
   const BOUNDS_Y_MAX = 24;  // front edge of table surface
+
+  // Magnetic snapping thresholds (unscaled units)
+  const SNAP_CENTER_X = 14;   // Snap to central axis (X = 0) within 14px
+  const SNAP_MIRROR_X = 12;   // Snap to symmetrical partner within 12px
+  const SNAP_DEPTH_Y = 6;     // Snap to partner depth within 6px
+
+  const [snapInfo, setSnapInfo] = useState<{ type: 'center' | 'mirror'; x: number } | null>(null);
 
   const handlePointerDown = (id: SceneItemId, e: React.PointerEvent) => {
     e.stopPropagation();
@@ -52,8 +79,9 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!activeDragId || !dragStartRef.current) return;
-    const dx = e.clientX - dragStartRef.current.startX;
-    const dy = e.clientY - dragStartRef.current.startY;
+    const safeScale = Math.max(0.4, tableScale);
+    const dx = (e.clientX - dragStartRef.current.startX) / safeScale;
+    const dy = (e.clientY - dragStartRef.current.startY) / safeScale;
 
     let newX = dragStartRef.current.itemX + dx;
     let newY = dragStartRef.current.itemY + dy;
@@ -61,6 +89,57 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
     newX = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, newX));
     newY = Math.max(BOUNDS_Y_MIN, Math.min(BOUNDS_Y_MAX, newY));
 
+    let currentSnap: { type: 'center' | 'mirror'; x: number } | null = null;
+
+    // 1. Center Axis Snap for Censer (or any item brought to center)
+    if (Math.abs(newX) < SNAP_CENTER_X) {
+      newX = 0;
+      currentSnap = { type: 'center', x: 0 };
+    }
+
+    // 2. Symmetrical Mirror Snap for Candle Pairs
+    if (activeDragId === 'candle_left' && items.candle_right) {
+      const mirrorTargetX = -items.candle_right.position.x;
+      if (Math.abs(newX - mirrorTargetX) < SNAP_MIRROR_X) {
+        newX = mirrorTargetX;
+        currentSnap = { type: 'mirror', x: newX };
+      }
+      if (Math.abs(newY - items.candle_right.position.y) < SNAP_DEPTH_Y) {
+        newY = items.candle_right.position.y;
+      }
+    } else if (activeDragId === 'candle_right' && items.candle_left) {
+      const mirrorTargetX = -items.candle_left.position.x;
+      if (Math.abs(newX - mirrorTargetX) < SNAP_MIRROR_X) {
+        newX = mirrorTargetX;
+        currentSnap = { type: 'mirror', x: newX };
+      }
+      if (Math.abs(newY - items.candle_left.position.y) < SNAP_DEPTH_Y) {
+        newY = items.candle_left.position.y;
+      }
+    }
+
+    // 3. Symmetrical Mirror Snap for Vase Pairs
+    if (activeDragId === 'vase_left' && items.vase_right) {
+      const mirrorTargetX = -items.vase_right.position.x;
+      if (Math.abs(newX - mirrorTargetX) < SNAP_MIRROR_X) {
+        newX = mirrorTargetX;
+        currentSnap = { type: 'mirror', x: newX };
+      }
+      if (Math.abs(newY - items.vase_right.position.y) < SNAP_DEPTH_Y) {
+        newY = items.vase_right.position.y;
+      }
+    } else if (activeDragId === 'vase_right' && items.vase_left) {
+      const mirrorTargetX = -items.vase_left.position.x;
+      if (Math.abs(newX - mirrorTargetX) < SNAP_MIRROR_X) {
+        newX = mirrorTargetX;
+        currentSnap = { type: 'mirror', x: newX };
+      }
+      if (Math.abs(newY - items.vase_left.position.y) < SNAP_DEPTH_Y) {
+        newY = items.vase_left.position.y;
+      }
+    }
+
+    setSnapInfo(currentSnap);
     onUpdateItemPosition(activeDragId, { x: newX, y: newY });
   };
 
@@ -74,12 +153,18 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
       }
       setActiveDragId(null);
       dragStartRef.current = null;
+      setSnapInfo(null);
     }
   };
 
   // Depth sort based on Y position (items with smaller Y are further back, rendered first)
   const sortedItemIds: SceneItemId[] = Object.keys(items)
     .sort((a, b) => (items[a]?.position.y || 0) - (items[b]?.position.y || 0));
+
+  const isSymmetrical = 
+    Math.abs(items.censer?.position.x || 0) <= 2 &&
+    Math.abs((items.candle_left?.position.x || 0) + (items.candle_right?.position.x || 0)) <= 2 &&
+    Math.abs((items.vase_left?.position.x || 0) + (items.vase_right?.position.x || 0)) <= 2;
 
   const renderItemContent = (id: SceneItemId) => {
     const item = items[id];
@@ -88,7 +173,7 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
     if (id.startsWith('offered_flower')) {
       return (
         <ItemOfferedBouquet
-          flowerType={item.flowerType || 'peonies'}
+          flowerType={item.flowerType || 'lilies'}
           scale={0.96}
           isArrangeMode={isArrangeMode}
           onRemove={() => onRemoveItem?.(id)}
@@ -100,18 +185,20 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
       case 'vase_left':
         return (
           <ItemVase
-            flowerType={item.flowerType || 'peonies'}
+            flowerType={item.flowerType || 'lilies'}
             scale={0.96}
             isRightSide={false}
           />
         );
       case 'vase_right':
         return (
-          <ItemVase
-            flowerType={item.flowerType || 'lilies'}
-            scale={0.96}
-            isRightSide={true}
-          />
+          <div style={{ transform: 'scaleX(-1)' }}>
+            <ItemVase
+              flowerType={item.flowerType || 'lilies'}
+              scale={0.96}
+              isRightSide={true}
+            />
+          </div>
         );
       case 'censer':
         return (
@@ -121,6 +208,8 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
             windForce={lighting.windForce}
             density={lighting.masterOn ? 1 : 0.5}
             sunlightIntensity={lighting.sunlightIntensity}
+            masterOn={lighting.masterOn}
+            timeOfDay={lighting.timeOfDay}
             scale={0.98}
           />
         );
@@ -154,87 +243,103 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
 
   return (
     <div 
-      className="relative w-full max-w-[580px] h-[340px] flex flex-col items-center justify-end select-none pointer-events-auto"
+      className="relative w-full max-w-[560px] flex flex-col items-center justify-end select-none pointer-events-auto"
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
-      {/* Arrange Mode Floating Helper Indicator */}
-      <div className="absolute -top-7 inset-x-2 flex items-center justify-between px-2 text-xs pointer-events-auto z-40">
-        <div className="flex items-center gap-1.5 text-stone-700 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full border border-amber-200/80 shadow-xs">
-          <Move size={12} className="text-amber-800 animate-pulse" />
-          <span className="text-[11px] sm:text-xs">
-            {isArrangeMode ? '可随意按住拖动花瓶、烛台与香炉' : '按住案上任一物件可自由拖曳摆放'}
-          </span>
-        </div>
-
+      {/* Symmetrical Reset Icon Button */}
+      <div className="absolute -top-9 inset-x-0 flex justify-end px-2 pointer-events-auto z-40">
         <button
           type="button"
           onClick={onResetLayout}
-          title="重置为对称规范排布"
-          className="flex items-center gap-1 bg-white/85 hover:bg-white text-stone-700 px-2.5 py-1 rounded-full border border-stone-200/80 shadow-xs transition-all text-[11px] cursor-pointer active:scale-95"
+          title="对称复位（花、烛、香对齐中轴）"
+          aria-label="对称复位"
+          className={`w-7 h-7 flex items-center justify-center rounded-full border shadow-xs transition-all cursor-pointer active:scale-90 ${
+            isSymmetrical 
+              ? 'bg-white/85 hover:bg-white text-stone-600 hover:text-stone-900 border-stone-200/80' 
+              : 'bg-amber-50/95 hover:bg-amber-100 text-amber-800 border-amber-300/90 shadow-amber-500/20 animate-pulse'
+          }`}
         >
-          <RotateCcw size={11} />
-          <span>对称复位</span>
+          <RotateCcw size={13} className={isSymmetrical ? '' : 'text-amber-700'} />
         </button>
       </div>
 
-      {/* Layer A: Draggable Items sitting on the 3D tabletop surface plane */}
-      {/* The tabletop top plane is at Y: bottom-[125px] */}
-      <div className="absolute bottom-[128px] left-1/2 -translate-x-1/2 w-[520px] h-0 pointer-events-none z-30">
-        {sortedItemIds.map((id) => {
-          const item = items[id];
-          if (!item) return null;
-
-          const isDragging = activeDragId === id;
-          // Items placed further back (smaller y) appear slightly smaller for true 3D perspective
-          const perspectiveScale = 1 + (item.position.y / 80) * 0.08;
-          // Contact shadow on the wooden tabletop
-          const shadowSize = id.includes('vase') ? 68 : id.includes('censer') ? 56 : id.includes('offered') ? 85 : 38;
-          const shadowSpread = id.includes('vase') ? 16 : id.includes('censer') ? 14 : id.includes('offered') ? 16 : 10;
-
-          return (
-            <div
-              key={id}
-              onPointerDown={(e) => handlePointerDown(id, e)}
-              className={`absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto cursor-grab active:cursor-grabbing ${
-                isDragging ? 'z-50 scale-105' : 'z-20'
-              }`}
-              style={{
-                transform: `translate3d(calc(-50% + ${item.position.x}px), ${item.position.y + (isDragging ? -10 : 0)}px, 0) scale(${perspectiveScale})`,
-                transition: isDragging ? 'none' : 'transform 0.16s cubic-bezier(0.2, 0.9, 0.4, 1), scale 0.16s ease-out',
-              }}
-            >
-              {/* Elliptical Contact Shadow cast directly on the wooden tabletop */}
-              <div
-                className="absolute bottom-1 rounded-[100%] pointer-events-none transition-all"
-                style={{
-                  width: shadowSize,
-                  height: shadowSpread,
-                  backgroundColor: 'rgba(50, 32, 16, 0.42)',
-                  filter: isDragging ? 'blur(6px)' : 'blur(2px)',
-                  transform: `translate(${shadowTiltX}px, ${4 + item.position.y * 0.05}px) scale(${isDragging ? 1.3 : 1})`,
-                  opacity: isDragging ? 0.25 : 0.65,
-                }}
-              />
-
-              {/* Arrange Mode dashed highlight halo */}
-              {isArrangeMode && (
-                <div className="absolute -inset-2 rounded-2xl border border-dashed border-amber-600/70 bg-amber-400/10 pointer-events-none animate-pulse" />
+      {/* Unified Responsive Table & Items Container */}
+      <div 
+        ref={tableRef}
+        className="relative w-full aspect-[560/160] select-none pointer-events-none z-20"
+      >
+        {/* Layer A: Draggable Items locked to the 3D tabletop surface plane */}
+        {/* At aspect ratio 560/160, the wooden tabletop top plane is at bottom-[71%] */}
+        <div className="absolute bottom-[71%] left-0 w-full h-0 pointer-events-none z-30">
+          {/* Sacred Center Axis Guide Line & Snap Indicator */}
+          {(isArrangeMode || snapInfo !== null) && (
+            <div className="absolute -top-36 bottom-0 left-1/2 -translate-x-1/2 w-0 pointer-events-none z-10 flex flex-col items-center">
+              <div className="w-[1px] h-44 bg-gradient-to-b from-amber-400/0 via-amber-400/80 to-amber-500/0 border-r border-dashed border-amber-400/70" />
+              {snapInfo && (
+                <div className="absolute -top-7 px-2.5 py-0.5 rounded-full bg-stone-900/90 text-[11px] font-medium text-amber-200 border border-amber-400/50 backdrop-blur-xs whitespace-nowrap shadow-lg animate-in fade-in zoom-in-95 duration-150 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                  {snapInfo.type === 'center' ? '已精准吸附中轴' : '已严格对称对齐'}
+                </div>
               )}
-
-              {renderItemContent(id)}
             </div>
-          );
-        })}
-      </div>
+          )}
 
-      {/* Layer B: Ultra-Realistic 3D Japanese Zen Wooden Altar Table (榻榻米供案) */}
-      <div className="relative w-full max-w-[560px] h-[160px] select-none pointer-events-none z-20">
+          {sortedItemIds.map((id) => {
+            const item = items[id];
+            if (!item) return null;
+
+            const isDragging = activeDragId === id;
+            // Scale positions and sizes proportionally with tableScale to ensure items never fall off the table
+            const posX = item.position.x * tableScale;
+            const posY = item.position.y * tableScale;
+            const perspectiveScale = (1 + (item.position.y / 80) * 0.08) * Math.max(0.72, tableScale);
+
+            // Contact shadow on the wooden tabletop
+            const shadowSize = (id.includes('vase') ? 68 : id.includes('censer') ? 56 : id.includes('offered') ? 85 : 38) * tableScale;
+            const shadowSpread = (id.includes('vase') ? 16 : id.includes('censer') ? 14 : id.includes('offered') ? 16 : 10) * tableScale;
+
+            return (
+              <div
+                key={id}
+                onPointerDown={(e) => handlePointerDown(id, e)}
+                className={`absolute bottom-0 left-1/2 flex flex-col items-center pointer-events-auto cursor-grab active:cursor-grabbing ${
+                  isDragging ? 'z-50 scale-105' : 'z-20'
+                }`}
+                style={{
+                  transform: `translate3d(calc(-50% + ${posX}px), ${posY + (isDragging ? -10 : 0)}px, 0) scale(${perspectiveScale})`,
+                  transition: isDragging ? 'none' : 'transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), scale 0.2s ease-out',
+                }}
+              >
+                {/* Elliptical Contact Shadow cast directly on the wooden tabletop */}
+                <div
+                  className="absolute bottom-1 rounded-[100%] pointer-events-none transition-all"
+                  style={{
+                    width: shadowSize,
+                    height: shadowSpread,
+                    background: 'radial-gradient(ellipse, rgba(50, 32, 16, 0.5) 0%, rgba(50, 32, 16, 0.2) 45%, transparent 75%)',
+                    transform: `translate(${shadowTiltX}px, ${4 + posY * 0.05}px) scale(${isDragging ? 1.3 : 1})`,
+                    opacity: isDragging ? 0.25 : 0.65,
+                  }}
+                />
+
+                {/* Arrange Mode dashed highlight halo */}
+                {isArrangeMode && (
+                  <div className="absolute -inset-2 rounded-2xl border border-dashed border-amber-600/70 bg-amber-400/10 pointer-events-none animate-pulse" />
+                )}
+
+                {renderItemContent(id)}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Layer B: Ultra-Realistic 3D Japanese Zen Wooden Altar Table (榻榻米供案) */}
         <svg 
           viewBox="0 0 560 160" 
-          className="w-full h-full filter drop-shadow-2xl"
-          preserveAspectRatio="xMidYMid meet"
+          className="w-full h-full drop-shadow-xl"
+          preserveAspectRatio="none"
         >
           <defs>
             {/* 1. Top Tabletop Surface Gradient (Sunlit warm blonde oak wood) */}
@@ -289,10 +394,12 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
               <stop offset="100%" stopColor="#9b734c" />
             </linearGradient>
 
-            {/* 7. Ambient Occlusion Shadow Filter */}
-            <filter id="tableSoftShadow" x="-15%" y="-15%" width="130%" height="130%">
-              <feGaussianBlur stdDeviation="8" />
-            </filter>
+            {/* 7. Soft Ambient Floor Shadow Gradient (Zero blur penalty) */}
+            <radialGradient id="tableFloorShadowGrad" cx="50%" cy="50%" rx="50%" ry="50%">
+              <stop offset="0%" stopColor="#3a2211" stopOpacity="0.58" />
+              <stop offset="55%" stopColor="#3a2211" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#3a2211" stopOpacity="0" />
+            </radialGradient>
           </defs>
 
           {/* === UNDER-STRUCTURE (Recessed Base & Pedestal Legs) === */}
@@ -401,10 +508,8 @@ export const DraggableAltarTable: React.FC<DraggableAltarTableProps> = ({
             cx={280 + shadowTiltX * 1.5}
             cy="146"
             rx="270"
-            ry="11"
-            fill="#3a2211"
-            opacity="0.55"
-            filter="url(#tableSoftShadow)"
+            ry="12"
+            fill="url(#tableFloorShadowGrad)"
           />
         </svg>
       </div>

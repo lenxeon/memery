@@ -7,6 +7,8 @@ interface ItemCenserProps {
   windForce?: number;
   density?: number;
   sunlightIntensity?: number;
+  masterOn?: boolean;
+  timeOfDay?: 'day' | 'sunset' | 'night';
   scale?: number;
   className?: string;
 }
@@ -17,6 +19,8 @@ export const ItemCenser: React.FC<ItemCenserProps> = ({
   windForce = 0,
   density = 1,
   sunlightIntensity = 0.8,
+  masterOn = true,
+  timeOfDay = 'day',
   scale = 1,
   className = '',
 }) => {
@@ -38,6 +42,8 @@ export const ItemCenser: React.FC<ItemCenserProps> = ({
           windForce={windForce}
           density={density}
           sunlightIntensity={sunlightIntensity}
+          masterOn={masterOn}
+          timeOfDay={timeOfDay}
         />
       </div>
 
