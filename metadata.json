@@ -1,0 +1,6 @@
+{
+  "name": "暖念场景模拟器",
+  "description": "高度还原温馨纪念与祈福场景的物理模拟应用，支持物体拖拽移动、灯光开关、丁达尔光线、真实火苗与香炉青烟模拟。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
