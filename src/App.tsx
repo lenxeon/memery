@@ -13,18 +13,16 @@ import {
   FruitType,
   WorldContext,
   EntityTypeId,
-  TableclothStyle,
-  WallBackgroundStyle
+  TableclothStyle
 } from './types';
 import { WindowArch } from './components/WindowArch';
-import { SceneAmbientFx } from './components/SceneAmbientFx';
 import { VolumetricRays } from './components/VolumetricRays';
 import { DustMotes } from './components/DustMotes';
 import { FloorPlanks } from './components/FloorPlanks';
 import { PortraitFrame } from './components/PortraitFrame';
 import { DraggableAltarTable } from './components/DraggableAltarTable';
 import { PetalShower } from './components/PetalShower';
-import { LightingPanel, WALL_BACKGROUND_OPTIONS } from './components/LightingPanel';
+import { LightingPanel } from './components/LightingPanel';
 import { FlowerPickerModal } from './components/FlowerPickerModal';
 import { BlessingModal } from './components/BlessingModal';
 import { BottomDock } from './components/BottomDock';
@@ -111,24 +109,6 @@ export default function App() {
   // Petal shower animation trigger
   const [petalTrigger, setPetalTrigger] = useState(0);
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
-
-  // Background wall & scenery style (7 大场景装潢风格)
-  const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('spring_sakura');
-
-  const handleWallStyleChange = (newStyle: WallBackgroundStyle, autoLinkDecor = true) => {
-    setWallStyle(newStyle);
-    const opt = WALL_BACKGROUND_OPTIONS.find((o) => o.id === newStyle);
-    if (autoLinkDecor && opt) {
-      if (opt.recommendedTablecloth) {
-        setTableclothStyle(opt.recommendedTablecloth);
-      }
-      if (opt.recommendedTimeOfDay) {
-        setLighting((prev) => ({ ...prev, timeOfDay: opt.recommendedTimeOfDay! }));
-      }
-    }
-    sound.playBell(560, 2);
-    showToast(`已切换背景装潢为「${opt?.season || ''} · ${opt?.name || ''}」`);
-  };
 
   // Toast / notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -414,20 +394,6 @@ export default function App() {
         {/* Left: FPS Monitor in dev mode & Theme Badge */}
         <div className="flex items-center gap-2">
           {import.meta.env.DEV && <FpsMonitor />}
-          <button
-            type="button"
-            onClick={() => setIsLightingOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white border border-amber-200/80 shadow-xs text-xs font-medium text-stone-700 transition-all cursor-pointer hover:shadow-sm"
-            title="点击切换背景墙风格与场景装潢"
-          >
-            <span className="text-sm">{WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.iconText || '🌸'}</span>
-            <span className="font-serif text-amber-950 font-semibold">
-              {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.season} · {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.name}
-            </span>
-            <span className="hidden sm:inline text-[10px] text-amber-700/80 bg-amber-100/70 px-1.5 py-0.5 rounded-full">
-              切换风格
-            </span>
-          </button>
         </div>
 
         {/* Quick controls on right */}
@@ -526,17 +492,13 @@ export default function App() {
 
       {/* Core Simulation Stage */}
       <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden">
-        {/* Layer 1: Cathedral Window with Themed Arch / Moon Gate */}
+        {/* Layer 1: Cathedral Window with Sky */}
         <WindowArch
           masterOn={lighting.masterOn}
           sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
           timeOfDay={lighting.timeOfDay}
           sunAngle={lighting.sunAngle}
-          wallStyle={wallStyle}
         />
-
-        {/* Layer 1.5: Dynamic Ambient Theme FX (🌸Sakura / 🌌Fireflies / 🍁Maples / ❄️Snow / 🎋Bamboo) */}
-        <SceneAmbientFx wallStyle={wallStyle} lighting={lighting} />
 
         {/* Layer 2: Volumetric Rays (Tyndall Light Beams / God Rays) */}
         <VolumetricRays
@@ -625,8 +587,6 @@ export default function App() {
         }}
         showPetals={showPetals}
         onTogglePetals={() => setShowPetals((v) => !v)}
-        wallStyle={wallStyle}
-        onChangeWallStyle={handleWallStyleChange}
         timeScale={timeScale}
         onUpdateTimeScale={setTimeScale}
       />

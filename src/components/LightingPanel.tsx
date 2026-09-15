@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LightingSettings, TimeOfDay, TableclothStyle, WallBackgroundStyle } from '../types';
+import { LightingSettings, TimeOfDay, TableclothStyle } from '../types';
 import { 
   Sun, 
   Moon, 
@@ -30,33 +30,11 @@ interface LightingPanelProps {
   onToggleTableRunner?: () => void;
   tableclothStyle?: TableclothStyle;
   onChangeTableclothStyle?: (style: TableclothStyle) => void;
-  wallStyle?: WallBackgroundStyle;
-  onChangeWallStyle?: (style: WallBackgroundStyle, autoLinkDecor?: boolean) => void;
   showPetals?: boolean;
   onTogglePetals?: () => void;
   timeScale?: number;
   onUpdateTimeScale?: (scale: number) => void;
 }
-
-export const WALL_BACKGROUND_OPTIONS: { 
-  id: WallBackgroundStyle; 
-  name: string; 
-  season: string; 
-  desc: string; 
-  recommendedTablecloth: TableclothStyle;
-  recommendedTimeOfDay?: TimeOfDay;
-  color: string; 
-  accentColor: string;
-  iconText: string;
-}[] = [
-  { id: 'spring_sakura', season: '春', name: '樱粉细语', desc: '淡粉白拱窗 · 飘落樱花 · 柔光散景 · 奶油系', recommendedTablecloth: 'moonlight_white', recommendedTimeOfDay: 'day', color: '#fce7f3', accentColor: '#f472b6', iconText: '🌸' },
-  { id: 'summer_firefly', season: '夏', name: '星夜流萤', desc: '深蓝夜空 · 金框拱窗 · 繁星明月 · 呼吸流萤', recommendedTablecloth: 'indigo_linen', recommendedTimeOfDay: 'night', color: '#0f172a', accentColor: '#fbbf24', iconText: '🌌' },
-  { id: 'autumn_maple', season: '秋', name: '暖阳枫语', desc: '米金拱窗 · 红枫旋舞 · 暖阳金光 · 橙黄秋意', recommendedTablecloth: 'autumn_gold', recommendedTimeOfDay: 'sunset', color: '#fef3c7', accentColor: '#d97706', iconText: '🍁' },
-  { id: 'winter_snow', season: '冬', name: '静雪围炉', desc: '窗外落雪 · 窗角冰晶霜花 · 壁炉微火暖晕', recommendedTablecloth: 'cinnabar_red', recommendedTimeOfDay: 'night', color: '#e2e8f0', accentColor: '#ea580c', iconText: '❄️' },
-  { id: 'zen_bamboo', season: '禅', name: '竹林月门', desc: '正圆中式月洞门 · 水墨远山 · 青竹摇曳 · 东方留白', recommendedTablecloth: 'moonlight_white', recommendedTimeOfDay: 'day', color: '#f1f5f9', accentColor: '#334155', iconText: '🎋' },
-  { id: 'classical_lattice', season: '古典', name: '朱漆花窗', desc: '明清朱漆木雕花格 · 冰裂万字纹描金 · 庄重典雅', recommendedTablecloth: 'cinnabar_red', recommendedTimeOfDay: 'sunset', color: '#881337', accentColor: '#fbbf24', iconText: '🏮' },
-  { id: 'modern_cream', season: '现代', name: '极简奶油', desc: '单一温润奶油色块 · 无窗棂线条 · 莫兰迪留白', recommendedTablecloth: 'moonlight_white', recommendedTimeOfDay: 'day', color: '#faf7f2', accentColor: '#c5bbae', iconText: '🍦' },
-];
 
 const TABLECLOTH_OPTIONS: { 
   id: TableclothStyle; 
@@ -86,15 +64,11 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
   onToggleTableRunner,
   tableclothStyle = 'autumn_gold',
   onChangeTableclothStyle,
-  wallStyle = 'spring_sakura',
-  onChangeWallStyle,
   showPetals = true,
   onTogglePetals,
   timeScale = 1,
   onUpdateTimeScale,
 }) => {
-  const [autoLinkDecor, setAutoLinkDecor] = useState(true);
-
   if (!isOpen) return null;
 
   const handleTimeChange = (tod: TimeOfDay) => {
@@ -157,75 +131,6 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
                 }`}
               />
             </button>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════════
-              背景墙头与场景装潢 (7 大风格选择)
-             ══════════════════════════════════════════════════════════════════ */}
-          <div className="space-y-2 p-3 bg-white rounded-xl border border-stone-200 text-xs">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-medium text-stone-800">
-                <Sparkles size={14} className="text-amber-600" />
-                <span className="font-semibold">背景墙头与场景风格 (7 款可选)</span>
-              </div>
-              <span className="text-[11px] text-amber-800 font-medium">
-                {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.season} · {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.name}
-              </span>
-            </div>
-
-            {/* 联动推荐选项开关 */}
-            <div className="flex items-center justify-between py-1 px-1 text-[11px] text-stone-500 border-b border-stone-100">
-              <span>一键联动对应桌布与光影天色</span>
-              <button
-                type="button"
-                onClick={() => setAutoLinkDecor(!autoLinkDecor)}
-                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
-                  autoLinkDecor ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-stone-100 text-stone-500'
-                }`}
-              >
-                {autoLinkDecor ? '已启用智能联动' : '仅更改背景墙'}
-              </button>
-            </div>
-
-            {/* 7 款风格卡片网格 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
-              {WALL_BACKGROUND_OPTIONS.map((opt) => {
-                const isSelected = wallStyle === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => {
-                      sound.playBell(520, 2);
-                      onChangeWallStyle?.(opt.id, autoLinkDecor);
-                    }}
-                    className={`flex items-center gap-2 p-2 rounded-xl border text-left transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-amber-50/95 border-amber-500 ring-1 ring-amber-500/40 shadow-xs'
-                        : 'bg-stone-50/80 hover:bg-stone-100 border-stone-200/80 text-stone-600'
-                    }`}
-                  >
-                    <div 
-                      className="w-7 h-7 rounded-lg border shadow-xs flex items-center justify-center shrink-0 text-sm"
-                      style={{ background: opt.color, borderColor: opt.accentColor }}
-                    >
-                      {opt.iconText}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1">
-                        <span className={`text-[11px] ${isSelected ? 'text-amber-950 font-semibold' : 'text-stone-800 font-medium'}`}>
-                          {opt.season} · {opt.name}
-                        </span>
-                        {isSelected && <Check size={11} className="text-amber-600 stroke-[3]" />}
-                      </div>
-                      <div className="text-[9.5px] text-stone-500 truncate mt-0.5">
-                        {opt.desc}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           {/* Time of Day Presets */}
