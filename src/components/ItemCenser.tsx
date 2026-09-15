@@ -1,5 +1,7 @@
 import React from 'react';
 import { IncenseSmoke } from './IncenseSmoke';
+import { ItemLifecycle } from '../game/types/entity';
+import { Sparkles } from 'lucide-react';
 
 interface ItemCenserProps {
   isLit: boolean;
@@ -11,6 +13,8 @@ interface ItemCenserProps {
   timeOfDay?: 'day' | 'sunset' | 'night';
   scale?: number;
   className?: string;
+  incenseHealth?: number; // 0.0 ~ 1.0 (剩余香长比例)
+  lifecycle?: ItemLifecycle;
 }
 
 export const ItemCenser: React.FC<ItemCenserProps> = ({
@@ -23,15 +27,36 @@ export const ItemCenser: React.FC<ItemCenserProps> = ({
   timeOfDay = 'day',
   scale = 1,
   className = '',
+  incenseHealth = 1.0,
+  lifecycle,
 }) => {
+  const health = lifecycle?.health ?? incenseHealth;
+  const stage = lifecycle?.stage || 'blooming';
+  const isExpired = stage === 'expired' || health <= 0.05;
+
+  let stageLabel = '青烟袅袅';
+  if (stage === 'blooming') stageLabel = '初献高香';
+  else if (stage === 'wilting') stageLabel = '香过半柱';
+  else if (stage === 'withered') stageLabel = '余烬残香';
+  else if (stage === 'expired') stageLabel = '燃毕留香脚';
+
   return (
     <div 
-      className={`relative select-none flex flex-col items-center ${className}`}
+      className={`relative select-none flex flex-col items-center group ${className}`}
       style={{
         width: 100 * scale,
         height: 140 * scale,
       }}
+      title={isExpired ? '香火燃毕（保留沉稳香脚 · 点击敬奉新香）' : `青瓷清香香炉（状态：${stageLabel} · 剩余 ${Math.round(health * 100)}% · 点击${isLit ? '熄灭' : '点燃'}）`}
     >
+      {/* 燃尽敬献新香浮标 */}
+      {isExpired && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-amber-950/90 text-[10px] font-medium text-amber-200 border border-amber-400/60 shadow-lg backdrop-blur-xs pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 z-30 whitespace-nowrap">
+          <Sparkles size={11} className="text-amber-400 animate-spin" style={{ animationDuration: '3s' }} />
+          <span>点击敬献新香</span>
+        </div>
+      )}
+
       <div 
         className="absolute -top-44 left-1/2 -translate-x-1/2 pointer-events-auto"
         style={{ width: 160, height: 280 }}
@@ -44,17 +69,17 @@ export const ItemCenser: React.FC<ItemCenserProps> = ({
           sunlightIntensity={sunlightIntensity}
           masterOn={masterOn}
           timeOfDay={timeOfDay}
+          health={health}
         />
       </div>
 
       <div 
         className="absolute bottom-0 w-full h-[52px] cursor-pointer"
         onClick={onToggle}
-        title={isLit ? '点击熄灭香火' : '点击敬点清香'}
       >
         <svg 
           viewBox="0 0 100 52" 
-          className="w-full h-full filter drop-shadow-md"
+          className="w-full h-full"
         >
           <defs>
             <linearGradient id="censerGlazeG" x1="0%" y1="0%" x2="100%" y2="0%">

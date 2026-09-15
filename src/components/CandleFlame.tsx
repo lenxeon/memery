@@ -8,6 +8,7 @@ interface CandleFlameProps {
   glowIntensity?: number;
   scale?: number;
   className?: string;
+  health?: number;
 }
 
 export const CandleFlame: React.FC<CandleFlameProps> = ({
@@ -17,6 +18,7 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
   glowIntensity = 1,
   scale = 1,
   className = '',
+  health = 1.0,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animFrameId = useRef<number | null>(null);
@@ -25,10 +27,10 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
   const emberAlpha = useRef<number>(0);
   const renderRef = useRef<(() => void) | null>(null);
 
-  const propsRef = useRef({ isLit, windForce, glowIntensity, scale });
+  const propsRef = useRef({ isLit, windForce, glowIntensity, scale, health });
   useEffect(() => {
-    propsRef.current = { isLit, windForce, glowIntensity, scale };
-  }, [isLit, windForce, glowIntensity, scale]);
+    propsRef.current = { isLit, windForce, glowIntensity, scale, health };
+  }, [isLit, windForce, glowIntensity, scale, health]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -44,7 +46,7 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
 
     const render = () => {
       time += 0.05;
-      const { isLit: lit, windForce: wind, glowIntensity: glow, scale: sc } = propsRef.current;
+      const { isLit: lit, windForce: wind, glowIntensity: glow, scale: sc, health: hl = 1.0 } = propsRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
@@ -56,15 +58,19 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
       if (lit) {
         emberAlpha.current = 1;
 
+        // 烛火后期自适应减小 (当生机低于 0.4 时平滑缩小至 ~45%)
+        const lateFlameFactor = hl > 0.4 
+          ? 1.0 
+          : Math.max(0.42, 0.42 + 0.58 * (hl / 0.4));
+
         const microFlicker = Math.sin(time * 12) * 0.5 + Math.cos(time * 23) * 0.3;
         const windTilt = wind * 12 + Math.sin(time * 3) * 2;
-        const flameHeight = (38 + Math.sin(time * 7) * 3 + microFlicker * 2) * sc;
-        const flameWidth = (14 + Math.cos(time * 5) * 1.5) * sc;
+        const flameHeight = (38 + Math.sin(time * 7) * 3 + microFlicker * 2) * sc * lateFlameFactor;
+        const flameWidth = (14 + Math.cos(time * 5) * 1.5) * sc * Math.max(0.55, lateFlameFactor);
 
-        // 1. Soft Warm Ambient Glow
-        // IMPORTANT: glowRadius MUST stay within canvas bounds (width 80, centerX 40)
-        // so alpha reaches 0 well before canvas borders to eliminate ANY rectangular edge clipping!
-        const maxGlowRadius = 28 * sc;
+        // 1. Soft Warm Ambient Glow (光晕在后期也同步微缩)
+        const effectiveGlow = glow * (0.35 + 0.65 * lateFlameFactor);
+        const maxGlowRadius = 28 * sc * Math.max(0.5, lateFlameFactor);
         const glowCenterY = baseY - flameHeight * 0.45;
         const radialGlow = ctx.createRadialGradient(
           centerX + windTilt * 0.3,
@@ -74,9 +80,9 @@ export const CandleFlame: React.FC<CandleFlameProps> = ({
           glowCenterY,
           maxGlowRadius
         );
-        radialGlow.addColorStop(0, `rgba(255, 180, 50, ${0.4 * glow})`);
-        radialGlow.addColorStop(0.4, `rgba(255, 130, 20, ${0.18 * glow})`);
-        radialGlow.addColorStop(0.75, `rgba(255, 90, 0, ${0.04 * glow})`);
+        radialGlow.addColorStop(0, `rgba(255, 180, 50, ${0.4 * effectiveGlow})`);
+        radialGlow.addColorStop(0.4, `rgba(255, 130, 20, ${0.18 * effectiveGlow})`);
+        radialGlow.addColorStop(0.75, `rgba(255, 90, 0, ${0.04 * effectiveGlow})`);
         radialGlow.addColorStop(1, 'rgba(255, 90, 0, 0)');
 
         ctx.fillStyle = radialGlow;

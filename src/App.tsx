@@ -9,20 +9,28 @@ import {
   SceneItemId, 
   LightingSettings, 
   MemorialInfo,
-  FlowerType 
+  FlowerType,
+  FruitType,
+  WorldContext,
+  EntityTypeId,
+  TableclothStyle,
+  WallBackgroundStyle
 } from './types';
 import { WindowArch } from './components/WindowArch';
+import { SceneAmbientFx } from './components/SceneAmbientFx';
 import { VolumetricRays } from './components/VolumetricRays';
 import { DustMotes } from './components/DustMotes';
 import { FloorPlanks } from './components/FloorPlanks';
 import { PortraitFrame } from './components/PortraitFrame';
 import { DraggableAltarTable } from './components/DraggableAltarTable';
 import { PetalShower } from './components/PetalShower';
-import { LightingPanel } from './components/LightingPanel';
+import { LightingPanel, WALL_BACKGROUND_OPTIONS } from './components/LightingPanel';
 import { FlowerPickerModal } from './components/FlowerPickerModal';
 import { BlessingModal } from './components/BlessingModal';
 import { BottomDock } from './components/BottomDock';
 import { FpsMonitor } from './components/FpsMonitor';
+import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
+import { useWorldLoop } from './game/lifecycle/useWorldLoop';
 import { sound } from './utils/audio';
 import { 
   Sun, 
@@ -36,110 +44,34 @@ import {
   Heart
 } from 'lucide-react';
 
-const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = {
+export const buildInitialItems = (): Record<SceneItemId, SceneItem> => ({
   // ── Symmetrical Pillars: Vases, Candles, Censer ──
-  vase_left: {
-    id: 'vase_left',
-    name: '富贵牡丹花瓶 (左)',
-    position: { x: -164, y: -4 },
-    flowerType: 'peonies',
-  },
-  vase_right: {
-    id: 'vase_right',
-    name: '纯洁百合花瓶 (右)',
-    position: { x: 164, y: -4 },
-    flowerType: 'lilies',
-  },
-  candle_left: {
-    id: 'candle_left',
-    name: '祈愿烛台 (左)',
-    position: { x: -74, y: 3 },
-    isLit: true,
-  },
-  candle_right: {
-    id: 'candle_right',
-    name: '祈愿烛台 (右)',
-    position: { x: 74, y: 3 },
-    isLit: true,
-  },
-  censer: {
-    id: 'censer',
-    name: '青瓷清香香炉 (中)',
-    position: { x: 0, y: 6 },
-    isLit: true,
-  },
+  vase_left: FloraFactory.createVase('left', 'peonies', { x: -164, y: -4 }),
+  vase_right: FloraFactory.createVase('right', 'lilies', { x: 164, y: -4 }),
+  candle_left: RitualFactory.createCandle('left', { x: -74, y: 3 }, true),
+  candle_right: RitualFactory.createCandle('right', { x: 74, y: 3 }, true),
+  censer: RitualFactory.createCenser({ x: 0, y: 6 }, true),
 
-  // ── Ten Fresh Flower Offerings (十景香花盛供 · 繁花锦簇) ──
-  // 1 & 2: Outer Wings (两侧后翼)
-  offered_flower_1: {
-    id: 'offered_flower_1',
-    name: '敬献 · 重瓣粉牡丹 (左翼)',
-    position: { x: -192, y: 14 },
-    flowerType: 'peonies',
-  },
-  offered_flower_2: {
-    id: 'offered_flower_2',
-    name: '敬献 · 纯白东方百合 (右翼)',
-    position: { x: 192, y: 14 },
-    flowerType: 'lilies',
-  },
+  // ── Auspicious Offerings (香、花、灯、水、果 · 五供齐备) ──
+  fruit_left: VesselFactory.createFruitPlatter('left', 'apples', { x: -118, y: 16 }),
+  fruit_right: VesselFactory.createFruitPlatter('right', 'oranges', { x: 118, y: 16 }),
+  tea_cups: VesselFactory.createTeaCups({ x: 0, y: 22 }),
+  singing_bowl: RitualFactory.createSingingBowl({ x: -62, y: 32 }),
 
-  // 3 & 4: Mid Flanks (瓶烛之间)
-  offered_flower_3: {
-    id: 'offered_flower_3',
-    name: '敬献 · 出尘清莲 (左侧)',
-    position: { x: -124, y: 18 },
-    flowerType: 'lotus',
-  },
-  offered_flower_4: {
-    id: 'offered_flower_4',
-    name: '敬献 · 淡雅香槟玫瑰 (右侧)',
-    position: { x: 124, y: 18 },
-    flowerType: 'roses',
-  },
+  // ── Ten Fresh Flower Offerings (十景香花盛供 · 繁花锦簇 · 带生命周期) ──
+  offered_flower_1: FloraFactory.createOfferedBouquet('peonies', { x: -192, y: 14 }, { id: 'offered_flower_1', name: '敬献 · 重瓣粉牡丹 (左翼)' }),
+  offered_flower_2: FloraFactory.createOfferedBouquet('lilies', { x: 192, y: 14 }, { id: 'offered_flower_2', name: '敬献 · 纯白东方百合 (右翼)' }),
+  offered_flower_3: FloraFactory.createOfferedBouquet('lotus', { x: -152, y: 22 }, { id: 'offered_flower_3', name: '敬献 · 出尘清莲 (左侧)' }),
+  offered_flower_4: FloraFactory.createOfferedBouquet('roses', { x: 152, y: 22 }, { id: 'offered_flower_4', name: '敬献 · 淡雅香槟玫瑰 (右侧)' }),
+  offered_flower_5: FloraFactory.createOfferedBouquet('chrysanthemum', { x: -172, y: 30 }, { id: 'offered_flower_5', name: '敬献 · 高洁白菊 (左中)' }),
+  offered_flower_6: FloraFactory.createOfferedBouquet('roses', { x: 172, y: 30 }, { id: 'offered_flower_6', name: '敬献 · 淡雅香槟玫瑰 (右中)' }),
+  offered_flower_7: FloraFactory.createOfferedBouquet('peonies', { x: -98, y: 28 }, { id: 'offered_flower_7', name: '敬献 · 重瓣粉牡丹 (左身)' }),
+  offered_flower_8: FloraFactory.createOfferedBouquet('chrysanthemum', { x: 98, y: 28 }, { id: 'offered_flower_8', name: '敬献 · 高洁白菊 (右身)' }),
+  offered_flower_9: FloraFactory.createOfferedBouquet('lilies', { x: -30, y: 35 }, { id: 'offered_flower_9', name: '敬献 · 纯白东方百合 (左前)' }),
+  offered_flower_10: FloraFactory.createOfferedBouquet('lotus', { x: 30, y: 35 }, { id: 'offered_flower_10', name: '敬献 · 出尘清莲 (右前)' }),
+});
 
-  // 5 & 6: Mid Outer Arc (中景两侧)
-  offered_flower_5: {
-    id: 'offered_flower_5',
-    name: '敬献 · 高洁白菊 (左中)',
-    position: { x: -160, y: 28 },
-    flowerType: 'chrysanthemum',
-  },
-  offered_flower_6: {
-    id: 'offered_flower_6',
-    name: '敬献 · 淡雅香槟玫瑰 (右中)',
-    position: { x: 160, y: 28 },
-    flowerType: 'roses',
-  },
-
-  // 7 & 8: Candle Flanks (烛台身侧)
-  offered_flower_7: {
-    id: 'offered_flower_7',
-    name: '敬献 · 重瓣粉牡丹 (左身)',
-    position: { x: -82, y: 25 },
-    flowerType: 'peonies',
-  },
-  offered_flower_8: {
-    id: 'offered_flower_8',
-    name: '敬献 · 高洁白菊 (右身)',
-    position: { x: 82, y: 25 },
-    flowerType: 'chrysanthemum',
-  },
-
-  // 9 & 10: Front Center Arc (案台前沿两束)
-  offered_flower_9: {
-    id: 'offered_flower_9',
-    name: '敬献 · 纯白东方百合 (左前)',
-    position: { x: -35, y: 34 },
-    flowerType: 'lilies',
-  },
-  offered_flower_10: {
-    id: 'offered_flower_10',
-    name: '敬献 · 出尘清莲 (右前)',
-    position: { x: 35, y: 34 },
-    flowerType: 'lotus',
-  },
-};
+const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = buildInitialItems();
 
 const INITIAL_LIGHTING: LightingSettings = {
   masterOn: true,
@@ -171,9 +103,32 @@ export default function App() {
   const [isArrangeMode, setIsArrangeMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
+  // Table adornments (桌旗/大桌布与落花瓣)
+  const [showTableRunner, setShowTableRunner] = useState(true);
+  const [tableclothStyle, setTableclothStyle] = useState<TableclothStyle>('autumn_gold');
+  const [showPetals, setShowPetals] = useState(true);
+
   // Petal shower animation trigger
   const [petalTrigger, setPetalTrigger] = useState(0);
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
+
+  // Background wall & scenery style (7 大场景装潢风格)
+  const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('spring_sakura');
+
+  const handleWallStyleChange = (newStyle: WallBackgroundStyle, autoLinkDecor = true) => {
+    setWallStyle(newStyle);
+    const opt = WALL_BACKGROUND_OPTIONS.find((o) => o.id === newStyle);
+    if (autoLinkDecor && opt) {
+      if (opt.recommendedTablecloth) {
+        setTableclothStyle(opt.recommendedTablecloth);
+      }
+      if (opt.recommendedTimeOfDay) {
+        setLighting((prev) => ({ ...prev, timeOfDay: opt.recommendedTimeOfDay! }));
+      }
+    }
+    sound.playBell(560, 2);
+    showToast(`已切换背景装潢为「${opt?.season || ''} · ${opt?.name || ''}」`);
+  };
 
   // Toast / notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -183,6 +138,29 @@ export default function App() {
     setTimeout(() => {
       setToastMessage((prev) => (prev === msg ? null : prev));
     }, 4500);
+  };
+
+  const handleToggleFruit = (id: SceneItemId) => {
+    setItems((prev) => {
+      const item = prev[id];
+      if (!item) return prev;
+      const current = item.fruitType || 'apples';
+      const next: FruitType = current === 'apples' ? 'oranges' : current === 'oranges' ? 'peaches' : 'apples';
+      const fruitNames: Record<FruitType, string> = {
+        apples: '平安红苹果',
+        oranges: '吉祥金蜜柑',
+        peaches: '福寿仙桃',
+      };
+      showToast(`已更换供果为「${fruitNames[next]}」`);
+      return {
+        ...prev,
+        [id]: {
+          ...item,
+          fruitType: next,
+          name: `${fruitNames[next]}高足盘 (${id.includes('left') ? '左' : '右'})`,
+        },
+      };
+    });
   };
 
   const updateItemPosition = (id: SceneItemId, pos: { x: number; y: number }) => {
@@ -196,42 +174,96 @@ export default function App() {
   };
 
   const toggleItemLit = (id: SceneItemId) => {
-    setItems((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        isLit: !prev[id].isLit,
-      },
-    }));
+    setItems((prev) => {
+      const item = prev[id];
+      if (!item) return prev;
+      const inferredType: EntityTypeId = (item.type || (
+        id.startsWith('candle') ? 'candle' :
+        id === 'censer' ? 'censer' : 'candle'
+      )) as EntityTypeId;
+      const worldContext: WorldContext = {
+        deltaSec: 0,
+        timeScale,
+        lighting,
+        soundEnabled,
+      };
+      const updated = itemRegistry.interactItem({ ...item, type: inferredType }, 'toggle_lit', worldContext);
+      if (item.lifecycle?.stage === 'expired' || (item.lifecycle?.health ?? 1) <= 0.05) {
+        showToast(id.startsWith('candle') ? '已添上崭新长明红烛并点燃' : '已敬奉崭新三炷高香并点燃');
+      }
+      return {
+        ...prev,
+        [id]: updated,
+      };
+    });
   };
+
+  // Game World Loop: Lifecycle ticking for flowers, candles, incense, fruits
+  const { timeScale, setTimeScale } = useWorldLoop({
+    items,
+    onUpdateItems: setItems,
+    lighting,
+    soundEnabled,
+    initialTimeScale: 1.0,
+    onEntityEvent: (event) => {
+      if (event.type === 'despawn') {
+        showToast('一捧供花完成生命花期，芬芳随风化作尘香');
+        setPetalTrigger(Date.now());
+      } else if (event.type === 'petal_drop') {
+        setPetalTrigger(Date.now());
+      }
+    },
+  });
 
   const resetTableLayout = () => {
     sound.playWoodPlacement();
-    setItems(JSON.parse(JSON.stringify(INITIAL_ITEMS)));
+    setItems(buildInitialItems());
     showToast('已依中轴规范对齐（花、烛、香严格对称）');
   };
 
   const toggleAllCandles = () => {
-    const anyLit = items.candle_left.isLit || items.candle_right.isLit || items.censer.isLit;
+    const anyLit = items.candle_left?.isLit || items.candle_right?.isLit || items.censer?.isLit;
     if (anyLit) {
       sound.playExtinguish();
       setItems((prev) => ({
         ...prev,
-        candle_left: { ...prev.candle_left, isLit: false },
-        candle_right: { ...prev.candle_right, isLit: false },
-        censer: { ...prev.censer, isLit: false },
+        candle_left: prev.candle_left ? { ...prev.candle_left, isLit: false } : prev.candle_left,
+        candle_right: prev.candle_right ? { ...prev.candle_right, isLit: false } : prev.candle_right,
+        censer: prev.censer ? { ...prev.censer, isLit: false } : prev.censer,
       }));
       showToast('已熄灭案上全部烛火与香炉');
     } else {
       sound.playMatchStrike();
       sound.playBell(528, 2.5);
-      setItems((prev) => ({
-        ...prev,
-        candle_left: { ...prev.candle_left, isLit: true },
-        candle_right: { ...prev.candle_right, isLit: true },
-        censer: { ...prev.censer, isLit: true },
-      }));
-      showToast('已重新点燃明烛与清香');
+      setItems((prev) => {
+        const renewOrLight = (item: SceneItem | undefined, type: 'candle' | 'censer'): SceneItem | undefined => {
+          if (!item) return item;
+          const isExpired = item.lifecycle?.stage === 'expired' || (item.lifecycle?.health ?? 1) <= 0.05;
+          if (isExpired) {
+            return {
+              ...item,
+              isLit: true,
+              ...(type === 'candle' ? { waxHeight: 1.0 } : {}),
+              ...(type === 'censer' ? { incenseHealth: 1.0 } : {}),
+              lifecycle: item.lifecycle ? {
+                ...item.lifecycle,
+                age: 0,
+                stage: 'blooming',
+                health: 1.0,
+              } : undefined,
+            };
+          }
+          return { ...item, isLit: true };
+        };
+
+        return {
+          ...prev,
+          candle_left: renewOrLight(prev.candle_left, 'candle'),
+          candle_right: renewOrLight(prev.candle_right, 'candle'),
+          censer: renewOrLight(prev.censer, 'censer'),
+        } as Record<SceneItemId, SceneItem>;
+      });
+      showToast('已重新奉上并点燃长明红烛与清香');
     }
   };
 
@@ -248,20 +280,22 @@ export default function App() {
     // Calculate natural position near center/front of table
     const existingOffered = Object.keys(items).filter((k) => k.startsWith('offered_flower_')).length;
     const offsetX = existingOffered === 0 ? 0 : (existingOffered % 2 === 1 ? -65 : 65);
-    const offsetY = Math.min(22, 14 + existingOffered * 2);
+    const offsetY = Math.min(24, 14 + (existingOffered % 4) * 3);
+
+    const newBouquet = FloraFactory.createOfferedBouquet(
+      flowerType,
+      { x: offsetX, y: offsetY },
+      { id: newId, name: `敬献 · ${flowerNameMap[flowerType]}` }
+    );
 
     setItems((prev) => ({
       ...prev,
-      [newId]: {
-        id: newId,
-        name: `敬献 · ${flowerNameMap[flowerType]}`,
-        position: { x: offsetX, y: offsetY },
-        flowerType,
-      },
+      [newId]: newBouquet,
     }));
 
     setLastOfferedFlower(flowerType);
     setPetalTrigger(Date.now());
+    sound.playBell(560, 2);
     showToast(`已将新鲜「${flowerNameMap[flowerType]}」奉献于供案桌面，可在案上随意拖拽摆放`);
   };
 
@@ -325,7 +359,7 @@ export default function App() {
   const handleFillTenFlowers = () => {
     sound.playBell(528, 2.5);
     setPetalTrigger(Date.now());
-    setItems(JSON.parse(JSON.stringify(INITIAL_ITEMS)));
+    setItems(buildInitialItems());
     showToast('已一键布设十捧香花盛供，案前繁花锦簇');
   };
 
@@ -377,15 +411,23 @@ export default function App() {
 
       {/* Top Header & Quick Environment Bar */}
       <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
-        {/* Brand & Concept badge & FPS Monitor */}
+        {/* Left: FPS Monitor in dev mode & Theme Badge */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 border border-amber-200/70 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-            <h1 className="font-serif text-xs sm:text-sm font-semibold tracking-wide text-stone-800">
-              暖念 · 真实光影与场景模拟
-            </h1>
-          </div>
           {import.meta.env.DEV && <FpsMonitor />}
+          <button
+            type="button"
+            onClick={() => setIsLightingOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white border border-amber-200/80 shadow-xs text-xs font-medium text-stone-700 transition-all cursor-pointer hover:shadow-sm"
+            title="点击切换背景墙风格与场景装潢"
+          >
+            <span className="text-sm">{WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.iconText || '🌸'}</span>
+            <span className="font-serif text-amber-950 font-semibold">
+              {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.season} · {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.name}
+            </span>
+            <span className="hidden sm:inline text-[10px] text-amber-700/80 bg-amber-100/70 px-1.5 py-0.5 rounded-full">
+              切换风格
+            </span>
+          </button>
         </div>
 
         {/* Quick controls on right */}
@@ -484,13 +526,17 @@ export default function App() {
 
       {/* Core Simulation Stage */}
       <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden">
-        {/* Layer 1: Cathedral Window with Sky */}
+        {/* Layer 1: Cathedral Window with Themed Arch / Moon Gate */}
         <WindowArch
           masterOn={lighting.masterOn}
           sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
           timeOfDay={lighting.timeOfDay}
           sunAngle={lighting.sunAngle}
+          wallStyle={wallStyle}
         />
+
+        {/* Layer 1.5: Dynamic Ambient Theme FX (🌸Sakura / 🌌Fireflies / 🍁Maples / ❄️Snow / 🎋Bamboo) */}
+        <SceneAmbientFx wallStyle={wallStyle} lighting={lighting} />
 
         {/* Layer 2: Volumetric Rays (Tyndall Light Beams / God Rays) */}
         <VolumetricRays
@@ -521,7 +567,7 @@ export default function App() {
           />
         </div>
 
-        {/* Layer 6: Altar Table with all draggable items (Vases, Candles, Censer with Smoke, Offered Flowers) */}
+        {/* Layer 6: Altar Table with all draggable items (Vases, Candles, Censer with Smoke, Offered Flowers, Fruits, Tea, Singing Bowl) */}
         <div className="absolute bottom-16 sm:bottom-20 z-25 w-full flex justify-center px-4">
           <DraggableAltarTable
             items={items}
@@ -529,6 +575,10 @@ export default function App() {
             onToggleItemLit={toggleItemLit}
             onResetLayout={resetTableLayout}
             onRemoveItem={handleRemoveItem}
+            onToggleFruit={handleToggleFruit}
+            showTableRunner={showTableRunner}
+            tableclothStyle={tableclothStyle}
+            showPetals={showPetals}
             lighting={lighting}
             isArrangeMode={isArrangeMode}
           />
@@ -559,6 +609,26 @@ export default function App() {
         onToggleAllCandles={toggleAllCandles}
         soundEnabled={soundEnabled}
         onToggleSound={toggleSound}
+        showTableRunner={showTableRunner}
+        tableclothStyle={tableclothStyle}
+        onChangeTableclothStyle={(st) => {
+          sound.playWoodPlacement();
+          setTableclothStyle(st);
+        }}
+        onToggleTableRunner={() => {
+          sound.playWoodPlacement();
+          setShowTableRunner((v) => {
+            const next = !v;
+            showToast(next ? '已铺设提花织锦大桌布（整案覆盖 · 金丝流苏）' : '已收起桌布，呈现素雅纯实木案台');
+            return next;
+          });
+        }}
+        showPetals={showPetals}
+        onTogglePetals={() => setShowPetals((v) => !v)}
+        wallStyle={wallStyle}
+        onChangeWallStyle={handleWallStyleChange}
+        timeScale={timeScale}
+        onUpdateTimeScale={setTimeScale}
       />
 
       <FlowerPickerModal

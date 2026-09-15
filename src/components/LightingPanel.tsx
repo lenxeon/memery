@@ -1,5 +1,5 @@
-import React from 'react';
-import { LightingSettings, TimeOfDay } from '../types';
+import React, { useState } from 'react';
+import { LightingSettings, TimeOfDay, TableclothStyle, WallBackgroundStyle } from '../types';
 import { 
   Sun, 
   Moon, 
@@ -11,6 +11,9 @@ import {
   Volume2, 
   VolumeX, 
   Sparkles,
+  Hourglass,
+  Check,
+  Palette,
   X
 } from 'lucide-react';
 import { sound } from '../utils/audio';
@@ -23,7 +26,53 @@ interface LightingPanelProps {
   onToggleAllCandles: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  showTableRunner?: boolean;
+  onToggleTableRunner?: () => void;
+  tableclothStyle?: TableclothStyle;
+  onChangeTableclothStyle?: (style: TableclothStyle) => void;
+  wallStyle?: WallBackgroundStyle;
+  onChangeWallStyle?: (style: WallBackgroundStyle, autoLinkDecor?: boolean) => void;
+  showPetals?: boolean;
+  onTogglePetals?: () => void;
+  timeScale?: number;
+  onUpdateTimeScale?: (scale: number) => void;
 }
+
+export const WALL_BACKGROUND_OPTIONS: { 
+  id: WallBackgroundStyle; 
+  name: string; 
+  season: string; 
+  desc: string; 
+  recommendedTablecloth: TableclothStyle;
+  recommendedTimeOfDay?: TimeOfDay;
+  color: string; 
+  accentColor: string;
+  iconText: string;
+}[] = [
+  { id: 'spring_sakura', season: '春', name: '樱粉细语', desc: '淡粉白拱窗 · 飘落樱花 · 柔光散景 · 奶油系', recommendedTablecloth: 'moonlight_white', recommendedTimeOfDay: 'day', color: '#fce7f3', accentColor: '#f472b6', iconText: '🌸' },
+  { id: 'summer_firefly', season: '夏', name: '星夜流萤', desc: '深蓝夜空 · 金框拱窗 · 繁星明月 · 呼吸流萤', recommendedTablecloth: 'indigo_linen', recommendedTimeOfDay: 'night', color: '#0f172a', accentColor: '#fbbf24', iconText: '🌌' },
+  { id: 'autumn_maple', season: '秋', name: '暖阳枫语', desc: '米金拱窗 · 红枫旋舞 · 暖阳金光 · 橙黄秋意', recommendedTablecloth: 'autumn_gold', recommendedTimeOfDay: 'sunset', color: '#fef3c7', accentColor: '#d97706', iconText: '🍁' },
+  { id: 'winter_snow', season: '冬', name: '静雪围炉', desc: '窗外落雪 · 窗角冰晶霜花 · 壁炉微火暖晕', recommendedTablecloth: 'cinnabar_red', recommendedTimeOfDay: 'night', color: '#e2e8f0', accentColor: '#ea580c', iconText: '❄️' },
+  { id: 'zen_bamboo', season: '禅', name: '竹林月门', desc: '正圆中式月洞门 · 水墨远山 · 青竹摇曳 · 东方留白', recommendedTablecloth: 'moonlight_white', recommendedTimeOfDay: 'day', color: '#f1f5f9', accentColor: '#334155', iconText: '🎋' },
+  { id: 'classical_lattice', season: '古典', name: '朱漆花窗', desc: '明清朱漆木雕花格 · 冰裂万字纹描金 · 庄重典雅', recommendedTablecloth: 'cinnabar_red', recommendedTimeOfDay: 'sunset', color: '#881337', accentColor: '#fbbf24', iconText: '🏮' },
+  { id: 'modern_cream', season: '现代', name: '极简奶油', desc: '单一温润奶油色块 · 无窗棂线条 · 莫兰迪留白', recommendedTablecloth: 'moonlight_white', recommendedTimeOfDay: 'day', color: '#faf7f2', accentColor: '#c5bbae', iconText: '🍦' },
+];
+
+const TABLECLOTH_OPTIONS: { 
+  id: TableclothStyle; 
+  name: string; 
+  material: string; 
+  texture: string; 
+  color: string; 
+  borderColor: string;
+}[] = [
+  { id: 'autumn_gold', name: '秋香金', material: '真丝重缎', texture: '黑金回形纹 · 宝相牡丹', color: '#dca842', borderColor: '#b45309' },
+  { id: 'indigo_linen', name: '靛青蓝', material: '苎麻粗布', texture: '素白抽纱边 · 水墨幽兰', color: '#425672', borderColor: '#1e293b' },
+  { id: 'cinnabar_red', name: '朱砂红', material: '密绒红呢', texture: '泥金万字锦 · 双鹤衔芝', color: '#b93839', borderColor: '#7f1d1d' },
+  { id: 'moonlight_white', name: '月魄白', material: '冰丝生绢', texture: '素银如意纹 · 月下修竹', color: '#edeae1', borderColor: '#a8a29e' },
+  { id: 'evergreen_pine', name: '黛螺绿', material: '沉香宋锦', texture: '八达晕金边 · 岁寒苍松', color: '#335242', borderColor: '#14532d' },
+  { id: 'sandalwood_purple', name: '紫檀金', material: '盘金缂丝', texture: '连珠卷草纹 · 金莲曼荼罗', color: '#593a52', borderColor: '#581c87' },
+];
 
 export const LightingPanel: React.FC<LightingPanelProps> = ({
   isOpen,
@@ -33,7 +82,19 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
   onToggleAllCandles,
   soundEnabled,
   onToggleSound,
+  showTableRunner = true,
+  onToggleTableRunner,
+  tableclothStyle = 'autumn_gold',
+  onChangeTableclothStyle,
+  wallStyle = 'spring_sakura',
+  onChangeWallStyle,
+  showPetals = true,
+  onTogglePetals,
+  timeScale = 1,
+  onUpdateTimeScale,
 }) => {
+  const [autoLinkDecor, setAutoLinkDecor] = useState(true);
+
   if (!isOpen) return null;
 
   const handleTimeChange = (tod: TimeOfDay) => {
@@ -48,28 +109,30 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-md bg-stone-50/95 backdrop-blur-md rounded-2xl p-5 shadow-2xl border border-amber-200/80 text-stone-800"
+        className="w-full max-w-lg max-h-[85vh] sm:max-h-[88vh] flex flex-col bg-stone-50/98 backdrop-blur-md rounded-2xl shadow-2xl border border-amber-200/80 text-stone-800 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-amber-200/60 pb-3 mb-4">
+        {/* Pinned Header */}
+        <div className="flex items-center justify-between border-b border-amber-200/60 px-5 py-3.5 shrink-0 bg-stone-50/95">
           <div className="flex items-center gap-2">
             <Sliders size={18} className="text-amber-700" />
             <h3 className="font-serif text-lg font-semibold text-stone-800">场景光影与模拟控制</h3>
           </div>
           <button 
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-600 text-lg leading-none p-1 rounded-full hover:bg-stone-200/60 transition-colors"
+            className="text-stone-400 hover:text-stone-600 p-1.5 rounded-full hover:bg-stone-200/70 transition-colors cursor-pointer"
+            title="关闭"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="space-y-4 text-xs">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-5 py-4 space-y-4 text-xs overscroll-contain">
           {/* Master Light Switch */}
           <div className="flex items-center justify-between p-3 bg-amber-100/50 rounded-xl border border-amber-200/60">
             <div className="flex items-center gap-2.5">
@@ -94,6 +157,75 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
                 }`}
               />
             </button>
+          </div>
+
+          {/* ══════════════════════════════════════════════════════════════════
+              背景墙头与场景装潢 (7 大风格选择)
+             ══════════════════════════════════════════════════════════════════ */}
+          <div className="space-y-2 p-3 bg-white rounded-xl border border-stone-200 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-medium text-stone-800">
+                <Sparkles size={14} className="text-amber-600" />
+                <span className="font-semibold">背景墙头与场景风格 (7 款可选)</span>
+              </div>
+              <span className="text-[11px] text-amber-800 font-medium">
+                {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.season} · {WALL_BACKGROUND_OPTIONS.find((o) => o.id === wallStyle)?.name}
+              </span>
+            </div>
+
+            {/* 联动推荐选项开关 */}
+            <div className="flex items-center justify-between py-1 px-1 text-[11px] text-stone-500 border-b border-stone-100">
+              <span>一键联动对应桌布与光影天色</span>
+              <button
+                type="button"
+                onClick={() => setAutoLinkDecor(!autoLinkDecor)}
+                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
+                  autoLinkDecor ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-stone-100 text-stone-500'
+                }`}
+              >
+                {autoLinkDecor ? '已启用智能联动' : '仅更改背景墙'}
+              </button>
+            </div>
+
+            {/* 7 款风格卡片网格 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+              {WALL_BACKGROUND_OPTIONS.map((opt) => {
+                const isSelected = wallStyle === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => {
+                      sound.playBell(520, 2);
+                      onChangeWallStyle?.(opt.id, autoLinkDecor);
+                    }}
+                    className={`flex items-center gap-2 p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-amber-50/95 border-amber-500 ring-1 ring-amber-500/40 shadow-xs'
+                        : 'bg-stone-50/80 hover:bg-stone-100 border-stone-200/80 text-stone-600'
+                    }`}
+                  >
+                    <div 
+                      className="w-7 h-7 rounded-lg border shadow-xs flex items-center justify-center shrink-0 text-sm"
+                      style={{ background: opt.color, borderColor: opt.accentColor }}
+                    >
+                      {opt.iconText}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1">
+                        <span className={`text-[11px] ${isSelected ? 'text-amber-950 font-semibold' : 'text-stone-800 font-medium'}`}>
+                          {opt.season} · {opt.name}
+                        </span>
+                        {isSelected && <Check size={11} className="text-amber-600 stroke-[3]" />}
+                      </div>
+                      <div className="text-[9.5px] text-stone-500 truncate mt-0.5">
+                        {opt.desc}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Time of Day Presets */}
@@ -228,6 +360,132 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
             </div>
           </div>
 
+          {/* Table Adornments (案台雅致装点) */}
+          <div className="space-y-2.5 p-3 bg-white rounded-xl border border-stone-200 text-xs">
+            <div className="flex items-center gap-1.5 font-medium text-stone-800">
+              <Sparkles size={14} className="text-amber-600" />
+              <span>案台雅致装点</span>
+            </div>
+            <div className="flex items-center justify-between text-stone-600 pt-1">
+              <span>提花织锦大桌布（整案铺设 · 金丝流苏）</span>
+              <button
+                type="button"
+                onClick={onToggleTableRunner}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                  showTableRunner ? 'bg-amber-600 text-white' : 'bg-stone-200 text-stone-600'
+                }`}
+              >
+                {showTableRunner ? '已铺设' : '素雅实木'}
+              </button>
+            </div>
+
+            {/* 6 款不同风格桌布定制选择 (当桌布铺设时展开) */}
+            {showTableRunner && (
+              <div className="pt-2 border-t border-stone-100 space-y-2">
+                <div className="flex items-center justify-between text-stone-500 text-[11px]">
+                  <span className="flex items-center gap-1 font-medium text-stone-700">
+                    <Palette size={12} className="text-amber-600" />
+                    <span>定制桌布风格 (6 款可选)</span>
+                  </span>
+                  <span className="text-amber-800 font-medium">
+                    {TABLECLOTH_OPTIONS.find((o) => o.id === tableclothStyle)?.name}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                  {TABLECLOTH_OPTIONS.map((opt) => {
+                    const isSelected = tableclothStyle === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          sound.playWoodPlacement();
+                          onChangeTableclothStyle?.(opt.id);
+                        }}
+                        className={`flex items-center gap-2 p-1.5 rounded-lg border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-amber-50/90 border-amber-500/80 ring-1 ring-amber-500/40 shadow-xs'
+                            : 'bg-stone-50/80 hover:bg-stone-100 border-stone-200/80 text-stone-600'
+                        }`}
+                      >
+                        <div
+                          className="w-5 h-5 rounded-full border shadow-xs flex items-center justify-center shrink-0"
+                          style={{ background: opt.color, borderColor: opt.borderColor }}
+                        >
+                          {isSelected && <Check size={11} className="text-white drop-shadow-xs stroke-[3]" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1">
+                            <span className={`text-[11px] truncate ${isSelected ? 'text-amber-950 font-semibold' : 'text-stone-800 font-medium'}`}>
+                              {opt.name}
+                            </span>
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-stone-200/60 text-stone-600 shrink-0 font-normal">
+                              {opt.material}
+                            </span>
+                          </div>
+                          <div className="text-[9px] text-stone-500 truncate mt-0.5">
+                            {opt.texture}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-stone-600 pt-1 border-t border-stone-100">
+              <span>案头散落花瓣（随风零落意境）</span>
+              <button
+                type="button"
+                onClick={onTogglePetals}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                  showPetals ? 'bg-amber-600 text-white' : 'bg-stone-200 text-stone-600'
+                }`}
+              >
+                {showPetals ? '已散落' : '隐藏'}
+              </button>
+            </div>
+          </div>
+
+          {/* Lifecycle & Time Scale (生机周期与岁月流速) */}
+          <div className="space-y-2.5 p-3 bg-white rounded-xl border border-stone-200 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-medium text-stone-800">
+                <Hourglass size={14} className="text-amber-600" />
+                <span>供奉生机与岁月流速</span>
+              </div>
+              <span className="text-[11px] text-amber-800 font-semibold">
+                {timeScale === 0 ? '🧘‍♂️ 禅意永生' : timeScale === 1 ? '🌱 现实流速' : timeScale === 10 ? '⏳ 演示加速 (10x)' : `${timeScale}x 极速`}
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 pt-1">
+              {[
+                { scale: 0, label: '永生停驻' },
+                { scale: 1, label: '现实 1x' },
+                { scale: 10, label: '演示 10x' },
+                { scale: 30, label: '极速 30x' },
+              ].map((opt) => (
+                <button
+                  key={opt.scale}
+                  type="button"
+                  onClick={() => onUpdateTimeScale?.(opt.scale)}
+                  className={`py-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                    timeScale === opt.scale
+                      ? 'bg-amber-600 text-white shadow-xs ring-1 ring-amber-700'
+                      : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-stone-400 leading-tight">
+              驱动案上供花真实生命历程（含苞 ➔ 盛开 ➔ 微凋 ➔ 枯萎 ➔ 消失）。
+            </p>
+          </div>
+
           {/* Audio & Ambience */}
           <div className="flex items-center justify-between p-2.5 bg-stone-100 rounded-xl">
             <div className="flex items-center gap-2">
@@ -250,13 +508,18 @@ export const LightingPanel: React.FC<LightingPanelProps> = ({
           </div>
         </div>
 
-        <div className="mt-5 flex justify-end">
+        {/* Pinned Bottom Confirm Bar */}
+        <div className="flex items-center justify-between border-t border-amber-200/60 px-5 py-3 shrink-0 bg-stone-100/95 backdrop-blur-xs">
+          <span className="text-[11px] text-stone-500">
+            全部调节已实时生效
+          </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-amber-50 font-medium text-xs shadow-md transition-colors cursor-pointer"
+            className="px-6 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 active:scale-95 text-amber-50 font-medium text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5"
           >
-            完成调节
+            <Check size={14} />
+            <span>完成确认</span>
           </button>
         </div>
       </div>

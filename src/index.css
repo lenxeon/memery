@@ -1,1 +1,208 @@
 @import "tailwindcss";
+
+/* ── 夏日微风风吹律动 (60FPS GPU-Accelerated Botanical Wind Dynamics) ──
+   特性：硬件加速合成层 (will-change: transform + translate3d)，完全规避 CPU 重排与重绘；
+   动作幅度肉眼清晰可见，花瓣与每片叶子都有专属的风吹律动；
+   微风从左向右徐徐吹拂，各部分周期错落交织，生动自然，花瓶底座稳固不动。
+*/
+
+/* 1. 冠顶花朵：随风优雅起伏 (明显可见的 ~3.6px 沉浮与 4.2° 微倾) */
+@keyframes flowerSwayCrown {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0) rotate(0deg);
+  }
+  28% {
+    transform: translate3d(2.2px, -3.6px, 0) rotate(4.2deg);
+  }
+  58% {
+    transform: translate3d(-1.2px, 2.4px, 0) rotate(-2.8deg);
+  }
+  80% {
+    transform: translate3d(1.0px, -1.2px, 0) rotate(1.8deg);
+  }
+}
+
+/* 2. 主花朵：丰满厚重的沉稳起伏呼吸 (~2.6px，3.2°) */
+@keyframes flowerSwayMain {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0) rotate(0deg);
+  }
+  32% {
+    transform: translate3d(1.8px, -2.6px, 0) rotate(3.2deg);
+  }
+  64% {
+    transform: translate3d(-1.0px, 2.0px, 0) rotate(-2.2deg);
+  }
+  84% {
+    transform: translate3d(0.6px, -0.8px, 0) rotate(1.2deg);
+  }
+}
+
+/* 3. 左侧迎风花朵：直接迎受左侧微风，向右微扬并起伏 */
+@keyframes flowerSwayLeft {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(2.5px, -2.8px, 0) rotate(5.0deg);
+  }
+  55% {
+    transform: translate3d(-1.4px, 1.8px, 0) rotate(-3.0deg);
+  }
+  78% {
+    transform: translate3d(1.2px, -1.0px, 0) rotate(2.0deg);
+  }
+}
+
+/* 4. 右侧背风花朵：向外和缓舒展 */
+@keyframes flowerSwayRight {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0) rotate(0deg);
+  }
+  35% {
+    transform: translate3d(1.6px, -3.0px, 0) rotate(-3.8deg);
+  }
+  68% {
+    transform: translate3d(-0.8px, 1.8px, 0) rotate(2.4deg);
+  }
+}
+
+/* 5. 梢头轻巧幼蕾：梢头更灵巧敏捷 (~4.0px，6.8°) */
+@keyframes flowerSwayBud {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0) rotate(0deg);
+  }
+  22% {
+    transform: translate3d(3.2px, -4.0px, 0) rotate(6.8deg);
+  }
+  48% {
+    transform: translate3d(-2.0px, 2.5px, 0) rotate(-4.2deg);
+  }
+  72% {
+    transform: translate3d(1.5px, -1.8px, 0) rotate(3.0deg);
+  }
+  88% {
+    transform: translate3d(-0.6px, 0.8px, 0) rotate(-1.2deg);
+  }
+}
+
+/* 6. 叶片明显可见的翩然扇动 (6° ~ 8.5° 摆动与波浪起伏) */
+@keyframes leafSway1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) skewX(0deg) scale(1);
+  }
+  30% {
+    transform: translate3d(0.5px, -0.8px, 0) rotate(7.5deg) skewX(3.5deg) scale(1.03);
+  }
+  62% {
+    transform: translate3d(-0.4px, 0.6px, 0) rotate(-4.5deg) skewX(-2.0deg) scale(0.98);
+  }
+  82% {
+    transform: translate3d(0.2px, -0.2px, 0) rotate(3.0deg) skewX(1.5deg) scale(1.01);
+  }
+}
+
+@keyframes leafSway2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) skewX(0deg) scale(1);
+  }
+  26% {
+    transform: translate3d(-0.4px, 0.8px, 0) rotate(-6.8deg) skewX(-3.2deg) scale(0.98);
+  }
+  58% {
+    transform: translate3d(0.5px, -0.6px, 0) rotate(5.0deg) skewX(2.5deg) scale(1.02);
+  }
+  80% {
+    transform: translate3d(-0.2px, 0.3px, 0) rotate(-2.5deg) skewX(-1.2deg) scale(0.99);
+  }
+}
+
+@keyframes leafSway3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) skewX(0deg) scale(1);
+  }
+  34% {
+    transform: translate3d(0.6px, -1.0px, 0) rotate(8.2deg) skewX(4.0deg) scale(1.04);
+  }
+  66% {
+    transform: translate3d(-0.5px, 0.7px, 0) rotate(-5.0deg) skewX(-2.5deg) scale(0.97);
+  }
+}
+
+@keyframes leafSway4 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) skewX(0deg) scale(1);
+  }
+  38% {
+    transform: translate3d(-0.5px, 0.9px, 0) rotate(-7.2deg) skewX(-3.5deg) scale(1.03);
+  }
+  70% {
+    transform: translate3d(0.4px, -0.5px, 0) rotate(4.2deg) skewX(2.0deg) scale(0.98);
+  }
+}
+
+/* 动效类声明：开启硬件加速 will-change: transform */
+.animate-flower-sway-crown {
+  will-change: transform;
+  animation: flowerSwayCrown 3.8s ease-in-out infinite;
+}
+
+.animate-flower-sway-main {
+  will-change: transform;
+  animation: flowerSwayMain 4.2s ease-in-out infinite 0.5s;
+}
+
+.animate-flower-sway-left {
+  will-change: transform;
+  animation: flowerSwayLeft 3.5s ease-in-out infinite 0.2s;
+}
+
+.animate-flower-sway-right {
+  will-change: transform;
+  animation: flowerSwayRight 4.4s ease-in-out infinite 0.8s;
+}
+
+.animate-flower-sway-bud {
+  will-change: transform;
+  animation: flowerSwayBud 3.2s ease-in-out infinite 0.3s;
+}
+
+.animate-leaf-sway-1 {
+  will-change: transform;
+  animation: leafSway1 3.2s ease-in-out infinite;
+}
+
+.animate-leaf-sway-2 {
+  will-change: transform;
+  animation: leafSway2 3.6s ease-in-out infinite 0.4s;
+}
+
+.animate-leaf-sway-3 {
+  will-change: transform;
+  animation: leafSway3 3.0s ease-in-out infinite 0.7s;
+}
+
+.animate-leaf-sway-4 {
+  will-change: transform;
+  animation: leafSway4 3.9s ease-in-out infinite 1.1s;
+}
+
+/* Custom subtle scrollbar for modals */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(217, 119, 6, 0.35) rgba(245, 245, 244, 0.6);
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(245, 245, 244, 0.6);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(217, 119, 6, 0.35);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(180, 83, 9, 0.55);
+}

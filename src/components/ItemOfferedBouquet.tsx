@@ -1,5 +1,6 @@
 import React from 'react';
 import { FlowerType } from '../types';
+import { ItemLifecycle } from '../game/types/entity';
 import { X } from 'lucide-react';
 
 interface ItemOfferedBouquetProps {
@@ -7,6 +8,7 @@ interface ItemOfferedBouquetProps {
   scale?: number;
   isArrangeMode?: boolean;
   onRemove?: () => void;
+  lifecycle?: ItemLifecycle;
 }
 
 export const ItemOfferedBouquet: React.FC<ItemOfferedBouquetProps> = ({
@@ -14,6 +16,7 @@ export const ItemOfferedBouquet: React.FC<ItemOfferedBouquetProps> = ({
   scale = 1,
   isArrangeMode = false,
   onRemove,
+  lifecycle,
 }) => {
   const getFlowerMeta = () => {
     switch (flowerType) {
@@ -58,15 +61,60 @@ export const ItemOfferedBouquet: React.FC<ItemOfferedBouquetProps> = ({
 
   const meta = getFlowerMeta();
 
+  // Lifecycle visual effects (含苞 -> 盛开 -> 微凋 -> 枯萎 -> 消失)
+  const stage = lifecycle?.stage || 'blooming';
+  const health = lifecycle?.health ?? 1.0;
+
+  let lifecycleTransform = '';
+  let lifecycleFilter = '';
+  let lifecycleOpacity = 1;
+  let stageBadgeText = '';
+
+  switch (stage) {
+    case 'budding':
+      lifecycleTransform = 'scale(0.92)';
+      stageBadgeText = '含苞';
+      break;
+    case 'blooming':
+      lifecycleTransform = 'scale(1)';
+      stageBadgeText = '盛开';
+      break;
+    case 'wilting':
+      lifecycleTransform = 'rotate(3deg) translateY(2px)';
+      lifecycleFilter = 'sepia(0.25) saturate(0.85)';
+      stageBadgeText = '微凋';
+      break;
+    case 'withered':
+      lifecycleTransform = 'rotate(7deg) translateY(4px)';
+      lifecycleFilter = 'sepia(0.55) saturate(0.6) brightness(0.88)';
+      lifecycleOpacity = Math.max(0.12, health * 1.6);
+      stageBadgeText = '枯萎';
+      break;
+    case 'expired':
+      lifecycleOpacity = 0;
+      stageBadgeText = '凋零';
+      break;
+  }
+
   return (
     <div 
-      className="relative select-none pointer-events-auto group"
+      className="relative select-none pointer-events-auto group transition-all duration-700 ease-out"
       style={{
         width: 130 * scale,
         height: 72 * scale,
+        transform: lifecycleTransform,
+        filter: lifecycleFilter || undefined,
+        opacity: lifecycleOpacity,
       }}
-      title={meta.title}
+      title={`${meta.title}${lifecycle ? `（状态：${stageBadgeText} · 生机 ${Math.round(health * 100)}%）` : ''}`}
     >
+      {/* Optional lifecycle badge when in arrange mode or hovered */}
+      {lifecycle && isArrangeMode && (
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-stone-900/80 text-[9px] font-medium text-amber-200 border border-amber-400/40 whitespace-nowrap shadow-sm pointer-events-none">
+          {stageBadgeText} {Math.round(health * 100)}%
+        </div>
+      )}
+
       {/* Delete button when in arrange mode */}
       {isArrangeMode && onRemove && (
         <button
@@ -85,7 +133,7 @@ export const ItemOfferedBouquet: React.FC<ItemOfferedBouquetProps> = ({
       {/* SVG Bouquet Art */}
       <svg 
         viewBox="0 0 130 72" 
-        className="w-full h-full filter drop-shadow-md"
+        className="w-full h-full"
       >
         <defs>
           <linearGradient id={`bouquetShadow_${flowerType}`} x1="0%" y1="0%" x2="0%" y2="100%">
