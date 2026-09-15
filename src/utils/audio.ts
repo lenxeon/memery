@@ -1,3 +1,7 @@
+/**
+ * @file audio.ts
+ * @description Web Audio API 纯原生算法合成音效库（铜磬、木鱼、甘露水滴、微烛等）。
+ */
 // Web Audio API Synthesizer for peaceful, meditative sound effects
 
 class SoundEngine {

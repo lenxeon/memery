@@ -1,43 +1,41 @@
 /**
+ * @file App.tsx
+ * @description 应用程序根组件，负责整合供桌场景、实体状态机、全局光影氛围、弹窗交互及音效调度。
+ */
+
+/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import React, { useState, useEffect } from 'react';
-import { 
-  SceneItem, 
-  SceneItemId, 
-  LightingSettings, 
+import {
+  SceneItem,
+  SceneItemId,
+  LightingSettings,
   MemorialInfo,
   FlowerType,
   FruitType,
   WorldContext,
   EntityTypeId,
-  TableclothStyle
+  TableclothStyle,
+  WallBackgroundStyle
 } from './types';
-import { WindowArch } from './components/WindowArch';
-import { VolumetricRays } from './components/VolumetricRays';
-import { DustMotes } from './components/DustMotes';
-import { FloorPlanks } from './components/FloorPlanks';
-import { PortraitFrame } from './components/PortraitFrame';
-import { DraggableAltarTable } from './components/DraggableAltarTable';
-import { PetalShower } from './components/PetalShower';
-import { LightingPanel } from './components/LightingPanel';
-import { FlowerPickerModal } from './components/FlowerPickerModal';
-import { BlessingModal } from './components/BlessingModal';
-import { BottomDock } from './components/BottomDock';
-import { FpsMonitor } from './components/FpsMonitor';
+import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait } from './components/scene';
+import { VolumetricRays, DustMotes, PetalShower } from './components/effects';
+import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, BlessingModal } from './components/settings';
+import { BottomDock, FpsMonitor } from './components/controls';
 import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
 import { useWorldLoop } from './game/lifecycle/useWorldLoop';
 import { sound } from './utils/audio';
-import { 
-  Sun, 
-  Moon, 
-  Sunset, 
-  Power, 
-  Volume2, 
-  VolumeX, 
-  Sparkles, 
+import {
+  Sun,
+  Moon,
+  Sunset,
+  Power,
+  Volume2,
+  VolumeX,
+  Sparkles,
   SlidersHorizontal,
   Heart
 } from 'lucide-react';
@@ -110,6 +108,16 @@ export default function App() {
   const [petalTrigger, setPetalTrigger] = useState(0);
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
 
+  // Background space aesthetics (6 款典雅建筑室内风格可选)
+  const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('brick_screen');
+
+  const handleWallStyleChange = (style: WallBackgroundStyle) => {
+    setWallStyle(style);
+    const opt = WALL_STYLE_OPTIONS.find((o) => o.id === style);
+    sound.playBell(540, 2);
+    showToast(`已切换背景风格为「${opt?.name || ''} · ${opt?.poeticTitle || ''}」`);
+  };
+
   // Toast / notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -159,7 +167,7 @@ export default function App() {
       if (!item) return prev;
       const inferredType: EntityTypeId = (item.type || (
         id.startsWith('candle') ? 'candle' :
-        id === 'censer' ? 'censer' : 'candle'
+          id === 'censer' ? 'censer' : 'candle'
       )) as EntityTypeId;
       const worldContext: WorldContext = {
         deltaSec: 0,
@@ -378,11 +386,11 @@ export default function App() {
   };
 
   return (
-    <main 
+    <main
       className={`relative w-full h-screen overflow-hidden flex flex-col items-center justify-between select-none transition-colors duration-700 font-sans ${getSceneBackgroundClass()}`}
     >
       {/* Wall Texture Effect (Hardware accelerated, zero blend cost) */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-50"
         style={{
           background: `radial-gradient(circle at 50% 35%, transparent 25%, rgba(60, 40, 20, 0.12) 100%)`,
@@ -391,9 +399,23 @@ export default function App() {
 
       {/* Top Header & Quick Environment Bar */}
       <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
-        {/* Left: FPS Monitor in dev mode & Theme Badge */}
+        {/* Left: FPS Monitor in dev mode & Style Badge */}
         <div className="flex items-center gap-2">
           {import.meta.env.DEV && <FpsMonitor />}
+          <button
+            type="button"
+            onClick={() => setIsLightingOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white border border-amber-200/80 shadow-xs text-xs font-medium text-stone-700 transition-all cursor-pointer hover:shadow-sm"
+            title="点击切换背景空间美学风格"
+          >
+            <span className="text-sm">{WALL_STYLE_OPTIONS.find((o) => o.id === wallStyle)?.iconText || '🏛️'}</span>
+            <span className="font-serif text-amber-950 font-semibold">
+              {WALL_STYLE_OPTIONS.find((o) => o.id === wallStyle)?.name}
+            </span>
+            <span className="hidden sm:inline text-[10px] text-amber-700/80 bg-amber-100/70 px-1.5 py-0.5 rounded-full">
+              {WALL_STYLE_OPTIONS.find((o) => o.id === wallStyle)?.poeticTitle}
+            </span>
+          </button>
         </div>
 
         {/* Quick controls on right */}
@@ -407,11 +429,10 @@ export default function App() {
               setLighting((p) => ({ ...p, masterOn: next }));
             }}
             title={lighting.masterOn ? '点击关闭自然光照' : '点击开启自然光照'}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all shadow-xs cursor-pointer ${
-              lighting.masterOn 
-                ? 'bg-amber-100/90 hover:bg-amber-200/90 text-amber-900 border border-amber-300/80' 
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all shadow-xs cursor-pointer ${lighting.masterOn
+                ? 'bg-amber-100/90 hover:bg-amber-200/90 text-amber-900 border border-amber-300/80'
                 : 'bg-stone-800 text-stone-300 border border-stone-700'
-            }`}
+              }`}
           >
             <Power size={13} className={lighting.masterOn ? 'text-amber-600' : 'text-stone-400'} />
             <span className="hidden sm:inline">{lighting.masterOn ? '日照开' : '烛夜暗'}</span>
@@ -425,9 +446,8 @@ export default function App() {
                 sound.playBell(480, 2);
                 setLighting((p) => ({ ...p, timeOfDay: 'day' }));
               }}
-              className={`p-1.5 rounded-full transition-colors ${
-                lighting.timeOfDay === 'day' ? 'bg-amber-200/80 text-amber-900' : 'text-stone-500 hover:text-stone-800'
-              }`}
+              className={`p-1.5 rounded-full transition-colors ${lighting.timeOfDay === 'day' ? 'bg-amber-200/80 text-amber-900' : 'text-stone-500 hover:text-stone-800'
+                }`}
               title="白昼晨光"
             >
               <Sun size={14} />
@@ -438,9 +458,8 @@ export default function App() {
                 sound.playBell(440, 2);
                 setLighting((p) => ({ ...p, timeOfDay: 'sunset' }));
               }}
-              className={`p-1.5 rounded-full transition-colors ${
-                lighting.timeOfDay === 'sunset' ? 'bg-orange-200/80 text-orange-900' : 'text-stone-500 hover:text-stone-800'
-              }`}
+              className={`p-1.5 rounded-full transition-colors ${lighting.timeOfDay === 'sunset' ? 'bg-orange-200/80 text-orange-900' : 'text-stone-500 hover:text-stone-800'
+                }`}
               title="黄昏暖阳"
             >
               <Sunset size={14} />
@@ -451,9 +470,8 @@ export default function App() {
                 sound.playBell(390, 2);
                 setLighting((p) => ({ ...p, timeOfDay: 'night' }));
               }}
-              className={`p-1.5 rounded-full transition-colors ${
-                lighting.timeOfDay === 'night' ? 'bg-slate-700 text-indigo-300' : 'text-stone-500 hover:text-stone-800'
-              }`}
+              className={`p-1.5 rounded-full transition-colors ${lighting.timeOfDay === 'night' ? 'bg-slate-700 text-indigo-300' : 'text-stone-500 hover:text-stone-800'
+                }`}
               title="静谧微夜"
             >
               <Moon size={14} />
@@ -492,12 +510,13 @@ export default function App() {
 
       {/* Core Simulation Stage */}
       <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden">
-        {/* Layer 1: Cathedral Window with Sky */}
-        <WindowArch
+        {/* Layer 1: Cathedral Window / Architectural Wall Niche */}
+        <AltarWall
           masterOn={lighting.masterOn}
           sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
           timeOfDay={lighting.timeOfDay}
           sunAngle={lighting.sunAngle}
+          wallStyle={wallStyle}
         />
 
         {/* Layer 2: Volumetric Rays (Tyndall Light Beams / God Rays) */}
@@ -521,7 +540,7 @@ export default function App() {
 
         {/* Layer 5: Sacred Memorial Portrait Frame (Centered against window) */}
         <div className="absolute top-[16%] sm:top-[18%] z-20 pointer-events-auto">
-          <PortraitFrame
+          <MemorialPortrait
             info={memorial}
             onUpdateInfo={(up) => setMemorial((prev) => ({ ...prev, ...up }))}
             sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.2}
@@ -531,7 +550,7 @@ export default function App() {
 
         {/* Layer 6: Altar Table with all draggable items (Vases, Candles, Censer with Smoke, Offered Flowers, Fruits, Tea, Singing Bowl) */}
         <div className="absolute bottom-16 sm:bottom-20 z-25 w-full flex justify-center px-4">
-          <DraggableAltarTable
+          <AltarTable
             items={items}
             onUpdateItemPosition={updateItemPosition}
             onToggleItemLit={toggleItemLit}
@@ -561,9 +580,9 @@ export default function App() {
         onOpenBlessing={() => setIsBlessingOpen(true)}
       />
 
-      {/* Modals */}
+      {/* Modals & Drawers */}
 
-      <LightingPanel
+      <EnvironmentDrawer
         isOpen={isLightingOpen}
         onClose={() => setIsLightingOpen(false)}
         lighting={lighting}
@@ -587,6 +606,8 @@ export default function App() {
         }}
         showPetals={showPetals}
         onTogglePetals={() => setShowPetals((v) => !v)}
+        wallStyle={wallStyle}
+        onChangeWallStyle={handleWallStyleChange}
         timeScale={timeScale}
         onUpdateTimeScale={setTimeScale}
       />

@@ -1,4 +1,8 @@
 /**
+ * @file FruitEntity.tsx
+ * @description 供果实体包装组件，处理水果盘位置排布与供奉状态。
+ */
+/**
  * FruitEntity: 四时鲜果高足盘实体控制器
  * 封装高足盘果品数据、切果循环交互、保鲜度生命周期
  */
@@ -12,7 +16,7 @@ import {
   EntityRenderProps,
   EntityShadowProps 
 } from '../types/entity';
-import { ItemFruitPlatter } from '../../components/ItemFruitPlatter';
+import { FruitDish } from '../../components/offerings/fruits';
 import { FruitType } from '../../types';
 
 export interface FruitItemData extends GameItemData {
@@ -83,7 +87,7 @@ export class FruitEntityController implements ItemEntityController<FruitItemData
   render(props: EntityRenderProps): React.ReactNode {
     const item = props.item as FruitItemData;
     return (
-      <ItemFruitPlatter
+      <FruitDish
         fruitType={item.fruitType || 'apples'}
         scale={item.scale || 0.95}
         onToggleFruit={() => props.onInteract?.('toggle_fruit')}

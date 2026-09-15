@@ -1,4 +1,8 @@
 /**
+ * @file AbstractItemFactory.ts
+ * @description 供品物品抽象工厂，负责根据配置实例化对应的实体对象。
+ */
+/**
  * Abstract Factory & Item Registry Architecture
  * 统一物品注册中心与抽象工厂接口
  */

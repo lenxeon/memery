@@ -1,4 +1,8 @@
 /**
+ * @file VaseEntity.tsx
+ * @description 花瓶实体包装组件，统筹左右花瓶插花展示与状态同步。
+ */
+/**
  * VaseEntity: 供案瓷瓶实体控制器
  * 封装对称瓷瓶、插花品种切换、花瓣枯萎凋零与终极枯枝生命周期
  */
@@ -14,7 +18,7 @@ import {
   LifecycleStage,
   EntityEvent
 } from '../types/entity';
-import { ItemVase } from '../../components/ItemVase';
+import { FlowerVase } from '../../components/offerings/flowers';
 import { FlowerType } from '../../types';
 
 export interface VaseItemData extends GameItemData {
@@ -154,7 +158,7 @@ export class VaseEntityController implements ItemEntityController<VaseItemData> 
     const item = props.item as VaseItemData;
     const isRightSide = item.id.includes('right');
     return (
-      <ItemVase
+      <FlowerVase
         isRightSide={isRightSide}
         flowerType={item.flowerType || (isRightSide ? 'lilies' : 'peonies')}
         scale={item.scale || 0.95}

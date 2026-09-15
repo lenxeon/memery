@@ -1,4 +1,8 @@
 /**
+ * @file FlowerEntity.tsx
+ * @description 献花束实体包装组件，处理花束供奉交互与渐变过渡。
+ */
+/**
  * FlowerEntity: 供花实体控制器
  * 封装鲜花的数据、生命周期（含苞 -> 盛开 -> 微凋 -> 枯萎 -> 消失）与渲染
  */
@@ -14,7 +18,7 @@ import {
   LifecycleStage,
   EntityEvent
 } from '../types/entity';
-import { ItemOfferedBouquet } from '../../components/ItemOfferedBouquet';
+import { OfferedBouquet } from '../../components/offerings/bouquet';
 
 export interface FlowerItemData extends GameItemData {
   type: 'flower';
@@ -158,7 +162,7 @@ export class FlowerEntityController implements ItemEntityController<FlowerItemDa
   render(props: EntityRenderProps): React.ReactNode {
     const item = props.item as FlowerItemData;
     return (
-      <ItemOfferedBouquet
+      <OfferedBouquet
         flowerType={item.flowerType || 'peonies'}
         scale={item.scale || 1}
         lifecycle={item.lifecycle}

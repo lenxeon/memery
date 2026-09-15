@@ -1,3 +1,7 @@
+/**
+ * @file scene.ts
+ * @description 场景与摆件实体几何坐标、物品元数据接口定义。
+ */
 export type TimeOfDay = 'day' | 'sunset' | 'night';
 
 export interface Position2D {

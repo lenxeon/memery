@@ -1,4 +1,8 @@
 /**
+ * @file SingingBowlEntity.tsx
+ * @description 颂钵实体包装组件，管理敲击振动、余音音波扩散反馈。
+ */
+/**
  * SingingBowlEntity: 静心铜磬实体控制器
  * 封装纯铜敲磬、528Hz 泛音共鸣衰减与振动光环
  */
@@ -12,7 +16,7 @@ import {
   EntityRenderProps,
   EntityShadowProps 
 } from '../types/entity';
-import { ItemSingingBowl } from '../../components/ItemSingingBowl';
+import { SingingBowlItem } from '../../components/offerings/singing_bowl';
 
 export interface SingingBowlItemData extends GameItemData {
   type: 'singing_bowl';
@@ -68,7 +72,7 @@ export class SingingBowlEntityController implements ItemEntityController<Singing
   render(props: EntityRenderProps): React.ReactNode {
     const item = props.item as SingingBowlItemData;
     return (
-      <ItemSingingBowl
+      <SingingBowlItem
         scale={item.scale || 0.95}
         onStrike={() => props.onInteract?.('strike')}
       />

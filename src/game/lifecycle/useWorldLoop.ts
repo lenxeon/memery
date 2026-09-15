@@ -1,4 +1,8 @@
 /**
+ * @file useWorldLoop.ts
+ * @description 游戏主时钟循环 Hook，基于 requestAnimationFrame 提供恒定帧调度。
+ */
+/**
  * useWorldLoop: 游戏世界时钟与高性能生命周期引擎
  * 采用累积时间片调度与事件驱动更新，彻底消除 60FPS 虚拟 DOM 频繁 Reconciliation 开销
  */

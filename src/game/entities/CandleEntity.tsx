@@ -1,4 +1,8 @@
 /**
+ * @file CandleEntity.tsx
+ * @description 蜡烛实体包装组件，封装点燃状态与烛光周期逻辑。
+ */
+/**
  * CandleEntity: 烛台实体控制器
  * 封装红烛生命周期：初燃长明 -> 渐燃半截 -> 残烛微光 -> 燃尽熄灭
  * 蜡烛高度随时间消耗变矮，烛火在后期自适应减小，最终自然熄灭
@@ -16,7 +20,7 @@ import {
   LifecycleStage,
   EntityEvent
 } from '../types/entity';
-import { ItemCandle } from '../../components/ItemCandle';
+import { CandleItem } from '../../components/offerings/candle';
 
 export interface CandleItemData extends GameItemData {
   type: 'candle';
@@ -167,7 +171,7 @@ export class CandleEntityController implements ItemEntityController<CandleItemDa
   render(props: EntityRenderProps): React.ReactNode {
     const item = props.item as CandleItemData;
     return (
-      <ItemCandle
+      <CandleItem
         isLit={!!item.isLit}
         onToggle={() => props.onInteract?.('toggle_lit')}
         windForce={props.lighting.windForce}

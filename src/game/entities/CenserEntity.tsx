@@ -1,4 +1,8 @@
 /**
+ * @file CenserEntity.tsx
+ * @description 香炉实体包装组件，封装燃香时长与烟雾粒子生命周期。
+ */
+/**
  * CenserEntity: 香炉实体控制器
  * 封装线香生命周期：初献高香 -> 香过半柱 -> 余烬残香 -> 燃尽熄灭
  * 线香长度随时间燃烧缩短，火头与烟雾在后期减细微缩，最后自然熄灭
@@ -16,7 +20,7 @@ import {
   LifecycleStage,
   EntityEvent
 } from '../types/entity';
-import { ItemCenser } from '../../components/ItemCenser';
+import { CenserItem } from '../../components/offerings/censer';
 
 export interface CenserItemData extends GameItemData {
   type: 'censer';
@@ -161,7 +165,7 @@ export class CenserEntityController implements ItemEntityController<CenserItemDa
   render(props: EntityRenderProps): React.ReactNode {
     const item = props.item as CenserItemData;
     return (
-      <ItemCenser
+      <CenserItem
         isLit={!!item.isLit}
         onToggle={() => props.onInteract?.('toggle_lit')}
         windForce={props.lighting.windForce}

@@ -1,4 +1,8 @@
 /**
+ * @file entity.ts
+ * @description 游戏实体（ItemEntity）、物品数据模型与渲染上下文类型定义。
+ */
+/**
  * Game Entity & Lifecycle Architecture - Core Types
  */
 

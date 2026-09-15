@@ -1,4 +1,8 @@
 /**
+ * @file TeaCupsEntity.tsx
+ * @description 敬茶实体包装组件，处理三杯茶水敬献、茶香微烟动效。
+ */
+/**
  * TeaCupsEntity: 敬茶三盅实体控制器
  * 封装紫檀托盘敬茶、茶汤温度与温润茶气
  */
@@ -12,7 +16,7 @@ import {
   EntityRenderProps,
   EntityShadowProps 
 } from '../types/entity';
-import { ItemTeaCups } from '../../components/ItemTeaCups';
+import { TeaCupsItem } from '../../components/offerings/tea_cups';
 
 export interface TeaCupsItemData extends GameItemData {
   type: 'tea_cups';
@@ -71,7 +75,7 @@ export class TeaCupsEntityController implements ItemEntityController<TeaCupsItem
   render(props: EntityRenderProps): React.ReactNode {
     const item = props.item as TeaCupsItemData;
     return (
-      <ItemTeaCups
+      <TeaCupsItem
         scale={item.scale || 0.96}
         onClick={() => props.onInteract?.('click')}
       />
