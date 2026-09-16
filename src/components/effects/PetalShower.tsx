@@ -171,10 +171,10 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
       const maxSz = flowerSpec.scaleRange[1];
       const size = Math.round(minSz + Math.random() * (maxSz - minSz));
 
-      // 差异化空气动力学参数
+      // 差异化空气动力学参数：降低重力加速度，大幅延长在空中的舒缓浮空时间（7.5s ~ 12.8s）
       const startX = 6 + Math.random() * 88; // 6% 到 94% 屏宽
-      const duration = 3.6 + Math.random() * 2.4;
-      const delay = (i * 0.04) + Math.random() * 0.55;
+      const duration = 7.5 + Math.random() * 5.3;
+      const delay = (i * 0.08) + Math.random() * 2.2;
 
       // 气动自旋角度随机值 (度)
       const rotZStart = Math.round((Math.random() - 0.5) * 120);
@@ -189,9 +189,9 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
 
       // 横向风力漂移位移量
       const windSign = Math.random() > 0.35 ? 1 : -1; // 偏向主风向
-      const driftTotal = Math.round(windSign * (40 + Math.random() * 120));
-      const sway1 = Math.round(windSign * (25 + Math.random() * 45));
-      const sway2 = Math.round(-windSign * (15 + Math.random() * 35));
+      const driftTotal = Math.round(windSign * (50 + Math.random() * 140));
+      const sway1 = Math.round(windSign * (30 + Math.random() * 55));
+      const sway2 = Math.round(-windSign * (20 + Math.random() * 45));
 
       return {
         id: Date.now() + i,
@@ -225,8 +225,8 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
 
     setPetals(newPetals);
 
-    // 最大下落时间 + 延迟后自动清理
-    const maxLifeMs = 6800;
+    // 最大下落时间 + 延迟后自动清理 (16s 优雅谢幕)
+    const maxLifeMs = 16000;
     const timer = setTimeout(() => {
       setPetals([]);
     }, maxLifeMs);
@@ -290,10 +290,10 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
 
       {/* 5 种完全不同动力学特性的 3D 轨迹动画 */}
       <style>{`
-        /* 1. 三维空翻螺旋盘旋 (Tumble Spiral) */
+        /* 1. 三维空翻螺旋盘旋 (Tumble Spiral) - 极轻重力与气旋托举 */
         .archetype-tumble_spiral {
           animation-name: animTumbleSpiral;
-          animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+          animation-timing-function: cubic-bezier(0.25, 0.7, 0.35, 1);
           animation-fill-mode: forwards;
         }
         @keyframes animTumbleSpiral {
@@ -302,52 +302,67 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
             transform: translate3d(0, 0, 0) rotateX(var(--p-rot-x-0)) rotateY(var(--p-rot-y-0)) rotateZ(var(--p-rot-z-0)) scale(0.85);
             opacity: 0;
           }
-          10% {
+          12% {
             opacity: 1;
           }
-          35% {
-            transform: translate3d(calc(var(--p-sway-1) * 1.4), 32vh, 40px) rotateX(var(--p-rot-x-1)) rotateY(calc(var(--p-rot-y-0) + 180deg)) rotateZ(var(--p-rot-z-1)) scale(1.05);
+          30% {
+            top: 20vh;
+            transform: translate3d(calc(var(--p-sway-1) * 1.6), 0, 50px) rotateX(var(--p-rot-x-1)) rotateY(calc(var(--p-rot-y-0) + 180deg)) rotateZ(var(--p-rot-z-1)) scale(1.05);
           }
-          70% {
-            transform: translate3d(calc(var(--p-sway-2) * 0.8), 65vh, -20px) rotateX(calc(var(--p-rot-x-1) + 180deg)) rotateY(var(--p-rot-y-1)) rotateZ(calc(var(--p-rot-z-1) + 120deg)) scale(0.95);
+          55% {
+            top: 42vh;
+            transform: translate3d(calc(var(--p-sway-2) * 1.3), 0, -25px) rotateX(calc(var(--p-rot-x-1) + 180deg)) rotateY(var(--p-rot-y-1)) rotateZ(calc(var(--p-rot-z-1) + 120deg)) scale(1.0);
             opacity: 0.95;
           }
+          78% {
+            top: 65vh;
+            transform: translate3d(calc(var(--p-sway-1) * 0.9), 0, 25px) rotateX(calc(var(--p-rot-x-1) + 270deg)) rotateY(calc(var(--p-rot-y-1) + 180deg)) rotateZ(calc(var(--p-rot-z-1) + 240deg)) scale(0.92);
+            opacity: 0.9;
+          }
           100% {
-            top: 86%;
+            top: 88%;
             transform: translate3d(var(--p-drift-x), 0, 0) rotateX(calc(var(--p-rot-x-1) + 360deg)) rotateY(calc(var(--p-rot-y-1) + 360deg)) rotateZ(var(--p-rot-z-2)) scale(0.8);
             opacity: 0;
           }
         }
 
-        /* 2. 顺风大角度斜掠滑翔 (Glide Breeze) */
+        /* 2. 顺风大角度斜掠滑翔 (Glide Breeze) - 空中羽落滑翔 */
         .archetype-glide_breeze {
           animation-name: animGlideBreeze;
-          animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
           animation-fill-mode: forwards;
         }
         @keyframes animGlideBreeze {
           0% {
             top: -6%;
-            transform: translate3d(0, 0, 0) rotateX(15deg) rotateY(10deg) rotateZ(var(--p-rot-z-0)) scale(0.9);
+            transform: translate3d(0, 0, 0) rotateX(12deg) rotateY(8deg) rotateZ(var(--p-rot-z-0)) scale(0.9);
             opacity: 0;
           }
-          8% {
+          10% {
             opacity: 1;
           }
-          45% {
-            transform: translate3d(calc(var(--p-drift-x) * 0.6), 40vh, 60px) rotateX(35deg) rotateY(25deg) rotateZ(calc(var(--p-rot-z-0) + 75deg)) scale(1.08);
+          32% {
+            top: 22vh;
+            transform: translate3d(calc(var(--p-drift-x) * 0.35), 0, 45px) rotateX(25deg) rotateY(18deg) rotateZ(calc(var(--p-rot-z-0) + 45deg)) scale(1.06);
           }
-          80% {
-            opacity: 0.92;
+          60% {
+            top: 48vh;
+            transform: translate3d(calc(var(--p-drift-x) * 0.7), 0, -15px) rotateX(40deg) rotateY(28deg) rotateZ(calc(var(--p-rot-z-0) + 95deg)) scale(1.0);
+            opacity: 0.95;
+          }
+          82% {
+            top: 70vh;
+            transform: translate3d(calc(var(--p-drift-x) * 1.05), 0, 30px) rotateX(48deg) rotateY(32deg) rotateZ(calc(var(--p-rot-z-0) + 130deg)) scale(0.88);
+            opacity: 0.88;
           }
           100% {
-            top: 88%;
-            transform: translate3d(calc(var(--p-drift-x) * 1.3), 0, -30px) rotateX(55deg) rotateY(40deg) rotateZ(calc(var(--p-rot-z-0) + 160deg)) scale(0.75);
+            top: 89%;
+            transform: translate3d(calc(var(--p-drift-x) * 1.35), 0, -20px) rotateX(55deg) rotateY(36deg) rotateZ(calc(var(--p-rot-z-0) + 170deg)) scale(0.75);
             opacity: 0;
           }
         }
 
-        /* 3. 气流微涡高频倾侧翻飞 (Flutter Eddy) */
+        /* 3. 气流微涡高频倾侧翻飞 (Flutter Eddy) - 漫空轻扬微颤 */
         .archetype-flutter_eddy {
           animation-name: animFlutterEddy;
           animation-timing-function: ease-in-out;
@@ -362,27 +377,35 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
           12% {
             opacity: 1;
           }
-          25% {
-            transform: translate3d(calc(var(--p-sway-1) * -1), 22vh, 30px) rotateX(120deg) rotateY(60deg) rotateZ(calc(var(--p-rot-z-0) - 80deg));
+          26% {
+            top: 18vh;
+            transform: translate3d(calc(var(--p-sway-1) * -1.2), 0, 35px) rotateX(120deg) rotateY(60deg) rotateZ(calc(var(--p-rot-z-0) - 70deg));
           }
           50% {
-            transform: translate3d(calc(var(--p-sway-2) * 1.5), 45vh, -15px) rotateX(240deg) rotateY(180deg) rotateZ(calc(var(--p-rot-z-0) + 140deg));
+            top: 38vh;
+            transform: translate3d(calc(var(--p-sway-2) * 1.6), 0, -20px) rotateX(240deg) rotateY(180deg) rotateZ(calc(var(--p-rot-z-0) + 120deg));
           }
-          75% {
-            transform: translate3d(var(--p-sway-1), 68vh, 45px) rotateX(360deg) rotateY(260deg) rotateZ(calc(var(--p-rot-z-0) + 260deg));
-            opacity: 0.9;
+          72% {
+            top: 60vh;
+            transform: translate3d(calc(var(--p-sway-1) * 1.1), 0, 40px) rotateX(360deg) rotateY(260deg) rotateZ(calc(var(--p-rot-z-0) + 220deg));
+            opacity: 0.92;
+          }
+          88% {
+            top: 76vh;
+            transform: translate3d(calc(var(--p-sway-2) * 0.8), 0, -10px) rotateX(440deg) rotateY(310deg) rotateZ(calc(var(--p-rot-z-0) + 280deg));
+            opacity: 0.85;
           }
           100% {
-            top: 86%;
-            transform: translate3d(calc(var(--p-drift-x) * 0.8), 0, 0) rotateX(520deg) rotateY(360deg) rotateZ(var(--p-rot-z-2));
+            top: 88%;
+            transform: translate3d(calc(var(--p-drift-x) * 0.85), 0, 0) rotateX(520deg) rotateY(360deg) rotateZ(var(--p-rot-z-2));
             opacity: 0;
           }
         }
 
-        /* 4. 缓带当风大 S 型从容摇曳 (Gentle Sway) */
+        /* 4. 缓带当风大 S 型从容摇曳 (Gentle Sway) - 优雅舒缓飘逸 */
         .archetype-gentle_sway {
           animation-name: animGentleSway;
-          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          animation-timing-function: cubic-bezier(0.35, 0.65, 0.4, 1);
           animation-fill-mode: forwards;
         }
         @keyframes animGentleSway {
@@ -394,24 +417,31 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
           10% {
             opacity: 0.95;
           }
-          30% {
-            transform: translate3d(calc(var(--p-sway-1) * 1.8), 28vh, 15px) rotateX(25deg) rotateY(-20deg) rotateZ(calc(var(--p-rot-z-0) + 40deg)) scale(1.0);
+          28% {
+            top: 19vh;
+            transform: translate3d(calc(var(--p-sway-1) * 2.0), 0, 20px) rotateX(20deg) rotateY(-18deg) rotateZ(calc(var(--p-rot-z-0) + 35deg)) scale(1.02);
           }
-          65% {
-            transform: translate3d(calc(var(--p-sway-2) * 2.0), 58vh, -15px) rotateX(-20deg) rotateY(25deg) rotateZ(calc(var(--p-rot-z-0) - 35deg)) scale(0.96);
+          52% {
+            top: 42vh;
+            transform: translate3d(calc(var(--p-sway-2) * 2.2), 0, -15px) rotateX(-18deg) rotateY(22deg) rotateZ(calc(var(--p-rot-z-0) - 30deg)) scale(0.98);
+            opacity: 0.95;
+          }
+          76% {
+            top: 66vh;
+            transform: translate3d(calc(var(--p-sway-1) * 1.5), 0, 18px) rotateX(15deg) rotateY(-12deg) rotateZ(calc(var(--p-rot-z-0) + 25deg)) scale(0.92);
             opacity: 0.9;
           }
           100% {
-            top: 87%;
-            transform: translate3d(calc(var(--p-drift-x) * 0.9), 0, 0) rotateX(15deg) rotateY(10deg) rotateZ(calc(var(--p-rot-z-0) + 15deg)) scale(0.85);
+            top: 88%;
+            transform: translate3d(calc(var(--p-drift-x) * 0.95), 0, 0) rotateX(10deg) rotateY(8deg) rotateZ(calc(var(--p-rot-z-0) + 10deg)) scale(0.82);
             opacity: 0;
           }
         }
 
-        /* 5. 轴线翻滚加速坠落 (Tumbling Leaf) */
+        /* 5. 轴线翻滚加速坠落 (Tumbling Leaf) - 柔缓微翻 */
         .archetype-tumbling_leaf {
           animation-name: animTumblingLeaf;
-          animation-timing-function: cubic-bezier(0.3, 0.1, 0.4, 1);
+          animation-timing-function: cubic-bezier(0.25, 0.8, 0.35, 1);
           animation-fill-mode: forwards;
         }
         @keyframes animTumblingLeaf {
@@ -420,15 +450,22 @@ export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerT
             transform: translate3d(0, 0, 0) rotateX(var(--p-rot-x-0)) rotateZ(var(--p-rot-z-0));
             opacity: 0;
           }
-          8% {
+          10% {
             opacity: 1;
           }
-          40% {
-            transform: translate3d(calc(var(--p-sway-1) * 0.9), 35vh, 20px) rotateX(calc(var(--p-rot-x-0) + 180deg)) rotateZ(calc(var(--p-rot-z-0) + 90deg));
+          32% {
+            top: 22vh;
+            transform: translate3d(calc(var(--p-sway-1) * 1.2), 0, 25px) rotateX(calc(var(--p-rot-x-0) + 180deg)) rotateZ(calc(var(--p-rot-z-0) + 90deg));
           }
-          75% {
-            transform: translate3d(calc(var(--p-sway-2) * 1.1), 66vh, -30px) rotateX(calc(var(--p-rot-x-0) + 360deg)) rotateZ(calc(var(--p-rot-z-0) + 210deg));
-            opacity: 0.88;
+          62% {
+            top: 48vh;
+            transform: translate3d(calc(var(--p-sway-2) * 1.4), 0, -25px) rotateX(calc(var(--p-rot-x-0) + 360deg)) rotateZ(calc(var(--p-rot-z-0) + 210deg));
+            opacity: 0.92;
+          }
+          82% {
+            top: 70vh;
+            transform: translate3d(calc(var(--p-sway-1) * 0.8), 0, 15px) rotateX(calc(var(--p-rot-x-0) + 450deg)) rotateZ(calc(var(--p-rot-z-0) + 300deg));
+            opacity: 0.85;
           }
           100% {
             top: 89%;
