@@ -15,10 +15,10 @@ import { FlowerComponentProps, FallingPetalDef } from '../types';
 import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const ORCHID_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.50, fallSpan: 0.07, startX: 84, startY: 78, landX: 92, landY: 194, rx: 7.0, ry: 4.8, landRot: 28, swayAmp: 14, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.38, fallSpan: 0.06, startX: 68, startY: 58, landX: 60, landY: 193, rx: 6.8, ry: 4.6, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.22, fallSpan: 0.06, startX: 56, startY: 40, landX: 50, landY: 195, rx: 6.2, ry: 4.2, landRot: 20, swayAmp: 16, swayFreq: 3.8 },
-  { id: 4, detachHealth: 0.10, fallSpan: 0.05, startX: 44, startY: 26, landX: 42, landY: 196, rx: 5.5, ry: 3.8, landRot: -18, swayAmp: 15, swayFreq: 4.0 },
+  { id: 1, detachHealth: 0.50, fallSpan: 0.07, startX: 84, startY: 78, landX: 92, landY: 194, rx: 6.3, ry: 4.3, landRot: 28, swayAmp: 14, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.38, fallSpan: 0.06, startX: 68, startY: 58, landX: 60, landY: 193, rx: 6.1, ry: 4.1, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
+  { id: 3, detachHealth: 0.22, fallSpan: 0.06, startX: 56, startY: 40, landX: 50, landY: 195, rx: 5.6, ry: 3.8, landRot: 20, swayAmp: 16, swayFreq: 3.8 },
+  { id: 4, detachHealth: 0.10, fallSpan: 0.05, startX: 44, startY: 26, landX: 42, landY: 196, rx: 5.0, ry: 3.4, landRot: -18, swayAmp: 15, swayFreq: 4.0 },
 ];
 
 export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
@@ -251,52 +251,52 @@ export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
         <path d="M 18 22 Q 16 21.5 14 21" stroke="url(#orchidHardStemGrad)" strokeWidth="1.0" fill="none" />
       </g>
 
-      {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（大花 -> 中花 -> 小花 -> 串串花骨朵） ── */}
+      {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（花朵整体缩小 10%） ── */}
       <g id="orchidBloomsRaceme">
-        {/* 1. 【基部第一朵·最大盛开花】(x:82, y:82)：靠近底部花朵最大（scale: 1.25），饱满盛放俯展 */}
+        {/* 1. 【基部第一朵·最大盛开花】(x:82, y:82)：靠近底部花朵最大（scale: 1.12），饱满盛放俯展 */}
         <g style={fl1} transform="translate(82, 82)">
-          {renderOrchidBloom(1.25, 15)}
+          {renderOrchidBloom(1.12, 15)}
         </g>
 
-        {/* 2. 【中下部第二朵·盛开大花】(x:67, y:63)：次大朵（scale: 1.12），向左微仰 */}
+        {/* 2. 【中下部第二朵·盛开大花】(x:67, y:63)：次大朵（scale: 1.00），向左微仰 */}
         <g style={fl2} transform="translate(67, 63)">
-          {renderOrchidBloom(1.12, -12)}
+          {renderOrchidBloom(1.00, -12)}
         </g>
 
-        {/* 3. 【中高部第三朵·端庄中花】(x:57, y:45)：中型朵（scale: 0.96），翩跹若飞 */}
+        {/* 3. 【中高部第三朵·端庄中花】(x:57, y:45)：中型朵（scale: 0.86），翩跹若飞 */}
         <g style={fl3} transform="translate(57, 45)">
-          {renderOrchidBloom(0.96, -20)}
+          {renderOrchidBloom(0.86, -20)}
         </g>
 
-        {/* 4. 【前段第四朵·初绽小花】(x:45, y:28)：逐渐缩小（scale: 0.78），初舒羽翼 */}
+        {/* 4. 【前段第四朵·初绽小花】(x:45, y:28)：逐渐缩小（scale: 0.70），初舒羽翼 */}
         <g style={fl4} transform="translate(45, 28)">
-          {renderOrchidBloom(0.78, -28)}
+          {renderOrchidBloom(0.70, -28)}
         </g>
 
-        {/* 5. 【前端第五朵·含苞微吐小花】(x:35, y:17)：小巧玲珑（scale: 0.62），半开掩映 */}
+        {/* 5. 【前端第五朵·含苞微吐小花】(x:35, y:17)：小巧玲珑（scale: 0.56），半开掩映 */}
         <g transform="translate(35, 17)">
-          {renderOrchidBloom(0.62, -35)}
+          {renderOrchidBloom(0.56, -35)}
         </g>
 
         {/* ── 前端未开放的花骨朵（依次递减变小） ── */}
-        {/* 6. 【前端大蕾】(x:26, y:12)：充实饱满的青紫花骨朵 (scale: 0.52) */}
+        {/* 6. 【前端大蕾】(x:26, y:12)：充实饱满的青紫花骨朵 (scale: 0.47) */}
         <g transform="translate(26, 12)">
-          {renderOrchidBud(0.52, -45)}
+          {renderOrchidBud(0.47, -45)}
         </g>
 
-        {/* 7. 【前端中蕾】(x:19, y:16)：紧致微翘小蕾 (scale: 0.40) */}
+        {/* 7. 【前端中蕾】(x:19, y:16)：紧致微翘小蕾 (scale: 0.36) */}
         <g transform="translate(19, 16)">
-          {renderOrchidBud(0.40, -60)}
+          {renderOrchidBud(0.36, -60)}
         </g>
 
-        {/* 8. 【前端初生嫩蕾】(x:14, y:21)：精巧青绿小蕾 (scale: 0.30) */}
+        {/* 8. 【前端初生嫩蕾】(x:14, y:21)：精巧青绿小蕾 (scale: 0.27) */}
         <g transform="translate(14, 21)">
-          {renderOrchidBud(0.30, -78)}
+          {renderOrchidBud(0.27, -78)}
         </g>
 
-        {/* 9. 【极梢微型苞尖】(x:11, y:29)：梢头初生细蕾 (scale: 0.22) */}
+        {/* 9. 【极梢微型苞尖】(x:11, y:29)：梢头初生细蕾 (scale: 0.20) */}
         <g transform="translate(11, 29)">
-          {renderOrchidBud(0.22, -95)}
+          {renderOrchidBud(0.20, -95)}
         </g>
       </g>
     </g>
