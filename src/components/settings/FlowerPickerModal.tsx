@@ -95,10 +95,10 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
     },
     {
       id: 'plum_blossoms',
-      name: '傲霜朱砂红梅',
+      name: '傲霜冷香白梅',
       emoji: '💮',
-      desc: '五瓣纯红，金丝长蕊，苍劲老枝，岁朝报春傲雪迎祥',
-      tag: '坚韧报春',
+      desc: '枯瘦挺拔木质细枝，单层五瓣小碟紧贴骨节，金丝满心，青蕾点缀，清瘦孤高',
+      tag: '清瘦孤高',
     },
     {
       id: 'sunflowers',

@@ -107,7 +107,7 @@ export class FloraFactory {
       lotus: '出尘清莲',
       chrysanthemum: '高洁白菊',
       roses: '淡雅香槟玫瑰',
-      plum_blossoms: '傲霜寒梅',
+      plum_blossoms: '傲霜冷香白梅',
       sunflowers: '金色向阳花',
       carnations: '慈孝康乃馨',
       calla_lilies: '圣洁马蹄莲',

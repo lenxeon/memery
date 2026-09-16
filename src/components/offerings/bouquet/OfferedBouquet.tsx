@@ -56,10 +56,10 @@ export const OfferedBouquet: React.FC<OfferedBouquetProps> = ({
         };
       case 'plum_blossoms':
         return {
-          title: '敬献 · 傲霜寒梅',
-          primaryColor: '#e11d48',
-          secColor: '#fecdd3',
-          ribbonColor: '#fef08a',
+          title: '敬献 · 傲霜冷香白梅',
+          primaryColor: '#ffffff',
+          secColor: '#f1f5f9',
+          ribbonColor: '#365314',
         };
       case 'sunflowers':
         return {

@@ -1,212 +1,258 @@
 /**
  * @file PlumBlossomsFlower.tsx
- * @description 【傲霜朱砂寒梅】老干虬枝·铁骨嶙峋·先花后叶传统古梅插花组件。
- * 核心特征：
- *  - 苍劲木质老枝（粗干古树皮皴纹、老木节瘤、之字顿挫硬朗折枝），绝非草本绿径；
- *  - 无草本绿叶（梅花先花后叶，冬雪开花时唯见铁骨红梅与深红小圆花蕾）；
- *  - 五瓣饱满圆润正红梅瓣、十数根放射金丝蕊丝与紫褐星形木质花萼底座。
+ * @description 【傲霜冷香素白梅】瘦、硬、折·单层五瓣紧贴枝·金丝满心青萼点缀·疏朗极简传统文人插梅。
+ * 
+ * 艺术四准则：
+ * 1. 骨（枝干形态）：“瘦、硬、折” —— 深褐焦墨、枯瘦挺拔木质细枝、硬朗顿挫与骨节感、顶端小分叉、通体不生一片叶。
+ * 2. 肉（花瓣结构）：“单层、五瓣、紧贴枝” —— 纯白圆润五瓣如瓷碟平展，无垂吊长梗，直接“咬/贴”在木枝骨节上。
+ * 3. 神（花蕊与花蕾）：“金丝满心，青萼点缀” —— 密集金色放射丝与火星花药、直立水滴形嫩青小花苞包覆深色花萼。
+ * 4. 韵（整体构图与气度）：“疏朗、素净、极简” —— 仅褐、白、金、青绿四色，疏密有致，清瘦孤高。
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
 import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
 
 export const PLUM_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.5, fallSpan: 0.05, startX: 118, startY: 40, landX: 124, landY: 194, rx: 4.8, ry: 4.2, landRot: 25, swayAmp: 14, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.4, fallSpan: 0.05, startX: 38, startY: 52, landX: 40, landY: 193, rx: 5.0, ry: 4.4, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.3, fallSpan: 0.05, startX: 102, startY: 62, landX: 108, landY: 195, rx: 5.2, ry: 4.5, landRot: -18, swayAmp: 16, swayFreq: 3.8 },
-  { id: 4, detachHealth: 0.2, fallSpan: 0.05, startX: 72, startY: 28, landX: 78, landY: 197, rx: 5.4, ry: 4.6, landRot: 35, swayAmp: 18, swayFreq: 4.0 },
-  { id: 5, detachHealth: 0.08, fallSpan: 0.04, startX: 56, startY: 66, landX: 62, landY: 196, rx: 5.5, ry: 4.8, landRot: 12, swayAmp: 14, swayFreq: 4.2 },
+  { id: 1, detachHealth: 0.5, fallSpan: 0.05, startX: 98, startY: 45, landX: 104, landY: 194, rx: 4.5, ry: 3.8, landRot: 25, swayAmp: 14, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.4, fallSpan: 0.05, startX: 58, startY: 96, landX: 62, landY: 193, rx: 4.6, ry: 3.9, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
+  { id: 3, detachHealth: 0.3, fallSpan: 0.05, startX: 90, startY: 60, landX: 96, landY: 195, rx: 4.8, ry: 4.0, landRot: -18, swayAmp: 16, swayFreq: 3.8 },
+  { id: 4, detachHealth: 0.2, fallSpan: 0.05, startX: 74, startY: 76, landX: 80, landY: 197, rx: 5.0, ry: 4.2, landRot: 35, swayAmp: 18, swayFreq: 4.0 },
+  { id: 5, detachHealth: 0.08, fallSpan: 0.04, startX: 68, startY: 36, landX: 74, landY: 196, rx: 5.2, ry: 4.3, landRot: 12, swayAmp: 14, swayFreq: 4.2 },
 ];
 
 export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
-  // 朱砂正红至枯萎深赭衰变
-  const petalRed0 = lerpColor('#f43f5e', '#b87b64', dryFactor);
-  const petalRed50 = lerpColor('#e11d48', '#8f4b36', dryFactor);
-  const petalRed100 = lerpColor('#9f1239', '#4d2417', dryFactor);
+  // 纯白花瓣衰变色：冰洁玉白 -> 微泛淡黄素宣纸白 -> 枯萎温润浅赭
+  const petalWhite0 = lerpColor('#ffffff', '#faf6ee', dryFactor);
+  const petalWhite50 = lerpColor('#fcfbf8', '#eedec7', dryFactor);
+  const petalBase = lerpColor('#f1f5f9', '#cbb398', dryFactor);
 
-  // 古梅苍干老皮色（铁褐、墨赭与苍皮高光）
-  const barkDark = lerpColor('#361b0c', '#241308', dryFactor);
-  const barkMid = lerpColor('#5c3418', '#3d2312', dryFactor);
-  const barkLight = lerpColor('#824e28', '#54331a', dryFactor);
+  // 焦墨老木苍干色（瘦、硬、枯老）
+  const barkDark = lerpColor('#261309', '#1a0c05', dryFactor);
+  const barkMid = lerpColor('#3d2212', '#2c170a', dryFactor);
+  const barkLight = lerpColor('#5a361e', '#412411', dryFactor);
 
-  // 金丝花蕊与暗红药头
-  const stamenGold = lerpColor('#fef08a', '#a88d6b', dryFactor);
-  const antherRed = lerpColor('#fbbf24', '#78542b', dryFactor);
+  // 金丝花蕊与金色小火星花药
+  const stamenGold = lerpColor('#fef08a', '#c4a66a', dryFactor);
+  const antherGold = lerpColor('#eab308', '#8f6828', dryFactor);
+
+  // 嫩青花蕾与青萼
+  const budGreen0 = lerpColor('#86efac', '#8a8868', dryFactor);
+  const budGreen100 = lerpColor('#22c55e', '#524f33', dryFactor);
+  const calyxDark = lerpColor('#3b1a0e', '#231109', dryFactor);
 
   const fl1 = getBlossomDropStyle(health, 0.5);
   const fl2 = getBlossomDropStyle(health, 0.4);
   const fl3 = getBlossomDropStyle(health, 0.3);
   const fl4 = getBlossomDropStyle(health, 0.2);
-  const fl5 = getBlossomDropStyle(health, 0.08);
+  const fl5 = getBlossomDropStyle(health, 0.12);
+  const fl6 = getBlossomDropStyle(health, 0.06);
 
-  const branchOpacity = isFaded ? 0.4 : Math.max(0.65, health);
+  const branchOpacity = isFaded ? 0.45 : Math.max(0.7, health);
 
-  // 单朵经典五瓣梅花（含紫黑木质花萼底托与金丝放射花蕊）
-  const renderPlumBloom = (cx: number, cy: number, r: number = 11, rot: number = 0) => (
+  // ── 肉：单层、五瓣、紧贴枝（平展如瓷小碟，白花、金蕊、青绿心） ──
+  const renderPlumBloom = (cx: number, cy: number, r: number = 10, rot: number = 0) => (
     <g transform={`translate(${cx}, ${cy}) rotate(${rot})`}>
-      {/* 1. 紫黑木质五星花托/花萼底托 (显露于花瓣后方) */}
-      {[36, 108, 180, 252, 324].map((ang, i) => (
-        <path
-          key={`calyx-${i}`}
-          d={`M 0 0 L -2 -${r * 0.9} Q 0 -${r * 1.1} 2 -${r * 0.9} Z`}
-          fill="#4c0519"
-          stroke="#2a040d"
-          strokeWidth="0.5"
-          transform={`rotate(${ang})`}
-          opacity="0.8"
-        />
-      ))}
+      {/* 1. 紧贴木枝的花托背萼点（紧紧咬附在老枝节骨上，绝无吊挂长花梗） */}
+      <circle cx="0" cy="0" r={r * 0.42} fill={calyxDark} opacity="0.8" />
 
-      {/* 2. 5 枚圆润饱满的倒卵形正红花瓣 */}
+      {/* 2. 纯白单层五枚圆润花瓣（如小浅碟般平展舒放） */}
       {[0, 72, 144, 216, 288].map((angle, idx) => (
         <g key={idx} transform={`rotate(${angle})`}>
           <path
-            d={`M 0 0 C -${r * 0.75} -${r * 0.5}, -${r * 0.8} -${r * 1.3}, 0 -${r * 1.4} C ${r * 0.8} -${r * 1.3}, ${r * 0.75} -${r * 0.5}, 0 0 Z`}
-            fill="url(#plumPetalGrad)"
+            d={`M 0 0 C -${r * 0.65} -${r * 0.45}, -${r * 0.75} -${r * 1.15}, 0 -${r * 1.25} C ${r * 0.75} -${r * 1.15}, ${r * 0.65} -${r * 0.45}, 0 0 Z`}
+            fill="url(#whitePlumPetalGrad)"
+            stroke={petalBase}
+            strokeWidth="0.45"
           />
-          {/* 花瓣中央微凹柔光 */}
+          {/* 花瓣中央莹润微光与细微纸感脉纹 */}
           <path
-            d={`M 0 -${r * 0.3} Q 0 -${r * 1.05} 0 -${r * 1.25}`}
-            stroke="#fda4af"
-            strokeWidth="0.8"
+            d={`M 0 -${r * 0.25} Q 0 -${r * 0.9} 0 -${r * 1.1}`}
+            stroke="#ffffff"
+            strokeWidth="0.75"
             strokeLinecap="round"
-            opacity="0.45"
+            opacity="0.8"
           />
         </g>
       ))}
 
-      {/* 3. 中央金丝辐射花蕊 (12根向四周放射，顶着金黄小花药) */}
-      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => {
+      {/* 3. 神：金丝满心，辐射细丝与金色火星花药（中心点缀青绿嫩芯） */}
+      {/* 绿萼梅花心青绿小圆蕊台 */}
+      <circle cx="0" cy="0" r={r * 0.22} fill={budGreen100} opacity="0.85" />
+      <circle cx="0" cy="0" r={r * 0.12} fill="#14532d" />
+
+      {/* 辐射细金丝 (14 根发散细丝，顶着繁密金黄花药，如金色小火星) */}
+      {[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 330].map((deg, i) => {
         const rad = (deg * Math.PI) / 180;
-        const len = r * 0.65;
+        const len = r * 0.68;
         const x2 = Math.cos(rad) * len;
         const y2 = Math.sin(rad) * len;
         return (
           <g key={i}>
-            <line x1="0" y1="0" x2={x2} y2={y2} stroke={stamenGold} strokeWidth="0.75" strokeLinecap="round" opacity="0.95" />
-            <circle cx={x2} cy={y2} r="1.1" fill={antherRed} />
+            <line
+              x1="0"
+              y1="0"
+              x2={x2}
+              y2={y2}
+              stroke={stamenGold}
+              strokeWidth="0.6"
+              strokeLinecap="round"
+              opacity="0.95"
+            />
+            {/* 金色小火星花药 */}
+            <circle cx={x2} cy={y2} r="0.95" fill={antherGold} />
           </g>
         );
       })}
+    </g>
+  );
 
-      {/* 4. 紧致暗红花心 */}
-      <circle cx="0" cy="0" r={r * 0.22} fill={petalRed100} />
-      <circle cx="0" cy="0" r={r * 0.1} fill="#881337" />
+  // ── 神：水滴一样直立生长的嫩青绿色小花苞（基部深色花萼包覆） ──
+  const renderWaterDropBud = (x: number, y: number, rot: number = 0, scale: number = 1) => (
+    <g transform={`translate(${x}, ${y}) rotate(${rot}) scale(${scale})`}>
+      {/* 深色木质小花萼杯 (附于枝上) */}
+      <path d="M -2 0 C -2.5 1.5, 2.5 1.5, 2 0 Z" fill={calyxDark} />
+      <path d="M -1.8 -0.5 L -2.4 -2.2 L -1 -1.4 L 0 -2.4 L 1 -1.4 L 2.4 -2.2 L 1.8 -0.5 Z" fill={calyxDark} />
+      {/* 水滴形嫩青绿色饱满花蕾 (青绿微透纯白尖尖) */}
+      <path
+        d="M 0 0 C -2.6 -1.8, -3.2 -4.8, 0 -8.5 C 3.2 -4.8, 2.6 -1.8, 0 0 Z"
+        fill="url(#greenDropBudGrad)"
+        stroke="#15803d"
+        strokeWidth="0.4"
+      />
+      {/* 水滴尖露出一缕微白花瓣尖 */}
+      <ellipse cx="0" cy="-6.6" rx="0.9" ry="1.6" fill="#ffffff" opacity="0.9" />
     </g>
   );
 
   return (
     <g id="plumBlossomsFlora">
       <defs>
-        <radialGradient id="plumPetalGrad" cx="50%" cy="30%" r="70%">
-          <stop offset="0%" stopColor={petalRed0} />
-          <stop offset="55%" stopColor={petalRed50} />
-          <stop offset="100%" stopColor={petalRed100} />
+        {/* 白梅花瓣莹洁玉白渐变 */}
+        <radialGradient id="whitePlumPetalGrad" cx="50%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="65%" stopColor={petalWhite0} />
+          <stop offset="100%" stopColor={petalWhite50} />
         </radialGradient>
-        <linearGradient id="plumWoodMain" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={barkMid} />
-          <stop offset="50%" stopColor={barkDark} />
-          <stop offset="100%" stopColor="#201007" />
+
+        {/* 水滴嫩青花蕾渐变 */}
+        <linearGradient id="greenDropBudGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor={budGreen100} />
+          <stop offset="60%" stopColor={budGreen0} />
+          <stop offset="100%" stopColor="#dcfce7" />
+        </linearGradient>
+
+        {/* 焦墨枯瘦老枝木纹渐变 */}
+        <linearGradient id="thinBarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={barkLight} />
+          <stop offset="40%" stopColor={barkMid} />
+          <stop offset="100%" stopColor={barkDark} />
         </linearGradient>
       </defs>
 
-      {/* ── 🪵 苍劲铁骨老干虬枝（顿挫转折、树皮皴裂、老木节瘤，绝非圆滑绿草茎） ── */}
-      <g id="plumBranches" style={{ opacity: branchOpacity }}>
-        {/* 1. 主粗干（自瓶口75,125粗壮拔起，向上硬朗顿挫折变） */}
+      {/* ── 骨：枝干形态“瘦、硬、折” ──
+          深褐焦墨，枯瘦挺拔的木质细枝。绝非粗苯圆滑，硬朗顿挫折枝与骨节，顶端小分叉，通体无叶。 */}
+      <g id="plumThinStems" style={{ opacity: branchOpacity }}>
+        {/* 1. 主枯瘦挺拔细干（自瓶口 75,125 凌空修长而起，宽度仅约 2.2~2.4px） */}
         <path
-          d="M 75 125 L 74 110 L 71 96 L 75 84 L 69 72 L 56 60 L 42 46"
-          stroke="url(#plumWoodMain)"
-          strokeWidth="6.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
-        {/* 主干背光深色轮廓与受光皴线 */}
-        <path
-          d="M 73 125 L 72 110 L 69 96 L 73 84 L 67 72 L 54 60 L 41 46"
-          stroke={barkLight}
-          strokeWidth="1.2"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.65"
-        />
-
-        {/* 2. 右侧苍劲大分枝（斜出盘曲，宛如龙爪伸展） */}
-        <path
-          d="M 75 84 L 84 76 L 94 68 L 104 54 L 118 38"
-          stroke="url(#plumWoodMain)"
-          strokeWidth="5.2"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
-        <path
-          d="M 85 75 L 95 67 L 105 53 L 119 37"
-          stroke={barkLight}
-          strokeWidth="1.0"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.6"
-        />
-
-        {/* 3. 向上直立古朴中挺梢 */}
-        <path
-          d="M 69 72 L 72 56 L 74 40 L 73 24"
-          stroke="url(#plumWoodMain)"
-          strokeWidth="3.6"
+          d="M 75 125 L 74 112 L 72 102 L 76 88 L 74 76"
+          stroke="url(#thinBarkGrad)"
+          strokeWidth="2.4"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="bevel"
         />
 
-        {/* 4. 侧向嶙峋小桠枝 */}
-        <path d="M 56 60 L 44 68 L 36 72" stroke="url(#plumWoodMain)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-        <path d="M 94 68 L 102 74 L 110 76" stroke="url(#plumWoodMain)" strokeWidth="2.6" fill="none" strokeLinecap="round" />
-        <path d="M 72 56 L 62 48" stroke="url(#plumWoodMain)" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-        <path d="M 104 54 L 114 50" stroke="url(#plumWoodMain)" strokeWidth="2.0" fill="none" strokeLinecap="round" />
+        {/* 2. 主干中段向右上方舒展的折枝（顿挫有力，瘦硬挺拔） */}
+        <path
+          d="M 74 76 L 82 68 L 92 60 L 98 48 L 106 36 L 115 28"
+          stroke="url(#thinBarkGrad)"
+          strokeWidth="1.9"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="bevel"
+        />
 
-        {/* 5. 古树皮木质节瘤与苔痕点 (Knots & Lichen) */}
-        <ellipse cx="73" cy="92" rx="3.5" ry="2.2" fill="#1f0c05" stroke={barkLight} strokeWidth="0.8" />
-        <ellipse cx="80" cy="79" rx="3.0" ry="1.8" fill="#1f0c05" stroke={barkLight} strokeWidth="0.7" transform="rotate(-25 80 79)" />
-        <ellipse cx="64" cy="65" rx="2.5" ry="1.6" fill="#1f0c05" stroke={barkLight} strokeWidth="0.6" transform="rotate(20 64 65)" />
-        {/* 苍古苔点 */}
-        <circle cx="76" cy="102" r="1.0" fill="#2d2a12" opacity="0.8" />
-        <circle cx="70" cy="88" r="0.9" fill="#2d2a12" opacity="0.8" />
-        <circle cx="91" cy="71" r="1.1" fill="#2d2a12" opacity="0.8" />
+        {/* 右枝末端极细分叉 */}
+        <path d="M 106 36 L 112 40 L 118 42" stroke="url(#thinBarkGrad)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+        <path d="M 92 60 L 86 64" stroke="url(#thinBarkGrad)" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+        <path d="M 98 48 L 105 50" stroke="url(#thinBarkGrad)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
 
-        {/* 6. 冬雪傲骨红梅小圆珠花蕾 (带紫黑萼托，绝无绿叶) */}
-        <g id="plumBuds">
-          <g transform="translate(34, 72)">
-            <circle cx="0" cy="0" r="3.2" fill="#4c0519" />
-            <circle cx="0" cy="-0.5" r="2.6" fill={petalRed50} />
-            <circle cx="0.5" cy="-1.0" r="1.0" fill="#fbcfe8" opacity="0.6" />
-          </g>
-          <g transform="translate(42, 44)">
-            <circle cx="0" cy="0" r="3.4" fill="#4c0519" />
-            <circle cx="0" cy="-0.5" r="2.8" fill={petalRed50} />
-          </g>
-          <g transform="translate(122, 34)">
-            <circle cx="0" cy="0" r="3.2" fill="#4c0519" />
-            <circle cx="0" cy="-0.5" r="2.6" fill={petalRed50} />
-          </g>
-          <g transform="translate(112, 76)">
-            <circle cx="0" cy="0" r="3.0" fill="#4c0519" />
-            <circle cx="0" cy="-0.5" r="2.4" fill={petalRed50} />
-          </g>
-          <g transform="translate(73, 20)">
-            <circle cx="0" cy="0" r="3.4" fill="#4c0519" />
-            <circle cx="0" cy="-0.5" r="2.8" fill={petalRed50} />
-          </g>
-        </g>
+        {/* 3. 向上高耸挺立的孤高长枝（细劲凌空，梢头挺秀） */}
+        <path
+          d="M 74 76 L 73 62 L 71 48 L 68 34 L 64 18"
+          stroke="url(#thinBarkGrad)"
+          strokeWidth="1.8"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="bevel"
+        />
+
+        {/* 左侧微折小分叉枝 */}
+        <path d="M 71 48 L 60 42 L 52 40" stroke="url(#thinBarkGrad)" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+        <path d="M 68 34 L 62 28" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+
+        {/* 4. 下段左侧低伸斜骨枝（疏密互衬） */}
+        <path
+          d="M 72 102 L 62 98 L 54 94 L 46 88"
+          stroke="url(#thinBarkGrad)"
+          strokeWidth="1.6"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="bevel"
+        />
+        <path d="M 62 98 L 58 104" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+
+        {/* 5. 枝条转折处硬朗骨节（Knobby Node swellings） */}
+        <ellipse cx="74" cy="112" rx="1.8" ry="1.2" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        <ellipse cx="76" cy="88" rx="1.7" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        <ellipse cx="74" cy="76" rx="2.2" ry="1.4" fill={barkDark} stroke={barkLight} strokeWidth="0.6" />
+        <ellipse cx="92" cy="60" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        <ellipse cx="98" cy="48" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        <ellipse cx="71" cy="48" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        <ellipse cx="62" cy="98" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+
+        {/* 细致树皮微皴线（焦墨笔意） */}
+        <path d="M 74.8 120 L 74.2 108" stroke={barkLight} strokeWidth="0.6" opacity="0.6" />
+        <path d="M 73.5 100 L 75.5 90" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
+        <path d="M 83 67 L 91 61" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
       </g>
 
-      {/* ── 🌸 5 朵正红傲雪红梅（生于老木虬枝之上，一眼即知为冬梅） ── */}
-      <g id="plumBlooms">
-        <g style={fl1}>{renderPlumBloom(118, 42, 12.0, 18)}</g>
-        <g style={fl2}>{renderPlumBloom(38, 54, 12.5, -25)}</g>
-        <g style={fl3}>{renderPlumBloom(100, 64, 13.2, 32)}</g>
-        <g style={fl4}>{renderPlumBloom(56, 70, 11.2, -12)}</g>
-        <g style={fl5}>{renderPlumBloom(74, 32, 14.8, 5)}</g>
+      {/* ── 神：水滴形直立嫩青绿色小花苞（点缀在枝梢与花旁） ── */}
+      <g id="plumGreenBuds" style={{ opacity: branchOpacity }}>
+        {/* 梢头直立水滴嫩蕾 */}
+        {renderWaterDropBud(64, 18, -12, 1.05)}
+        {renderWaterDropBud(62, 28, -25, 0.9)}
+        {renderWaterDropBud(52, 40, -45, 0.95)}
+        {/* 右梢与侧芽直立水滴嫩蕾 */}
+        {renderWaterDropBud(115, 28, 25, 1.0)}
+        {renderWaterDropBud(118, 42, 38, 0.9)}
+        {renderWaterDropBud(105, 50, 18, 0.85)}
+        {renderWaterDropBud(86, 64, -20, 0.85)}
+        {/* 下枝与老骨间隐现小蕾 */}
+        {renderWaterDropBud(46, 88, -35, 0.95)}
+        {renderWaterDropBud(58, 104, 30, 0.85)}
+        {renderWaterDropBud(76, 86, 15, 0.85)}
+      </g>
+
+      {/* ── 肉：纯白单层五瓣梅花（疏朗分布在单枝骨节上，直接贴/咬老枝，小碟盛开） ── */}
+      <g id="plumWhiteBlooms">
+        {/* 1. 主骨节处核心素白盛开梅花（直接咬在主杈 74,76） */}
+        <g style={fl1}>{renderPlumBloom(74, 76, 11.2, 8)}</g>
+
+        {/* 2. 右侧枝斜上盛放梅花（咬在 92,59 骨节处） */}
+        <g style={fl2}>{renderPlumBloom(93, 59, 10.5, -20)}</g>
+
+        {/* 3. 右上高枝舒展白梅（咬在 106,36 骨节处） */}
+        <g style={fl3}>{renderPlumBloom(106, 36, 10.8, 35)}</g>
+
+        {/* 4. 中挺清拔单朵白梅（咬在 71,48 骨节处） */}
+        <g style={fl4}>{renderPlumBloom(71, 48, 10.0, -12)}</g>
+
+        {/* 5. 顶梢高挺清雅小碟白梅（咬在 68,34 骨节处） */}
+        <g style={fl5}>{renderPlumBloom(68, 34, 9.5, 16)}</g>
+
+        {/* 6. 下部左折枝点缀素白梅花（咬在 54,94 骨节处，下部呼应） */}
+        <g style={fl6}>{renderPlumBloom(54, 94, 9.8, -30)}</g>
       </g>
     </g>
   );

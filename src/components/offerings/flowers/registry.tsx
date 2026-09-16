@@ -67,8 +67,8 @@ export const FLOWER_REGISTRY: Record<FlowerType, FlowerMetadata> = {
   },
   plum_blossoms: {
     id: 'plum_blossoms',
-    name: '傲霜寒梅',
-    poeticTitle: '岁朝报春',
+    name: '傲霜冷香白梅',
+    poeticTitle: '清瘦孤高',
     Component: PlumBlossomsFlower,
     fallingPetals: PLUM_FALLING_PETALS,
   },

@@ -148,7 +148,7 @@ export const buildAuditFlowerItems = (
           'plum_blossoms',
           { x: -144, y: 0 },
           'ribbed_fluted_white',
-          '1. 傲霜朱砂红梅 · 苍劲曲木枝',
+          '1. 傲霜冷香白梅 · 枯瘦挺拔细折枝',
           0.96
         ),
         lifecycle,
@@ -288,7 +288,7 @@ export const buildAuditFlowerItems = (
 
       // 前排 5 款
       vase_audit_flower_1: {
-        ...FloraFactory.createVase('vase_audit_flower_1', 'plum_blossoms', { x: -148, y: 12 }, 'ribbed_fluted_white', '1. 傲霜红梅', 0.88),
+        ...FloraFactory.createVase('vase_audit_flower_1', 'plum_blossoms', { x: -148, y: 12 }, 'ribbed_fluted_white', '1. 傲霜冷香白梅', 0.88),
         lifecycle,
       },
       vase_audit_flower_2: {
@@ -346,7 +346,7 @@ export const buildAuditFlowerItems = (
     offered_flower_b10: FloraFactory.createOfferedBouquet('daisies', { x: 140, y: -4 }, { id: 'offered_flower_b10', name: '雏菊花束' }),
 
     // 前排 5 束花
-    offered_flower_b1: FloraFactory.createOfferedBouquet('plum_blossoms', { x: -140, y: 18 }, { id: 'offered_flower_b1', name: '红梅花束' }),
+    offered_flower_b1: FloraFactory.createOfferedBouquet('plum_blossoms', { x: -140, y: 18 }, { id: 'offered_flower_b1', name: '冷香素白梅' }),
     offered_flower_b2: FloraFactory.createOfferedBouquet('sunflowers', { x: -70, y: 18 }, { id: 'offered_flower_b2', name: '向日葵花束' }),
     offered_flower_b3: FloraFactory.createOfferedBouquet('carnations', { x: 0, y: 18 }, { id: 'offered_flower_b3', name: '康乃馨花束' }),
     offered_flower_b4: FloraFactory.createOfferedBouquet('calla_lilies', { x: 70, y: 18 }, { id: 'offered_flower_b4', name: '马蹄莲花束' }),
@@ -711,7 +711,7 @@ export default function App() {
     lotus: '出尘净莲',
     chrysanthemum: '岁寒金菊',
     roses: '长情玫瑰',
-    plum_blossoms: '傲霜寒梅',
+    plum_blossoms: '傲霜冷香白梅',
     sunflowers: '金色向阳',
     carnations: '慈孝康乃馨',
     calla_lilies: '圣洁马蹄莲',
