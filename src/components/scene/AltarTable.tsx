@@ -47,6 +47,7 @@ interface AltarItemSlotProps {
   onPointerDown: (id: SceneItemId, e: React.PointerEvent) => void;
   onToggleItemLit: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
+  onToggleVase?: (id: SceneItemId) => void;
   onRemoveItem?: (id: SceneItemId) => void;
 }
 
@@ -61,6 +62,7 @@ const AltarItemSlot = React.memo<AltarItemSlotProps>(({
   onPointerDown,
   onToggleItemLit,
   onToggleFruit,
+  onToggleVase,
   onRemoveItem,
 }) => {
   const posX = item.position.x * tableScale;
@@ -91,6 +93,8 @@ const AltarItemSlot = React.memo<AltarItemSlotProps>(({
         onToggleItemLit(id);
       } else if (action === 'toggle_fruit') {
         onToggleFruit?.(id);
+      } else if (action === 'toggle_vase_style' || action === 'toggle_vase' || action === 'click') {
+        onToggleVase?.(id);
       }
     },
     onRemove: () => onRemoveItem?.(id),
@@ -351,6 +355,7 @@ export const DraggableAltarTableComponent: React.FC<DraggableAltarTableProps> = 
                 onPointerDown={handlePointerDown}
                 onToggleItemLit={onToggleItemLit}
                 onToggleFruit={onToggleFruit}
+                onToggleVase={onToggleVase}
                 onRemoveItem={onRemoveItem}
               />
             );

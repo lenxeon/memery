@@ -806,18 +806,20 @@ export default function App() {
   };
 
   const handleToggleVaseStyle = (id: SceneItemId) => {
-    if (id.startsWith('vase_audit_flower_')) {
+    if (id.startsWith('vase_audit_flower_') || (isAuditMode && auditCategory === 'flowers')) {
       const item = items[id];
-      if (item && item.flowerType) {
-        const meta = FLOWER_REGISTRY[item.flowerType];
+      if (item) {
+        sound.playPorcelainClink();
+        const meta = item.flowerType ? FLOWER_REGISTRY[item.flowerType] : null;
         if (meta) {
-          sound.playPorcelainClink();
           showToast(`🌸【${meta.name}】${meta.poeticTitle} · 名花专项审计中`);
-          return;
+        } else {
+          showToast(`🌸【${item.name}】· 名花专项审计中`);
         }
+        return;
       }
     }
-    if (id.startsWith('vase_audit_')) {
+    if (id.startsWith('vase_audit_') || isAuditMode) {
       const item = items[id];
       if (item) {
         sound.playPorcelainClink();
