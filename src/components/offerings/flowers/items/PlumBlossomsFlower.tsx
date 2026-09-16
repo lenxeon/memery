@@ -13,11 +13,11 @@ import { FlowerComponentProps, FallingPetalDef } from '../types';
 import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
 
 export const PLUM_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.5, fallSpan: 0.05, startX: 98, startY: 45, landX: 104, landY: 194, rx: 4.5, ry: 3.8, landRot: 25, swayAmp: 14, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.4, fallSpan: 0.05, startX: 58, startY: 96, landX: 62, landY: 193, rx: 4.6, ry: 3.9, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.3, fallSpan: 0.05, startX: 90, startY: 60, landX: 96, landY: 195, rx: 4.8, ry: 4.0, landRot: -18, swayAmp: 16, swayFreq: 3.8 },
-  { id: 4, detachHealth: 0.2, fallSpan: 0.05, startX: 74, startY: 76, landX: 80, landY: 197, rx: 5.0, ry: 4.2, landRot: 35, swayAmp: 18, swayFreq: 4.0 },
-  { id: 5, detachHealth: 0.08, fallSpan: 0.04, startX: 68, startY: 36, landX: 74, landY: 196, rx: 5.2, ry: 4.3, landRot: 12, swayAmp: 14, swayFreq: 4.2 },
+  { id: 1, detachHealth: 0.5, fallSpan: 0.05, startX: 104, startY: -25, landX: 108, landY: 194, rx: 2.8, ry: 2.3, landRot: 25, swayAmp: 14, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.4, fallSpan: 0.05, startX: 52, startY: 15, landX: 58, landY: 193, rx: 2.9, ry: 2.4, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
+  { id: 3, detachHealth: 0.3, fallSpan: 0.05, startX: 92, startY: -5, landX: 96, landY: 195, rx: 2.7, ry: 2.2, landRot: -18, swayAmp: 16, swayFreq: 3.8 },
+  { id: 4, detachHealth: 0.2, fallSpan: 0.05, startX: 74, startY: 35, landX: 80, landY: 197, rx: 3.0, ry: 2.5, landRot: 35, swayAmp: 18, swayFreq: 4.0 },
+  { id: 5, detachHealth: 0.08, fallSpan: 0.04, startX: 68, startY: -45, landX: 74, landY: 196, rx: 3.1, ry: 2.6, landRot: 12, swayAmp: 14, swayFreq: 4.2 },
 ];
 
 export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
@@ -26,10 +26,10 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
   const petalWhite50 = lerpColor('#fcfbf8', '#eedec7', dryFactor);
   const petalBase = lerpColor('#f1f5f9', '#cbb398', dryFactor);
 
-  // 焦墨老木苍干色（瘦、硬、枯老）
-  const barkDark = lerpColor('#261309', '#1a0c05', dryFactor);
-  const barkMid = lerpColor('#3d2212', '#2c170a', dryFactor);
-  const barkLight = lerpColor('#5a361e', '#412411', dryFactor);
+  // 焦墨老木苍干色（瘦、硬、枯老、节骨顿挫）
+  const barkDark = lerpColor('#221008', '#160a04', dryFactor);
+  const barkMid = lerpColor('#391e10', '#251308', dryFactor);
+  const barkLight = lerpColor('#543018', '#381e0d', dryFactor);
 
   // 金丝花蕊与金色小火星花药
   const stamenGold = lerpColor('#fef08a', '#c4a66a', dryFactor);
@@ -38,89 +38,176 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
   // 嫩青花蕾与青萼
   const budGreen0 = lerpColor('#86efac', '#8a8868', dryFactor);
   const budGreen100 = lerpColor('#22c55e', '#524f33', dryFactor);
-  const calyxDark = lerpColor('#3b1a0e', '#231109', dryFactor);
+  const calyxDark = lerpColor('#30150b', '#1a0b05', dryFactor);
 
   const fl1 = getBlossomDropStyle(health, 0.5);
   const fl2 = getBlossomDropStyle(health, 0.4);
   const fl3 = getBlossomDropStyle(health, 0.3);
   const fl4 = getBlossomDropStyle(health, 0.2);
-  const fl5 = getBlossomDropStyle(health, 0.12);
-  const fl6 = getBlossomDropStyle(health, 0.06);
+  const fl5 = getBlossomDropStyle(health, 0.1);
 
   const branchOpacity = isFaded ? 0.45 : Math.max(0.7, health);
 
-  // ── 肉：单层、五瓣、紧贴枝（平展如瓷小碟，白花、金蕊、青绿心） ──
-  const renderPlumBloom = (cx: number, cy: number, r: number = 10, rot: number = 0) => (
-    <g transform={`translate(${cx}, ${cy}) rotate(${rot})`}>
-      {/* 1. 紧贴木枝的花托背萼点（紧紧咬附在老枝节骨上，绝无吊挂长花梗） */}
-      <circle cx="0" cy="0" r={r * 0.42} fill={calyxDark} opacity="0.8" />
+  // ── 纯白五瓣梅神态渲染（花朵极小，各异神态，绝非单一千篇一律正面） ──
+  /**
+   * @param cx 枝干节点 X
+   * @param cy 枝干节点 Y
+   * @param r 基础半径（缩小一半：约 4.8 ~ 6.2px）
+   * @param rot 枝头附着角度
+   * @param posture 神态：
+   *   - 'side_right': 侧颜向右微昂，2瓣重叠背立，3瓣展向侧方，花蕊斜挑而出
+   *   - 'side_left': 侧颜向左斜倚，青萼后托明显，花蕊斜出
+   *   - 'three_quarter': 三分之四侧俯仰，花盘椭圆透视倾斜
+   *   - 'back_cup': 背身/侧背向（仅露青绿托萼与探出的一半微卷白瓣，含蓄冷幽）
+   *   - 'front_tilt': 正面微仰，透视扁圆，显金色火星花蕊
+   */
+  const renderPlumBloom = (
+    cx: number,
+    cy: number,
+    r: number = 5.5,
+    rot: number = 0,
+    posture: 'side_right' | 'side_left' | 'three_quarter' | 'back_cup' | 'front_tilt' = 'three_quarter'
+  ) => {
+    return (
+      <g transform={`translate(${cx}, ${cy}) rotate(${rot})`}>
+        {/* 1. 侧枝贴合木质深焦墨花托基座（紧咬枝节，无下垂软梗） */}
+        <circle cx="0" cy="0" r={r * 0.35} fill={calyxDark} opacity="0.85" />
 
-      {/* 2. 纯白单层五枚圆润花瓣（如小浅碟般平展舒放） */}
-      {[0, 72, 144, 216, 288].map((angle, idx) => (
-        <g key={idx} transform={`rotate(${angle})`}>
-          <path
-            d={`M 0 0 C -${r * 0.65} -${r * 0.45}, -${r * 0.75} -${r * 1.15}, 0 -${r * 1.25} C ${r * 0.75} -${r * 1.15}, ${r * 0.65} -${r * 0.45}, 0 0 Z`}
-            fill="url(#whitePlumPetalGrad)"
-            stroke={petalBase}
-            strokeWidth="0.45"
-          />
-          {/* 花瓣中央莹润微光与细微纸感脉纹 */}
-          <path
-            d={`M 0 -${r * 0.25} Q 0 -${r * 0.9} 0 -${r * 1.1}`}
-            stroke="#ffffff"
-            strokeWidth="0.75"
-            strokeLinecap="round"
-            opacity="0.8"
-          />
-        </g>
-      ))}
-
-      {/* 3. 神：金丝满心，辐射细丝与金色火星花药（中心点缀青绿嫩芯） */}
-      {/* 绿萼梅花心青绿小圆蕊台 */}
-      <circle cx="0" cy="0" r={r * 0.22} fill={budGreen100} opacity="0.85" />
-      <circle cx="0" cy="0" r={r * 0.12} fill="#14532d" />
-
-      {/* 辐射细金丝 (14 根发散细丝，顶着繁密金黄花药，如金色小火星) */}
-      {[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 330].map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const len = r * 0.68;
-        const x2 = Math.cos(rad) * len;
-        const y2 = Math.sin(rad) * len;
-        return (
-          <g key={i}>
-            <line
-              x1="0"
-              y1="0"
-              x2={x2}
-              y2={y2}
-              stroke={stamenGold}
-              strokeWidth="0.6"
-              strokeLinecap="round"
-              opacity="0.95"
-            />
-            {/* 金色小火星花药 */}
-            <circle cx={x2} cy={y2} r="0.95" fill={antherGold} />
+        {/* 2. 依据不同姿态绘制形态各异的花瓣与花蕊 */}
+        {posture === 'front_tilt' && (
+          // 正面微仰小碟状（椭圆透视扁平，花体轻巧精妙）
+          <g transform="scale(1, 0.82)">
+            {[0, 72, 144, 216, 288].map((angle, idx) => (
+              <g key={idx} transform={`rotate(${angle})`}>
+                <path
+                  d={`M 0 0 C -${r * 0.65} -${r * 0.45}, -${r * 0.72} -${r * 1.1}, 0 -${r * 1.22} C ${r * 0.72} -${r * 1.1}, ${r * 0.65} -${r * 0.45}, 0 0 Z`}
+                  fill="url(#whitePlumPetalGrad)"
+                  stroke={petalBase}
+                  strokeWidth="0.35"
+                />
+              </g>
+            ))}
+            {/* 青绿花心 */}
+            <circle cx="0" cy="0" r={r * 0.22} fill={budGreen100} />
+            {/* 放射细金丝与花药（辐射开出，精细纤巧） */}
+            {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((deg, i) => {
+              const rad = (deg * Math.PI) / 180;
+              const len = r * 0.65;
+              const x2 = Math.cos(rad) * len;
+              const y2 = Math.sin(rad) * len;
+              return (
+                <g key={i}>
+                  <line x1="0" y1="0" x2={x2} y2={y2} stroke={stamenGold} strokeWidth="0.4" />
+                  <circle cx={x2} cy={y2} r="0.55" fill={antherGold} />
+                </g>
+              );
+            })}
           </g>
-        );
-      })}
-    </g>
-  );
+        )}
 
-  // ── 神：水滴一样直立生长的嫩青绿色小花苞（基部深色花萼包覆） ──
-  const renderWaterDropBud = (x: number, y: number, rot: number = 0, scale: number = 1) => (
+        {posture === 'three_quarter' && (
+          // 三刻侧颜（后两瓣因透视较短，前三瓣舒展，金丝向侧前发散）
+          <g transform="scale(0.88, 1.1) rotate(15)">
+            {/* 后侧两瓣 */}
+            <path d={`M 0 0 C -${r * 0.5} -${r * 0.3}, -${r * 0.6} -${r * 0.8}, 0 -${r * 0.85} C ${r * 0.4} -${r * 0.8}, ${r * 0.4} -${r * 0.3}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" transform="rotate(-50)" />
+            <path d={`M 0 0 C -${r * 0.4} -${r * 0.3}, -${r * 0.4} -${r * 0.8}, 0 -${r * 0.85} C ${r * 0.6} -${r * 0.8}, ${r * 0.5} -${r * 0.3}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" transform="rotate(45)" />
+            {/* 青绿心底 */}
+            <ellipse cx="0" cy="0" rx={r * 0.25} ry={r * 0.18} fill={budGreen100} />
+            {/* 前侧三瓣倾展 */}
+            <path d={`M 0 0 C -${r * 0.65} -${r * 0.4}, -${r * 0.75} -${r * 1.1}, 0 -${r * 1.25} C ${r * 0.75} -${r * 1.1}, ${r * 0.65} -${r * 0.4}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.35" transform="rotate(115)" />
+            <path d={`M 0 0 C -${r * 0.65} -${r * 0.4}, -${r * 0.75} -${r * 1.1}, 0 -${r * 1.2} C ${r * 0.75} -${r * 1.1}, ${r * 0.65} -${r * 0.4}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.35" transform="rotate(180)" />
+            <path d={`M 0 0 C -${r * 0.65} -${r * 0.4}, -${r * 0.75} -${r * 1.1}, 0 -${r * 1.25} C ${r * 0.75} -${r * 1.1}, ${r * 0.65} -${r * 0.4}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.35" transform="rotate(245)" />
+            {/* 侧探金丝 */}
+            {[-25, -10, 5, 20, 35].map((angle, i) => {
+              const rad = ((angle + 90) * Math.PI) / 180;
+              const len = r * 0.75;
+              return (
+                <g key={i}>
+                  <line x1="0" y1="0" x2={Math.cos(rad) * len} y2={Math.sin(rad) * len} stroke={stamenGold} strokeWidth="0.4" />
+                  <circle cx={Math.cos(rad) * len} cy={Math.sin(rad) * len} r="0.55" fill={antherGold} />
+                </g>
+              );
+            })}
+          </g>
+        )}
+
+        {posture === 'side_right' && (
+          // 纯侧身向右（花瓣层叠如玉勺侧立，花萼在左下清晰紧包，极具古典画意）
+          <g>
+            {/* 左后侧深褐色青绿花萼托 */}
+            <path d="M 0 0 C -3 1, -4 -3, -1 -4 C 1 -4, 2 -1, 0 0 Z" fill={calyxDark} />
+            <ellipse cx="-1.5" cy="-2.5" rx="1.8" ry="1.2" fill={budGreen100} opacity="0.9" />
+            {/* 后向侧瓣 */}
+            <path d={`M 0 0 C 0 -${r * 0.6}, ${r * 0.4} -${r * 1.1}, ${r * 0.85} -${r * 1.0} C ${r * 0.8} -${r * 0.4}, ${r * 0.3} -${r * 0.1}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" />
+            {/* 正侧中瓣 */}
+            <path d={`M 0 0 C ${r * 0.3} -${r * 0.6}, ${r * 0.9} -${r * 0.8}, ${r * 1.25} -${r * 0.2} C ${r * 0.9} ${r * 0.3}, ${r * 0.4} ${r * 0.2}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.35" />
+            {/* 前下方微收瓣 */}
+            <path d={`M 0 0 C ${r * 0.2} ${r * 0.2}, ${r * 0.7} ${r * 0.6}, ${r * 1.0} ${r * 0.5} C ${r * 0.8} ${r * 0.1}, ${r * 0.4} 0, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" />
+            {/* 向右探出的细金丝与花药 */}
+            <line x1="2" y1="-1" x2={r * 0.9} y2="-3" stroke={stamenGold} strokeWidth="0.4" />
+            <circle cx={r * 0.9} cy="-3" r="0.55" fill={antherGold} />
+            <line x1="2" y1="0" x2={r * 1.05} y2="-0.5" stroke={stamenGold} strokeWidth="0.4" />
+            <circle cx={r * 1.05} cy="-0.5" r="0.55" fill={antherGold} />
+            <line x1="2" y1="1" x2={r * 0.95} y2="2" stroke={stamenGold} strokeWidth="0.4" />
+            <circle cx={r * 0.95} cy="2" r="0.55" fill={antherGold} />
+          </g>
+        )}
+
+        {posture === 'side_left' && (
+          // 纯侧身向左微倾
+          <g transform="scale(-1, 1)">
+            <path d="M 0 0 C -3 1, -4 -3, -1 -4 C 1 -4, 2 -1, 0 0 Z" fill={calyxDark} />
+            <ellipse cx="-1.5" cy="-2.5" rx="1.8" ry="1.2" fill={budGreen100} opacity="0.9" />
+            <path d={`M 0 0 C 0 -${r * 0.6}, ${r * 0.4} -${r * 1.1}, ${r * 0.85} -${r * 1.0} C ${r * 0.8} -${r * 0.4}, ${r * 0.3} -${r * 0.1}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" />
+            <path d={`M 0 0 C ${r * 0.3} -${r * 0.6}, ${r * 0.9} -${r * 0.8}, ${r * 1.25} -${r * 0.2} C ${r * 0.9} ${r * 0.3}, ${r * 0.4} ${r * 0.2}, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.35" />
+            <path d={`M 0 0 C ${r * 0.2} ${r * 0.2}, ${r * 0.7} ${r * 0.6}, ${r * 1.0} ${r * 0.5} C ${r * 0.8} ${r * 0.1}, ${r * 0.4} 0, 0 0 Z`} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" />
+            <line x1="2" y1="-1" x2={r * 0.9} y2="-3" stroke={stamenGold} strokeWidth="0.4" />
+            <circle cx={r * 0.9} cy="-3" r="0.55" fill={antherGold} />
+            <line x1="2" y1="0" x2={r * 1.05} y2="-0.5" stroke={stamenGold} strokeWidth="0.4" />
+            <circle cx={r * 1.05} cy="-0.5" r="0.55" fill={antherGold} />
+            <line x1="2" y1="1" x2={r * 0.95} y2="2" stroke={stamenGold} strokeWidth="0.4" />
+            <circle cx={r * 0.95} cy="2" r="0.55" fill={antherGold} />
+          </g>
+        )}
+
+        {posture === 'back_cup' && (
+          // 背身回望杯状（主要呈现深色与青绿五裂花萼，掩映露出素白瓣尖，极具文人幽玄含蓄之神）
+          <g>
+            {/* 白瓣背影浅露 */}
+            <circle cx="0" cy="-2.5" r={r * 0.75} fill="url(#whitePlumPetalGrad)" stroke={petalBase} strokeWidth="0.3" />
+            {/* 清晰挺拔的五星青褐色花萼杯 */}
+            <circle cx="0" cy="0" r={r * 0.32} fill={calyxDark} />
+            {[0, 72, 144, 216, 288].map((angle, idx) => (
+              <path
+                key={idx}
+                d="M 0 0 L -1.2 -1.8 L 0 -3.6 L 1.2 -1.8 Z"
+                fill={budGreen100}
+                stroke={calyxDark}
+                strokeWidth="0.3"
+                transform={`rotate(${angle})`}
+              />
+            ))}
+          </g>
+        )}
+      </g>
+    );
+  };
+
+  // ── 神：水滴直立生长的嫩青绿色小花苞（更小更紧致，清瘦灵动） ──
+  const renderWaterDropBud = (x: number, y: number, rot: number = 0, scale: number = 0.85) => (
     <g transform={`translate(${x}, ${y}) rotate(${rot}) scale(${scale})`}>
-      {/* 深色木质小花萼杯 (附于枝上) */}
-      <path d="M -2 0 C -2.5 1.5, 2.5 1.5, 2 0 Z" fill={calyxDark} />
-      <path d="M -1.8 -0.5 L -2.4 -2.2 L -1 -1.4 L 0 -2.4 L 1 -1.4 L 2.4 -2.2 L 1.8 -0.5 Z" fill={calyxDark} />
-      {/* 水滴形嫩青绿色饱满花蕾 (青绿微透纯白尖尖) */}
+      {/* 深色木质小花萼杯 (咬紧于枝) */}
+      <path d="M -1.8 0 C -2.2 1.2, 2.2 1.2, 1.8 0 Z" fill={calyxDark} />
+      <path d="M -1.5 -0.4 L -2.0 -1.8 L -0.8 -1.1 L 0 -2.0 L 0.8 -1.1 L 2.0 -1.8 L 1.5 -0.4 Z" fill={calyxDark} />
+      {/* 水滴形嫩青小花苞 */}
       <path
-        d="M 0 0 C -2.6 -1.8, -3.2 -4.8, 0 -8.5 C 3.2 -4.8, 2.6 -1.8, 0 0 Z"
+        d="M 0 0 C -2.2 -1.4, -2.6 -4.0, 0 -7.2 C 2.6 -4.0, 2.2 -1.4, 0 0 Z"
         fill="url(#greenDropBudGrad)"
         stroke="#15803d"
-        strokeWidth="0.4"
+        strokeWidth="0.3"
       />
-      {/* 水滴尖露出一缕微白花瓣尖 */}
-      <ellipse cx="0" cy="-6.6" rx="0.9" ry="1.6" fill="#ffffff" opacity="0.9" />
+      {/* 尖端一缕素白瓣芯 */}
+      <ellipse cx="0" cy="-5.6" rx="0.7" ry="1.2" fill="#ffffff" opacity="0.9" />
     </g>
   );
 
@@ -150,109 +237,106 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
       </defs>
 
       {/* ── 骨：枝干形态“瘦、硬、折” ──
-          深褐焦墨，枯瘦挺拔的木质细枝。绝非粗苯圆滑，硬朗顿挫折枝与骨节，顶端小分叉，通体无叶。 */}
+          枝干加高一半（从原本瓶口 125 一路破空耸立至 -75，高挑清朗，中后段错落折枝，通体绝不生叶） */}
       <g id="plumThinStems" style={{ opacity: branchOpacity }}>
-        {/* 1. 主枯瘦挺拔细干（自瓶口 75,125 凌空修长而起，宽度仅约 2.2~2.4px） */}
+        {/* 1. 下部木质老主干（自瓶口 75,125 挺拔直上，极度清瘦 2.0px，至中段 74,48 破空顿挫） */}
         <path
-          d="M 75 125 L 74 112 L 72 102 L 76 88 L 74 76"
+          d="M 75 125 L 75 106 L 73 88 L 76 70 L 74 48"
           stroke="url(#thinBarkGrad)"
-          strokeWidth="2.4"
+          strokeWidth="2.1"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="bevel"
         />
 
-        {/* 2. 主干中段向右上方舒展的折枝（顿挫有力，瘦硬挺拔） */}
+        {/* 2. 中后段向右上方舒展的折枝（硬朗折角，高远瘦硬） */}
         <path
-          d="M 74 76 L 82 68 L 92 60 L 98 48 L 106 36 L 115 28"
-          stroke="url(#thinBarkGrad)"
-          strokeWidth="1.9"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
-
-        {/* 右枝末端极细分叉 */}
-        <path d="M 106 36 L 112 40 L 118 42" stroke="url(#thinBarkGrad)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-        <path d="M 92 60 L 86 64" stroke="url(#thinBarkGrad)" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-        <path d="M 98 48 L 105 50" stroke="url(#thinBarkGrad)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-
-        {/* 3. 向上高耸挺立的孤高长枝（细劲凌空，梢头挺秀） */}
-        <path
-          d="M 74 76 L 73 62 L 71 48 L 68 34 L 64 18"
-          stroke="url(#thinBarkGrad)"
-          strokeWidth="1.8"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
-
-        {/* 左侧微折小分叉枝 */}
-        <path d="M 71 48 L 60 42 L 52 40" stroke="url(#thinBarkGrad)" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-        <path d="M 68 34 L 62 28" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
-
-        {/* 4. 下段左侧低伸斜骨枝（疏密互衬） */}
-        <path
-          d="M 72 102 L 62 98 L 54 94 L 46 88"
+          d="M 74 48 L 84 32 L 95 18 L 102 -2 L 108 -25 L 114 -42"
           stroke="url(#thinBarkGrad)"
           strokeWidth="1.6"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="bevel"
         />
-        <path d="M 62 98 L 58 104" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
 
-        {/* 5. 枝条转折处硬朗骨节（Knobby Node swellings） */}
-        <ellipse cx="74" cy="112" rx="1.8" ry="1.2" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
-        <ellipse cx="76" cy="88" rx="1.7" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
-        <ellipse cx="74" cy="76" rx="2.2" ry="1.4" fill={barkDark} stroke={barkLight} strokeWidth="0.6" />
-        <ellipse cx="92" cy="60" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
-        <ellipse cx="98" cy="48" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
-        <ellipse cx="71" cy="48" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
-        <ellipse cx="62" cy="98" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        {/* 右后段分叉梢细枝 */}
+        <path d="M 108 -25 L 115 -18 L 122 -14" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
+        <path d="M 95 18 L 89 12 L 85 8" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+        <path d="M 102 -2 L 110 -6" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
 
-        {/* 细致树皮微皴线（焦墨笔意） */}
-        <path d="M 74.8 120 L 74.2 108" stroke={barkLight} strokeWidth="0.6" opacity="0.6" />
-        <path d="M 73.5 100 L 75.5 90" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
-        <path d="M 83 67 L 91 61" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
+        {/* 3. 破空拔高之孤高绝顶主枝（加高至 y=-75，峭拔清峻，一枝独秀） */}
+        <path
+          d="M 74 48 L 72 26 L 68 2 L 64 -26 L 67 -54 L 62 -75"
+          stroke="url(#thinBarkGrad)"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="bevel"
+        />
+
+        {/* 梢头微有清瘦小分叉 */}
+        <path d="M 64 -26 L 56 -36 L 48 -42" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
+        <path d="M 67 -54 L 72 -64" stroke="url(#thinBarkGrad)" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+        <path d="M 62 -75 L 58 -82" stroke="url(#thinBarkGrad)" strokeWidth="0.8" fill="none" strokeLinecap="round" />
+
+        {/* 4. 中下部向左探出的小折枝（极为克制，仅作骨气呼应） */}
+        <path
+          d="M 73 88 L 62 82 L 54 78"
+          stroke="url(#thinBarkGrad)"
+          strokeWidth="1.3"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="bevel"
+        />
+        <path d="M 62 82 L 58 88" stroke="url(#thinBarkGrad)" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+
+        {/* 5. 枝条折变处的硬朗骨节（Knobby Node） */}
+        <ellipse cx="75" cy="106" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+        <ellipse cx="76" cy="70" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+        <ellipse cx="74" cy="48" rx="1.8" ry="1.2" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+        <ellipse cx="95" cy="18" rx="1.4" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+        <ellipse cx="108" cy="-25" rx="1.3" ry="0.9" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+        <ellipse cx="68" cy="2" rx="1.4" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+        <ellipse cx="64" cy="-26" rx="1.3" ry="0.9" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+
+        {/* 树皮皴纹细笔 */}
+        <path d="M 74.8 115 L 74.2 98" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
+        <path d="M 74.5 65 L 75.2 55" stroke={barkLight} strokeWidth="0.4" opacity="0.6" />
+        <path d="M 86 30 L 93 20" stroke={barkLight} strokeWidth="0.4" opacity="0.6" />
       </g>
 
-      {/* ── 神：水滴形直立嫩青绿色小花苞（点缀在枝梢与花旁） ── */}
+      {/* ── 神：水滴形直立嫩青绿色小花苞（仅稀疏点缀在中后高段枝节与梢头） ── */}
       <g id="plumGreenBuds" style={{ opacity: branchOpacity }}>
-        {/* 梢头直立水滴嫩蕾 */}
-        {renderWaterDropBud(64, 18, -12, 1.05)}
-        {renderWaterDropBud(62, 28, -25, 0.9)}
-        {renderWaterDropBud(52, 40, -45, 0.95)}
-        {/* 右梢与侧芽直立水滴嫩蕾 */}
-        {renderWaterDropBud(115, 28, 25, 1.0)}
-        {renderWaterDropBud(118, 42, 38, 0.9)}
-        {renderWaterDropBud(105, 50, 18, 0.85)}
-        {renderWaterDropBud(86, 64, -20, 0.85)}
-        {/* 下枝与老骨间隐现小蕾 */}
-        {renderWaterDropBud(46, 88, -35, 0.95)}
-        {renderWaterDropBud(58, 104, 30, 0.85)}
-        {renderWaterDropBud(76, 86, 15, 0.85)}
+        {/* 极顶高梢直立水滴嫩蕾 */}
+        {renderWaterDropBud(58, -82, -18, 0.85)}
+        {renderWaterDropBud(72, -64, 22, 0.8)}
+        {renderWaterDropBud(48, -42, -35, 0.8)}
+        {/* 右上高梢直立嫩蕾 */}
+        {renderWaterDropBud(114, -42, 28, 0.85)}
+        {renderWaterDropBud(122, -14, 45, 0.75)}
+        {renderWaterDropBud(110, -6, 15, 0.75)}
+        {renderWaterDropBud(85, 8, -25, 0.75)}
+        {/* 中下部极少一两枚幼蕾 */}
+        {renderWaterDropBud(54, 78, -35, 0.8)}
+        {renderWaterDropBud(76, 68, 12, 0.75)}
       </g>
 
-      {/* ── 肉：纯白单层五瓣梅花（疏朗分布在单枝骨节上，直接贴/咬老枝，小碟盛开） ── */}
+      {/* ── 肉：纯白小碟梅花（花体缩小一半，稀疏错落分布在中后段，神态各异：俯仰、侧颜、背杯） ── */}
       <g id="plumWhiteBlooms">
-        {/* 1. 主骨节处核心素白盛开梅花（直接咬在主杈 74,76） */}
-        <g style={fl1}>{renderPlumBloom(74, 76, 11.2, 8)}</g>
+        {/* 1. 中段主节处：【侧颜向右】微昂（咬在 84,32 节处，尺寸极小 r=5.4，侧颜清冷，向右斜挑金蕊） */}
+        <g style={fl1}>{renderPlumBloom(84, 32, 5.4, -18, 'side_right')}</g>
 
-        {/* 2. 右侧枝斜上盛放梅花（咬在 92,59 骨节处） */}
-        <g style={fl2}>{renderPlumBloom(93, 59, 10.5, -20)}</g>
+        {/* 2. 中高右侧折枝：【三分之四侧俯】微俯（咬在 102,-2 节处，尺寸 r=5.8，向案前微俯视） */}
+        <g style={fl2}>{renderPlumBloom(102, -2, 5.8, 25, 'three_quarter')}</g>
 
-        {/* 3. 右上高枝舒展白梅（咬在 106,36 骨节处） */}
-        <g style={fl3}>{renderPlumBloom(106, 36, 10.8, 35)}</g>
+        {/* 3. 高枝顶端分梢：【侧颜向左】清拔（咬在 108,-25 节处，尺寸 r=5.0，侧身回看主干） */}
+        <g style={fl3}>{renderPlumBloom(108, -25, 5.0, 15, 'side_left')}</g>
 
-        {/* 4. 中挺清拔单朵白梅（咬在 71,48 骨节处） */}
-        <g style={fl4}>{renderPlumBloom(71, 48, 10.0, -12)}</g>
+        {/* 4. 主长枝中段偏左：【正面微仰】扁碟（咬在 68,2 节处，尺寸 r=5.2，仰望长空，金丝毕现） */}
+        <g style={fl4}>{renderPlumBloom(68, 2, 5.2, -10, 'front_tilt')}</g>
 
-        {/* 5. 顶梢高挺清雅小碟白梅（咬在 68,34 骨节处） */}
-        <g style={fl5}>{renderPlumBloom(68, 34, 9.5, 16)}</g>
-
-        {/* 6. 下部左折枝点缀素白梅花（咬在 54,94 骨节处，下部呼应） */}
-        <g style={fl6}>{renderPlumBloom(54, 94, 9.8, -30)}</g>
+        {/* 5. 顶梢破空回眸处：【背身含蓄杯状】（咬在 64,-26 节处，尺寸 r=4.8，背立露青绿花萼与白瓣尖，宋画幽玄禅意） */}
+        <g style={fl5}>{renderPlumBloom(64, -26, 4.8, 30, 'back_cup')}</g>
       </g>
     </g>
   );
