@@ -28,6 +28,7 @@ import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerMo
 import { BottomDock, FpsMonitor } from './components/controls';
 import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
 import { VaseStyle, getVaseStyleMeta } from './components/offerings/flowers/vases';
+import { FLOWER_REGISTRY } from './components/offerings/flowers';
 import { CinnabarSealBadge } from './components/common/ChineseDecorations';
 import { useWorldLoop } from './game/lifecycle/useWorldLoop';
 import { sound } from './utils/audio';
@@ -56,11 +57,21 @@ export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
   singing_bowl: RitualFactory.createSingingBowl({ x: -62, y: 32 }),
 });
 
-// ── 🔍 专项花器审计展台 (台面清空其它所有物品，并列陈列供逐一审计器形、微观肌理与咬合) ──
-export type AuditGroup = 'new_unique' | 'designer_twist';
+// ── 🔍 专项审计展台 (台面清空其它所有物品，并列陈列供逐一审计花器形制、微观肌理与名花形神) ──
+export type AuditCategory = 'flowers' | 'vases';
+export type VaseAuditGroup = 'new_unique' | 'designer_twist';
+export type FlowerAuditGroup =
+  | 'flowers_tier1_all'   // 🌟 第一梯队 10 花齐放同台
+  | 'flowers_tier1_a'     // 🌺 第一梯队 A 组 (前5名卉：梅花/向日葵/康乃馨/马蹄莲/郁金香)
+  | 'flowers_tier1_b'     // 🪷 第一梯队 B 组 (后5名卉：水仙/铃兰/蝴蝶兰/绣球/雏菊)
+  | 'flowers_classic'     // 💮 经典传承 5 供 (牡丹/百合/清莲/白菊/玫瑰)
+  | 'flowers_bouquets';   // 💐 案前敬献花束平铺对比
 
+export type AuditGroup = VaseAuditGroup | FlowerAuditGroup;
+
+// 1. 雅瓷花器形制专项审计
 export const buildAuditVaseItems = (
-  group: AuditGroup = 'new_unique',
+  group: VaseAuditGroup = 'new_unique',
   withFlowers: boolean = true
 ): Record<SceneItemId, SceneItem> => {
   if (group === 'new_unique') {
@@ -114,7 +125,256 @@ export const buildAuditVaseItems = (
   };
 };
 
-export const buildInitialItems = (): Record<SceneItemId, SceneItem> => buildAuditVaseItems('new_unique', true);
+// 2. 🌸 名花形神与枯荣生命周期专项审计
+export const buildAuditFlowerItems = (
+  group: FlowerAuditGroup = 'flowers_tier1_all',
+  decayHealth: number = 1.0
+): Record<SceneItemId, SceneItem> => {
+  const lifecycle = {
+    stage: (decayHealth < 0.2 ? 'withered' : decayHealth < 0.7 ? 'decaying' : 'blooming') as any,
+    age: (1 - decayHealth) * 200,
+    duration: 240,
+    decayRate: 1.0,
+    health: decayHealth,
+    autoDespawn: false,
+  };
+
+  if (group === 'flowers_tier1_a') {
+    // 5 款第一梯队名花 (前5)
+    return {
+      vase_audit_flower_1: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_1',
+          'plum_blossoms',
+          { x: -144, y: 0 },
+          'ribbed_fluted_white',
+          '1. 傲霜朱砂红梅 · 苍劲曲木枝',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_2: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_2',
+          'sunflowers',
+          { x: -72, y: -4 },
+          'chiseled_stone_gray',
+          '2. 金色灿烂向日 · 葵盘蜂巢蕊',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_3: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_3',
+          'carnations',
+          { x: 0, y: -6 },
+          'organic_twist_rose',
+          '3. 慈孝粉康乃馨 · 锯齿折叠瓣',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_4: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_4',
+          'calla_lilies',
+          { x: 72, y: -4 },
+          'minimal_drop_swan',
+          '4. 素雅圣洁马蹄莲 · 纯白佛焰苞',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_5: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_5',
+          'tulips',
+          { x: 144, y: 0 },
+          'pearlescent_turbine',
+          '5. 优雅高脚红郁金香 · 艳红高杯',
+          0.96
+        ),
+        lifecycle,
+      },
+    };
+  }
+
+  if (group === 'flowers_tier1_b') {
+    // 5 款第一梯队名花 (后5)
+    return {
+      vase_audit_flower_6: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_6',
+          'narcissus',
+          { x: -144, y: 0 },
+          'melon_lobed_celadon',
+          '6. 凌波仙子水仙 · 金盏银台',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_7: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_7',
+          'lily_of_valley',
+          { x: -72, y: -4 },
+          'fluted_trapezoid_mini',
+          '7. 幽谷如意铃兰 · 拱枝乳白银铃',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_8: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_8',
+          'orchids',
+          { x: 0, y: -6 },
+          'twisted_helix_tower',
+          '8. 空谷幽兰蝴蝶兰 · 展翅粉紫唇',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_9: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_9',
+          'hydrangeas',
+          { x: 72, y: -4 },
+          'pinched_clay_ruffle',
+          '9. 团圆锦簇紫绣球 · 繁英聚球',
+          0.96
+        ),
+        lifecycle,
+      },
+      vase_audit_flower_10: {
+        ...FloraFactory.createVase(
+          'vase_audit_flower_10',
+          'daisies',
+          { x: 144, y: 0 },
+          'organic_twist_cream',
+          '10. 清纯明朗雏菊 · 金蕊白丝带',
+          0.96
+        ),
+        lifecycle,
+      },
+    };
+  }
+
+  if (group === 'flowers_tier1_all') {
+    // 10 款第一梯队名花同台大展 (双排立体景深)
+    return {
+      // 后排 5 款 (微靠后、略小尺寸营造进深感)
+      vase_audit_flower_6: {
+        ...FloraFactory.createVase('vase_audit_flower_6', 'narcissus', { x: -148, y: -10 }, 'melon_lobed_celadon', '6. 凌波水仙', 0.84),
+        lifecycle,
+      },
+      vase_audit_flower_7: {
+        ...FloraFactory.createVase('vase_audit_flower_7', 'lily_of_valley', { x: -74, y: -12 }, 'fluted_trapezoid_mini', '7. 幽谷铃兰', 0.84),
+        lifecycle,
+      },
+      vase_audit_flower_8: {
+        ...FloraFactory.createVase('vase_audit_flower_8', 'orchids', { x: 0, y: -14 }, 'twisted_helix_tower', '8. 蝴蝶兰', 0.84),
+        lifecycle,
+      },
+      vase_audit_flower_9: {
+        ...FloraFactory.createVase('vase_audit_flower_9', 'hydrangeas', { x: 74, y: -12 }, 'pinched_clay_ruffle', '9. 紫绣球', 0.84),
+        lifecycle,
+      },
+      vase_audit_flower_10: {
+        ...FloraFactory.createVase('vase_audit_flower_10', 'daisies', { x: 148, y: -10 }, 'organic_twist_cream', '10. 小雏菊', 0.84),
+        lifecycle,
+      },
+
+      // 前排 5 款
+      vase_audit_flower_1: {
+        ...FloraFactory.createVase('vase_audit_flower_1', 'plum_blossoms', { x: -148, y: 12 }, 'ribbed_fluted_white', '1. 傲霜红梅', 0.88),
+        lifecycle,
+      },
+      vase_audit_flower_2: {
+        ...FloraFactory.createVase('vase_audit_flower_2', 'sunflowers', { x: -74, y: 14 }, 'chiseled_stone_gray', '2. 向日葵', 0.88),
+        lifecycle,
+      },
+      vase_audit_flower_3: {
+        ...FloraFactory.createVase('vase_audit_flower_3', 'carnations', { x: 0, y: 16 }, 'organic_twist_rose', '3. 康乃馨', 0.88),
+        lifecycle,
+      },
+      vase_audit_flower_4: {
+        ...FloraFactory.createVase('vase_audit_flower_4', 'calla_lilies', { x: 74, y: 14 }, 'minimal_drop_swan', '4. 马蹄莲', 0.88),
+        lifecycle,
+      },
+      vase_audit_flower_5: {
+        ...FloraFactory.createVase('vase_audit_flower_5', 'tulips', { x: 148, y: 12 }, 'pearlescent_turbine', '5. 郁金香', 0.88),
+        lifecycle,
+      },
+    };
+  }
+
+  if (group === 'flowers_classic') {
+    // 5 款经典名花
+    return {
+      vase_audit_flower_c1: {
+        ...FloraFactory.createVase('vase_audit_flower_c1', 'peonies', { x: -144, y: 0 }, 'warm_white_plain', '经典 · 富贵牡丹', 0.96),
+        lifecycle,
+      },
+      vase_audit_flower_c2: {
+        ...FloraFactory.createVase('vase_audit_flower_c2', 'lilies', { x: -72, y: -4 }, 'painted_iris', '经典 · 纯白百合', 0.96),
+        lifecycle,
+      },
+      vase_audit_flower_c3: {
+        ...FloraFactory.createVase('vase_audit_flower_c3', 'lotus', { x: 0, y: -6 }, 'celadon_ru', '经典 · 出尘净莲', 0.96),
+        lifecycle,
+      },
+      vase_audit_flower_c4: {
+        ...FloraFactory.createVase('vase_audit_flower_c4', 'chrysanthemum', { x: 72, y: -4 }, 'ribbed_fluted_white', '经典 · 傲霜白菊', 0.96),
+        lifecycle,
+      },
+      vase_audit_flower_c5: {
+        ...FloraFactory.createVase('vase_audit_flower_c5', 'roses', { x: 144, y: 0 }, 'chiseled_stone_gray', '经典 · 长情玫瑰', 0.96),
+        lifecycle,
+      },
+    };
+  }
+
+  // flowers_bouquets: 案前敬献花束平铺比对
+  return {
+    // 后排 5 束花
+    offered_flower_b6: FloraFactory.createOfferedBouquet('narcissus', { x: -140, y: -4 }, { id: 'offered_flower_b6', name: '水仙花束' }),
+    offered_flower_b7: FloraFactory.createOfferedBouquet('lily_of_valley', { x: -70, y: -4 }, { id: 'offered_flower_b7', name: '铃兰花束' }),
+    offered_flower_b8: FloraFactory.createOfferedBouquet('orchids', { x: 0, y: -4 }, { id: 'offered_flower_b8', name: '蝴蝶兰花束' }),
+    offered_flower_b9: FloraFactory.createOfferedBouquet('hydrangeas', { x: 70, y: -4 }, { id: 'offered_flower_b9', name: '绣球花束' }),
+    offered_flower_b10: FloraFactory.createOfferedBouquet('daisies', { x: 140, y: -4 }, { id: 'offered_flower_b10', name: '雏菊花束' }),
+
+    // 前排 5 束花
+    offered_flower_b1: FloraFactory.createOfferedBouquet('plum_blossoms', { x: -140, y: 18 }, { id: 'offered_flower_b1', name: '红梅花束' }),
+    offered_flower_b2: FloraFactory.createOfferedBouquet('sunflowers', { x: -70, y: 18 }, { id: 'offered_flower_b2', name: '向日葵花束' }),
+    offered_flower_b3: FloraFactory.createOfferedBouquet('carnations', { x: 0, y: 18 }, { id: 'offered_flower_b3', name: '康乃馨花束' }),
+    offered_flower_b4: FloraFactory.createOfferedBouquet('calla_lilies', { x: 70, y: 18 }, { id: 'offered_flower_b4', name: '马蹄莲花束' }),
+    offered_flower_b5: FloraFactory.createOfferedBouquet('tulips', { x: 140, y: 18 }, { id: 'offered_flower_b5', name: '郁金香花束' }),
+  };
+};
+
+// 3. 统一审计展台物品生成器
+export const buildAuditItems = (
+  category: AuditCategory = 'flowers',
+  group: AuditGroup = 'flowers_tier1_all',
+  withFlowers: boolean = true,
+  decayHealth: number = 1.0
+): Record<SceneItemId, SceneItem> => {
+  if (category === 'flowers') {
+    const flowerGroup = (
+      ['flowers_tier1_a', 'flowers_tier1_b', 'flowers_tier1_all', 'flowers_classic', 'flowers_bouquets'].includes(group)
+        ? group
+        : 'flowers_tier1_all'
+    ) as FlowerAuditGroup;
+    return buildAuditFlowerItems(flowerGroup, decayHealth);
+  }
+  const vaseGroup = (group === 'designer_twist' ? 'designer_twist' : 'new_unique') as VaseAuditGroup;
+  return buildAuditVaseItems(vaseGroup, withFlowers);
+};
+
+export const buildInitialItems = (): Record<SceneItemId, SceneItem> =>
+  buildAuditItems('flowers', 'flowers_tier1_all', true, 1.0);
 
 const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = buildInitialItems();
 
@@ -317,42 +577,62 @@ export default function App() {
 
   // ── 专项审计模式状态 ──
   const [isAuditMode, setIsAuditMode] = useState(true);
-  const [auditGroup, setAuditGroup] = useState<AuditGroup>('new_unique');
+  const [auditCategory, setAuditCategory] = useState<AuditCategory>('flowers');
+  const [auditGroup, setAuditGroup] = useState<AuditGroup>('flowers_tier1_all');
   const [auditWithFlowers, setAuditWithFlowers] = useState(true);
+  const [flowerDecayHealth, setFlowerDecayHealth] = useState<number>(1.0);
+
+  const switchAuditCategory = (category: AuditCategory) => {
+    setAuditCategory(category);
+    const defaultGroup: AuditGroup = category === 'flowers' ? 'flowers_tier1_all' : 'new_unique';
+    setAuditGroup(defaultGroup);
+    sound.playPorcelainClink();
+    setItems(buildAuditItems(category, defaultGroup, auditWithFlowers, flowerDecayHealth));
+    showToast(category === 'flowers' ? '已进入「名花专项审计展台」' : '已进入「花器专项审计展台」');
+  };
 
   const switchAuditGroup = (group: AuditGroup) => {
     setAuditGroup(group);
     sound.playPorcelainClink();
-    setItems(buildAuditVaseItems(group, auditWithFlowers));
-    showToast(group === 'new_unique' ? '已展示4款全新异形与微观肌理瓶' : '已展示8款现代几何折痕瓶');
+    setItems(buildAuditItems(auditCategory, group, auditWithFlowers, flowerDecayHealth));
+    const labelMap: Record<AuditGroup, string> = {
+      flowers_tier1_all: '已展示第一梯队 10 款名花齐放同台全景',
+      flowers_tier1_a: '已展示第一梯队前5名花 (梅花/向日葵/康乃馨/马蹄莲/郁金香)',
+      flowers_tier1_b: '已展示第一梯队后5名花 (水仙/铃兰/蝴蝶兰/绣球/雏菊)',
+      flowers_classic: '已展示经典五供名花 (牡丹/百合/清莲/白菊/玫瑰)',
+      flowers_bouquets: '已展示案前敬献花束平铺形态对比',
+      new_unique: '已展示 4 款异形与微观肌理瓶',
+      designer_twist: '已展示 8 款现代几何折痕瓶',
+    };
+    showToast(labelMap[group] || '展台已更新');
+  };
+
+  const cycleFlowerDecay = () => {
+    // 1.0 (满盛) -> 0.55 (微枯) -> 0.15 (岁暮) -> 1.0 (重放)
+    const nextHealth = flowerDecayHealth === 1.0 ? 0.55 : flowerDecayHealth === 0.55 ? 0.15 : 1.0;
+    setFlowerDecayHealth(nextHealth);
+    sound.playBell(720, 1.5);
+    setItems(buildAuditItems(auditCategory, auditGroup, auditWithFlowers, nextHealth));
+    const stageDesc =
+      nextHealth === 1.0
+        ? '🌸 满盛怒放（生机 100%）'
+        : nextHealth === 0.55
+        ? '🍂 微枯初衰（生机 55%）'
+        : '🥀 岁暮深凋（生机 15%）';
+    showToast(`名花枯荣生命审计：${stageDesc}`);
+  };
+
+  const triggerAuditPetals = () => {
+    setPetalTrigger(Date.now());
+    sound.playBell(580, 2);
+    showToast('🍃 已触发落英缤纷动效（花瓣随风舒展漫舞）');
   };
 
   const toggleAuditFlowers = () => {
     const next = !auditWithFlowers;
     setAuditWithFlowers(next);
     sound.playPorcelainClink();
-    setItems((prev) => {
-      const updated = { ...prev };
-      const flowerMap: Record<string, FlowerType> = {
-        vase_audit_1: 'peonies',
-        vase_audit_2: 'lilies',
-        vase_audit_3: auditGroup === 'new_unique' ? 'lotus' : 'peonies',
-        vase_audit_4: 'roses',
-        vase_audit_5: 'lotus',
-        vase_audit_6: 'chrysanthemum',
-        vase_audit_7: 'lilies',
-        vase_audit_8: 'lotus',
-      };
-      Object.keys(updated).forEach((id) => {
-        if (id.startsWith('vase_audit_')) {
-          updated[id] = {
-            ...updated[id],
-            flowerType: next ? flowerMap[id] || 'peonies' : ('none' as FlowerType),
-          };
-        }
-      });
-      return updated;
-    });
+    setItems(buildAuditItems(auditCategory, auditGroup, next, flowerDecayHealth));
     showToast(next ? '已开启插花比对（审计花枝入瓶景深与咬合）' : '已切换为净瓶裸检模式（审计器形、釉色与微观肌理）');
   };
 
@@ -363,15 +643,19 @@ export default function App() {
       showToast('已恢复常规五供陈设（香、花、灯、水、果）');
     } else {
       setIsAuditMode(true);
-      setItems(buildAuditVaseItems(auditGroup, auditWithFlowers));
-      showToast('已进入器物专项审计展台');
+      setItems(buildAuditItems(auditCategory, auditGroup, auditWithFlowers, flowerDecayHealth));
+      showToast(auditCategory === 'flowers' ? '已进入「名花专项审计展台」' : '已进入「花器专项审计展台」');
     }
     sound.playWoodPlacement();
   };
 
   const resetTableLayout = () => {
     sound.playWoodPlacement();
-    setItems(isAuditMode ? buildAuditVaseItems(auditGroup, auditWithFlowers) : buildStandardItems());
+    setItems(
+      isAuditMode
+        ? buildAuditItems(auditCategory, auditGroup, auditWithFlowers, flowerDecayHealth)
+        : buildStandardItems()
+    );
     showToast('案面摆设已恢复初始格局');
   };
 
@@ -522,6 +806,25 @@ export default function App() {
   };
 
   const handleToggleVaseStyle = (id: SceneItemId) => {
+    if (id.startsWith('vase_audit_flower_')) {
+      const item = items[id];
+      if (item && item.flowerType) {
+        const meta = FLOWER_REGISTRY[item.flowerType];
+        if (meta) {
+          sound.playPorcelainClink();
+          showToast(`🌸【${meta.name}】${meta.poeticTitle} · 名花专项审计中`);
+          return;
+        }
+      }
+    }
+    if (id.startsWith('vase_audit_')) {
+      const item = items[id];
+      if (item) {
+        sound.playPorcelainClink();
+        showToast(`🏺【${item.name}】· 花器专项审计中`);
+        return;
+      }
+    }
     const styleOrder: VaseStyle[] = [
       'warm_white_plain',
       'painted_iris',
@@ -899,52 +1202,177 @@ export default function App() {
           />
         </div>
 
-        {/* Layer 5.5: 🔍 雅瓷花器专项审计模式控制胶囊 (居于案台上方，一键全景审计) */}
-        <div className="absolute top-[28%] sm:top-[30%] z-30 flex justify-center w-full px-4 pointer-events-none">
-          <div className="pointer-events-auto flex items-center flex-wrap justify-center gap-2 px-4 py-2 rounded-full bg-[#1c1917]/95 backdrop-blur-xl border border-amber-500/60 shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-xs text-amber-100 ring-1 ring-amber-400/20 animate-in fade-in slide-in-from-top-4">
+        {/* Layer 5.5: 🔍 专项审计模式控制胶囊 (居于案台上方，一键全景审计) */}
+        <div className="absolute top-[26%] sm:top-[28%] z-30 flex justify-center w-full px-4 pointer-events-none">
+          <div className="pointer-events-auto flex items-center flex-wrap justify-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1c1917]/95 backdrop-blur-xl border border-amber-500/60 shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-xs text-amber-100 ring-1 ring-amber-400/20 animate-in fade-in slide-in-from-top-4 max-w-[98vw]">
             <div className="flex items-center gap-1.5 font-semibold text-amber-300 font-serif mr-1">
-              <span>🏺</span>
-              <span>{isAuditMode ? '器物专项审计展台' : '常规五供陈设'}</span>
+              <span>{auditCategory === 'flowers' ? '🌸' : '🏺'}</span>
+              <span>{isAuditMode ? (auditCategory === 'flowers' ? '名花专项审计' : '花器专项审计') : '常规五供陈设'}</span>
               <CinnabarSealBadge text="审计" />
             </div>
 
             {isAuditMode && (
               <>
                 <span className="text-stone-600 hidden sm:inline">|</span>
-                <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                {/* 类别切换：名花 vs 花器 */}
+                <div className="flex items-center bg-stone-950/90 p-0.5 rounded-full border border-amber-500/40">
                   <button
                     type="button"
-                    onClick={() => switchAuditGroup('new_unique')}
-                    className={`px-3 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'new_unique'
-                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                    onClick={() => switchAuditCategory('flowers')}
+                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                      auditCategory === 'flowers'
+                        ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-stone-950 font-bold shadow-xs'
                         : 'text-amber-200/70 hover:text-amber-100'
                     }`}
                   >
-                    ✨ 4款异形纹理瓶
+                    <span>🌸</span>
+                    <span>名花 (15款)</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => switchAuditGroup('designer_twist')}
-                    className={`px-3 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'designer_twist'
+                    onClick={() => switchAuditCategory('vases')}
+                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                      auditCategory === 'vases'
                         ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
                         : 'text-amber-200/70 hover:text-amber-100'
                     }`}
                   >
-                    🎨 8款现代折痕瓶
+                    <span>🏺</span>
+                    <span>花器 (12款)</span>
                   </button>
                 </div>
 
                 <span className="text-stone-600 hidden sm:inline">|</span>
-                <button
-                  type="button"
-                  onClick={toggleAuditFlowers}
-                  className="px-3 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                  title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
-                >
-                  <span>{auditWithFlowers ? '🌸 切换净瓶裸检' : '🌸 显示插花景深'}</span>
-                </button>
+
+                {/* 名花专属分组切换 */}
+                {auditCategory === 'flowers' ? (
+                  <div className="flex items-center flex-wrap gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('flowers_tier1_all')}
+                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'flowers_tier1_all'
+                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                      title="第一梯队 10 款新名花双排错落同台大展"
+                    >
+                      🌟 10花齐放
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('flowers_tier1_a')}
+                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'flowers_tier1_a'
+                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                      title="梅花、向日葵、康乃馨、马蹄莲、郁金香"
+                    >
+                      🌺 梯队A (前5)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('flowers_tier1_b')}
+                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'flowers_tier1_b'
+                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                      title="水仙、铃兰、蝴蝶兰、绣球、雏菊"
+                    >
+                      🪷 梯队B (后5)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('flowers_classic')}
+                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'flowers_classic'
+                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                      title="牡丹、百合、清莲、白菊、玫瑰"
+                    >
+                      💮 经典5供
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('flowers_bouquets')}
+                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'flowers_bouquets'
+                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                      title="桌面平铺丝带花束敬献形态比对"
+                    >
+                      💐 案前花束
+                    </button>
+                  </div>
+                ) : (
+                  /* 花器专属分组切换 */
+                  <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('new_unique')}
+                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'new_unique'
+                          ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                    >
+                      ✨ 4款异形瓶
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditGroup('designer_twist')}
+                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                        auditGroup === 'designer_twist'
+                          ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                    >
+                      🎨 8款折痕瓶
+                    </button>
+                  </div>
+                )}
+
+                <span className="text-stone-600 hidden sm:inline">|</span>
+
+                {/* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */}
+                {auditCategory === 'flowers' ? (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={cycleFlowerDecay}
+                      className="px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border border-rose-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                      title="切换名花生命周期：满盛(100%) -> 微枯(55%) -> 岁暮深凋(15%)"
+                    >
+                      <span>
+                        {flowerDecayHealth === 1.0 ? '🌸 满盛' : flowerDecayHealth === 0.55 ? '🍂 微枯' : '🥀 岁暮'}
+                      </span>
+                      <span className="text-[10px] text-rose-300/80 font-mono">
+                        {Math.round(flowerDecayHealth * 100)}%
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={triggerAuditPetals}
+                      className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                      title="模拟落英缤纷漫天落瓣动效"
+                    >
+                      <span>🍃 花雨</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={toggleAuditFlowers}
+                    className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                    title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
+                  >
+                    <span>{auditWithFlowers ? '🌸 切换裸检' : '🌸 显示插花'}</span>
+                  </button>
+                )}
               </>
             )}
 
@@ -954,7 +1382,7 @@ export default function App() {
               className="px-3 py-1 rounded-full bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
               title="切换展台模式与常规五供模式"
             >
-              <span>{isAuditMode ? '🔄 恢复常规五供' : '🔍 进入器物展台'}</span>
+              <span>{isAuditMode ? '🔄 恢复常规五供' : '🔍 进入专项展台'}</span>
             </button>
           </div>
         </div>
