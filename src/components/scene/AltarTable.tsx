@@ -322,6 +322,7 @@ export const DraggableAltarTableComponent: React.FC<DraggableAltarTableProps> = 
       {/* Unified Responsive Table & Items Container */}
       <div 
         ref={tableRef}
+        id="altarTableSurfaceContainer"
         className="relative w-full aspect-[560/160] select-none pointer-events-none z-20"
       >
         {/* Layer A: Draggable Items locked to the 3D tabletop surface plane */}

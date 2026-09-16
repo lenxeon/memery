@@ -1,479 +1,412 @@
 /**
  * @file PetalShower.tsx
- * @description 漫天落英缤纷全屏 3D 特效组件。
- * 具备三维气动翻滚（Pitch/Roll/Yaw）、多样化气流轨迹（顺风滑翔、漩涡盘旋、大S摇曳、高频轻颤）
- * 以及品类专属花瓣剪影与光影渐变，呈现极度真实自然的落花意境。
+ * @description 漫天落英缤纷高性能 Canvas 3D 物理引擎特效组件。
+ * 具备极低重力空气浮力动力学、气流微涡翻滚、贡桌案台与木地板物理碰撞检测、
+ * 案面/地面平铺停留及生命周期平滑消散。
  */
-import React, { useEffect, useState, useMemo } from 'react';
-
-export type FlightArchetype = 
-  | 'tumble_spiral'   // 三维空翻螺旋盘旋
-  | 'glide_breeze'    // 顺风大角度斜掠滑翔
-  | 'flutter_eddy'    // 气流微涡高频倾侧翻飞
-  | 'gentle_sway'     // 缓带当风大S型从容摇曳
-  | 'tumbling_leaf';  // 轴线翻滚加速坠落
-
-interface PetalSpec {
-  id: number;
-  startX: number;        // 起始 X 坐标 (vw 比例: 5% ~ 95%)
-  delay: number;         // 错峰延迟 (0 ~ 1.5s)
-  duration: number;      // 下落持续时间 (3.6s ~ 6.2s)
-  size: number;          // 视觉尺寸 (12px ~ 26px)
-  archetype: FlightArchetype;
-  colorGradId: string;
-  fillColor1: string;
-  fillColor2: string;
-  accentEdge: string;
-  opacity: number;
-  svgPath: string;
-  viewBox: string;
-  cssVars: Record<string, string>;
-}
+import React, { useEffect, useRef } from 'react';
 
 interface PetalShowerProps {
   activeTrigger: number;
   flowerType?: string;
 }
 
-export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerType = 'peonies' }) => {
-  const [petals, setPetals] = useState<PetalSpec[]>([]);
+interface PhysicsPetal {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  gravity: number;
+  terminalVy: number;
+  swayAmp: number;
+  swayFreq: number;
+  swayPhase: number;
+  pitch: number;
+  roll: number;
+  yaw: number;
+  pitchSpeed: number;
+  rollSpeed: number;
+  yawSpeed: number;
+  scale: number;
+  depthRatio: number; // 落在桌面的进深比例 (0.0 ~ 1.0)
+  status: 'falling' | 'settled' | 'fading';
+  landedSurface?: 'table' | 'floor';
+  stayDurationMs: number; // 停留在桌面/地面的生命时长 (毫秒)
+  settledAtMs?: number;   // 刚着陆的时间戳
+  fadeDurationMs: number;
+  opacity: number;
+  baseOpacity: number;
+  colorPrimary: string;
+  colorSecondary: string;
+  colorEdge: string;
+  petalShapeType: 'plum' | 'sunflower' | 'carnation' | 'calla' | 'tulip' | 'standard';
+}
 
-  // 花种专属形态与色彩调色板定义
-  const flowerSpec = useMemo(() => {
-    switch (flowerType) {
+export const PetalShower: React.FC<PetalShowerProps> = ({ activeTrigger, flowerType = 'peonies' }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const petalsRef = useRef<PhysicsPetal[]>([]);
+  const animFrameIdRef = useRef<number | null>(null);
+
+  // 花瓣色彩与几何分类
+  const getFlowerPalette = (type: string) => {
+    switch (type) {
       case 'plum_blossoms':
         return {
+          shape: 'plum' as const,
+          scaleRange: [7, 12],
           colors: [
-            { c1: '#ffffff', c2: '#faf6ee', edge: '#f1f5f9' },
-            { c1: '#fffef8', c2: '#fce7f3', edge: '#f8fafc' },
-            { c1: '#ffffff', c2: '#fef3c7', edge: '#fefce8' },
-            { c1: '#f8fafc', c2: '#edd5d9', edge: '#fbcfe8' },
+            { p: '#ffffff', s: '#faf5ea', e: '#f1f5f9' },
+            { p: '#fffef9', s: '#fce7f3', e: '#ffffff' },
+            { p: '#ffffff', s: '#fef3c7', e: '#fefce8' },
           ],
-          // 小巧圆润五瓣梅花之单个花瓣（圆润微凹）
-          path: 'M 10 2 C 16 2, 20 7, 19 15 C 18 22, 13 26, 10 28 C 7 26, 2 22, 1 15 C 0 7, 4 2, 10 2 Z',
-          viewBox: '0 0 20 28',
-          scaleRange: [10, 16],
         };
-
       case 'sunflowers':
         return {
+          shape: 'sunflower' as const,
+          scaleRange: [10, 16],
           colors: [
-            { c1: '#facc15', c2: '#eab308', edge: '#ca8a04' },
-            { c1: '#fde047', c2: '#f59e0b', edge: '#b45309' },
-            { c1: '#fef08a', c2: '#eab308', edge: '#d97706' },
-            { c1: '#fbbf24', c2: '#d97706', edge: '#92400e' },
+            { p: '#fde047', s: '#eab308', e: '#ca8a04' },
+            { p: '#facc15', s: '#d97706', e: '#b45309' },
+            { p: '#fef08a', s: '#f59e0b', e: '#d97706' },
           ],
-          // 狭长微弧金黄向日葵舌状花瓣
-          path: 'M 9 0 C 14 6, 17 18, 14 30 C 12 36, 9 40, 9 42 C 9 40, 6 36, 4 30 C 1 18, 4 6, 9 0 Z',
-          viewBox: '0 0 18 42',
-          scaleRange: [13, 22],
         };
-
       case 'carnations':
         return {
+          shape: 'carnation' as const,
+          scaleRange: [8, 14],
           colors: [
-            { c1: '#ffffff', c2: '#fbcfe8', edge: '#f472b6' },
-            { c1: '#fdf2f8', c2: '#f472b6', edge: '#ec4899' },
-            { c1: '#fff1f2', c2: '#fda4af', edge: '#fb7185' },
-            { c1: '#fce7f3', c2: '#f9a8d4', edge: '#f43f5e' },
+            { p: '#ffffff', s: '#fbcfe8', e: '#f472b6' },
+            { p: '#fff1f2', s: '#fda4af', e: '#fb7185' },
+            { p: '#fdf2f8', s: '#f9a8d4', e: '#ec4899' },
           ],
-          // 康乃馨边缘细碎锯齿波浪小折扇花瓣
-          path: 'M 10 28 C 7 22, 5 16, 2 12 C 1 10, 3 9, 4 8 C 4 7, 6 7, 7 6 C 8 5, 10 5, 11 6 C 12 7, 14 7, 15 8 C 16 9, 18 10, 17 12 C 14 16, 12 22, 10 28 Z',
-          viewBox: '0 0 20 28',
-          scaleRange: [12, 18],
         };
-
       case 'calla_lilies':
         return {
+          shape: 'calla' as const,
+          scaleRange: [10, 17],
           colors: [
-            { c1: '#ffffff', c2: '#fff1f2', edge: '#fbcfe8' },
-            { c1: '#fafaf9', c2: '#fce7f3', edge: '#f472b6' },
-            { c1: '#ffffff', c2: '#fdf4ff', edge: '#f5d0fe' },
+            { p: '#ffffff', s: '#fff1f2', e: '#fbcfe8' },
+            { p: '#fafaf9', s: '#fce7f3', e: '#f472b6' },
           ],
-          // 马蹄莲卷苞片与大片佛焰瓣
-          path: 'M 10 0 C 18 8, 20 22, 13 32 C 9 36, 9 38, 9 40 C 9 38, 9 36, 5 32 C -2 22, 0 8, 10 0 Z',
-          viewBox: '0 0 20 40',
-          scaleRange: [15, 25],
         };
-
       case 'tulips':
         return {
+          shape: 'tulip' as const,
+          scaleRange: [9, 15],
           colors: [
-            { c1: '#f43f5e', c2: '#be123c', edge: '#9f1239' },
-            { c1: '#fb7185', c2: '#e11d48', edge: '#881337' },
-            { c1: '#ffffff', c2: '#fef08a', edge: '#facc15' },
-            { c1: '#fbcfe8', c2: '#f43f5e', edge: '#fda4af' },
+            { p: '#fb7185', s: '#e11d48', e: '#9f1239' },
+            { p: '#f43f5e', s: '#be123c', e: '#881337' },
+            { p: '#ffffff', s: '#fef08a', e: '#facc15' },
           ],
-          // 丰满挺立杯状郁金香花瓣
-          path: 'M 12 2 C 19 2, 23 12, 22 24 C 20 32, 15 36, 12 38 C 9 36, 4 32, 2 24 C 1 12, 5 2, 12 2 Z',
-          viewBox: '0 0 24 38',
-          scaleRange: [14, 23],
         };
-
-      case 'roses':
-        return {
-          colors: [
-            { c1: '#f43f5e', c2: '#be123c', edge: '#881337' },
-            { c1: '#fda4af', c2: '#e11d48', edge: '#9f1239' },
-            { c1: '#ffedd5', c2: '#fb923c', edge: '#ea580c' },
-            { c1: '#fff1f2', c2: '#f472b6', edge: '#e11d48' },
-          ],
-          // 柔美圆润玫瑰花瓣（顶端微凹卷心）
-          path: 'M 12 4 C 15 1, 21 3, 23 10 C 25 18, 19 26, 12 30 C 5 26, -1 18, 1 10 C 3 3, 9 1, 12 4 Z',
-          viewBox: '0 0 24 30',
-          scaleRange: [13, 22],
-        };
-
-      case 'lotus':
-        return {
-          colors: [
-            { c1: '#ffffff', c2: '#fbcfe8', edge: '#ec4899' },
-            { c1: '#fce7f3', c2: '#f472b6', edge: '#db2777' },
-            { c1: '#ffffff', c2: '#fdf2f8', edge: '#f472b6' },
-          ],
-          path: 'M 10 0 C 17 6, 20 20, 12 30 C 10 32, 10 34, 10 36 C 10 34, 10 32, 8 30 C 0 20, 3 6, 10 0 Z',
-          viewBox: '0 0 20 36',
-          scaleRange: [14, 24],
-        };
-
-      case 'peonies':
       default:
         return {
+          shape: 'standard' as const,
+          scaleRange: [9, 15],
           colors: [
-            { c1: '#fbcfe8', c2: '#f472b6', edge: '#db2777' },
-            { c1: '#fff1f2', c2: '#fda4af', edge: '#f43f5e' },
-            { c1: '#fce7f3', c2: '#f472b6', edge: '#ec4899' },
-            { c1: '#ffffff', c2: '#fbcfe8', edge: '#f472b6' },
+            { p: '#fbcfe8', s: '#f472b6', e: '#db2777' },
+            { p: '#fff1f2', s: '#fda4af', e: '#f43f5e' },
+            { p: '#ffffff', s: '#fbcfe8', e: '#f472b6' },
           ],
-          path: 'M 12 2 C 18 1, 23 8, 22 18 C 20 25, 15 29, 12 31 C 9 29, 4 25, 2 18 C 1 8, 6 1, 12 2 Z',
-          viewBox: '0 0 24 32',
-          scaleRange: [13, 23],
         };
     }
-  }, [flowerType]);
+  };
 
+  // 生成单次花雨粒子
   useEffect(() => {
     if (!activeTrigger) return;
 
-    const archetypes: FlightArchetype[] = [
-      'tumble_spiral',
-      'glide_breeze',
-      'flutter_eddy',
-      'gentle_sway',
-      'tumbling_leaf',
-    ];
+    const palette = getFlowerPalette(flowerType);
+    const canvas = canvasRef.current;
+    const width = canvas ? canvas.width : window.innerWidth;
 
-    const count = 34; // 适度稠密，如梦似幻
-    const newPetals: PetalSpec[] = Array.from({ length: count }).map((_, i) => {
-      const archetype = archetypes[i % archetypes.length];
-      const colorScheme = flowerSpec.colors[i % flowerSpec.colors.length];
-      const minSz = flowerSpec.scaleRange[0];
-      const maxSz = flowerSpec.scaleRange[1];
-      const size = Math.round(minSz + Math.random() * (maxSz - minSz));
+    // 每次触发生成 28 ~ 36 瓣灵动花雨
+    const count = 32;
+    const now = performance.now();
+    const newPetals: PhysicsPetal[] = [];
 
-      // 差异化空气动力学参数：降低重力加速度，大幅延长在空中的舒缓浮空时间（7.5s ~ 12.8s）
-      const startX = 6 + Math.random() * 88; // 6% 到 94% 屏宽
-      const duration = 7.5 + Math.random() * 5.3;
-      const delay = (i * 0.08) + Math.random() * 2.2;
+    for (let i = 0; i < count; i++) {
+      const col = palette.colors[i % palette.colors.length];
+      const sz = palette.scaleRange[0] + Math.random() * (palette.scaleRange[1] - palette.scaleRange[0]);
+      
+      // 错落自然分布：错开高低出生点，杜绝“一起浮空等待下落”
+      const startX = width * (0.05 + Math.random() * 0.9);
+      // 竖向分散在屏幕上方 -40px 到 -480px 的自然高度层，随风依次徐徐入画
+      const startY = -40 - Math.random() * 440;
 
-      // 气动自旋角度随机值 (度)
-      const rotZStart = Math.round((Math.random() - 0.5) * 120);
-      const rotZMid = Math.round(rotZStart + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 240));
-      const rotZEnd = Math.round(rotZMid + (Math.random() > 0.5 ? 1 : -1) * (200 + Math.random() * 320));
+      // 超轻重力与超低终端沉降速度（飘逸出尘）
+      const terminalVy = 0.65 + Math.random() * 0.75; // 仅 0.65 ~ 1.4 px/帧
+      const gravity = 0.012 + Math.random() * 0.018;
 
-      // 三维俯仰/滚转翻面参数 (模拟薄片花瓣正反两面朝光翻滚)
-      const rotX1 = Math.round((Math.random() - 0.5) * 360);
-      const rotX2 = Math.round(rotX1 + (Math.random() > 0.5 ? 360 : -360) + (Math.random() - 0.5) * 180);
-      const rotY1 = Math.round((Math.random() - 0.5) * 360);
-      const rotY2 = Math.round(rotY1 + (Math.random() > 0.5 ? 360 : -360) + (Math.random() - 0.5) * 180);
+      newPetals.push({
+        id: Date.now() + i + Math.random(),
+        x: startX,
+        y: startY,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: 0.3 + Math.random() * 0.4,
+        gravity,
+        terminalVy,
+        swayAmp: 0.9 + Math.random() * 1.5,
+        swayFreq: 0.016 + Math.random() * 0.018,
+        swayPhase: Math.random() * Math.PI * 2,
+        pitch: Math.random() * Math.PI * 2,
+        roll: Math.random() * Math.PI * 2,
+        yaw: Math.random() * Math.PI * 2,
+        pitchSpeed: (Math.random() - 0.5) * 0.045,
+        rollSpeed: (Math.random() - 0.5) * 0.045,
+        yawSpeed: (Math.random() - 0.5) * 0.025,
+        scale: sz,
+        depthRatio: Math.random(),
+        status: 'falling',
+        stayDurationMs: 8000 + Math.random() * 6000, // 案面/地面停留 8 ~ 14 秒
+        fadeDurationMs: 2500, // 平滑消散 2.5 秒
+        opacity: 0,
+        baseOpacity: 0.92 + Math.random() * 0.08,
+        colorPrimary: col.p,
+        colorSecondary: col.s,
+        colorEdge: col.e,
+        petalShapeType: palette.shape,
+      });
+    }
 
-      // 横向风力漂移位移量
-      const windSign = Math.random() > 0.35 ? 1 : -1; // 偏向主风向
-      const driftTotal = Math.round(windSign * (50 + Math.random() * 140));
-      const sway1 = Math.round(windSign * (30 + Math.random() * 55));
-      const sway2 = Math.round(-windSign * (20 + Math.random() * 45));
+    // 追加到粒子队列中
+    petalsRef.current = [...petalsRef.current, ...newPetals];
+  }, [activeTrigger, flowerType]);
 
-      return {
-        id: Date.now() + i,
-        startX,
-        delay,
-        duration,
-        size,
-        archetype,
-        colorGradId: `petalGrad_${i % flowerSpec.colors.length}`,
-        fillColor1: colorScheme.c1,
-        fillColor2: colorScheme.c2,
-        accentEdge: colorScheme.edge,
-        opacity: 0.88 + Math.random() * 0.12,
-        svgPath: flowerSpec.path,
-        viewBox: flowerSpec.viewBox,
-        cssVars: {
-          '--p-start-x': `${startX}vw`,
-          '--p-drift-x': `${driftTotal}px`,
-          '--p-sway-1': `${sway1}px`,
-          '--p-sway-2': `${sway2}px`,
-          '--p-rot-z-0': `${rotZStart}deg`,
-          '--p-rot-z-1': `${rotZMid}deg`,
-          '--p-rot-z-2': `${rotZEnd}deg`,
-          '--p-rot-x-0': `${rotX1}deg`,
-          '--p-rot-x-1': `${rotX2}deg`,
-          '--p-rot-y-0': `${rotY1}deg`,
-          '--p-rot-y-1': `${rotY2}deg`,
-        },
-      };
-    });
+  // 高性能 Canvas 渲染与连续物理动力学循环
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    setPetals(newPetals);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    // 最大下落时间 + 延迟后自动清理 (16s 优雅谢幕)
-    const maxLifeMs = 16000;
-    const timer = setTimeout(() => {
-      setPetals([]);
-    }, maxLifeMs);
+    // Retina 视网膜高清自适应
+    const handleResize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.scale(dpr, dpr);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
-    return () => clearTimeout(timer);
-  }, [activeTrigger, flowerSpec]);
+    // 绘制具体品类花瓣矢量剪影路径
+    const drawPetalPath = (c: CanvasRenderingContext2D, shape: string, r: number) => {
+      c.beginPath();
+      switch (shape) {
+        case 'plum':
+          // 小巧圆润五瓣白梅瓣
+          c.moveTo(0, -r * 0.95);
+          c.bezierCurveTo(r * 0.85, -r * 0.95, r * 1.05, r * 0.1, r * 0.85, r * 0.7);
+          c.bezierCurveTo(r * 0.6, r * 1.05, -r * 0.6, r * 1.05, -r * 0.85, r * 0.7);
+          c.bezierCurveTo(-r * 1.05, r * 0.1, -r * 0.85, -r * 0.95, 0, -r * 0.95);
+          break;
 
-  if (petals.length === 0) return null;
+        case 'sunflower':
+          // 狭长微弧金黄向日葵舌瓣
+          c.moveTo(0, -r * 1.4);
+          c.bezierCurveTo(r * 0.55, -r * 0.7, r * 0.6, r * 0.6, 0, r * 1.4);
+          c.bezierCurveTo(-r * 0.6, r * 0.6, -r * 0.55, -r * 0.7, 0, -r * 1.4);
+          break;
+
+        case 'carnation':
+          // 锯齿扇形重叠波浪瓣
+          c.moveTo(0, r * 0.9);
+          c.bezierCurveTo(-r * 0.6, r * 0.5, -r * 0.9, -r * 0.2, -r * 0.8, -r * 0.7);
+          c.lineTo(-r * 0.5, -r * 0.9);
+          c.lineTo(-r * 0.2, -r * 0.75);
+          c.lineTo(0, -r * 0.95);
+          c.lineTo(r * 0.2, -r * 0.75);
+          c.lineTo(r * 0.5, -r * 0.9);
+          c.lineTo(r * 0.8, -r * 0.7);
+          c.bezierCurveTo(r * 0.9, -r * 0.2, r * 0.6, r * 0.5, 0, r * 0.9);
+          break;
+
+        case 'tulip':
+        case 'calla':
+        case 'standard':
+        default:
+          // 丰满椭圆高杯自然花瓣
+          c.moveTo(0, -r * 1.15);
+          c.bezierCurveTo(r * 0.9, -r * 0.85, r * 0.95, r * 0.45, 0, r * 1.15);
+          c.bezierCurveTo(-r * 0.95, r * 0.45, -r * 0.9, -r * 0.85, 0, -r * 1.15);
+          break;
+      }
+      c.closePath();
+    };
+
+    let lastFrameTime = performance.now();
+
+    const loop = (currentTime: number) => {
+      const dt = Math.min(32, currentTime - lastFrameTime);
+      lastFrameTime = currentTime;
+
+      const screenW = window.innerWidth;
+      const screenH = window.innerHeight;
+
+      // 动态获取案台与地面物理碰撞边界
+      const tableElem = document.getElementById('altarTableSurfaceContainer');
+      let tableRect: DOMRect | null = null;
+      if (tableElem) {
+        tableRect = tableElem.getBoundingClientRect();
+      }
+
+      // 贡桌与地板几何碰撞参数
+      // 贡桌木台面进深面 (从 top+20% 至 top+50%)
+      const tableLeft = tableRect ? tableRect.left + tableRect.width * 0.05 : screenW * 0.25;
+      const tableRight = tableRect ? tableRect.right - tableRect.width * 0.05 : screenW * 0.75;
+      const tableTopY = tableRect ? tableRect.top + tableRect.height * 0.22 : screenH * 0.62;
+      const tableBottomY = tableRect ? tableRect.top + tableRect.height * 0.48 : screenH * 0.68;
+
+      // 地板着陆面
+      const floorY = screenH * 0.91;
+
+      // 清屏
+      ctx.clearRect(0, 0, screenW, screenH);
+
+      const activePetals: PhysicsPetal[] = [];
+
+      for (let i = 0; i < petalsRef.current.length; i++) {
+        const p = petalsRef.current[i];
+
+        // ── 1. 物理位置与生命周期更新 ──
+        if (p.status === 'falling') {
+          // 淡入可见度
+          if (p.opacity < p.baseOpacity && p.y > -20) {
+            p.opacity = Math.min(p.baseOpacity, p.opacity + 0.06);
+          }
+
+          // 重力与空气阻力
+          p.vy = Math.min(p.terminalVy, p.vy + p.gravity);
+          
+          // 空气升力微涡横向摇曳 (Sway)
+          const swayOffset = Math.sin(currentTime * p.swayFreq + p.swayPhase) * p.swayAmp;
+          p.x += p.vx + swayOffset * 0.35;
+          p.y += p.vy;
+
+          // 三维姿态自由翻转 (Pitch/Roll/Yaw)
+          p.pitch += p.pitchSpeed;
+          p.roll += p.rollSpeed;
+          p.yaw += p.yawSpeed;
+
+          // ── 物理碰撞检测 (Collision Detection) ──
+          // A. 碰撞贡桌案面
+          if (p.x >= tableLeft && p.x <= tableRight) {
+            const tableTargetY = tableTopY + (tableBottomY - tableTopY) * p.depthRatio;
+            if (p.y >= tableTargetY) {
+              p.y = tableTargetY;
+              p.status = 'settled';
+              p.landedSurface = 'table';
+              p.settledAtMs = currentTime;
+              // 着陆后微幅滑动衰减
+              p.vx = 0;
+              p.vy = 0;
+              // 花瓣平铺贴合在桌面（俯仰角放松趋平）
+              p.pitch = (Math.random() - 0.5) * 0.2;
+              p.roll = (Math.random() - 0.5) * 0.2;
+            }
+          }
+
+          // B. 碰撞地面
+          if (p.status === 'falling' && p.y >= floorY + (p.depthRatio * 20 - 10)) {
+            p.y = floorY + (p.depthRatio * 20 - 10);
+            p.status = 'settled';
+            p.landedSurface = 'floor';
+            p.settledAtMs = currentTime;
+            p.vx = 0;
+            p.vy = 0;
+            p.pitch = (Math.random() - 0.5) * 0.2;
+            p.roll = (Math.random() - 0.5) * 0.2;
+          }
+        } else if (p.status === 'settled') {
+          // 案面/地面安静留存期
+          const settledAge = currentTime - (p.settledAtMs || currentTime);
+          if (settledAge > p.stayDurationMs) {
+            p.status = 'fading';
+          }
+        } else if (p.status === 'fading') {
+          // 平滑化为微尘散去
+          p.opacity -= (dt / p.fadeDurationMs) * p.baseOpacity;
+          if (p.opacity <= 0.01) {
+            continue; // 该瓣消亡，不再留存
+          }
+        }
+
+        // ── 2. 高保真三维透视投影绘制 ──
+        ctx.save();
+        ctx.translate(p.x, p.y);
+
+        // 着陆阴影渲染（案面/地面微观接触软阴影）
+        if (p.status === 'settled' || p.status === 'fading') {
+          ctx.save();
+          ctx.scale(1, 0.35);
+          ctx.beginPath();
+          ctx.arc(0, p.scale * 0.5, p.scale * 0.85, 0, Math.PI * 2);
+          ctx.fillStyle = p.landedSurface === 'table' ? 'rgba(35, 18, 8, 0.22)' : 'rgba(20, 15, 10, 0.28)';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 姿态自旋 (Yaw) 与 3D 翻面模拟 (Roll & Pitch)
+        ctx.rotate(p.yaw);
+        // 使用余弦实现逼真 3D 纸片/花瓣正反翻转效果 (正弦厚度微调避免完全变成 0 宽闪烁)
+        const scaleX = Math.max(0.12, Math.abs(Math.cos(p.roll)));
+        const scaleY = Math.max(0.12, Math.abs(Math.cos(p.pitch)));
+        ctx.scale(scaleX, scaleY);
+
+        // 花瓣渐变色
+        const radGrad = ctx.createRadialGradient(0, -p.scale * 0.3, p.scale * 0.1, 0, 0, p.scale * 1.2);
+        radGrad.addColorStop(0, p.colorPrimary);
+        radGrad.addColorStop(0.7, p.colorSecondary);
+        radGrad.addColorStop(1, p.colorEdge);
+
+        ctx.fillStyle = radGrad;
+        ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity));
+
+        // 花瓣边缘柔和微描边
+        ctx.strokeStyle = p.colorEdge;
+        ctx.lineWidth = 0.5;
+
+        drawPetalPath(ctx, p.petalShapeType, p.scale);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+
+        activePetals.push(p);
+      }
+
+      petalsRef.current = activePetals;
+
+      // 如果队列中仍有花瓣，继续下一帧动力学循环
+      if (activePetals.length > 0) {
+        animFrameIdRef.current = requestAnimationFrame(loop);
+      } else {
+        animFrameIdRef.current = null;
+      }
+    };
+
+    // 启动动画循环
+    if (petalsRef.current.length > 0 && animFrameIdRef.current === null) {
+      animFrameIdRef.current = requestAnimationFrame(loop);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animFrameIdRef.current) {
+        cancelAnimationFrame(animFrameIdRef.current);
+        animFrameIdRef.current = null;
+      }
+    };
+  }, [activeTrigger]);
 
   return (
-    <div
-      className="fixed inset-0 pointer-events-none z-35 overflow-hidden"
-      style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
-    >
-      {/* 动态渐变资源 */}
-      <svg className="absolute w-0 h-0 pointer-events-none">
-        <defs>
-          {flowerSpec.colors.map((c, idx) => (
-            <linearGradient key={idx} id={`petalGrad_${idx}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={c.c1} />
-              <stop offset="65%" stopColor={c.c2} />
-              <stop offset="100%" stopColor={c.edge} />
-            </linearGradient>
-          ))}
-        </defs>
-      </svg>
-
-      {petals.map((petal) => (
-        <div
-          key={petal.id}
-          className={`absolute petal-item archetype-${petal.archetype}`}
-          style={
-            {
-              left: `${petal.startX}%`,
-              top: '-6%',
-              animationDuration: `${petal.duration}s`,
-              animationDelay: `${petal.delay}s`,
-              ...petal.cssVars,
-            } as React.CSSProperties
-          }
-        >
-          <svg
-            width={petal.size}
-            height={petal.size * 1.5}
-            viewBox={petal.viewBox}
-            style={{
-              filter: 'drop-shadow(0 3px 6px rgba(45, 20, 10, 0.18))',
-              overflow: 'visible',
-            }}
-          >
-            <path
-              d={petal.svgPath}
-              fill={`url(#${petal.colorGradId})`}
-              stroke={petal.accentEdge}
-              strokeWidth="0.4"
-              opacity={petal.opacity}
-            />
-          </svg>
-        </div>
-      ))}
-
-      {/* 5 种完全不同动力学特性的 3D 轨迹动画 */}
-      <style>{`
-        /* 1. 三维空翻螺旋盘旋 (Tumble Spiral) - 极轻重力与气旋托举 */
-        .archetype-tumble_spiral {
-          animation-name: animTumbleSpiral;
-          animation-timing-function: cubic-bezier(0.25, 0.7, 0.35, 1);
-          animation-fill-mode: forwards;
-        }
-        @keyframes animTumbleSpiral {
-          0% {
-            top: -6%;
-            transform: translate3d(0, 0, 0) rotateX(var(--p-rot-x-0)) rotateY(var(--p-rot-y-0)) rotateZ(var(--p-rot-z-0)) scale(0.85);
-            opacity: 0;
-          }
-          12% {
-            opacity: 1;
-          }
-          30% {
-            top: 20vh;
-            transform: translate3d(calc(var(--p-sway-1) * 1.6), 0, 50px) rotateX(var(--p-rot-x-1)) rotateY(calc(var(--p-rot-y-0) + 180deg)) rotateZ(var(--p-rot-z-1)) scale(1.05);
-          }
-          55% {
-            top: 42vh;
-            transform: translate3d(calc(var(--p-sway-2) * 1.3), 0, -25px) rotateX(calc(var(--p-rot-x-1) + 180deg)) rotateY(var(--p-rot-y-1)) rotateZ(calc(var(--p-rot-z-1) + 120deg)) scale(1.0);
-            opacity: 0.95;
-          }
-          78% {
-            top: 65vh;
-            transform: translate3d(calc(var(--p-sway-1) * 0.9), 0, 25px) rotateX(calc(var(--p-rot-x-1) + 270deg)) rotateY(calc(var(--p-rot-y-1) + 180deg)) rotateZ(calc(var(--p-rot-z-1) + 240deg)) scale(0.92);
-            opacity: 0.9;
-          }
-          100% {
-            top: 88%;
-            transform: translate3d(var(--p-drift-x), 0, 0) rotateX(calc(var(--p-rot-x-1) + 360deg)) rotateY(calc(var(--p-rot-y-1) + 360deg)) rotateZ(var(--p-rot-z-2)) scale(0.8);
-            opacity: 0;
-          }
-        }
-
-        /* 2. 顺风大角度斜掠滑翔 (Glide Breeze) - 空中羽落滑翔 */
-        .archetype-glide_breeze {
-          animation-name: animGlideBreeze;
-          animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
-          animation-fill-mode: forwards;
-        }
-        @keyframes animGlideBreeze {
-          0% {
-            top: -6%;
-            transform: translate3d(0, 0, 0) rotateX(12deg) rotateY(8deg) rotateZ(var(--p-rot-z-0)) scale(0.9);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          32% {
-            top: 22vh;
-            transform: translate3d(calc(var(--p-drift-x) * 0.35), 0, 45px) rotateX(25deg) rotateY(18deg) rotateZ(calc(var(--p-rot-z-0) + 45deg)) scale(1.06);
-          }
-          60% {
-            top: 48vh;
-            transform: translate3d(calc(var(--p-drift-x) * 0.7), 0, -15px) rotateX(40deg) rotateY(28deg) rotateZ(calc(var(--p-rot-z-0) + 95deg)) scale(1.0);
-            opacity: 0.95;
-          }
-          82% {
-            top: 70vh;
-            transform: translate3d(calc(var(--p-drift-x) * 1.05), 0, 30px) rotateX(48deg) rotateY(32deg) rotateZ(calc(var(--p-rot-z-0) + 130deg)) scale(0.88);
-            opacity: 0.88;
-          }
-          100% {
-            top: 89%;
-            transform: translate3d(calc(var(--p-drift-x) * 1.35), 0, -20px) rotateX(55deg) rotateY(36deg) rotateZ(calc(var(--p-rot-z-0) + 170deg)) scale(0.75);
-            opacity: 0;
-          }
-        }
-
-        /* 3. 气流微涡高频倾侧翻飞 (Flutter Eddy) - 漫空轻扬微颤 */
-        .archetype-flutter_eddy {
-          animation-name: animFlutterEddy;
-          animation-timing-function: ease-in-out;
-          animation-fill-mode: forwards;
-        }
-        @keyframes animFlutterEddy {
-          0% {
-            top: -6%;
-            transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) rotateZ(var(--p-rot-z-0));
-            opacity: 0;
-          }
-          12% {
-            opacity: 1;
-          }
-          26% {
-            top: 18vh;
-            transform: translate3d(calc(var(--p-sway-1) * -1.2), 0, 35px) rotateX(120deg) rotateY(60deg) rotateZ(calc(var(--p-rot-z-0) - 70deg));
-          }
-          50% {
-            top: 38vh;
-            transform: translate3d(calc(var(--p-sway-2) * 1.6), 0, -20px) rotateX(240deg) rotateY(180deg) rotateZ(calc(var(--p-rot-z-0) + 120deg));
-          }
-          72% {
-            top: 60vh;
-            transform: translate3d(calc(var(--p-sway-1) * 1.1), 0, 40px) rotateX(360deg) rotateY(260deg) rotateZ(calc(var(--p-rot-z-0) + 220deg));
-            opacity: 0.92;
-          }
-          88% {
-            top: 76vh;
-            transform: translate3d(calc(var(--p-sway-2) * 0.8), 0, -10px) rotateX(440deg) rotateY(310deg) rotateZ(calc(var(--p-rot-z-0) + 280deg));
-            opacity: 0.85;
-          }
-          100% {
-            top: 88%;
-            transform: translate3d(calc(var(--p-drift-x) * 0.85), 0, 0) rotateX(520deg) rotateY(360deg) rotateZ(var(--p-rot-z-2));
-            opacity: 0;
-          }
-        }
-
-        /* 4. 缓带当风大 S 型从容摇曳 (Gentle Sway) - 优雅舒缓飘逸 */
-        .archetype-gentle_sway {
-          animation-name: animGentleSway;
-          animation-timing-function: cubic-bezier(0.35, 0.65, 0.4, 1);
-          animation-fill-mode: forwards;
-        }
-        @keyframes animGentleSway {
-          0% {
-            top: -6%;
-            transform: translate3d(0, 0, 0) rotateZ(var(--p-rot-z-0)) scale(0.95);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.95;
-          }
-          28% {
-            top: 19vh;
-            transform: translate3d(calc(var(--p-sway-1) * 2.0), 0, 20px) rotateX(20deg) rotateY(-18deg) rotateZ(calc(var(--p-rot-z-0) + 35deg)) scale(1.02);
-          }
-          52% {
-            top: 42vh;
-            transform: translate3d(calc(var(--p-sway-2) * 2.2), 0, -15px) rotateX(-18deg) rotateY(22deg) rotateZ(calc(var(--p-rot-z-0) - 30deg)) scale(0.98);
-            opacity: 0.95;
-          }
-          76% {
-            top: 66vh;
-            transform: translate3d(calc(var(--p-sway-1) * 1.5), 0, 18px) rotateX(15deg) rotateY(-12deg) rotateZ(calc(var(--p-rot-z-0) + 25deg)) scale(0.92);
-            opacity: 0.9;
-          }
-          100% {
-            top: 88%;
-            transform: translate3d(calc(var(--p-drift-x) * 0.95), 0, 0) rotateX(10deg) rotateY(8deg) rotateZ(calc(var(--p-rot-z-0) + 10deg)) scale(0.82);
-            opacity: 0;
-          }
-        }
-
-        /* 5. 轴线翻滚加速坠落 (Tumbling Leaf) - 柔缓微翻 */
-        .archetype-tumbling_leaf {
-          animation-name: animTumblingLeaf;
-          animation-timing-function: cubic-bezier(0.25, 0.8, 0.35, 1);
-          animation-fill-mode: forwards;
-        }
-        @keyframes animTumblingLeaf {
-          0% {
-            top: -6%;
-            transform: translate3d(0, 0, 0) rotateX(var(--p-rot-x-0)) rotateZ(var(--p-rot-z-0));
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          32% {
-            top: 22vh;
-            transform: translate3d(calc(var(--p-sway-1) * 1.2), 0, 25px) rotateX(calc(var(--p-rot-x-0) + 180deg)) rotateZ(calc(var(--p-rot-z-0) + 90deg));
-          }
-          62% {
-            top: 48vh;
-            transform: translate3d(calc(var(--p-sway-2) * 1.4), 0, -25px) rotateX(calc(var(--p-rot-x-0) + 360deg)) rotateZ(calc(var(--p-rot-z-0) + 210deg));
-            opacity: 0.92;
-          }
-          82% {
-            top: 70vh;
-            transform: translate3d(calc(var(--p-sway-1) * 0.8), 0, 15px) rotateX(calc(var(--p-rot-x-0) + 450deg)) rotateZ(calc(var(--p-rot-z-0) + 300deg));
-            opacity: 0.85;
-          }
-          100% {
-            top: 89%;
-            transform: translate3d(var(--p-drift-x), 0, 0) rotateX(calc(var(--p-rot-x-0) + 540deg)) rotateZ(var(--p-rot-z-2));
-            opacity: 0;
-          }
-        }
-      `}</style>
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-35"
+      style={{ width: '100vw', height: '100vh' }}
+    />
   );
 };
