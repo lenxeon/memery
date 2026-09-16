@@ -3,7 +3,7 @@
  * @description 花瓶花卉模块统一导出入口，按品类派发插花渲染。
  */
 import React from 'react';
-import { VaseFlowerProps } from './types';
+import { VaseFlowerProps, getVaseMouthAperture, getVaseSpreadFactor } from './types';
 import { BaseVase } from './BaseVase';
 import { getFlowerModule } from './registry';
 
