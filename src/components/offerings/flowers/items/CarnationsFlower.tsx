@@ -280,8 +280,8 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
           <stop offset="100%" stopColor={petalBlush} />
         </linearGradient>
 
-        {/* 细长花茎圆柱立体渐变 */}
-        <linearGradient id="carnationStemRealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        {/* 细长花茎圆柱立体渐变 (使用 userSpaceOnUse 杜绝垂直线零宽度渐变失效) */}
+        <linearGradient id="carnationStemRealGrad" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="110" y2="0">
           <stop offset="0%" stopColor={stemDark} />
           <stop offset="35%" stopColor={stemBright} />
           <stop offset="75%" stopColor={stemDark} />
@@ -334,7 +334,7 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
 
         {/* 枝3：直通居中旺盛主花 */}
         <path
-          d={`M 75 125 C 75 106, 75 87, ${b3x} ${b3y}`}
+          d={`M 75 125 C 75.8 106, 74.4 87, ${b3x} ${b3y}`}
           stroke="url(#carnationStemRealGrad)"
           strokeWidth="2.5"
           fill="none"

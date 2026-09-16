@@ -1,20 +1,18 @@
 /**
  * @file CallaLiliesFlower.tsx
- * @description 【写实粉晕与象牙白马蹄莲】严格按照参考图与用户要求重构：
- * 1. 严格一花一径：5 枝花独立通往花瓶，各花茎与佛焰苞基部精准对齐无缝连接，通体无多余杂叶。
- * 2. 真实色彩与光感质感（彻底告别死白平淡）：
- *    - 参考图中极美的“粉晕马蹄莲”与“象牙白马蹄莲”双色混插：
- *      • 卷曲翻卷的苞口边缘晕染着娇艳灵动的蜜桃玫瑰粉晕（#fb7185, #f472b6, #fbcfe8）；
- *      • 苞身向下自然过渡为丝缎般温润的乳白与象牙白；
- *      • 喉部与基部泛着清透鲜活的嫩草绿（#bbf7d0, #86efac）；
- *      • 卷尖处生动回钩出标志性翠绿小尾尖；
- *    - 表面附带细腻柔和的纵向肉质纤维微纹理与丝缎高光反光。
- * 3. 错落有致与俯仰姿态：
- *    - 枝1 (左高-粉晕侧仰): 高位探出
- *    - 枝2 (右高-粉晕微卷): 侧向舒展
- *    - 枝3 (中位-象牙白主花): 优雅居中
- *    - 枝4 (左中低-正面粉晕花): 展现明亮嫩黄肉穗花序与翠绿花喉
- *    - 枝5 (右中低-象牙白翻卷花): 侧翻下垂微翘
+ * @description 【写实粉晕与象牙白马蹄莲（三枝经典大花雅供）】严格按照用户要求与参考图重构：
+ * 1. 经典三枝构图（保留三朵大花，疏朗空灵不拥挤）：
+ *    - 马蹄莲花型舒展阔大，三朵构成高雅经典的黄金三角错落构图：
+ *      • 枝1 (左高-粉晕侧仰): (54, 38)
+ *      • 枝2 (右中高-象牙白粉晕微卷): (96, 46)
+ *      • 枝3 (居中低-正面粉晕花，展现金黄肉穗与鲜活花喉): (72, 70)
+ * 2. 严格一花一径：3 根细长肉质青绿长茎由瓶口直通花底，无杂叶相扰，端点100%精确相接。
+ * 3. 真实色彩与质感（彻底告别死白平淡）：
+ *    - 翻卷马蹄口沿晕染柔美生动的玫瑰蜜桃粉晕（#fb7185, #f472b6, #fbcfe8）；
+ *    - 苞身流线过渡为羊脂玉般丝缎象牙白；
+ *    - 花喉与基部透着青翠嫩草绿（#bbf7d0, #86efac）；
+ *    - 尖端灵动回钩出标志性翠绿小尾角；
+ *    - 正面大花内嵌立体鲜亮金黄肉穗花序；
  * 4. 支持花瓶口径动态自适应 (spreadFactor)。
  */
 import React from 'react';
@@ -22,9 +20,9 @@ import { FlowerComponentProps, FallingPetalDef } from '../types';
 import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
 
 export const CALLA_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.5, fallSpan: 0.06, startX: 104, startY: 42, landX: 110, landY: 194, rx: 5.2, ry: 2.8, landRot: 28, swayAmp: 12, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.35, fallSpan: 0.06, startX: 46, startY: 46, landX: 50, landY: 193, rx: 5.4, ry: 2.9, landRot: -30, swayAmp: 10, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.15, fallSpan: 0.05, startX: 75, startY: 64, landX: 78, landY: 195, rx: 5.6, ry: 3.0, landRot: 14, swayAmp: 14, swayFreq: 3.8 },
+  { id: 1, detachHealth: 0.45, fallSpan: 0.06, startX: 96, startY: 46, landX: 104, landY: 194, rx: 5.8, ry: 3.0, landRot: 28, swayAmp: 14, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.25, fallSpan: 0.06, startX: 54, startY: 38, landX: 58, landY: 193, rx: 6.0, ry: 3.2, landRot: -28, swayAmp: 12, swayFreq: 3.5 },
+  { id: 3, detachHealth: 0.1, fallSpan: 0.05, startX: 72, startY: 70, landX: 76, landY: 195, rx: 6.2, ry: 3.4, landRot: 14, swayAmp: 16, swayFreq: 3.8 },
 ];
 
 export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
@@ -33,7 +31,7 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   isFaded,
   spreadFactor = 1.0,
 }) => {
-  // ── 粉晕色彩色阶（参考图中迷人的玫瑰蜜桃渐变） ──
+  // ── 粉晕色彩色阶（参考图中迷人的玫瑰蜜桃粉渐变） ──
   const pinkEdge = lerpColor('#f43f5e', '#b04a5a', dryFactor);
   const pinkMid = lerpColor('#fb7185', '#c26d7c', dryFactor);
   const pinkSoft = lerpColor('#fbcfe8', '#d6a8b1', dryFactor);
@@ -57,19 +55,17 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   const stemDark = lerpColor('#226519', '#464a33', dryFactor);
   const stemLight = lerpColor('#4ade80', '#839e6a', dryFactor);
 
-  const fl1 = getBlossomDropStyle(health, 0.5);
-  const fl2 = getBlossomDropStyle(health, 0.4);
-  const fl3 = getBlossomDropStyle(health, 0.28);
-  const fl4 = getBlossomDropStyle(health, 0.16);
-  const fl5 = getBlossomDropStyle(health, 0.05);
+  const fl1 = getBlossomDropStyle(health, 0.45);
+  const fl2 = getBlossomDropStyle(health, 0.3);
+  const fl3 = getBlossomDropStyle(health, 0.12);
 
   const overallOpacity = isFaded ? 0.45 : Math.max(0.65, health);
 
   /**
    * 1. 侧仰/半侧面【粉晕马蹄莲】（参考图中部及上方花朵）
-   * 佛焰苞呈现螺旋漏斗外翻，口沿泛起娇嫩粉晕，尖端回翘翠绿小尾尖
+   * 佛焰苞流线漏斗螺旋外翻，口沿泛起娇嫩粉晕，尖端回翘翠绿小尾尖
    */
-  const renderPinkSideCalla = (scale: number = 1.0) => (
+  const renderPinkSideCalla = (scale: number = 1.15) => (
     <g transform={`scale(${scale})`}>
       {/* 佛焰苞背面阴影内腔 */}
       <path
@@ -147,10 +143,10 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   );
 
   /**
-   * 2. 正面微倾【粉晕马蹄莲】（参考图左下正面大花朵）
-   * 完美展露圆润翠绿花喉、金黄肉穗花序与全圈外卷波浪粉晕边缘
+   * 2. 正面微倾【粉晕大马蹄莲】（参考图左下正面大花朵）
+   * 展现圆润翠绿花喉、金黄肉穗花序与全圈外卷波浪粉晕边缘
    */
-  const renderPinkFrontCalla = (scale: number = 1.0) => (
+  const renderPinkFrontCalla = (scale: number = 1.15) => (
     <g transform={`scale(${scale})`}>
       {/* 苞身外漏斗 */}
       <path
@@ -172,7 +168,7 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
         d="M -2 -17 L -1.5 -29 C -1.5 -32, 1.5 -32, 1.5 -29 L 2 -17 Z"
         fill="url(#callaSpadixGrad)"
       />
-      {/* 肉穗花序表面颗粒质感光点 */}
+      {/* 肉穗表面颗粒质感光点 */}
       <ellipse cx="0" cy="-30" rx="1.6" ry="2.0" fill={spadixLight} />
       <circle cx="-0.6" cy="-24" r="0.6" fill={spadixGold} />
       <circle cx="0.6" cy="-22" r="0.6" fill={spadixLight} />
@@ -208,11 +204,11 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   );
 
   /**
-   * 3. 优雅舒展【象牙白马蹄莲】（参考图右下与中部纯白花朵）
-   * 温润如羊脂玉的象牙白、青绿通透花喉、细长回卷青尖与丝绢微光
+   * 3. 优雅舒展【象牙白微粉卷边马蹄莲】（参考图右侧纯白温润花朵）
+   * 温润象牙白、青绿通透花喉、细长回卷青尖与丝绢微光
    */
-  const renderWhiteCalla = (scale: number = 1.0, isLeftCurve: boolean = false) => (
-    <g transform={`scale(${scale}) ${isLeftCurve ? 'scale(-1, 1)' : ''}`}>
+  const renderWhiteCalla = (scale: number = 1.15) => (
+    <g transform={`scale(${scale})`}>
       {/* 内壁阴影 */}
       <path
         d="M -3 0 C -6 -12, -12 -26, -2 -36 C 10 -24, 12 -12, 3 0 Z"
@@ -237,7 +233,7 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
         strokeWidth="0.3"
       />
 
-      {/* 边缘翻卷薄膜透光白边 */}
+      {/* 边缘翻卷薄膜透光边 */}
       <path
         d="M -17 -30 C -19 -38, -9 -44, 2 -46 C 13 -44, 20 -34, 16 -24"
         stroke={ivoryWhite}
@@ -272,32 +268,22 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   );
 
   // ─────────────────────────────────────────────────────────────
-  // 5 枝独立花朵坐标与姿态规划（严丝合缝连接瓶口 125）：
+  // 3 枝黄金三角插花空间规划（保留三朵大花，疏朗空灵、错落有致）：
   // 枝1: (左高-粉晕侧仰)
-  // 枝2: (右高-粉晕微卷)
-  // 枝3: (中偏高-象牙白舒展主花)
-  // 枝4: (左中低-粉晕正面花，露出金黄肉穗)
-  // 枝5: (右中低-象牙白轻卷花)
+  // 枝2: (右中高-象牙白舒展花)
+  // 枝3: (居中偏低-正面粉晕花，展现金黄肉穗)
   // ─────────────────────────────────────────────────────────────
-  const b1x = 75 - 24 * spreadFactor;
-  const b1y = 30;
+  const b1x = 75 - 20 * spreadFactor;
+  const b1y = 38;
   const b1rot = -10 * spreadFactor;
 
-  const b2x = 75 + 24 * spreadFactor;
-  const b2y = 36;
+  const b2x = 75 + 20 * spreadFactor;
+  const b2y = 46;
   const b2rot = 12 * spreadFactor;
 
-  const b3x = 75 - 2 * spreadFactor;
-  const b3y = 48;
-  const b3rot = -2 * spreadFactor;
-
-  const b4x = 75 - 16 * spreadFactor;
-  const b4y = 66;
-  const b4rot = -6 * spreadFactor;
-
-  const b5x = 75 + 16 * spreadFactor;
-  const b5y = 62;
-  const b5rot = 8 * spreadFactor;
+  const b3x = 75 - 3 * spreadFactor;
+  const b3y = 70;
+  const b3rot = -4 * spreadFactor;
 
   return (
     <g id="callaLiliesFlora" style={{ opacity: overallOpacity }}>
@@ -357,8 +343,8 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
           <stop offset="100%" stopColor={spadixLight} />
         </linearGradient>
 
-        {/* 8. 肉质细长花茎圆柱立体渐变 */}
-        <linearGradient id="callaStemRealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        {/* 8. 肉质细长花茎圆柱立体渐变 (userSpaceOnUse 杜绝零宽度渐变失效) */}
+        <linearGradient id="callaStemRealGrad" gradientUnits="userSpaceOnUse" x1="45" y1="0" x2="105" y2="0">
           <stop offset="0%" stopColor={stemDark} />
           <stop offset="35%" stopColor={stemLight} />
           <stop offset="75%" stopColor={stemDark} />
@@ -367,82 +353,54 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
       </defs>
 
       {/* ─────────────────────────────────────────────────────────────
-          严格一花一径：5 根细长优雅肉质青绿花茎（无叶，端点与花朵底座 100% 严丝合缝）
+          严格一花一径：3 根细长优雅肉质青绿花茎（无叶，端点与花朵底座 100% 严丝合缝）
       ───────────────────────────────────────────────────────────── */}
       <g id="callaStems">
-        {/* 枝1 花茎：直通左高粉晕花 (b1x, b1y) */}
+        {/* 枝1 花茎：直通左高粉晕大花 (b1x, b1y) */}
         <path
-          d={`M ${75 - 3.5 * spreadFactor} 125 C ${75 - 9 * spreadFactor} 96, ${b1x + 2} 62, ${b1x} ${b1y}`}
-          stroke="url(#callaStemRealGrad)"
-          strokeWidth="3.0"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* 枝2 花茎：直通右高粉晕花 (b2x, b2y) */}
-        <path
-          d={`M ${75 + 3.5 * spreadFactor} 125 C ${75 + 9 * spreadFactor} 96, ${b2x - 2} 66, ${b2x} ${b2y}`}
-          stroke="url(#callaStemRealGrad)"
-          strokeWidth="3.0"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* 枝3 花茎：直通中位象牙白主花 (b3x, b3y) */}
-        <path
-          d={`M 75 125 C 75 102, ${b3x} 75, ${b3x} ${b3y}`}
+          d={`M ${75 - 2.8 * spreadFactor} 125 C ${75 - 7 * spreadFactor} 96, ${b1x + 2} 65, ${b1x} ${b1y}`}
           stroke="url(#callaStemRealGrad)"
           strokeWidth="3.2"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* 枝4 花茎：直通左中低正面粉晕花 (b4x, b4y) */}
+        {/* 枝2 花茎：直通右高象牙白大花 (b2x, b2y) */}
         <path
-          d={`M ${75 - 1.8 * spreadFactor} 125 C ${75 - 5 * spreadFactor} 105, ${b4x + 1} 86, ${b4x} ${b4y}`}
+          d={`M ${75 + 2.8 * spreadFactor} 125 C ${75 + 7 * spreadFactor} 96, ${b2x - 2} 72, ${b2x} ${b2y}`}
           stroke="url(#callaStemRealGrad)"
-          strokeWidth="3.1"
+          strokeWidth="3.2"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* 枝5 花茎：直通右中低象牙白花 (b5x, b5y) */}
+        {/* 枝3 花茎：直通居中低位正面粉晕大花 (b3x, b3y) */}
         <path
-          d={`M ${75 + 1.8 * spreadFactor} 125 C ${75 + 5 * spreadFactor} 105, ${b5x - 1} 84, ${b5x} ${b5y}`}
+          d={`M 75 125 C 75.8 106, 73.8 88, ${b3x} ${b3y}`}
           stroke="url(#callaStemRealGrad)"
-          strokeWidth="3.1"
+          strokeWidth="3.3"
           fill="none"
           strokeLinecap="round"
         />
       </g>
 
       {/* ─────────────────────────────────────────────────────────────
-          五枝高低错落马蹄莲（粉晕与象牙白交映，生机盎然）
+          三枝阔大马蹄莲（粉晕与象牙白交映，疏密得体、高低生动）
       ───────────────────────────────────────────────────────────── */}
       <g id="callaBlooms">
-        {/* 枝1：【粉晕侧仰马蹄莲】左侧高梢 */}
+        {/* 枝1：【粉晕侧仰马蹄莲】左高梢，大而舒展 */}
         <g transform={`translate(${b1x}, ${b1y}) rotate(${b1rot})`} style={fl1}>
-          {renderPinkSideCalla(1.05)}
+          {renderPinkSideCalla(1.15)}
         </g>
 
-        {/* 枝2：【粉晕微卷马蹄莲】右侧高梢 */}
+        {/* 枝2：【象牙白舒展大花】右侧中高位，温润高贵 */}
         <g transform={`translate(${b2x}, ${b2y}) rotate(${b2rot})`} style={fl2}>
-          {renderPinkSideCalla(1.02)}
+          {renderWhiteCalla(1.12)}
         </g>
 
-        {/* 枝3：【象牙白舒展主花】居中偏高位，温润纯白 */}
+        {/* 枝3：【正面粉晕大马蹄莲】居中偏低焦点花，露出金黄肉穗与鲜活花喉 */}
         <g transform={`translate(${b3x}, ${b3y}) rotate(${b3rot})`} style={fl3}>
-          {renderWhiteCalla(1.08, false)}
-        </g>
-
-        {/* 枝4：【正面粉晕马蹄莲】左中偏低位，正展花喉与金黄肉穗 */}
-        <g transform={`translate(${b4x}, ${b4y}) rotate(${b4rot})`} style={fl4}>
-          {renderPinkFrontCalla(1.0)}
-        </g>
-
-        {/* 枝5：【象牙白翻卷花】右中偏低位，侧翻呼应 */}
-        <g transform={`translate(${b5x}, ${b5y}) rotate(${b5rot})`} style={fl5}>
-          {renderWhiteCalla(0.98, true)}
+          {renderPinkFrontCalla(1.18)}
         </g>
       </g>
     </g>
