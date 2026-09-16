@@ -1,6 +1,8 @@
 /**
  * @file PeachesFruit.tsx
- * @description 【福寿绵长】寿桃供品组件。
+ * @description 【福寿绵长】瑶池仙桃工笔写实三仙供品组件。
+ * 具备水蜜寿桃经典饱满心形丰润体态、灵动微翘仙桃尖、工笔国画「白里透红、胭脂染尖」细腻晕染，
+ * 以及天鹅绒般柔润无瑕的桃绒漫反射微光与修长苍翠仙桃寿叶，彻底消除生硬刻线与板结形体。
  */
 import React from 'react';
 import { FruitProps } from '../types';
@@ -9,23 +11,74 @@ import { BaseFruitDish } from '../BaseFruitDish';
 export const PeachesFruit: React.FC<FruitProps> = ({ scale, className, onClick }) => {
   const defs = (
     <>
-      <radialGradient id="peachGradTip" cx="50%" cy="25%" r="75%">
-        <stop offset="0%" stopColor="#fda4af" />
-        <stop offset="30%" stopColor="#fb7185" />
-        <stop offset="70%" stopColor="#fef08a" />
+      {/* 1. 仙桃底色渐变 (羊脂玉白、暖乳浅金，如脂如玉) */}
+      <radialGradient id="peachBaseJadeGrad" cx="42%" cy="48%" r="68%">
+        <stop offset="0%" stopColor="#ffffff" />
+        <stop offset="25%" stopColor="#fffdfa" />
+        <stop offset="55%" stopColor="#fefce8" />
+        <stop offset="80%" stopColor="#fef08a" />
         <stop offset="100%" stopColor="#fde047" />
       </radialGradient>
-      <radialGradient id="peachGradBody" cx="45%" cy="45%" r="65%">
-        <stop offset="0%" stopColor="#fff1f2" />
-        <stop offset="25%" stopColor="#fecdd3" />
-        <stop offset="60%" stopColor="#fef08a" />
-        <stop offset="100%" stopColor="#eab308" />
+
+      {/* 2. 顶层主仙桃胭脂霞彩分染 (浓郁水蜜桃胭脂朱砂层层晕化) */}
+      <radialGradient id="peachTopBlushGrad" cx="48%" cy="18%" r="65%">
+        <stop offset="0%" stopColor="#9f1239" />
+        <stop offset="16%" stopColor="#be123c" />
+        <stop offset="38%" stopColor="#e11d48" />
+        <stop offset="60%" stopColor="#f43f5e" />
+        <stop offset="78%" stopColor="#fb7185" />
+        <stop offset="90%" stopColor="#fbcfe8" stopOpacity="0.8" />
+        <stop offset="100%" stopColor="#fecdd3" stopOpacity="0" />
       </radialGradient>
-      <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#86efac" />
-        <stop offset="50%" stopColor="#22c55e" />
-        <stop offset="100%" stopColor="#15803d" />
+
+      {/* 3. 左仙桃胭脂渐变 */}
+      <radialGradient id="peachLeftBlushGrad" cx="45%" cy="22%" r="65%">
+        <stop offset="0%" stopColor="#be123c" />
+        <stop offset="25%" stopColor="#e11d48" />
+        <stop offset="52%" stopColor="#fb7185" />
+        <stop offset="78%" stopColor="#fbcfe8" stopOpacity="0.75" />
+        <stop offset="100%" stopColor="#fecdd3" stopOpacity="0" />
+      </radialGradient>
+
+      {/* 4. 右仙桃胭脂渐变 */}
+      <radialGradient id="peachRightBlushGrad" cx="52%" cy="22%" r="65%">
+        <stop offset="0%" stopColor="#be123c" />
+        <stop offset="25%" stopColor="#e11d48" />
+        <stop offset="52%" stopColor="#fb7185" />
+        <stop offset="78%" stopColor="#fbcfe8" stopOpacity="0.75" />
+        <stop offset="100%" stopColor="#fecdd3" stopOpacity="0" />
+      </radialGradient>
+
+      {/* 5. 桃沟柔和阴影渐变 (极柔和分染，绝非粗黑刻线) */}
+      <linearGradient id="peachSutureSoftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#be123c" stopOpacity="0.4" />
+        <stop offset="45%" stopColor="#e11d48" stopOpacity="0.25" />
+        <stop offset="85%" stopColor="#fda4af" stopOpacity="0.08" />
+        <stop offset="100%" stopColor="#fecdd3" stopOpacity="0" />
       </linearGradient>
+
+      {/* 6. 天鹅绒桃绒漫反射微光 (Velvety Peach Fuzz Bloom，无塑料反光) */}
+      <radialGradient id="peachVelvetBloom" cx="38%" cy="36%" r="58%">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
+        <stop offset="35%" stopColor="#fff1f2" stopOpacity="0.2" />
+        <stop offset="70%" stopColor="#fbcfe8" stopOpacity="0.06" />
+        <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
+      </radialGradient>
+
+      {/* 7. 修长苍翠仙桃寿叶渐变 */}
+      <linearGradient id="peachLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#86efac" />
+        <stop offset="30%" stopColor="#22c55e" />
+        <stop offset="75%" stopColor="#15803d" />
+        <stop offset="100%" stopColor="#0f4625" />
+      </linearGradient>
+
+      {/* 8. 桃实相互依偎闭塞阴影 */}
+      <radialGradient id="peachContactShadow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#2d050d" stopOpacity="0.75" />
+        <stop offset="55%" stopColor="#4a0e1a" stopOpacity="0.3" />
+        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+      </radialGradient>
     </>
   );
 
@@ -38,34 +91,142 @@ export const PeachesFruit: React.FC<FruitProps> = ({ scale, className, onClick }
       onClick={onClick}
       defsSlot={defs}
     >
-      <g id="peachesDuo">
-        {/* Left Peach */}
-        <g id="peachLeft" transform="rotate(-10, 36, 44)">
+      <g id="peachesTrio">
+        {/* ── 0. 底衬双生修长仙桃寿叶 (Background Longevity Leaves) ── */}
+        <g id="peachBackLeaves">
+          {/* 左侧斜探长叶 */}
           <path
-            d="M 36 20 C 44 26 52 38 48 54 C 44 64 26 64 22 52 C 18 38 28 26 36 20 Z"
-            fill="url(#peachGradBody)"
+            d="M 38 54 C 26 56, 12 51, 6 43 C 12 42, 26 45, 36 50 Z"
+            fill="url(#peachLeafGrad)"
+            stroke="#0f4625"
+            strokeWidth="0.4"
           />
-          {/* Crimson Blush on Tip */}
-          <path d="M 36 20 C 40 24 45 30 42 38 C 38 40 30 38 28 32 C 28 26 33 22 36 20 Z" fill="url(#peachGradTip)" />
-          {/* Peach Cleft / Crease */}
-          <path d="M 36 20 Q 34 35 33 50" stroke="#f43f5e" strokeWidth="1.2" fill="none" opacity="0.65" />
-          <ellipse cx="28" cy="38" rx="3.5" ry="7" fill="#ffffff" opacity="0.4" transform="rotate(-15, 28, 38)" />
+          <path d="M 37 53 Q 23 48 8 43" stroke="#bbf7d0" strokeWidth="0.45" fill="none" opacity="0.8" />
+
+          {/* 右侧斜探长叶 */}
+          <path
+            d="M 64 54 C 76 56, 90 51, 96 43 C 90 42, 76 45, 66 50 Z"
+            fill="url(#peachLeafGrad)"
+            stroke="#0f4625"
+            strokeWidth="0.4"
+          />
+          <path d="M 65 53 Q 79 48 94 43" stroke="#bbf7d0" strokeWidth="0.45" fill="none" opacity="0.8" />
         </g>
 
-        {/* Right Peach (Front) */}
-        <g id="peachRight" transform="rotate(12, 68, 42)">
+        {/* ── 1. 左下饱满仙桃 (Left Plump Longevity Peach) ── */}
+        <g id="peachLeft">
+          {/* 饱满心形倒卵桃身：底部丰厚圆润，桃尖朝上自然微倾 */}
           <path
-            d="M 68 18 C 77 24 85 36 81 53 C 77 63 58 63 54 51 C 50 37 60 24 68 18 Z"
-            fill="url(#peachGradBody)"
+            d="M 33 24 C 36 22, 38 23, 39 26 C 45 32, 50 42, 48 51 C 46 60, 36 63, 29 63 C 20 63, 15 56, 16 47 C 17 37, 26 29, 33 24 Z"
+            fill="url(#peachBaseJadeGrad)"
           />
-          <path d="M 68 18 C 73 23 78 30 75 38 C 70 41 61 38 59 31 C 60 24 65 21 68 18 Z" fill="url(#peachGradTip)" />
-          <path d="M 68 18 Q 66 34 65 49" stroke="#f43f5e" strokeWidth="1.2" fill="none" opacity="0.65" />
-          <ellipse cx="61" cy="36" rx="4" ry="8" fill="#ffffff" opacity="0.45" transform="rotate(-15, 61, 36)" />
+          {/* 桃尖与向阳颊面胭脂水红晕染 */}
+          <path
+            d="M 33 24 C 36 22, 38 23, 39 26 C 45 32, 50 42, 48 51 C 46 60, 36 63, 29 63 C 20 63, 15 56, 16 47 C 17 37, 26 29, 33 24 Z"
+            fill="url(#peachLeftBlushGrad)"
+          />
+          {/* 天然桃沟凹槽柔和阴影 (极度柔和自然，非生硬刻划) */}
+          <path
+            d="M 34 25 Q 35 37 32 50"
+            stroke="url(#peachSutureSoftGrad)"
+            strokeWidth="1.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* 桃绒漫散射柔光 */}
+          <ellipse cx="25" cy="40" rx="4.5" ry="7.5" fill="url(#peachVelvetBloom)" transform="rotate(-18, 25, 40)" />
+          {/* 边缘暖玉微光 */}
+          <path d="M 18 47 Q 20 57 28 61" stroke="#fef08a" strokeWidth="0.75" fill="none" opacity="0.3" />
         </g>
 
-        {/* Longevity Peach Leaves (仙桃青翠长叶) */}
-        <path d="M 52 48 Q 50 32 38 28 Q 46 38 52 48 Z" fill="url(#leafGrad)" stroke="#15803d" strokeWidth="0.5" />
-        <path d="M 54 48 Q 58 30 72 26 Q 62 36 54 48 Z" fill="url(#leafGrad)" stroke="#15803d" strokeWidth="0.5" />
+        {/* ── 2. 右下饱满仙桃 (Right Plump Longevity Peach) ── */}
+        <g id="peachRight">
+          {/* 饱满心形桃身 */}
+          <path
+            d="M 69 24 C 66 22, 64 23, 63 26 C 57 32, 52 42, 54 51 C 56 60, 66 63, 73 63 C 82 63, 87 56, 86 47 C 85 37, 76 29, 69 24 Z"
+            fill="url(#peachBaseJadeGrad)"
+          />
+          {/* 桃尖与右颊胭脂晕染 */}
+          <path
+            d="M 69 24 C 66 22, 64 23, 63 26 C 57 32, 52 42, 54 51 C 56 60, 66 63, 73 63 C 82 63, 87 56, 86 47 C 85 37, 76 29, 69 24 Z"
+            fill="url(#peachRightBlushGrad)"
+          />
+          {/* 桃沟柔和阴影 */}
+          <path
+            d="M 68 25 Q 67 37 70 50"
+            stroke="url(#peachSutureSoftGrad)"
+            strokeWidth="1.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* 桃绒漫散射柔光 */}
+          <ellipse cx="64" cy="40" rx="4.5" ry="7.5" fill="url(#peachVelvetBloom)" transform="rotate(-12, 64, 40)" />
+          {/* 边缘暖光 */}
+          <path d="M 84 47 Q 82 57 74 61" stroke="#fef08a" strokeWidth="0.75" fill="none" opacity="0.3" />
+        </g>
+
+        {/* 两底桃依偎接触闭塞阴影 */}
+        <ellipse cx="51" cy="48" rx="8" ry="11" fill="url(#peachContactShadow)" />
+
+        {/* ── 3. 顶层压盘大仙桃 (Crown Longevity Peach) ── */}
+        <g id="peachTop">
+          {/* 顶桃投在底桃上的柔和阴影 */}
+          <ellipse cx="51" cy="45" rx="16.5" ry="6" fill="#2d050d" opacity="0.38" />
+
+          {/* 仙桃饱满心形轮廓：双颊隆起丰腴，顶端桃尖灵动微翘 */}
+          <path
+            d="M 50 12 C 48 11.5, 45 14, 40 18 C 34 23, 31 31, 32 39 C 33 47, 41 51, 51 51 C 61 51, 69 47, 70 39 C 71 31, 68 23, 62 18 C 57 14, 53 14, 52 14.5 C 51 14.5, 51 13, 50 12 Z"
+            fill="url(#peachBaseJadeGrad)"
+          />
+          {/* 顶端仙桃尖与阳面胭脂朱砂晕染 (白里透红，由尖向腹层层曼延) */}
+          <path
+            d="M 50 12 C 48 11.5, 45 14, 40 18 C 34 23, 31 31, 32 39 C 33 47, 41 51, 51 51 C 61 51, 69 47, 70 39 C 71 31, 68 23, 62 18 C 57 14, 53 14, 52 14.5 C 51 14.5, 51 13, 50 12 Z"
+            fill="url(#peachTopBlushGrad)"
+          />
+
+          {/* 桃尖顺延而下的浅桃沟 (柔和阴影，展现真实仙桃饱满肌肉质感) */}
+          <path
+            d="M 51.5 14.5 Q 52.5 26 51 40"
+            stroke="url(#peachSutureSoftGrad)"
+            strokeWidth="1.8"
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* 桃沟受光柔边 */}
+          <path
+            d="M 50.5 15 Q 51.5 26 50 40"
+            stroke="#ffffff"
+            strokeWidth="0.6"
+            fill="none"
+            opacity="0.3"
+            strokeLinecap="round"
+          />
+
+          {/* 顶桃娇俏叶片 (鲜活小叶衬托桃尖微翘之灵动) */}
+          <g id="topPeachLeaf">
+            <path
+              d="M 52 14.5 C 60 10, 70 12, 68 19 C 63 21, 56 18, 52 14.5 Z"
+              fill="url(#peachLeafGrad)"
+              stroke="#0f4625"
+              strokeWidth="0.45"
+            />
+            <path d="M 53 15 Q 61 16 66 18.5" stroke="#d1fae5" strokeWidth="0.5" fill="none" opacity="0.85" />
+          </g>
+
+          {/* 仙桃天鹅绒质感柔光 (Velvety Peach Bloom，通透粉润绝非硬光) */}
+          <ellipse cx="42" cy="26" rx="5" ry="8.5" fill="url(#peachVelvetBloom)" transform="rotate(-20, 42, 26)" />
+          {/* 次级漫光 */}
+          <path
+            d="M 39 22 C 37 26, 38 31, 41 34"
+            stroke="#ffffff"
+            strokeWidth="0.8"
+            fill="none"
+            opacity="0.3"
+            strokeLinecap="round"
+          />
+          {/* 下沿玉暖漫反 */}
+          <path d="M 34 35 Q 36 43 43 47" stroke="#fef08a" strokeWidth="0.75" fill="none" opacity="0.25" />
+        </g>
       </g>
     </BaseFruitDish>
   );

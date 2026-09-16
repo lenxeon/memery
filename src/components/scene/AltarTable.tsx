@@ -27,6 +27,7 @@ export interface AltarTableProps {
   onResetLayout: () => void;
   onRemoveItem?: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
+  onToggleVase?: (id: SceneItemId) => void;
   showTableRunner?: boolean;
   tableclothStyle?: TableclothStyle;
   showPetals?: boolean;
@@ -47,6 +48,7 @@ interface AltarItemSlotProps {
   onPointerDown: (id: SceneItemId, e: React.PointerEvent) => void;
   onToggleItemLit: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
+  onToggleVase?: (id: SceneItemId) => void;
   onRemoveItem?: (id: SceneItemId) => void;
 }
 
@@ -61,6 +63,7 @@ const AltarItemSlot = React.memo<AltarItemSlotProps>(({
   onPointerDown,
   onToggleItemLit,
   onToggleFruit,
+  onToggleVase,
   onRemoveItem,
 }) => {
   const posX = item.position.x * tableScale;
@@ -91,6 +94,8 @@ const AltarItemSlot = React.memo<AltarItemSlotProps>(({
         onToggleItemLit(id);
       } else if (action === 'toggle_fruit') {
         onToggleFruit?.(id);
+      } else if (action === 'toggle_vase_style') {
+        onToggleVase?.(id);
       }
     },
     onRemove: () => onRemoveItem?.(id),
@@ -132,6 +137,7 @@ export const DraggableAltarTableComponent: React.FC<DraggableAltarTableProps> = 
   onResetLayout,
   onRemoveItem,
   onToggleFruit,
+  onToggleVase,
   showTableRunner = true,
   tableclothStyle = 'autumn_gold',
   showPetals = true,
@@ -351,6 +357,7 @@ export const DraggableAltarTableComponent: React.FC<DraggableAltarTableProps> = 
                 onPointerDown={handlePointerDown}
                 onToggleItemLit={onToggleItemLit}
                 onToggleFruit={onToggleFruit}
+                onToggleVase={onToggleVase}
                 onRemoveItem={onRemoveItem}
               />
             );
@@ -513,14 +520,32 @@ export const DraggableAltarTableComponent: React.FC<DraggableAltarTableProps> = 
               <line x1="15" y1="0" x2="15" y2="16" stroke="rgba(255,255,255,0.4)" strokeWidth="1.0" strokeDasharray="3,3" />
             </pattern>
 
+            {/* [材质 7]: 暖念金绫织锦机理 (Warm Gold Brocade Weave) */}
+            <pattern id="weaveGoldBrocade" width="16" height="16" patternUnits="userSpaceOnUse">
+              <rect width="16" height="16" fill="none" />
+              <line x1="0" y1="0" x2="16" y2="16" stroke="rgba(255,255,255,0.18)" strokeWidth="0.8" />
+              <line x1="16" y1="0" x2="0" y2="16" stroke="rgba(80,45,10,0.1)" strokeWidth="0.8" />
+            </pattern>
+
             {/* ══════════════════════════════════════════════════════════════════
                 2. 边饰锦带贴图库 (6款各具风骨的传统经典织锦滚边)
                ══════════════════════════════════════════════════════════════════ */}
 
-            {/* [边饰 1]: 黑金回纹锦带 (Autumn Gold Meander) */}
-            <pattern id="borderMeanderGold" width="24" height="14" patternUnits="userSpaceOnUse">
-              <rect width="24" height="14" fill="#26170d" />
-              <path d="M 0 2 L 21 2 L 21 12 L 3 12 L 3 5.5 L 17 5.5 L 17 9 L 7 9" fill="none" stroke="#f3cf7a" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" />
+            {/* [边饰 1]: 金绫万字回纹锦带 (Autumn Gold Meander - 参考图金地浓墨万字回纹) */}
+            <pattern id="borderMeanderGold" width="28" height="14" patternUnits="userSpaceOnUse">
+              <rect width="28" height="14" fill="#cca74f" />
+              {/* 上下细金边线 */}
+              <line x1="0" y1="0.8" x2="28" y2="0.8" stroke="#24170d" strokeWidth="1.2" />
+              <line x1="0" y1="13.2" x2="28" y2="13.2" stroke="#24170d" strokeWidth="1.2" />
+              {/* 连环万字双回纹 (工整深墨线条) */}
+              <path
+                d="M 0 7 L 7 7 L 7 2.5 L 14 2.5 L 14 7 L 21 7 L 21 2.5 L 28 2.5 M 7 7 L 7 11.5 L 14 11.5 L 14 7 M 21 7 L 21 11.5 L 28 11.5"
+                fill="none"
+                stroke="#24170d"
+                strokeWidth="1.8"
+                strokeLinecap="square"
+                strokeLinejoin="miter"
+              />
             </pattern>
 
             {/* [边饰 2]: 素白抽纱人字边 (Indigo Linen Hemstitch) - 对应图1素白编织边 */}

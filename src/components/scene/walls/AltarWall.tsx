@@ -27,7 +27,7 @@ export const AltarWall: React.FC<AltarWallProps> = ({
   sunlightIntensity,
   timeOfDay,
   sunAngle,
-  wallStyle = 'brick_screen',
+  wallStyle = 'classic_dawn',
 }) => {
   // 1. 获取对应的风格模块定义
   const wallModule = getWallModule(wallStyle);

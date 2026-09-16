@@ -125,12 +125,22 @@ export class FloraFactory {
     });
   }
 
-  static createVase(side: 'left' | 'right', flowerType: FlowerType, position?: Position2D): VaseItemData {
+  static createVase(
+    sideOrId: 'left' | 'right' | string,
+    flowerType: FlowerType | 'none',
+    position?: Position2D,
+    vaseStyle?: VaseItemData['vaseStyle'],
+    customName?: string,
+    scale?: number
+  ): VaseItemData {
+    const id = sideOrId.startsWith('vase') ? sideOrId : `vase_${sideOrId}`;
     return itemRegistry.createItem<VaseItemData>('vase', {
-      id: `vase_${side}`,
-      name: side === 'left' ? '富贵牡丹花瓶 (左)' : '纯洁百合花瓶 (右)',
-      flowerType,
-      position: position || (side === 'left' ? { x: -164, y: -4 } : { x: 164, y: -4 }),
+      id,
+      name: customName || (sideOrId === 'left' ? '富贵牡丹花瓶 (左)' : '纯洁百合花瓶 (右)'),
+      flowerType: flowerType as FlowerType,
+      vaseStyle: vaseStyle || (sideOrId === 'left' ? 'warm_white_plain' : 'painted_iris'),
+      position: position || (sideOrId === 'left' ? { x: -164, y: -4 } : { x: 164, y: -4 }),
+      scale: scale || 0.95,
     });
   }
 }
@@ -167,20 +177,38 @@ export class RitualFactory {
 // 3. 供奉器皿工厂 (Vessel Factory)
 export class VesselFactory {
   static createFruitPlatter(
-    side: 'left' | 'right', 
+    side: 'left' | 'right' | string, 
     fruitType: FruitType = 'apples', 
-    position?: Position2D
+    position?: Position2D,
+    customProps?: Partial<FruitItemData>
   ): FruitItemData {
     const names: Record<FruitType, string> = {
       apples: '平安红苹果高足盘',
       oranges: '吉祥金蜜柑高足盘',
       peaches: '福寿仙桃高足盘',
+      persimmons: '如意丹柿高足盘',
+      citrons: '禅意佛手高足盘',
+      grapes: '阳光玫瑰青提高足盘',
+      pomelos: '黄金蜜柚高足盘',
+      longans: '富贵龙眼高足盘',
+      bananas: '招财金蕉高足盘',
+      kumquats: '翡翠青桔高足盘',
+      dragonfruits: '红运火龙果高足盘',
+      cucumbers: '翠玉黄瓜高足盘',
+      watermelons: '盛夏西瓜高足盘',
+      coconuts: '南国椰子高足盘',
+      plums: '金玉蜂糖李高足盘',
+      mangosteens: '果后山竹高足盘',
+      pineapples: '祥瑞凤梨高足盘',
+      pears: '金秋秋月梨高足盘',
     };
+    const sideName = side === 'left' ? ' (左)' : side === 'right' ? ' (右)' : ' (敬献)';
     return itemRegistry.createItem<FruitItemData>('fruit', {
-      id: `fruit_${side}`,
-      name: `${names[fruitType]} (${side === 'left' ? '左' : '右'})`,
+      id: customProps?.id || `fruit_${side}`,
+      name: customProps?.name || `${names[fruitType]}${sideName}`,
       fruitType,
-      position: position || (side === 'left' ? { x: -118, y: 16 } : { x: 118, y: 16 }),
+      position: position || (side === 'left' ? { x: -118, y: 16 } : side === 'right' ? { x: 118, y: 16 } : { x: 0, y: 28 }),
+      ...customProps,
     });
   }
 

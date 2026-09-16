@@ -4,6 +4,9 @@
  */
 import { FlowerType } from '../../../types';
 import { ItemLifecycle } from '../../../game/types/entity';
+import { VaseStyle } from './vases/types';
+
+export * from './vases/types';
 
 export interface FallingPetalDef {
   id: number;
@@ -28,10 +31,12 @@ export interface FlowerComponentProps {
 }
 
 export interface VaseFlowerProps {
-  flowerType?: FlowerType;
+  vaseStyle?: VaseStyle;
+  flowerType?: FlowerType | 'none';
   scale?: number;
   className?: string;
   isRightSide?: boolean;
   lifecycle?: ItemLifecycle;
   onRevitalize?: () => void;
+  onClick?: () => void;
 }

@@ -1,164 +1,268 @@
 /**
  * @file FloorPlanks.tsx
- * @description 祭坛地板层，负责渲染具有禅意质感的古朴木质条纹透视地板与阴影。
+ * @description 祭坛地面系统，100% 严选对标参考图 1、图 2、图 3 所示的暖木禅意大宅风格，
+ * 搭载 5 款工业级 2D 手绘写实超清原木与禅意材质资产，具备真实 3D 纵深透视（近大远小视锥压缩）与晨昏光影。
  */
 import React from 'react';
-import { LightingSettings } from '../../types';
+import { LightingSettings, FloorStyle } from '../../types';
 
 interface FloorPlanksProps {
   lighting: LightingSettings;
+  floorStyle?: FloorStyle;
 }
 
-export const FloorPlanks: React.FC<FloorPlanksProps> = ({ lighting }) => {
-  const { masterOn, timeOfDay, sunAngle, sunlightIntensity, godRaysEnabled } = lighting;
+export const FLOOR_STYLE_OPTIONS = [
+  {
+    id: 'hinoki_wood' as FloorStyle,
+    name: '日式浅暖原木',
+    poeticTitle: '晴岚暖木',
+    desc: '对标参考图 1！阳光倾洒茶室的明朗浅橡原木大长板，温厚治愈，透视纵深开阔。',
+    iconText: '🪵',
+    tag: '图1核心推荐',
+    textureUrl: '/textures/hinoki_wood.jpg',
+  },
+  {
+    id: 'walnut_plank' as FloorStyle,
+    name: '自然胡桃宽板',
+    poeticTitle: '檀影温润',
+    desc: '对标参考图 3！北美黑胡桃宽板错缝地板，木纹舒展流淌，斜切微倒角温润高级。',
+    iconText: '🌲',
+    tag: '图3奢雅质感',
+    textureUrl: '/textures/walnut_plank.jpg',
+  },
+  {
+    id: 'herringbone_wood' as FloorStyle,
+    name: '暖木人字拼花',
+    poeticTitle: '暖木拼花',
+    desc: '对标参考图 2！经典手绘橡木人字拼实木地板，交织错落，立体层次分明。',
+    iconText: '🏡',
+    tag: '图2经典大宅',
+    textureUrl: '/textures/herringbone_wood.jpg',
+  },
+  {
+    id: 'zen_tatami' as FloorStyle,
+    name: '禅意草木素席',
+    poeticTitle: '幽香素席',
+    desc: '对标参考图 1 禅意座榻！日式草木素麻编织地席配雅致深色包边，质朴静谧。',
+    iconText: '🍵',
+    tag: '图1茶室禅风',
+    textureUrl: '/textures/zen_tatami.jpg',
+  },
+  {
+    id: 'marble_tile' as FloorStyle,
+    name: '汉白玉大理石',
+    poeticTitle: '如意方砖',
+    desc: '原版受好评的皇家级云石大方砖，光洁温润，美缝清晰，带近大远小倒影反光。',
+    iconText: '🏛️',
+    tag: '光洁高华',
+    textureUrl: '/textures/marble_tile.jpg',
+  },
+];
 
+export const FloorPlanks: React.FC<FloorPlanksProps> = ({ 
+  lighting, 
+  floorStyle = 'hinoki_wood' 
+}) => {
+  const { masterOn, timeOfDay, sunAngle, sunlightIntensity, godRaysEnabled } = lighting;
   const lightFactor = masterOn ? sunlightIntensity : 0.08;
 
-  // Harmonious natural floor palettes matching room ambiance in both lit and unlit states
-  const getFloorPalette = () => {
-    if (!masterOn) {
-      return {
-        baseFloor: 'from-[#090706] via-[#120f0d]/90 to-transparent',
-        plankSeam: 'rgba(35, 24, 18, 0.45)',
-        sunlightColor: 'rgba(255, 180, 100, 0.08)',
-        sunlightCore: 'rgba(255, 200, 120, 0.12)',
-        ambientShadow: 'rgba(5, 4, 3, 0.6)',
-      };
+  // 映射当前风格贴图路径
+  const getTextureUrl = () => {
+    switch (floorStyle) {
+      case 'walnut_plank':
+        return '/textures/walnut_plank.jpg';
+      case 'herringbone_wood':
+      case 'wood_planks':
+        return '/textures/herringbone_wood.jpg';
+      case 'zen_tatami':
+        return '/textures/zen_tatami.jpg';
+      case 'marble_tile':
+        return '/textures/marble_tile.jpg';
+      case 'hinoki_wood':
+      default:
+        return '/textures/hinoki_wood.jpg';
     }
-    switch (timeOfDay) {
-      case 'sunset':
+  };
+
+  // 根据当前材质类型调整贴图尺寸与踢脚线用色（完全匹配暖木与禅意体系）
+  const getStyleAttributes = () => {
+    switch (floorStyle) {
+      case 'marble_tile':
         return {
-          baseFloor: 'from-[#c9956d] via-[#dcb08d]/60 to-transparent',
-          plankSeam: 'rgba(120, 75, 45, 0.16)',
-          sunlightColor: 'rgba(255, 205, 145, 0.65)',
-          sunlightCore: 'rgba(255, 235, 195, 0.85)',
-          ambientShadow: 'rgba(60, 35, 18, 0.35)',
+          bgSize: '320px 180px',
+          baseboardBg: '#a89884',
+          baseboardHighlight: '#ffffff',
+          baseboardShadow: 'rgba(60, 50, 40, 0.45)',
         };
-      case 'night':
+      case 'zen_tatami':
         return {
-          baseFloor: 'from-[#0e121a] via-[#161d2b]/60 to-transparent',
-          plankSeam: 'rgba(15, 22, 35, 0.35)',
-          sunlightColor: 'rgba(160, 190, 240, 0.15)',
-          sunlightCore: 'rgba(190, 215, 255, 0.22)',
-          ambientShadow: 'rgba(6, 10, 18, 0.5)',
+          bgSize: '360px 200px',
+          baseboardBg: '#4a3b2c',
+          baseboardHighlight: '#8a735c',
+          baseboardShadow: 'rgba(25, 18, 12, 0.75)',
         };
-      case 'day':
+      case 'walnut_plank':
+        return {
+          bgSize: '280px 180px',
+          baseboardBg: '#4e3322',
+          baseboardHighlight: '#8c6044',
+          baseboardShadow: 'rgba(30, 16, 8, 0.75)',
+        };
+      case 'herringbone_wood':
+      case 'wood_planks':
+        return {
+          bgSize: '280px 155px',
+          baseboardBg: '#5a2e16',
+          baseboardHighlight: '#a3633d',
+          baseboardShadow: 'rgba(45, 24, 12, 0.65)',
+        };
+      case 'hinoki_wood':
       default:
         return {
-          baseFloor: 'from-[#d2b89a] via-[#e5d2be]/60 to-transparent',
-          plankSeam: 'rgba(130, 95, 65, 0.12)',
-          sunlightColor: 'rgba(255, 246, 220, 0.72)',
-          sunlightCore: 'rgba(255, 253, 240, 0.9)',
-          ambientShadow: 'rgba(70, 45, 25, 0.28)',
+          bgSize: '280px 180px',
+          baseboardBg: '#8c5a32',
+          baseboardHighlight: '#e5ab75',
+          baseboardShadow: 'rgba(60, 32, 14, 0.65)',
         };
     }
   };
 
-  const palette = getFloorPalette();
+  const attrs = getStyleAttributes();
+
+  // 根据时间动态计算光影滤镜（保持图1温暖明亮通透的基调）
+  const getAmbianceFilter = () => {
+    if (!masterOn) {
+      return {
+        filter: 'brightness(0.24) contrast(1.18) saturate(0.6)',
+        tintColor: 'rgba(5, 4, 3, 0.75)',
+        lightPuddle: 'rgba(255, 200, 120, 0.06)',
+      };
+    }
+
+    switch (timeOfDay) {
+      case 'sunset':
+        return {
+          filter: 'brightness(0.98) contrast(1.08) saturate(1.22)',
+          tintColor: 'rgba(190, 95, 25, 0.14)',
+          lightPuddle: 'rgba(255, 215, 140, 0.58)',
+        };
+      case 'night':
+        return {
+          filter: 'brightness(0.42) contrast(1.22) saturate(0.55) hue-rotate(200deg)',
+          tintColor: 'rgba(10, 18, 32, 0.58)',
+          lightPuddle: 'rgba(180, 210, 255, 0.18)',
+        };
+      case 'day':
+      default:
+        return {
+          filter: 'brightness(1.03) contrast(1.04) saturate(1.02)',
+          tintColor: 'rgba(255, 248, 230, 0.05)',
+          lightPuddle: 'rgba(255, 250, 235, 0.65)',
+        };
+    }
+  };
+
+  const ambiance = getAmbianceFilter();
 
   return (
-    <div
-      className="absolute inset-x-0 bottom-0 h-[45%] max-h-[440px] w-full pointer-events-none overflow-hidden select-none z-10"
-      style={{
-        maskImage: 'linear-gradient(to top, black 0%, black 25%, rgba(0,0,0,0.6) 65%, transparent 96%)',
-        WebkitMaskImage: 'linear-gradient(to top, black 0%, black 25%, rgba(0,0,0,0.6) 65%, transparent 96%)',
-      }}
+    <div 
+      className="absolute inset-x-0 bottom-0 h-[210px] sm:h-[240px] w-full pointer-events-none select-none z-10 overflow-hidden"
     >
-      {/* 1. Base Wooden Floor Perspective Planks (Fades naturally to transparent at the top) */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-t ${palette.baseFloor} transition-colors duration-700`}
-      >
-        {/* SVG Perspective Floorboard Lines */}
-        <svg
-          viewBox="0 0 1000 400"
-          className="absolute inset-0 w-full h-full"
-          preserveAspectRatio="none"
+      {/* ── 1. 顶部写实实木雕花踢脚线 (位于供桌台面后下方，自然衔接墙地) ── */}
+      <div className="absolute top-0 inset-x-0 h-5 z-25 flex flex-col justify-start pointer-events-none shadow-sm">
+        {/* 1.1 顶面微光修边 */}
+        <div 
+          className="w-full h-[2px] transition-colors duration-500" 
+          style={{ backgroundColor: attrs.baseboardHighlight }} 
+        />
+        {/* 1.2 踢脚线立体主身 (实木雕花双层凹凸线脚) */}
+        <div 
+          className="w-full h-[12px] flex flex-col justify-between transition-colors duration-500" 
+          style={{
+            backgroundColor: attrs.baseboardBg,
+            backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.3) 100%)',
+          }} 
         >
-          <defs>
-            <linearGradient id="softWoodGrain" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
-              <stop offset="25%" stopColor="rgba(0,0,0,0.03)" />
-              <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
-              <stop offset="75%" stopColor="rgba(0,0,0,0.03)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0.08)" />
-            </linearGradient>
-
-            {/* Subtle soft gradient fade into vanishing distance */}
-            <linearGradient id="plankDepthFade" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
-              <stop offset="40%" stopColor="rgba(0,0,0,0.02)" />
-              <stop offset="100%" stopColor="rgba(0,0,0,0.05)" />
-            </linearGradient>
-          </defs>
-
-          {/* Perspective floorboard seams radiating gently from vanishing center point */}
-          <line x1="120" y1="0" x2="-60" y2="400" stroke={palette.plankSeam} strokeWidth="1.8" />
-          <line x1="260" y1="0" x2="140" y2="400" stroke={palette.plankSeam} strokeWidth="1.8" />
-          <line x1="390" y1="0" x2="330" y2="400" stroke={palette.plankSeam} strokeWidth="1.8" />
-          <line x1="500" y1="0" x2="500" y2="400" stroke={palette.plankSeam} strokeWidth="2.0" />
-          <line x1="610" y1="0" x2="670" y2="400" stroke={palette.plankSeam} strokeWidth="1.8" />
-          <line x1="740" y1="0" x2="860" y2="400" stroke={palette.plankSeam} strokeWidth="1.8" />
-          <line x1="880" y1="0" x2="1060" y2="400" stroke={palette.plankSeam} strokeWidth="1.8" />
-
-          {/* Gentle horizontal floor cuts */}
-          <line x1="0" y1="130" x2="1000" y2="130" stroke={palette.plankSeam} strokeWidth="1" opacity="0.6" />
-          <line x1="0" y1="270" x2="1000" y2="270" stroke={palette.plankSeam} strokeWidth="1.2" opacity="0.7" />
-
-          <rect x="0" y="0" width="1000" height="400" fill="url(#softWoodGrain)" />
-          <rect x="0" y="0" width="1000" height="400" fill="url(#plankDepthFade)" />
-        </svg>
+          <div className="w-full h-[1px] bg-black/35 mt-0.5" />
+          <div className="w-full h-[1px] bg-white/20 mb-0.5" />
+        </div>
+        {/* 1.3 踢脚线与地面咬合的深沉投影切缝 */}
+        <div 
+          className="w-full h-[6px]" 
+          style={{
+            background: `linear-gradient(to bottom, ${attrs.baseboardShadow} 0%, transparent 100%)`,
+          }} 
+        />
       </div>
 
-      {/* 2. Warm Sunlit Light Puddle projected from Cathedral Window onto Floor */}
-      {masterOn && godRaysEnabled && (
-        <div
-          className="absolute inset-0 flex items-center justify-center transition-all duration-700 pointer-events-none"
+      {/* ── 2. 地坪主体：真·CSS 3D 纵深压缩与近大远小视锥透视 ── */}
+      <div 
+        className="absolute inset-0 top-4 overflow-hidden"
+        style={{
+          perspective: '420px',
+          perspectiveOrigin: '50% -15%',
+        }}
+      >
+        <div 
+          className="relative w-full h-[260%] origin-top transition-all duration-700"
           style={{
-            opacity: lightFactor * 0.9,
-            transform: `translateX(${sunAngle * 3.5}px)`,
+            transform: 'rotateX(66deg) scale(1.36, 1.26)',
+            backgroundImage: `url(${getTextureUrl()})`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: attrs.bgSize,
+            backgroundPosition: 'center top',
+            filter: ambiance.filter,
           }}
         >
-          <svg
-            viewBox="0 0 800 400"
-            className="w-full h-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <radialGradient id="sunFloorSoftGlow" cx="50%" cy="60%" rx="46%" ry="42%">
-                <stop offset="0%" stopColor={palette.sunlightCore} stopOpacity="0.85" />
-                <stop offset="35%" stopColor={palette.sunlightColor} stopOpacity="0.65" />
-                <stop offset="65%" stopColor={palette.sunlightColor} stopOpacity="0.25" />
-                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-              </radialGradient>
-            </defs>
+          {/* 光照色相温润漫反射滤层 */}
+          <div 
+            className="absolute inset-0 transition-colors duration-700 pointer-events-none"
+            style={{ backgroundColor: ambiance.tintColor }}
+          />
 
-            {/* Smooth, atmospheric sunlight footprint on floor - No harsh lines or dirty blotches */}
-            <ellipse
-              cx="400"
-              cy="230"
-              rx="370"
-              ry="165"
-              fill="url(#sunFloorSoftGlow)"
-            />
+          {/* 自然视线景深光影：远处幽微深沉、近处受光清晰（极强近大远小空间感） */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.08) 35%, transparent 65%, rgba(255,255,255,0.08) 100%)',
+            }}
+          />
 
-            {/* Soft, gentle window reflection warmth */}
-            <ellipse
-              cx="400"
-              cy="220"
-              rx="260"
-              ry="110"
-              fill={palette.sunlightCore}
-              opacity="0.3"
-            />
-          </svg>
+          {/* 近景两侧微弱暗角，引导视觉汇聚向供案中心 */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse at 50% 100%, transparent 55%, rgba(0,0,0,0.22) 100%)',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* ── 3. 窗外晨曦日光投射在地面的聚光光斑 (Ambient Sunlight Floor Pool) ── */}
+      {masterOn && godRaysEnabled && (
+        <div 
+          className="absolute inset-0 flex items-center justify-center transition-all duration-700 pointer-events-none z-15"
+          style={{
+            opacity: lightFactor * 0.85,
+            transform: `translateX(${sunAngle * 3}px)`,
+          }}
+        >
+          <div 
+            className="w-[88%] max-w-[740px] h-[140px] rounded-full pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse at 50% 50%, ${ambiance.lightPuddle} 0%, transparent 70%)`,
+              filter: 'blur(16px)',
+            }}
+          />
         </div>
       )}
 
-      {/* 3. Deep ambient floor shadow directly beneath the altar table */}
-      <div
-        className="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 w-[90%] max-w-[620px] h-20 rounded-full pointer-events-none"
+      {/* ── 4. 供桌台脚与基座沉稳接地阴影 (Table Ambient Occlusion Shadow) ── */}
+      <div 
+        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[620px] h-14 rounded-full pointer-events-none z-20"
         style={{
-          background: 'radial-gradient(ellipse, rgba(45, 28, 14, 0.35) 0%, rgba(55, 35, 18, 0.16) 45%, transparent 75%)',
+          background: 'radial-gradient(ellipse at 50% 50%, rgba(15,8,4,0.76) 0%, rgba(25,14,6,0.3) 50%, transparent 80%)',
+          filter: 'blur(6px)',
         }}
       />
     </div>

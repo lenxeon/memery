@@ -12,6 +12,14 @@ export * from './registry';
 export * from './items/ApplesFruit';
 export * from './items/OrangesFruit';
 export * from './items/PeachesFruit';
+export * from './items/PersimmonsFruit';
+export * from './items/CitronsFruit';
+export * from './items/GrapesFruit';
+export * from './items/PomelosFruit';
+export * from './items/LongansFruit';
+export * from './items/BananasFruit';
+export * from './items/KumquatsFruit';
+export * from './items/DragonfruitsFruit';
 
 export const FruitDish: React.FC<FruitPlatterProps> = ({
   fruitType = 'apples',
@@ -19,7 +27,7 @@ export const FruitDish: React.FC<FruitPlatterProps> = ({
   className = '',
   onToggleFruit,
 }) => {
-  const fruitModule = getFruitModule(fruitType);
+  const fruitModule = getFruitModule((fruitType || 'apples') as FruitType);
   const FruitComponent = fruitModule.Component;
 
   return (

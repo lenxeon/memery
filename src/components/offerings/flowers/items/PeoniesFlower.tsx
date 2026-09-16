@@ -70,13 +70,13 @@ export const PeoniesFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
         </linearGradient>
       </defs>
 
-      {/* 5 根坚挺枝干 */}
+      {/* 5 根坚挺枝干 (瓶内紧致收束于瓶口 x:72~78，出瓶后向外舒展绽放) */}
       <g id="peonyStems">
-        <path d="M 74 125 Q 68 85 54 48" stroke="url(#peonyStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
-        <path d="M 76 125 Q 86 85 96 58" stroke="url(#peonyStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
-        <path d="M 75 125 Q 75 65 76 28" stroke="url(#peonyStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
-        <path d="M 73 125 Q 56 86 36 54" stroke="url(#peonyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-        <path d="M 77 125 Q 96 78 114 44" stroke="url(#peonyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+        <path d="M 74 125 C 74 114, 74 108, 70 96 C 66 84, 58 66, 54 48" stroke="url(#peonyStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+        <path d="M 76 125 C 76 114, 76 108, 80 96 C 84 84, 92 68, 96 58" stroke="url(#peonyStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+        <path d="M 75 125 C 75 114, 75 108, 75 85 C 75 65, 76 45, 76 28" stroke="url(#peonyStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+        <path d="M 73 125 C 73 115, 73 108, 68 98 C 62 86, 48 70, 36 54" stroke="url(#peonyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+        <path d="M 77 125 C 77 115, 77 108, 82 98 C 88 86, 102 68, 114 44" stroke="url(#peonyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
 
         <circle cx="70" cy="85" r="2.2" fill={stemCol100} opacity="0.8" />
         <circle cx="82" cy="82" r="2.0" fill={stemCol100} opacity="0.8" />

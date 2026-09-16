@@ -18,7 +18,7 @@ src/
 ├── components/
 │   ├── scene/            # 【场景领域】祭坛宏观空间（供台、地板、遗照像框、背景墙系统）
 │   │   ├── AltarTable.tsx        # 核心供桌基座与插槽布局
-│   │   ├── FloorPlanks.tsx       # 禅意古木地板透视
+│   │   ├── FloorPlanks.tsx       # 禅意大理石方砖与沉香实木地板双风格系统
 │   │   ├── MemorialPortrait.tsx  # 纪念遗像框与贡香环绕
 │   │   └── walls/                # 动态背景墙多风格系统（BaseWall + Registry）
 │   ├── offerings/        # 【供品摆件领域】所有供桌摆件与交互物（细分独立目录）
@@ -82,14 +82,20 @@ src/
 
 ---
 
-## 3. 音效与交互规范 (`src/utils/audio.ts`)
+## 3. 音效与禅意背景音乐规范 (`src/utils/audio.ts`)
 
-- 音效均通过浏览器原生 `Web Audio API`（`AudioContext`）算法合成，不依赖外部音频资产网络请求，确保离线可用、无延迟响应。
-- 支持音效：
-  - `playBell()`：空灵悠扬的铜磬/颂钵余音（泛音衰减）。
-  - `playMuyu()`：沉稳清脆的木鱼声。
-  - `playDrip()`：晨露甘露滴落声。
-  - `playCandle()`：烛火微燃环境声。
+- **纯原生算法合成**：全部音效与长效背景音乐均通过浏览器原生 `Web Audio API`（`AudioContext`）算法合成，不依赖任何外部音频资产网络请求，确保 100% 离线可用、无版权争议、无卡顿加载延迟。
+- **4 大禅意背景音乐乐章 (BGM)**：
+  - `singing_bowl`：《空灵钵韵 · 528Hz》—— 528Hz 疗愈泛音和声声底与周期性空灵磬钟余音。
+  - `bamboo_wind`：《幽篁清风 · 甘露竹影》—— 竹林微风沙沙、清泉甘露水滴、悠远沉稳木鱼（绝配【古朴苍然】风格）。
+  - `temple_bell`：《晨钟暮鼓 · 远山梵音》—— 名山古刹深远大钟、低频庄严共鸣。
+  - `pentatonic_zither`：《五音琴韵 · 高山流水》—— 中国传统五声音阶（宫商角徵羽）古琴算法弹奏。
+- **交互离散音效**：
+  - `playSingingBowl()`：528Hz 铜磬击打与余音震颤。
+  - `playBell()`：空灵清音泛音点触。
+  - `playPorcelainClink()`：敬茶瓷器碰杯清脆声。
+  - `playMatchStrike()` / `playExtinguish()`：点烛火柴与微风吹熄。
+  - `playWoodPlacement()`：置物沉实木质声。
 
 ---
 

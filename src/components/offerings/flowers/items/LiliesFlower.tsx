@@ -64,13 +64,13 @@ export const LiliesFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
         </linearGradient>
       </defs>
 
-      {/* 5 根坚实百合花枝 */}
+      {/* 5 根坚实百合花枝 (在瓶颈内聚束于 x:73~77，出瓶后向外优雅探出) */}
       <g id="lilyStems">
-        <path d="M 76 128 Q 86 85 98 52" stroke="url(#lilyStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
-        <path d="M 75 128 Q 62 88 52 68" stroke="url(#lilyStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
-        <path d="M 75 128 Q 74 65 75 26" stroke="url(#lilyStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
-        <path d="M 74 128 Q 54 88 34 54" stroke="url(#lilyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-        <path d="M 78 128 Q 98 76 116 36" stroke="url(#lilyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+        <path d="M 76 128 C 76 115, 76 108, 81 96 C 87 84, 94 68, 98 52" stroke="url(#lilyStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+        <path d="M 74 128 C 74 115, 74 108, 69 96 C 63 84, 56 76, 52 68" stroke="url(#lilyStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+        <path d="M 75 128 C 75 115, 75 108, 75 80 C 74 60, 75 40, 75 26" stroke="url(#lilyStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+        <path d="M 73 128 C 73 115, 73 108, 66 96 C 58 84, 44 68, 34 54" stroke="url(#lilyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+        <path d="M 77 128 C 77 115, 77 108, 84 96 C 92 84, 106 60, 116 36" stroke="url(#lilyStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
 
         <circle cx="78" cy="95" r="2.2" fill={stemCol100} opacity="0.8" />
         <circle cx="86" cy="85" r="2.0" fill={stemCol100} opacity="0.8" />

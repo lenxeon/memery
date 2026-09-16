@@ -5,4 +5,5 @@
 export * from './EnvironmentDrawer';
 export * from './BlessingModal';
 export * from './FlowerPickerModal';
+export * from './FruitPickerModal';
 export * from './MemorialEditModal';

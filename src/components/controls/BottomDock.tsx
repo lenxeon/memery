@@ -8,6 +8,7 @@ import {
   Sliders, 
   Heart, 
   Flower2, 
+  Apple,
   LayoutGrid, 
   ChevronDown, 
   ChevronUp, 
@@ -17,6 +18,7 @@ import { sound } from '../../utils/audio';
 
 interface BottomDockProps {
   onOpenFlowers: () => void;
+  onOpenFruits: () => void;
   onToggleCandles: () => void;
   candlesLit: boolean;
   onToggleArrangeMode: () => void;
@@ -28,6 +30,7 @@ interface BottomDockProps {
 
 export const BottomDock: React.FC<BottomDockProps> = ({
   onOpenFlowers,
+  onOpenFruits,
   onToggleCandles,
   candlesLit,
   onToggleArrangeMode,
@@ -45,7 +48,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
 
   return (
     <div className="fixed bottom-2 sm:bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
-      <div className="pointer-events-auto flex flex-col items-center max-w-[420px] w-full transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]">
+      <div className="pointer-events-auto flex flex-col items-center max-w-[460px] w-full transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]">
         
         {/* ── 1. 展开状态：完整苹果式控制底栏 ── */}
         {isExpanded ? (
@@ -64,8 +67,8 @@ export const BottomDock: React.FC<BottomDockProps> = ({
               <ChevronDown size={14} className="text-stone-400 group-hover:text-amber-700 ml-1.5 opacity-60 group-hover:opacity-100 transition-all" />
             </button>
 
-            {/* 5 个核心功能按钮 */}
-            <div className="w-full flex items-center justify-between gap-1 sm:gap-3">
+            {/* 6 个核心功能按钮 (香、花、果、烛、台、愿) */}
+            <div className="w-full flex items-center justify-between gap-1 sm:gap-2">
               {/* 1. 献花 */}
               <button
                 type="button"
@@ -73,13 +76,26 @@ export const BottomDock: React.FC<BottomDockProps> = ({
                   sound.playBell(580, 2);
                   onOpenFlowers();
                 }}
-                className="flex flex-col items-center justify-center gap-1 min-h-[44px] py-1 px-2.5 rounded-2xl hover:bg-amber-100/50 text-stone-600 hover:text-amber-900 transition-all active:scale-95 cursor-pointer group"
+                className="flex flex-col items-center justify-center gap-1 min-h-[44px] py-1 px-2 rounded-2xl hover:bg-amber-100/50 text-stone-600 hover:text-amber-900 transition-all active:scale-95 cursor-pointer group"
               >
                 <Flower2 size={20} className="text-stone-500 group-hover:text-amber-700 transition-colors" />
                 <span className="text-[11px] font-normal tracking-wider">献花</span>
               </button>
 
-              {/* 2. 点烛 */}
+              {/* 2. 供果 */}
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playBell(560, 2);
+                  onOpenFruits();
+                }}
+                className="flex flex-col items-center justify-center gap-1 min-h-[44px] py-1 px-2 rounded-2xl hover:bg-amber-100/50 text-stone-600 hover:text-amber-900 transition-all active:scale-95 cursor-pointer group"
+              >
+                <Apple size={20} className="text-stone-500 group-hover:text-amber-700 transition-colors" />
+                <span className="text-[11px] font-normal tracking-wider">供果</span>
+              </button>
+
+              {/* 3. 点烛 */}
               <button
                 type="button"
                 onClick={onToggleCandles}

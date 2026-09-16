@@ -1,6 +1,8 @@
 /**
  * @file OrangesFruit.tsx
- * @description 【吉祥如意】金橙柑橘供品组件。
+ * @description 【吉祥如意】金蜜柑工笔写实堆叠供品组件。
+ * 具备柑橘特有的扁圆丰硕饱满造型、多层金橙温润晕染、五裂翠绿星芒花萼与双生吉庆橘叶，
+ * 彻底消除生硬斑点 pattern 与塑料反光，呈现天然柑橘油润光泽与稳坐白玉盘中的庄重感。
  */
 import React from 'react';
 import { FruitProps } from '../types';
@@ -9,29 +11,73 @@ import { BaseFruitDish } from '../BaseFruitDish';
 export const OrangesFruit: React.FC<FruitProps> = ({ scale, className, onClick }) => {
   const defs = (
     <>
-      <radialGradient id="orangeGradTop" cx="40%" cy="35%" r="65%">
-        <stop offset="0%" stopColor="#fed7aa" />
-        <stop offset="35%" stopColor="#fb923c" />
-        <stop offset="75%" stopColor="#ea580c" />
-        <stop offset="100%" stopColor="#9a3412" />
-      </radialGradient>
-      <radialGradient id="orangeGradLeft" cx="45%" cy="40%" r="60%">
-        <stop offset="0%" stopColor="#ffedd5" />
-        <stop offset="40%" stopColor="#f97316" />
-        <stop offset="85%" stopColor="#c2410c" />
+      {/* 1. 顶层金蜜柑主体渐变 (金黄透亮至浓郁熟橙层层晕染) */}
+      <radialGradient id="orangeTopBodyGrad" cx="36%" cy="30%" r="68%">
+        <stop offset="0%" stopColor="#fef08a" />
+        <stop offset="16%" stopColor="#fde047" />
+        <stop offset="38%" stopColor="#fb923c" />
+        <stop offset="65%" stopColor="#f97316" />
+        <stop offset="85%" stopColor="#ea580c" />
+        <stop offset="96%" stopColor="#c2410c" />
         <stop offset="100%" stopColor="#7c2d12" />
       </radialGradient>
-      <radialGradient id="orangeGradRight" cx="35%" cy="40%" r="60%">
-        <stop offset="0%" stopColor="#fed7aa" />
-        <stop offset="45%" stopColor="#ea580c" />
-        <stop offset="85%" stopColor="#9a3412" />
-        <stop offset="100%" stopColor="#6c1d07" />
+
+      {/* 2. 左下蜜柑渐变 */}
+      <radialGradient id="orangeLeftBodyGrad" cx="36%" cy="32%" r="66%">
+        <stop offset="0%" stopColor="#fef08a" />
+        <stop offset="18%" stopColor="#fdba74" />
+        <stop offset="45%" stopColor="#f97316" />
+        <stop offset="72%" stopColor="#ea580c" />
+        <stop offset="90%" stopColor="#c2410c" />
+        <stop offset="100%" stopColor="#6c2307" />
       </radialGradient>
-      <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#86efac" />
-        <stop offset="50%" stopColor="#22c55e" />
-        <stop offset="100%" stopColor="#15803d" />
+
+      {/* 3. 右下蜜柑渐变 */}
+      <radialGradient id="orangeRightBodyGrad" cx="34%" cy="32%" r="66%">
+        <stop offset="0%" stopColor="#fed7aa" />
+        <stop offset="20%" stopColor="#fb923c" />
+        <stop offset="48%" stopColor="#f97316" />
+        <stop offset="75%" stopColor="#d9480f" />
+        <stop offset="92%" stopColor="#9a3412" />
+        <stop offset="100%" stopColor="#581604" />
+      </radialGradient>
+
+      {/* 4. 后方底层微露蜜柑渐变 */}
+      <radialGradient id="orangeBackBodyGrad" cx="45%" cy="35%" r="60%">
+        <stop offset="0%" stopColor="#fdba74" />
+        <stop offset="50%" stopColor="#ea580c" />
+        <stop offset="100%" stopColor="#7c2d12" />
+      </radialGradient>
+
+      {/* 5. 翠绿星形果萼与嫩叶渐变 */}
+      <linearGradient id="orangeLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#a7f3d0" />
+        <stop offset="35%" stopColor="#22c55e" />
+        <stop offset="75%" stopColor="#15803d" />
+        <stop offset="100%" stopColor="#0f4625" />
       </linearGradient>
+
+      {/* 6. 果实相互接触闭塞阴影 */}
+      <radialGradient id="orangeContactOcclusion" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#2e0d04" stopOpacity="0.8" />
+        <stop offset="60%" stopColor="#431407" stopOpacity="0.35" />
+        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+      </radialGradient>
+
+      {/* 7. 柑橘表皮柔和油润漫散射微光 (绝非高对比度白斑噪点) */}
+      <radialGradient id="orangeMatteSheen" cx="38%" cy="32%" r="58%">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.38" />
+        <stop offset="35%" stopColor="#fef08a" stopOpacity="0.2" />
+        <stop offset="70%" stopColor="#fed7aa" stopOpacity="0.06" />
+        <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+      </radialGradient>
+
+      {/* 8. 浅凹果蒂窝阴影 */}
+      <radialGradient id="orangeStemDimple" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#3d1204" />
+        <stop offset="65%" stopColor="#7c2d12" />
+        <stop offset="100%" stopColor="#ea580c" stopOpacity="0" />
+      </radialGradient>
     </>
   );
 
@@ -45,37 +91,125 @@ export const OrangesFruit: React.FC<FruitProps> = ({ scale, className, onClick }
       defsSlot={defs}
     >
       <g id="orangesPyramid">
-        {/* Left Bottom Orange */}
-        <g id="orangeLeft">
-          <ellipse cx="32" cy="48" rx="18" ry="16" fill="url(#orangeGradLeft)" />
-          <circle cx="32" cy="36" r="2.5" fill="#431407" />
-          <ellipse cx="27" cy="43" rx="3.5" ry="6" fill="#ffffff" opacity="0.35" transform="rotate(-20, 27, 43)" />
-        </g>
-
-        {/* Right Bottom Orange */}
-        <g id="orangeRight">
-          <ellipse cx="72" cy="48" rx="18" ry="16" fill="url(#orangeGradRight)" />
-          <circle cx="72" cy="36" r="2.5" fill="#431407" />
-          <ellipse cx="77" cy="43" rx="3.5" ry="6" fill="#ffffff" opacity="0.35" transform="rotate(20, 77, 43)" />
-        </g>
-
-        {/* Center Base Middle Orange */}
+        {/* ── 0. 衬底中央微露金桔 (Center Base Supporting Orange) ── */}
         <g id="orangeCenterBase">
-          <ellipse cx="52" cy="50" rx="17" ry="15" fill="url(#orangeGradTop)" />
-          <circle cx="52" cy="38" r="2.5" fill="#431407" />
+          <ellipse cx="51" cy="45" rx="16.5" ry="13.5" fill="url(#orangeBackBodyGrad)" />
         </g>
 
-        {/* Top Center Crown Orange */}
+        {/* ── 1. 左下蜜柑 (Left Orange) ── */}
+        <g id="orangeLeft">
+          {/* 饱满扁圆柑橘外形：横阔略扁，敦实饱满 */}
+          <path
+            d="M 33 33 C 44 33, 51 39, 50 48 C 49 57, 42 62, 33 62 C 24 62, 16 57, 16 48 C 16 39, 23 33, 33 33 Z"
+            fill="url(#orangeLeftBodyGrad)"
+          />
+          {/* 果顶微凹 */}
+          <ellipse cx="33" cy="36" rx="3.5" ry="1.4" fill="url(#orangeStemDimple)" />
+          {/* 翠绿五裂星芒小萼与小柄 */}
+          <path
+            d="M 33 36 L 31 33.5 M 33 36 L 35 33.5 M 33 36 L 30 36.5 M 33 36 L 36 36.5 M 33 36 L 33 38"
+            stroke="#15803d"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+          />
+          <circle cx="33" cy="36" r="0.9" fill="#451a03" />
+
+          {/* 柔润柑橘油润漫散射微光 (无白斑麻点) */}
+          <ellipse cx="26" cy="42" rx="5" ry="7" fill="url(#orangeMatteSheen)" transform="rotate(-18, 26, 42)" />
+          <path d="M 23 38 C 22 42, 24 47, 27 50" stroke="#ffffff" strokeWidth="0.75" fill="none" opacity="0.3" strokeLinecap="round" />
+          {/* 下部边缘白玉盘暖金反光 */}
+          <path d="M 18 48 Q 21 58 31 61" stroke="#fde047" strokeWidth="0.75" fill="none" opacity="0.28" />
+        </g>
+
+        {/* ── 2. 右下蜜柑 (Right Orange) ── */}
+        <g id="orangeRight">
+          {/* 饱满扁圆柑橘外形 */}
+          <path
+            d="M 69 33 C 79 33, 86 39, 86 48 C 86 57, 78 62, 69 62 C 60 62, 52 57, 52 48 C 52 39, 59 33, 69 33 Z"
+            fill="url(#orangeRightBodyGrad)"
+          />
+          {/* 果顶微凹 */}
+          <ellipse cx="69" cy="36" rx="3.5" ry="1.4" fill="url(#orangeStemDimple)" />
+          {/* 翠绿星萼 */}
+          <path
+            d="M 69 36 L 67 33.5 M 69 36 L 71 33.5 M 69 36 L 66 36.5 M 69 36 L 72 36.5 M 69 36 L 69 38"
+            stroke="#15803d"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+          />
+          <circle cx="69" cy="36" r="0.9" fill="#451a03" />
+
+          {/* 柔润漫散射高光 */}
+          <ellipse cx="64" cy="42" rx="5" ry="7" fill="url(#orangeMatteSheen)" transform="rotate(-12, 64, 42)" />
+          <path d="M 61 38 C 60 42, 62 47, 65 50" stroke="#ffffff" strokeWidth="0.75" fill="none" opacity="0.28" strokeLinecap="round" />
+          {/* 底部反光 */}
+          <path d="M 84 48 Q 81 58 71 61" stroke="#fde047" strokeWidth="0.75" fill="none" opacity="0.28" />
+        </g>
+
+        {/* 左右金桔交汇闭塞阴影 */}
+        <ellipse cx="51" cy="49" rx="9" ry="10" fill="url(#orangeContactOcclusion)" />
+
+        {/* ── 3. 顶层压轴金蜜柑 (Top Crown Orange) ── */}
         <g id="orangeTop">
-          <ellipse cx="52" cy="33" rx="18.5" ry="16.5" fill="url(#orangeGradTop)" />
-          <circle cx="52" cy="20" r="3" fill="#3b1103" />
-          {/* Calyx & Twin Leaves */}
-          <path d="M 52 19 L 45 14 Q 50 11 52 19 Z" fill="url(#leafGrad)" />
-          <path d="M 52 19 L 61 13 Q 58 9 52 19 Z" fill="url(#leafGrad)" />
-          <path d="M 52 19 Q 53 14 54 11" stroke="#2e1004" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-          {/* Peel Texture Dimples & Specular */}
-          <ellipse cx="46" cy="27" rx="3.8" ry="7" fill="#ffffff" opacity="0.45" transform="rotate(-25, 46, 27)" />
-          <circle cx="49" cy="24" r="1.5" fill="#ffffff" opacity="0.75" />
+          {/* 顶果压底的柔和阴影 */}
+          <ellipse cx="51" cy="44" rx="16.5" ry="5.5" fill="#290a03" opacity="0.4" />
+
+          {/* 饱满扁圆顶果：果顶微凹，侧向饱满丰硕 */}
+          <path
+            d="M 51 16 C 63 16, 71 22, 70 31 C 69 40, 61 46, 51 46 C 41 46, 33 40, 32 31 C 31 22, 39 16, 51 16 Z"
+            fill="url(#orangeTopBodyGrad)"
+          />
+
+          {/* 果蒂微凹深涡 */}
+          <ellipse cx="51" cy="18" rx="4" ry="1.8" fill="url(#orangeStemDimple)" />
+
+          {/* 翠绿五裂星芒花萼与木质短蒂 */}
+          <g id="orangeStarCalyx">
+            {/* 五角小星萼 */}
+            <path
+              d="M 51 18 L 47 15.5 M 51 18 L 55 15.5 M 51 18 L 45.5 18 M 51 18 L 56.5 18 M 51 18 L 51 20.5"
+              stroke="#15803d"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+            />
+            {/* 木质短柄 */}
+            <path d="M 51 18 Q 52 13 54 10" stroke="#3b1502" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+            <circle cx="51" cy="18" r="1.1" fill="#451a03" />
+          </g>
+
+          {/* 双生翠绿吉庆小橘叶 */}
+          <g id="orangeTwinLeaves">
+            {/* 左小叶 */}
+            <path
+              d="M 52 14 C 43 9, 37 15, 44 19 C 49 19, 51 16, 52 14 Z"
+              fill="url(#orangeLeafGrad)"
+              stroke="#0f4625"
+              strokeWidth="0.4"
+            />
+            <path d="M 50 14 Q 44 14 41 16" stroke="#bbf7d0" strokeWidth="0.45" fill="none" opacity="0.8" />
+            {/* 右长叶 */}
+            <path
+              d="M 52 14 C 62 8, 72 13, 67 21 C 61 22, 56 18, 52 14 Z"
+              fill="url(#orangeLeafGrad)"
+              stroke="#0f4625"
+              strokeWidth="0.4"
+            />
+            <path d="M 53 14 Q 62 15 65 19" stroke="#bbf7d0" strokeWidth="0.5" fill="none" opacity="0.85" />
+            <path d="M 55 13 Q 63 11 67 15" stroke="#ffffff" strokeWidth="0.45" fill="none" opacity="0.35" />
+          </g>
+
+          {/* 柑橘表皮柔和油润漫射高光 (纯净晶莹，绝不长白斑) */}
+          <ellipse cx="42" cy="24" rx="5" ry="7.5" fill="url(#orangeMatteSheen)" transform="rotate(-20, 42, 24)" />
+          <path
+            d="M 39 21 C 37 25, 38 30, 42 33"
+            stroke="#ffffff"
+            strokeWidth="0.85"
+            fill="none"
+            opacity="0.32"
+            strokeLinecap="round"
+          />
+          {/* 下沿环境漫反温和金色 */}
+          <path d="M 34 32 Q 36 41 45 44" stroke="#fef08a" strokeWidth="0.75" fill="none" opacity="0.25" />
         </g>
       </g>
     </BaseFruitDish>

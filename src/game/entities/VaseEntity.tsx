@@ -20,10 +20,12 @@ import {
 } from '../types/entity';
 import { FlowerVase } from '../../components/offerings/flowers';
 import { FlowerType } from '../../types';
+import { VaseStyle, VASE_STYLES } from '../../components/offerings/flowers/vases';
 
 export interface VaseItemData extends GameItemData {
   type: 'vase';
   flowerType: FlowerType;
+  vaseStyle?: VaseStyle;
 }
 
 export class VaseEntityController implements ItemEntityController<VaseItemData> {
@@ -39,6 +41,7 @@ export class VaseEntityController implements ItemEntityController<VaseItemData> 
       position: params.position || (isRight ? { x: 164, y: -4 } : { x: -164, y: -4 }),
       scale: params.scale || 0.95,
       flowerType: params.flowerType || (isRight ? 'lilies' : 'peonies'),
+      vaseStyle: params.vaseStyle || (isRight ? 'painted_iris' : 'warm_white_plain'),
       lifecycle: params.lifecycle || {
         stage: 'blooming',
         age: 0,
@@ -129,6 +132,24 @@ export class VaseEntityController implements ItemEntityController<VaseItemData> 
       };
     }
 
+    if (action === 'change_vase_style') {
+      const nextStyle = payload as VaseStyle;
+      return {
+        ...item,
+        vaseStyle: nextStyle || item.vaseStyle,
+      };
+    }
+
+    if (action === 'toggle_vase_style') {
+      const styleList: VaseStyle[] = VASE_STYLES.map((v) => v.id);
+      const curIdx = styleList.indexOf(item.vaseStyle || 'warm_white_plain');
+      const nextStyle = styleList[(curIdx + 1) % styleList.length];
+      return {
+        ...item,
+        vaseStyle: nextStyle,
+      };
+    }
+
     if (action === 'revitalize' || action === 'click') {
       // 添水剪枝，枯木逢春，重新盛开
       return {
@@ -160,10 +181,12 @@ export class VaseEntityController implements ItemEntityController<VaseItemData> 
     return (
       <FlowerVase
         isRightSide={isRightSide}
-        flowerType={item.flowerType || (isRightSide ? 'lilies' : 'peonies')}
+        vaseStyle={item.vaseStyle || (isRightSide ? 'painted_iris' : 'warm_white_plain')}
+        flowerType={item.flowerType !== undefined ? item.flowerType : (isRightSide ? 'lilies' : 'peonies')}
         scale={item.scale || 0.95}
         lifecycle={item.lifecycle}
         onRevitalize={() => props.onInteract?.('revitalize')}
+        onClick={() => props.onInteract?.('toggle_vase_style')}
       />
     );
   }

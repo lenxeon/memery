@@ -10,7 +10,27 @@ export interface Position2D {
 }
 
 export type FlowerType = 'peonies' | 'lilies' | 'lotus' | 'chrysanthemum' | 'roses';
-export type FruitType = 'apples' | 'oranges' | 'peaches';
+export type FruitType = 
+  | 'apples' 
+  | 'oranges' 
+  | 'peaches' 
+  | 'persimmons' 
+  | 'citrons' 
+  | 'grapes'
+  | 'pomelos'
+  | 'longans'
+  | 'bananas'
+  | 'kumquats'
+  | 'dragonfruits'
+  | 'cucumbers'
+  | 'watermelons'
+  | 'coconuts'
+  | 'plums'
+  | 'mangosteens'
+  | 'pineapples'
+  | 'pears';
+
+export type { VaseStyle } from './components/offerings/flowers/vases';
 
 export type TableclothStyle = 
   | 'autumn_gold'       // 👑 秋香金 · 宫廷织锦 (如参考图2)
@@ -53,4 +73,31 @@ export interface MemorialInfo {
   title: string;
   subtitle: string;
   photoUrl: string;
+}
+
+export type FloorStyle = 
+  | 'hinoki_wood'      // 日式浅暖原木 (图1 参考风格 · 晴岚暖木)
+  | 'walnut_plank'     // 自然胡桃宽板 (图3 参考风格 · 檀影温润)
+  | 'herringbone_wood' // 暖木人字拼花 (图2 参考风格 · 经典人字拼)
+  | 'wood_planks'      // 兼容别名
+  | 'zen_tatami'       // 禅意素席榻榻米 (图1 茶室风格 · 幽香素席)
+  | 'marble_tile';     // 汉白玉大理石 (如意方砖)
+
+export interface FloorStyleInfo {
+  id: FloorStyle;
+  name: string;
+  poeticTitle: string;
+  desc: string;
+  iconText: string;
+}
+
+export type BgmTrackId = 'singing_bowl' | 'bamboo_wind' | 'temple_bell' | 'pentatonic_zither';
+
+export interface BgmTrackInfo {
+  id: BgmTrackId;
+  name: string;
+  poeticName: string;
+  instrument: string;
+  desc: string;
+  icon: string;
 }

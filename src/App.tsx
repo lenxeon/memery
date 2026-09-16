@@ -19,13 +19,16 @@ import {
   WorldContext,
   EntityTypeId,
   TableclothStyle,
-  WallBackgroundStyle
+  WallBackgroundStyle,
+  FloorStyle
 } from './types';
-import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait } from './components/scene';
+import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait, FLOOR_STYLE_OPTIONS } from './components/scene';
 import { VolumetricRays, DustMotes, PetalShower } from './components/effects';
-import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, BlessingModal } from './components/settings';
+import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerModal, BlessingModal } from './components/settings';
 import { BottomDock, FpsMonitor } from './components/controls';
 import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
+import { VaseStyle, getVaseStyleMeta } from './components/offerings/flowers/vases';
+import { CinnabarSealBadge } from './components/common/ChineseDecorations';
 import { useWorldLoop } from './game/lifecycle/useWorldLoop';
 import { sound } from './utils/audio';
 import {
@@ -40,32 +43,78 @@ import {
   Heart
 } from 'lucide-react';
 
-export const buildInitialItems = (): Record<SceneItemId, SceneItem> => ({
-  // ── Symmetrical Pillars: Vases, Candles, Censer ──
-  vase_left: FloraFactory.createVase('left', 'peonies', { x: -164, y: -4 }),
-  vase_right: FloraFactory.createVase('right', 'lilies', { x: 164, y: -4 }),
+// ── 供案常规陈设 (五供齐备) ──
+export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
+  vase_left: FloraFactory.createVase('left', 'peonies', { x: -164, y: -4 }, 'warm_white_plain'),
+  vase_right: FloraFactory.createVase('right', 'lilies', { x: 164, y: -4 }, 'painted_iris'),
   candle_left: RitualFactory.createCandle('left', { x: -74, y: 3 }, true),
   candle_right: RitualFactory.createCandle('right', { x: 74, y: 3 }, true),
   censer: RitualFactory.createCenser({ x: 0, y: 6 }, true),
-
-  // ── Auspicious Offerings (香、花、灯、水、果 · 五供齐备) ──
   fruit_left: VesselFactory.createFruitPlatter('left', 'apples', { x: -118, y: 16 }),
   fruit_right: VesselFactory.createFruitPlatter('right', 'oranges', { x: 118, y: 16 }),
   tea_cups: VesselFactory.createTeaCups({ x: 0, y: 22 }),
   singing_bowl: RitualFactory.createSingingBowl({ x: -62, y: 32 }),
-
-  // ── Ten Fresh Flower Offerings (十景香花盛供 · 繁花锦簇 · 带生命周期) ──
-  offered_flower_1: FloraFactory.createOfferedBouquet('peonies', { x: -192, y: 14 }, { id: 'offered_flower_1', name: '敬献 · 重瓣粉牡丹 (左翼)' }),
-  offered_flower_2: FloraFactory.createOfferedBouquet('lilies', { x: 192, y: 14 }, { id: 'offered_flower_2', name: '敬献 · 纯白东方百合 (右翼)' }),
-  offered_flower_3: FloraFactory.createOfferedBouquet('lotus', { x: -152, y: 22 }, { id: 'offered_flower_3', name: '敬献 · 出尘清莲 (左侧)' }),
-  offered_flower_4: FloraFactory.createOfferedBouquet('roses', { x: 152, y: 22 }, { id: 'offered_flower_4', name: '敬献 · 淡雅香槟玫瑰 (右侧)' }),
-  offered_flower_5: FloraFactory.createOfferedBouquet('chrysanthemum', { x: -172, y: 30 }, { id: 'offered_flower_5', name: '敬献 · 高洁白菊 (左中)' }),
-  offered_flower_6: FloraFactory.createOfferedBouquet('roses', { x: 172, y: 30 }, { id: 'offered_flower_6', name: '敬献 · 淡雅香槟玫瑰 (右中)' }),
-  offered_flower_7: FloraFactory.createOfferedBouquet('peonies', { x: -98, y: 28 }, { id: 'offered_flower_7', name: '敬献 · 重瓣粉牡丹 (左身)' }),
-  offered_flower_8: FloraFactory.createOfferedBouquet('chrysanthemum', { x: 98, y: 28 }, { id: 'offered_flower_8', name: '敬献 · 高洁白菊 (右身)' }),
-  offered_flower_9: FloraFactory.createOfferedBouquet('lilies', { x: -30, y: 35 }, { id: 'offered_flower_9', name: '敬献 · 纯白东方百合 (左前)' }),
-  offered_flower_10: FloraFactory.createOfferedBouquet('lotus', { x: 30, y: 35 }, { id: 'offered_flower_10', name: '敬献 · 出尘清莲 (右前)' }),
 });
+
+// ── 🔍 专项花器审计展台 (台面清空其它所有物品，并列陈列供逐一审计器形、微观肌理与咬合) ──
+export type AuditGroup = 'new_unique' | 'designer_twist';
+
+export const buildAuditVaseItems = (
+  group: AuditGroup = 'new_unique',
+  withFlowers: boolean = true
+): Record<SceneItemId, SceneItem> => {
+  if (group === 'new_unique') {
+    // 4 款全新异形与手作/旋涡/流沙微观质感花器 (最新参考图提炼打造)
+    return {
+      vase_audit_1: FloraFactory.createVase(
+        'vase_audit_1',
+        withFlowers ? 'peonies' : 'none',
+        { x: -140, y: 0 },
+        'pinched_clay_ruffle',
+        '1. 手作泥捏翻边陶瓶 (梳齿拉坯刮痕粗陶)',
+        0.96
+      ),
+      vase_audit_2: FloraFactory.createVase(
+        'vase_audit_2',
+        withFlowers ? 'lilies' : 'none',
+        { x: -46, y: -4 },
+        'pearlescent_turbine',
+        '2. 银曜珠光螺旋涡轮瓶 (8道3D旋转刀锋棱)',
+        0.96
+      ),
+      vase_audit_3: FloraFactory.createVase(
+        'vase_audit_3',
+        withFlowers ? 'lotus' : 'none',
+        { x: 46, y: -4 },
+        'twisted_helix_tower',
+        '3. 极简莫兰迪旋转扭扭塔 (90°沙漏扭转腰)',
+        0.96
+      ),
+      vase_audit_4: FloraFactory.createVase(
+        'vase_audit_4',
+        withFlowers ? 'roses' : 'none',
+        { x: 140, y: 0 },
+        'gradient_sand_volcano',
+        '4. 天青流沙渐变圆锥瓶 (砂岩颗粒极简锥台)',
+        0.96
+      ),
+    };
+  }
+
+  // designer_twist: 8 款现代几何折痕与器形
+  return {
+    vase_audit_1: FloraFactory.createVase('vase_audit_1', withFlowers ? 'peonies' : 'none', { x: -189, y: 4 }, 'ribbed_fluted_white', '1. 极细百褶密棱瓶', 0.82),
+    vase_audit_2: FloraFactory.createVase('vase_audit_2', withFlowers ? 'lilies' : 'none', { x: -135, y: 0 }, 'organic_twist_cream', '2. 旋风波浪奶油瓶', 0.82),
+    vase_audit_3: FloraFactory.createVase('vase_audit_3', withFlowers ? 'peonies' : 'none', { x: -81, y: -4 }, 'organic_twist_rose', '3. 落樱粉旋风波纹瓶', 0.82),
+    vase_audit_4: FloraFactory.createVase('vase_audit_4', withFlowers ? 'roses' : 'none', { x: -27, y: -6 }, 'chiseled_stone_gray', '4. 侘寂砂岩横纹瓶', 0.82),
+    vase_audit_5: FloraFactory.createVase('vase_audit_5', withFlowers ? 'lotus' : 'none', { x: 27, y: -6 }, 'fluted_trapezoid_mini', '5. 圆台百褶梯形瓶', 0.82),
+    vase_audit_6: FloraFactory.createVase('vase_audit_6', withFlowers ? 'chrysanthemum' : 'none', { x: 81, y: -4 }, 'faceted_gem_prism', '6. 钻石晶体切角瓶', 0.82),
+    vase_audit_7: FloraFactory.createVase('vase_audit_7', withFlowers ? 'lilies' : 'none', { x: 135, y: 0 }, 'melon_lobed_celadon', '7. 海棠瓜棱秀颈瓶', 0.82),
+    vase_audit_8: FloraFactory.createVase('vase_audit_8', withFlowers ? 'lotus' : 'none', { x: 189, y: 4 }, 'minimal_drop_swan', '8. 极简水滴天鹅瓶', 0.82),
+  };
+};
+
+export const buildInitialItems = (): Record<SceneItemId, SceneItem> => buildAuditVaseItems('new_unique', true);
 
 const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = buildInitialItems();
 
@@ -95,6 +144,7 @@ export default function App() {
   // Modals state
   const [isLightingOpen, setIsLightingOpen] = useState(false);
   const [isFlowerOpen, setIsFlowerOpen] = useState(false);
+  const [isFruitOpen, setIsFruitOpen] = useState(false);
   const [isBlessingOpen, setIsBlessingOpen] = useState(false);
   const [isArrangeMode, setIsArrangeMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -108,14 +158,24 @@ export default function App() {
   const [petalTrigger, setPetalTrigger] = useState(0);
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
 
-  // Background space aesthetics (6 款典雅建筑室内风格可选)
-  const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('brick_screen');
+  // Background space aesthetics (默认晴岚映曜 · 宏伟木构殿堂长廊)
+  const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('heritage_wood');
 
   const handleWallStyleChange = (style: WallBackgroundStyle) => {
     setWallStyle(style);
     const opt = WALL_STYLE_OPTIONS.find((o) => o.id === style);
     sound.playBell(540, 2);
     showToast(`已切换背景风格为「${opt?.name || ''} · ${opt?.poeticTitle || ''}」`);
+  };
+
+  // Ground floor aesthetics (5 款高品质暖木与禅意大宅地坪材质可选，默认图1晴岚暖木)
+  const [floorStyle, setFloorStyle] = useState<FloorStyle>('hinoki_wood');
+
+  const handleFloorStyleChange = (style: FloorStyle) => {
+    setFloorStyle(style);
+    sound.playWoodPlacement();
+    const opt = FLOOR_STYLE_OPTIONS.find((o) => o.id === style);
+    showToast(`已切换地面材质为「${opt?.name || ''} · ${opt?.poeticTitle || ''}」`);
   };
 
   // Toast / notification
@@ -128,24 +188,76 @@ export default function App() {
     }, 4500);
   };
 
+  // 2.5D 深度视差微动交互
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+
+  const handleStageMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    setParallax({ x: nx * 14, y: ny * 8 });
+  };
+
+  const handleStageMouseLeave = () => {
+    setParallax({ x: 0, y: 0 });
+  };
+
+
   const handleToggleFruit = (id: SceneItemId) => {
     setItems((prev) => {
       const item = prev[id];
       if (!item) return prev;
       const current = item.fruitType || 'apples';
-      const next: FruitType = current === 'apples' ? 'oranges' : current === 'oranges' ? 'peaches' : 'apples';
+      const order: FruitType[] = [
+        'apples', 
+        'oranges', 
+        'peaches', 
+        'persimmons', 
+        'citrons', 
+        'grapes',
+        'pomelos',
+        'longans',
+        'bananas',
+        'kumquats',
+        'dragonfruits',
+        'cucumbers',
+        'watermelons',
+        'coconuts',
+        'plums',
+        'mangosteens',
+        'pineapples',
+        'pears',
+      ];
+      const curIdx = order.indexOf(current);
+      const next: FruitType = order[(curIdx + 1) % order.length];
       const fruitNames: Record<FruitType, string> = {
-        apples: '平安红苹果',
+        apples: '平安红富士苹果',
         oranges: '吉祥金蜜柑',
         peaches: '福寿仙桃',
+        persimmons: '如意熟丹柿',
+        citrons: '禅意佛手柑',
+        grapes: '阳光玫瑰青提',
+        pomelos: '黄金蜜柚',
+        longans: '富贵龙眼',
+        bananas: '招财金蕉',
+        kumquats: '翡翠青桔',
+        dragonfruits: '红运火龙果',
+        cucumbers: '翠玉黄瓜',
+        watermelons: '盛夏西瓜',
+        coconuts: '南国椰子',
+        plums: '金玉蜂糖李',
+        mangosteens: '果后山竹',
+        pineapples: '祥瑞凤梨',
+        pears: '金秋秋月梨',
       };
       showToast(`已更换供果为「${fruitNames[next]}」`);
+      sound.playPorcelainClink();
       return {
         ...prev,
         [id]: {
           ...item,
           fruitType: next,
-          name: `${fruitNames[next]}高足盘 (${id.includes('left') ? '左' : '右'})`,
+          name: `${fruitNames[next]}高足盘 (${id.includes('left') ? '左' : id.includes('right') ? '右' : '敬献'})`,
         },
       };
     });
@@ -203,10 +315,64 @@ export default function App() {
     },
   });
 
+  // ── 专项审计模式状态 ──
+  const [isAuditMode, setIsAuditMode] = useState(true);
+  const [auditGroup, setAuditGroup] = useState<AuditGroup>('new_unique');
+  const [auditWithFlowers, setAuditWithFlowers] = useState(true);
+
+  const switchAuditGroup = (group: AuditGroup) => {
+    setAuditGroup(group);
+    sound.playPorcelainClink();
+    setItems(buildAuditVaseItems(group, auditWithFlowers));
+    showToast(group === 'new_unique' ? '已展示4款全新异形与微观肌理瓶' : '已展示8款现代几何折痕瓶');
+  };
+
+  const toggleAuditFlowers = () => {
+    const next = !auditWithFlowers;
+    setAuditWithFlowers(next);
+    sound.playPorcelainClink();
+    setItems((prev) => {
+      const updated = { ...prev };
+      const flowerMap: Record<string, FlowerType> = {
+        vase_audit_1: 'peonies',
+        vase_audit_2: 'lilies',
+        vase_audit_3: auditGroup === 'new_unique' ? 'lotus' : 'peonies',
+        vase_audit_4: 'roses',
+        vase_audit_5: 'lotus',
+        vase_audit_6: 'chrysanthemum',
+        vase_audit_7: 'lilies',
+        vase_audit_8: 'lotus',
+      };
+      Object.keys(updated).forEach((id) => {
+        if (id.startsWith('vase_audit_')) {
+          updated[id] = {
+            ...updated[id],
+            flowerType: next ? flowerMap[id] || 'peonies' : ('none' as FlowerType),
+          };
+        }
+      });
+      return updated;
+    });
+    showToast(next ? '已开启插花比对（审计花枝入瓶景深与咬合）' : '已切换为净瓶裸检模式（审计器形、釉色与微观肌理）');
+  };
+
+  const toggleAuditMode = () => {
+    if (isAuditMode) {
+      setIsAuditMode(false);
+      setItems(buildStandardItems());
+      showToast('已恢复常规五供陈设（香、花、灯、水、果）');
+    } else {
+      setIsAuditMode(true);
+      setItems(buildAuditVaseItems(auditGroup, auditWithFlowers));
+      showToast('已进入器物专项审计展台');
+    }
+    sound.playWoodPlacement();
+  };
+
   const resetTableLayout = () => {
     sound.playWoodPlacement();
-    setItems(buildInitialItems());
-    showToast('已依中轴规范对齐（花、烛、香严格对称）');
+    setItems(isAuditMode ? buildAuditVaseItems(auditGroup, auditWithFlowers) : buildStandardItems());
+    showToast('案面摆设已恢复初始格局');
   };
 
   const toggleAllCandles = () => {
@@ -258,11 +424,11 @@ export default function App() {
   const handleAddOfferedFlower = (flowerType: FlowerType) => {
     const newId = `offered_flower_${Date.now()}`;
     const flowerNameMap: Record<FlowerType, string> = {
-      peonies: '粉白重瓣牡丹',
-      lilies: '纯净白百合',
+      peonies: '粉白牡丹',
+      lilies: '白百合',
       lotus: '出尘清莲',
       chrysanthemum: '高洁白菊',
-      roses: '淡雅香槟玫瑰',
+      roses: '香槟玫瑰',
     };
 
     // Calculate natural position near center/front of table
@@ -289,11 +455,11 @@ export default function App() {
 
   const handleChangeVaseFlower = (side: 'left' | 'right' | 'both', flowerType: FlowerType) => {
     const flowerNameMap: Record<FlowerType, string> = {
-      peonies: '粉白重瓣牡丹',
-      lilies: '纯净白百合',
+      peonies: '粉白牡丹',
+      lilies: '白百合',
       lotus: '出尘清莲',
       chrysanthemum: '高洁白菊',
-      roses: '淡雅香槟玫瑰',
+      roses: '香槟玫瑰',
     };
 
     setItems((prev) => {
@@ -318,6 +484,66 @@ export default function App() {
     setLastOfferedFlower(flowerType);
     setPetalTrigger(Date.now());
     showToast(`已更换花瓶插花为「${flowerNameMap[flowerType]}」`);
+  };
+
+  const handleChangeVaseStyle = (side: 'left' | 'right' | 'both', vaseStyle: VaseStyle) => {
+    const meta = getVaseStyleMeta(vaseStyle);
+    setItems((prev) => {
+      const next = { ...prev };
+      if (side === 'left' || side === 'both') {
+        if (next.vase_left) {
+          next.vase_left = {
+            ...next.vase_left,
+            vaseStyle,
+            name: `${meta.name} (左)`,
+          };
+        }
+      }
+      if (side === 'right' || side === 'both') {
+        if (next.vase_right) {
+          next.vase_right = {
+            ...next.vase_right,
+            vaseStyle,
+            name: `${meta.name} (右)`,
+          };
+        }
+      }
+      return next;
+    });
+    sound.playPorcelainClink();
+    sound.playBell(640, 2);
+    showToast(`已更换花瓶形制为「${meta.name}」`);
+  };
+
+  const handleToggleVaseStyle = (id: SceneItemId) => {
+    const styleOrder: VaseStyle[] = [
+      'warm_white_plain',
+      'painted_iris',
+      'painted_peony',
+      'painted_plum',
+      'qinghua_lotus',
+      'royal_blue_gold',
+      'mutton_jade_ears',
+      'celadon_ru',
+    ];
+    setItems((prev) => {
+      const item = prev[id];
+      if (!item || !id.startsWith('vase')) return prev;
+      const current = (item.vaseStyle || (id.includes('right') ? 'painted_iris' : 'warm_white_plain')) as VaseStyle;
+      const curIdx = styleOrder.indexOf(current);
+      const next: VaseStyle = styleOrder[(curIdx + 1) % styleOrder.length];
+      const nextMeta = getVaseStyleMeta(next);
+      showToast(`已更换花瓶为「${nextMeta.name}」`);
+      sound.playPorcelainClink();
+      return {
+        ...prev,
+        [id]: {
+          ...item,
+          vaseStyle: next,
+          name: `${nextMeta.name} (${id.includes('left') ? '左' : '右'})`,
+        },
+      };
+    });
   };
 
   const handleRemoveItem = (id: SceneItemId) => {
@@ -351,13 +577,122 @@ export default function App() {
     showToast('已一键布设十捧香花盛供，案前繁花锦簇');
   };
 
-  const handleBlessingSubmit = (blessingText: string) => {
-    // Also light candles if not lit
+  // ── 供果与摆盘能力拓展 (献果上案 · 定制双盘) ──
+  const handleAddOfferedFruit = (fruitType: FruitType) => {
+    const newId = `fruit_offered_${Date.now()}`;
+    const fruitNames: Record<FruitType, string> = {
+      apples: '平安红富士苹果',
+      oranges: '吉祥金蜜柑',
+      peaches: '福寿并蒂仙桃',
+      persimmons: '如意熟丹柿',
+      citrons: '禅意佛手柑',
+      grapes: '阳光玫瑰青提',
+      pomelos: '黄金蜜柚',
+      longans: '富贵龙眼',
+      bananas: '招财金蕉',
+      kumquats: '翡翠青桔',
+      dragonfruits: '红运火龙果',
+      cucumbers: '翠玉黄瓜',
+      watermelons: '盛夏西瓜',
+      coconuts: '南国椰子',
+      plums: '金玉蜂糖李',
+      mangosteens: '果后山竹',
+      pineapples: '祥瑞凤梨',
+      pears: '金秋秋月梨',
+    };
+
+    // 计算案上黄金位置（若已有，则在案前错落排开）
+    const existingFruits = Object.keys(items).filter((k) => k.startsWith('fruit_offered_')).length;
+    const offsetX = existingFruits === 0 ? 0 : (existingFruits % 2 === 1 ? -150 : 150);
+    const offsetY = Math.min(32, 22 + (existingFruits % 3) * 4);
+
+    const newFruitDish = VesselFactory.createFruitPlatter(
+      `offered_${Date.now()}`,
+      fruitType,
+      { x: offsetX, y: offsetY },
+      { id: newId, name: `敬奉 · ${fruitNames[fruitType]}` }
+    );
+
     setItems((prev) => ({
       ...prev,
-      candle_left: { ...prev.candle_left, isLit: true },
-      candle_right: { ...prev.candle_right, isLit: true },
-      censer: { ...prev.censer, isLit: true },
+      [newId]: newFruitDish,
+    }));
+
+    sound.playBell(560, 2);
+    sound.playPorcelainClink();
+    showToast(`已向供案敬奉一盘新鲜「${fruitNames[fruitType]}」，可在案台自由拖拽摆放`);
+  };
+
+  const handleChangeMainFruit = (side: 'left' | 'right' | 'both', fruitType: FruitType) => {
+    const fruitNames: Record<FruitType, string> = {
+      apples: '平安红富士苹果',
+      oranges: '吉祥金蜜柑',
+      peaches: '福寿仙桃',
+      persimmons: '如意熟丹柿',
+      citrons: '禅意佛手柑',
+      grapes: '阳光玫瑰青提',
+      pomelos: '黄金蜜柚',
+      longans: '富贵龙眼',
+      bananas: '招财金蕉',
+      kumquats: '翡翠青桔',
+      dragonfruits: '红运火龙果',
+      cucumbers: '翠玉黄瓜',
+      watermelons: '盛夏西瓜',
+      coconuts: '南国椰子',
+      plums: '金玉蜂糖李',
+      mangosteens: '果后山竹',
+      pineapples: '祥瑞凤梨',
+      pears: '金秋秋月梨',
+    };
+
+    setItems((prev) => {
+      const next = { ...prev };
+      if (side === 'left' || side === 'both') {
+        if (next.fruit_left) {
+          next.fruit_left = {
+            ...next.fruit_left,
+            fruitType,
+            name: `${fruitNames[fruitType]}高足盘 (左)`,
+          };
+        }
+      }
+      if (side === 'right' || side === 'both') {
+        if (next.fruit_right) {
+          next.fruit_right = {
+            ...next.fruit_right,
+            fruitType,
+            name: `${fruitNames[fruitType]}高足盘 (右)`,
+          };
+        }
+      }
+      return next;
+    });
+
+    sound.playPorcelainClink();
+    showToast(`已将${side === 'left' ? '左侧' : side === 'right' ? '右侧' : '左右双侧'}主果盘设置为「${fruitNames[fruitType]}」`);
+  };
+
+  const handleClearOfferedFruits = () => {
+    setItems((prev) => {
+      const next = { ...prev };
+      for (const k of Object.keys(next)) {
+        if (k.startsWith('fruit_offered_')) {
+          delete next[k];
+        }
+      }
+      return next;
+    });
+    sound.playWoodPlacement();
+    showToast('已从供案上撤下全部新增敬献果盘');
+  };
+
+  const handleBlessingSubmit = (blessingText: string) => {
+    // Also light candles if present
+    setItems((prev) => ({
+      ...prev,
+      ...(prev.candle_left ? { candle_left: { ...prev.candle_left, isLit: true } } : {}),
+      ...(prev.candle_right ? { candle_right: { ...prev.candle_right, isLit: true } } : {}),
+      ...(prev.censer ? { censer: { ...prev.censer, isLit: true } } : {}),
     }));
     showToast(`祈愿已诚心呈奉：「${blessingText.slice(0, 16)}...」`);
   };
@@ -399,27 +734,13 @@ export default function App() {
 
       {/* Top Header & Quick Environment Bar */}
       <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
-        {/* Left: FPS Monitor in dev mode & Style Badge */}
+        {/* Left: FPS Monitor in dev mode (页面不显示主题胶囊，保持画面庄重素净) */}
         <div className="flex items-center gap-2">
           {import.meta.env.DEV && <FpsMonitor />}
-          <button
-            type="button"
-            onClick={() => setIsLightingOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white border border-amber-200/80 shadow-xs text-xs font-medium text-stone-700 transition-all cursor-pointer hover:shadow-sm"
-            title="点击切换背景空间美学风格"
-          >
-            <span className="text-sm">{WALL_STYLE_OPTIONS.find((o) => o.id === wallStyle)?.iconText || '🏛️'}</span>
-            <span className="font-serif text-amber-950 font-semibold">
-              {WALL_STYLE_OPTIONS.find((o) => o.id === wallStyle)?.name}
-            </span>
-            <span className="hidden sm:inline text-[10px] text-amber-700/80 bg-amber-100/70 px-1.5 py-0.5 rounded-full">
-              {WALL_STYLE_OPTIONS.find((o) => o.id === wallStyle)?.poeticTitle}
-            </span>
-          </button>
         </div>
 
         {/* Quick controls on right */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Master Light switch */}
           <button
             type="button"
@@ -429,7 +750,7 @@ export default function App() {
               setLighting((p) => ({ ...p, masterOn: next }));
             }}
             title={lighting.masterOn ? '点击关闭自然光照' : '点击开启自然光照'}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all shadow-xs cursor-pointer ${lighting.masterOn
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all shadow-xs cursor-pointer whitespace-nowrap ${lighting.masterOn
                 ? 'bg-amber-100/90 hover:bg-amber-200/90 text-amber-900 border border-amber-300/80'
                 : 'bg-stone-800 text-stone-300 border border-stone-700'
               }`}
@@ -488,14 +809,15 @@ export default function App() {
             {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} className="text-stone-400" />}
           </button>
 
-          {/* Detailed Ambiance panel button */}
+          {/* Detailed Ambiance & Music panel button */}
           <button
             type="button"
             onClick={() => setIsLightingOpen(true)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/90 border border-amber-200/60 text-stone-700 hover:bg-white shadow-xs text-xs cursor-pointer transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/90 border border-amber-200/60 text-stone-700 hover:bg-white shadow-xs text-xs cursor-pointer transition-colors whitespace-nowrap"
+            title="设置：背景风格、光影、禅意背景音乐、桌布等"
           >
             <SlidersHorizontal size={13} className="text-amber-700" />
-            <span className="hidden sm:inline font-medium">调光</span>
+            <span className="hidden sm:inline font-medium">设置</span>
           </button>
         </div>
       </header>
@@ -508,16 +830,27 @@ export default function App() {
         </div>
       )}
 
-      {/* Core Simulation Stage */}
-      <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden">
-        {/* Layer 1: Cathedral Window / Architectural Wall Niche */}
-        <AltarWall
-          masterOn={lighting.masterOn}
-          sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
-          timeOfDay={lighting.timeOfDay}
-          sunAngle={lighting.sunAngle}
-          wallStyle={wallStyle}
-        />
+      {/* Core Simulation Stage (图 2 绝美宏伟建筑背景 + 2.5D 深度视差微动 + 写实地坪 + 极致精美供台花卉) */}
+      <div 
+        className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden"
+        onMouseMove={handleStageMouseMove}
+        onMouseLeave={handleStageMouseLeave}
+      >
+        {/* Layer 1: Cathedral Window / Architectural Heritage Wood Wall (晴岚映曜宏伟殿宇木构长廊) */}
+        <div 
+          className="absolute inset-0 transition-transform duration-300 ease-out pointer-events-none"
+          style={{
+            transform: `translate3d(${parallax.x * 0.25}px, ${parallax.y * 0.25}px, 0)`,
+          }}
+        >
+          <AltarWall
+            masterOn={lighting.masterOn}
+            sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
+            timeOfDay={lighting.timeOfDay}
+            sunAngle={lighting.sunAngle}
+            wallStyle={wallStyle}
+          />
+        </div>
 
         {/* Layer 2: Volumetric Rays (Tyndall Light Beams / God Rays) */}
         <VolumetricRays
@@ -535,11 +868,23 @@ export default function App() {
           timeOfDay={lighting.timeOfDay}
         />
 
-        {/* Layer 4: Realistic Perspective Wooden Floorboards with Window Sunlight Projection */}
-        <FloorPlanks lighting={lighting} />
+        {/* Layer 4: Perspective Flooring with Marble Tile & Hardwood Planks (2D 插画写实人字拼与汉白玉大理石) */}
+        <div 
+          className="absolute inset-x-0 bottom-0 transition-transform duration-300 ease-out pointer-events-none"
+          style={{
+            transform: `translate3d(${parallax.x * 0.45}px, ${parallax.y * 0.45}px, 0)`,
+          }}
+        >
+          <FloorPlanks lighting={lighting} floorStyle={floorStyle} />
+        </div>
 
-        {/* Layer 5: Sacred Memorial Portrait Frame (Centered against window) */}
-        <div className="absolute top-[16%] sm:top-[18%] z-20 pointer-events-auto">
+        {/* Layer 5: Sacred Memorial Portrait Frame (居中安放于木构长廊正前) */}
+        <div 
+          className="absolute top-[18%] sm:top-[20%] z-20 pointer-events-auto transition-transform duration-300 ease-out"
+          style={{
+            transform: `translate3d(${parallax.x * 0.45}px, ${parallax.y * 0.45}px, 0)`,
+          }}
+        >
           <MemorialPortrait
             info={memorial}
             onUpdateInfo={(up) => setMemorial((prev) => ({ ...prev, ...up }))}
@@ -548,32 +893,102 @@ export default function App() {
           />
         </div>
 
-        {/* Layer 6: Altar Table with all draggable items (Vases, Candles, Censer with Smoke, Offered Flowers, Fruits, Tea, Singing Bowl) */}
-        <div className="absolute bottom-16 sm:bottom-20 z-25 w-full flex justify-center px-4">
-          <AltarTable
-            items={items}
-            onUpdateItemPosition={updateItemPosition}
-            onToggleItemLit={toggleItemLit}
-            onResetLayout={resetTableLayout}
-            onRemoveItem={handleRemoveItem}
-            onToggleFruit={handleToggleFruit}
-            showTableRunner={showTableRunner}
-            tableclothStyle={tableclothStyle}
-            showPetals={showPetals}
-            lighting={lighting}
-            isArrangeMode={isArrangeMode}
-          />
+        {/* Layer 5.5: 🔍 雅瓷花器专项审计模式控制胶囊 (居于案台上方，一键全景审计) */}
+        <div className="absolute top-[28%] sm:top-[30%] z-30 flex justify-center w-full px-4 pointer-events-none">
+          <div className="pointer-events-auto flex items-center flex-wrap justify-center gap-2 px-4 py-2 rounded-full bg-[#1c1917]/95 backdrop-blur-xl border border-amber-500/60 shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-xs text-amber-100 ring-1 ring-amber-400/20 animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center gap-1.5 font-semibold text-amber-300 font-serif mr-1">
+              <span>🏺</span>
+              <span>{isAuditMode ? '器物专项审计展台' : '常规五供陈设'}</span>
+              <CinnabarSealBadge text="审计" />
+            </div>
+
+            {isAuditMode && (
+              <>
+                <span className="text-stone-600 hidden sm:inline">|</span>
+                <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                  <button
+                    type="button"
+                    onClick={() => switchAuditGroup('new_unique')}
+                    className={`px-3 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'new_unique'
+                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
+                  >
+                    ✨ 4款异形纹理瓶
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchAuditGroup('designer_twist')}
+                    className={`px-3 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'designer_twist'
+                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
+                  >
+                    🎨 8款现代折痕瓶
+                  </button>
+                </div>
+
+                <span className="text-stone-600 hidden sm:inline">|</span>
+                <button
+                  type="button"
+                  onClick={toggleAuditFlowers}
+                  className="px-3 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                  title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
+                >
+                  <span>{auditWithFlowers ? '🌸 切换净瓶裸检' : '🌸 显示插花景深'}</span>
+                </button>
+              </>
+            )}
+
+            <button
+              type="button"
+              onClick={toggleAuditMode}
+              className="px-3 py-1 rounded-full bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+              title="切换展台模式与常规五供模式"
+            >
+              <span>{isAuditMode ? '🔄 恢复常规五供' : '🔍 进入器物展台'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Layer 6: Altar Table with all draggable items (往背墙位置适度移入，紧贴墙体立面，更具厅堂进深感) */}
+        <div 
+          className="absolute bottom-22 sm:bottom-28 z-25 w-full flex justify-center px-4 transition-transform duration-300 ease-out pointer-events-none"
+          style={{
+            transform: `translate3d(${parallax.x * 0.85}px, ${parallax.y * 0.85}px, 0) scale(1.0)`,
+            transformOrigin: '50% 90%',
+          }}
+        >
+          <div className="pointer-events-auto w-full flex justify-center">
+            <AltarTable
+              items={items}
+              onUpdateItemPosition={updateItemPosition}
+              onToggleItemLit={toggleItemLit}
+              onResetLayout={resetTableLayout}
+              onRemoveItem={handleRemoveItem}
+              onToggleFruit={handleToggleFruit}
+              onToggleVase={handleToggleVaseStyle}
+              showTableRunner={showTableRunner}
+              tableclothStyle={tableclothStyle}
+              showPetals={showPetals}
+              lighting={lighting}
+              isArrangeMode={isArrangeMode}
+            />
+          </div>
         </div>
 
         {/* Layer 7: Gentle Petal Shower upon flower offering */}
         <PetalShower activeTrigger={petalTrigger} flowerType={lastOfferedFlower} />
       </div>
 
-      {/* Bottom Navigation Dock (reproducing user's bottom buttons: 献花 / 点烛 / 置台 / 氛围 / 祈愿) */}
+      {/* Bottom Navigation Dock (reproducing user's bottom buttons: 献花 / 供果 / 点烛 / 置台 / 氛围 / 祈愿) */}
       <BottomDock
         onOpenFlowers={() => setIsFlowerOpen(true)}
+        onOpenFruits={() => setIsFruitOpen(true)}
         onToggleCandles={toggleAllCandles}
-        candlesLit={items.candle_left.isLit || items.candle_right.isLit}
+        candlesLit={Boolean(items.candle_left?.isLit || items.candle_right?.isLit)}
         onToggleArrangeMode={() => setIsArrangeMode(!isArrangeMode)}
         isArrangeMode={isArrangeMode}
         onOpenLighting={() => setIsLightingOpen(true)}
@@ -596,6 +1011,8 @@ export default function App() {
           sound.playWoodPlacement();
           setTableclothStyle(st);
         }}
+        floorStyle={floorStyle}
+        onChangeFloorStyle={handleFloorStyleChange}
         onToggleTableRunner={() => {
           sound.playWoodPlacement();
           setShowTableRunner((v) => {
@@ -612,16 +1029,32 @@ export default function App() {
         onUpdateTimeScale={setTimeScale}
       />
 
+      {/* 献花控制弹窗 (献花上案 · 更换花瓶) */}
       <FlowerPickerModal
         isOpen={isFlowerOpen}
         onClose={() => setIsFlowerOpen(false)}
         onAddOfferedFlower={handleAddOfferedFlower}
         onChangeVaseFlower={handleChangeVaseFlower}
+        onChangeVaseStyle={handleChangeVaseStyle}
         leftVaseFlower={items.vase_left?.flowerType || 'peonies'}
         rightVaseFlower={items.vase_right?.flowerType || 'lilies'}
+        leftVaseStyle={items.vase_left?.vaseStyle || 'warm_white_plain'}
+        rightVaseStyle={items.vase_right?.vaseStyle || 'painted_iris'}
         offeredCount={Object.keys(items).filter((k) => k.startsWith('offered_flower_')).length}
         onClearOfferedFlowers={handleClearOfferedFlowers}
         onFillTenFlowers={handleFillTenFlowers}
+      />
+
+      {/* 供果控制弹窗 (献果上案 · 定制左右主盘) */}
+      <FruitPickerModal
+        isOpen={isFruitOpen}
+        onClose={() => setIsFruitOpen(false)}
+        onAddOfferedFruit={handleAddOfferedFruit}
+        onChangeMainFruit={handleChangeMainFruit}
+        leftFruitType={items.fruit_left?.fruitType || 'apples'}
+        rightFruitType={items.fruit_right?.fruitType || 'oranges'}
+        offeredCount={Object.keys(items).filter((k) => k.startsWith('fruit_offered_')).length}
+        onClearOfferedFruits={handleClearOfferedFruits}
       />
 
       <BlessingModal

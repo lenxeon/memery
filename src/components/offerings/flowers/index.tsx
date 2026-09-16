@@ -18,21 +18,24 @@ export * from './items/ChrysanthemumFlower';
 export * from './items/RosesFlower';
 
 export const FlowerVase: React.FC<VaseFlowerProps> = ({
+  vaseStyle = 'warm_white_plain',
   flowerType = 'peonies',
   scale = 1,
   className = '',
   isRightSide = false,
   lifecycle,
   onRevitalize,
+  onClick,
 }) => {
-  const flowerModule = getFlowerModule(flowerType);
-  const FlowerComponent = flowerModule.Component;
+  const hasFlower = flowerType && flowerType !== 'none';
+  const flowerModule = hasFlower ? getFlowerModule(flowerType) : null;
+  const FlowerComponent = flowerModule?.Component;
   const health = lifecycle?.health ?? 1.0;
   const dryFactor = Math.max(0, Math.min(1.0, (0.75 - health) / 0.7));
   const isFaded = health <= 0.05;
 
   // 掉落花瓣轨迹渲染
-  const fallingPetalsSlot = (
+  const fallingPetalsSlot = flowerModule ? (
     <g id="fallingPetalsGroup">
       {flowerModule.fallingPetals.map((petal) => {
         if (health > petal.detachHealth) return null;
@@ -56,18 +59,22 @@ export const FlowerVase: React.FC<VaseFlowerProps> = ({
         );
       })}
     </g>
-  );
+  ) : undefined;
 
   return (
     <BaseVase
+      vaseStyle={vaseStyle}
       scale={scale}
       className={className}
       isRightSide={isRightSide}
       lifecycle={lifecycle}
       onRevitalize={onRevitalize}
+      onClick={onClick}
       fallingPetalsSlot={fallingPetalsSlot}
     >
-      <FlowerComponent health={health} dryFactor={dryFactor} isFaded={isFaded} />
+      {FlowerComponent && (
+        <FlowerComponent health={health} dryFactor={dryFactor} isFaded={isFaded} />
+      )}
     </BaseVase>
   );
 };
