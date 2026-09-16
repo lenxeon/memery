@@ -1,139 +1,305 @@
 /**
  * @file OrchidsFlower.tsx
- * @description 【幽谷空灵】素雅蝴蝶兰/国兰插花组件。
+ * @description 【空谷幽兰 / 素兰蝴蝶兰】
+ * 核心特征：
+ * 1. 素兰无叶：剔除一切杂叶，展现文人雅供“一枝独秀、清冷出尘”的纯粹花葶之美；
+ * 2. 径硬挺韧：深褐青色硬挺花葶，带天然竹节状花梗节点，线条遒劲流畅；
+ * 3. 一径多花成串、大小各异：
+ *    - 靠近底部（花序基部）花朵硕大饱满，花瓣舒展如飞蝶；
+ *    - 沿花序向前依次递减变小（大花 -> 中花 -> 初绽小花）；
+ *    - 前端梢头为一串由大到小的青紫未开放花骨朵；
+ * 4. 花朵质感写实：艳丽华贵的玫紫渐变翼瓣，洁白微鹅黄双须蝶唇，立体生动。
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
-import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
+import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const ORCHID_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.5, fallSpan: 0.06, startX: 110, startY: 42, landX: 116, landY: 194, rx: 5.2, ry: 3.2, landRot: 32, swayAmp: 15, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.4, fallSpan: 0.06, startX: 42, startY: 52, landX: 40, landY: 193, rx: 5.4, ry: 3.0, landRot: -28, swayAmp: 12, swayFreq: 3.6 },
-  { id: 3, detachHealth: 0.3, fallSpan: 0.06, startX: 98, startY: 56, landX: 102, landY: 195, rx: 5.6, ry: 3.4, landRot: -20, swayAmp: 16, swayFreq: 3.8 },
-  { id: 4, detachHealth: 0.2, fallSpan: 0.06, startX: 74, startY: 26, landX: 80, landY: 197, rx: 5.8, ry: 3.5, landRot: 38, swayAmp: 18, swayFreq: 4.0 },
-  { id: 5, detachHealth: 0.08, fallSpan: 0.05, startX: 58, startY: 44, landX: 64, landY: 196, rx: 6.0, ry: 3.6, landRot: 14, swayAmp: 14, swayFreq: 4.2 },
+  { id: 1, detachHealth: 0.50, fallSpan: 0.07, startX: 84, startY: 78, landX: 92, landY: 194, rx: 7.0, ry: 4.8, landRot: 28, swayAmp: 14, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.38, fallSpan: 0.06, startX: 68, startY: 58, landX: 60, landY: 193, rx: 6.8, ry: 4.6, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
+  { id: 3, detachHealth: 0.22, fallSpan: 0.06, startX: 56, startY: 40, landX: 50, landY: 195, rx: 6.2, ry: 4.2, landRot: 20, swayAmp: 16, swayFreq: 3.8 },
+  { id: 4, detachHealth: 0.10, fallSpan: 0.05, startX: 44, startY: 26, landX: 42, landY: 196, rx: 5.5, ry: 3.8, landRot: -18, swayAmp: 15, swayFreq: 4.0 },
 ];
 
 export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
-  // 兰花紫粉至素雅白青衰变
-  const orchidWing0 = lerpColor('#e9d5ff', '#d6c7b2', dryFactor);
-  const orchidWing60 = lerpColor('#c084fc', '#9f8569', dryFactor);
-  const orchidWing100 = lerpColor('#9333ea', '#5b4530', dryFactor);
+  const agingStyle = getFlowerAgingFilter(health, isFaded);
 
-  const orchidLip0 = lerpColor('#fef08a', '#d1bca0', dryFactor);
-  const orchidLip60 = lerpColor('#eab308', '#8f683e', dryFactor);
-  const orchidLip100 = lerpColor('#a855f7', '#4b2a1a', dryFactor);
+  // ── 兰花华贵紫红至枯萎茶褐衰变 ──
+  const petalEdgeLight = lerpColor('#f5d0fe', '#ebd8c2', dryFactor);
+  const petalMidMagenta = lerpColor('#d946ef', '#b07a65', dryFactor);
+  const petalRichViolet = lerpColor('#a21caf', '#784638', dryFactor);
+  const petalDeepShadow = lerpColor('#701a75', '#45251d', dryFactor);
 
-  const stemCol0 = lerpColor('#86efac', '#98836a', dryFactor);
-  const stemCol60 = lerpColor('#16a34a', '#523e27', dryFactor);
-  const stemCol100 = lerpColor('#14532d', '#2c1e13', dryFactor);
+  // ── 兰花唇瓣与蕊柱（白底鹅黄、深红斑纹） ──
+  const lipWhite = lerpColor('#ffffff', '#f1e6d4', dryFactor);
+  const lipYellow = lerpColor('#facc15', '#b8924b', dryFactor);
+  const lipRedSpots = lerpColor('#9f1239', '#5c2222', dryFactor);
+  const columnPollen = lerpColor('#fef08a', '#d4be8a', dryFactor);
 
-  const leafCol0 = lerpColor('#4ade80', '#9c8466', dryFactor);
-  const leafCol60 = lerpColor('#15803d', '#584128', dryFactor);
-  const leafCol100 = lerpColor('#064e3b', '#241b12', dryFactor);
+  // ── 硬挺花葶枝茎（暗橄榄褐青色，木质化硬韧） ──
+  const stemDark = lerpColor('#1f2918', '#382b1c', dryFactor);
+  const stemMid = lerpColor('#3f4e29', '#5c462e', dryFactor);
+  const stemLight = lerpColor('#657c3d', '#856e4c', dryFactor);
+  const nodeBract = lerpColor('#78350f', '#4d2b17', dryFactor);
 
-  const fl1 = getBlossomDropStyle(health, 0.5);
-  const fl2 = getBlossomDropStyle(health, 0.4);
-  const fl3 = getBlossomDropStyle(health, 0.3);
-  const fl4 = getBlossomDropStyle(health, 0.2);
-  const fl5 = getBlossomDropStyle(health, 0.08);
+  // ── 花骨朵青紫渐变 ──
+  const budGreen = lerpColor('#4d7c0f', '#5e5234', dryFactor);
+  const budPurple = lerpColor('#86198f', '#6b403a', dryFactor);
 
-  const leafOpacity = isFaded ? 0.35 : Math.max(0.45, health);
+  const fl1 = getBlossomDropStyle(health, 0.50);
+  const fl2 = getBlossomDropStyle(health, 0.38);
+  const fl3 = getBlossomDropStyle(health, 0.22);
+  const fl4 = getBlossomDropStyle(health, 0.10);
 
-  // 单朵蝴蝶兰翼瓣与唇瓣渲染
-  const renderOrchidBloom = (cx: number, cy: number, scale: number = 1.0, rot: number = 0) => (
-    <g transform={`translate(${cx}, ${cy}) rotate(${rot}) scale(${scale})`}>
-      {/* 后方背萼片与侧萼片 */}
-      <path d="M 0 0 C -3 -12 3 -12 0 -18 C -2 -14 -4 -10 0 0 Z" fill="url(#orchidWingGrad)" opacity="0.92" />
-      <path d="M 0 0 C -12 4 -16 10 -18 14 C -12 12 -6 8 0 0 Z" fill="url(#orchidWingGrad)" opacity="0.9" />
-      <path d="M 0 0 C 12 4 16 10 18 14 C 12 12 6 8 0 0 Z" fill="url(#orchidWingGrad)" opacity="0.9" />
+  /**
+   * 渲染单朵写实蝴蝶兰（宽大圆润翼瓣 + 三枚外萼片 + 悬垂金黄双须唇瓣）
+   */
+  const renderOrchidBloom = (scale: number = 1.0, rot: number = 0) => {
+    return (
+      <g transform={`rotate(${rot}) scale(${scale})`}>
+        {/* 1. 后层外轮三枚萼片 (Sepals) */}
+        {/* 中萼片（正上方直挺） */}
+        <path
+          d="M 0 -2 C -5 -9, -7 -17, 0 -21 C 7 -17, 5 -9, 0 -2 Z"
+          fill="url(#orchidSepalGrad)"
+          stroke={petalDeepShadow}
+          strokeWidth="0.35"
+        />
+        {/* 左下侧萼片 */}
+        <path
+          d="M -2 2 C -8 7, -15 14, -13 20 C -7 21, -2 13, -1 2 Z"
+          fill="url(#orchidSepalGrad)"
+          stroke={petalDeepShadow}
+          strokeWidth="0.35"
+        />
+        {/* 右下侧萼片 */}
+        <path
+          d="M 2 2 C 8 7, 15 14, 13 20 C 7 21, 2 13, 1 2 Z"
+          fill="url(#orchidSepalGrad)"
+          stroke={petalDeepShadow}
+          strokeWidth="0.35"
+        />
 
-      {/* 左右舒展蝴蝶大翼瓣 */}
-      <path d="M 0 0 C -6 -10 -16 -8 -18 -1 C -19 6 -10 8 0 0 Z" fill="url(#orchidWingGrad)" />
-      <path d="M 0 0 C 6 -10 16 -8 18 -1 C 19 6 10 8 0 0 Z" fill="url(#orchidWingGrad)" />
+        {/* 2. 中层内轮两大圆润翼瓣（蝴蝶阔翅，质感丰腴） */}
+        {/* 左大翼瓣 */}
+        <g>
+          <path
+            d="M -2 -1 C -10 -9, -21 -5, -23 4 C -24 13, -13 15, -2 3 Z"
+            fill="url(#orchidPetalGrad)"
+            stroke={petalDeepShadow}
+            strokeWidth="0.38"
+          />
+          {/* 瓣面放射状微细脉纹与丝绒反光 */}
+          <path d="M -2 0 C -9 -3, -16 1, -19 5" stroke={petalEdgeLight} strokeWidth="0.4" fill="none" opacity="0.6" />
+          <path d="M -2 1 C -8 3, -14 7, -17 11" stroke={petalEdgeLight} strokeWidth="0.35" fill="none" opacity="0.5" />
+        </g>
+        {/* 右大翼瓣 */}
+        <g>
+          <path
+            d="M 2 -1 C 10 -9, 21 -5, 23 4 C 24 13, 13 15, 2 3 Z"
+            fill="url(#orchidPetalGrad)"
+            stroke={petalDeepShadow}
+            strokeWidth="0.38"
+          />
+          {/* 瓣面放射状微细脉纹与丝绒反光 */}
+          <path d="M 2 0 C 9 -3, 16 1, 19 5" stroke={petalEdgeLight} strokeWidth="0.4" fill="none" opacity="0.6" />
+          <path d="M 2 1 C 8 3, 14 7, 17 11" stroke={petalEdgeLight} strokeWidth="0.35" fill="none" opacity="0.5" />
+        </g>
 
-      {/* 兰花唇瓣与花蕊 */}
-      <path d="M 0 1 C -4 4 -6 10 0 12 C 6 10 4 4 0 1 Z" fill="url(#orchidLipGrad)" />
-      <circle cx="0" cy="3" r="1.6" fill={orchidLip60} />
-      <circle cx="0" cy="5" r="1.1" fill={orchidLip100} />
-    </g>
-  );
+        {/* 3. 前层标志性素兰唇瓣 (Labellum) */}
+        {/* 侧裂片（深红与金黄内衬） */}
+        <path
+          d="M -4 2 C -7 5, -5 9, -1 8 C -2 5, -3 3, -4 2 Z"
+          fill={lipYellow}
+          stroke={lipRedSpots}
+          strokeWidth="0.3"
+        />
+        <path
+          d="M 4 2 C 7 5, 5 9, 1 8 C 2 5, 3 3, 4 2 Z"
+          fill={lipYellow}
+          stroke={lipRedSpots}
+          strokeWidth="0.3"
+        />
+
+        {/* 中裂片（纯白底染鹅黄，带双丝状弯曲胡须） */}
+        <path
+          d="M -3 6 C -5 11, -3 16, 0 17.5 C 3 16, 5 11, 3 6 Z"
+          fill="url(#orchidLipGrad)"
+          stroke={lipRedSpots}
+          strokeWidth="0.35"
+        />
+        {/* 唇端双弯须 (Cirri) */}
+        <path d="M -0.8 17 C -2.5 19, -4.5 19, -3.8 17" stroke={lipWhite} strokeWidth="0.5" fill="none" strokeLinecap="round" />
+        <path d="M 0.8 17 C 2.5 19, 4.5 19, 3.8 17" stroke={lipWhite} strokeWidth="0.5" fill="none" strokeLinecap="round" />
+
+        {/* 喉部红斑点彩 */}
+        <circle cx="-1.2" cy="7" r="0.45" fill={lipRedSpots} />
+        <circle cx="0" cy="8" r="0.5" fill={lipRedSpots} />
+        <circle cx="1.2" cy="7" r="0.45" fill={lipRedSpots} />
+        <circle cx="-0.8" cy="10" r="0.4" fill={lipRedSpots} />
+        <circle cx="0.8" cy="10" r="0.4" fill={lipRedSpots} />
+
+        {/* 4. 核心蕊柱 (Column) */}
+        <ellipse cx="0" cy="2.2" rx="2.0" ry="2.6" fill={lipWhite} stroke={petalDeepShadow} strokeWidth="0.25" />
+        <circle cx="0" cy="1.2" r="1.1" fill={columnPollen} />
+      </g>
+    );
+  };
+
+  /**
+   * 渲染前端未开放的花骨朵（饱满青紫水滴形，带合拢萼缝）
+   */
+  const renderOrchidBud = (scale: number = 1.0, rot: number = 0) => {
+    return (
+      <g transform={`rotate(${rot}) scale(${scale})`}>
+        {/* 饱满花蕾主体 */}
+        <path
+          d="M 0 0 C -4.5 -3.5, -5.5 -10, 0 -14 C 5.5 -10, 4.5 -3.5, 0 0 Z"
+          fill="url(#orchidBudGrad)"
+          stroke={stemDark}
+          strokeWidth="0.35"
+        />
+        {/* 萼片合拢纵缝线 */}
+        <path d="M 0 0 L 0 -13.5" stroke={petalDeepShadow} strokeWidth="0.4" opacity="0.8" />
+        {/* 侧萼微拱线 */}
+        <path d="M -1.8 -4 C -2.8 -8, -1.8 -11, 0 -13" stroke={budGreen} strokeWidth="0.3" fill="none" opacity="0.7" />
+        <path d="M 1.8 -4 C 2.8 -8, 1.8 -11, 0 -13" stroke={budGreen} strokeWidth="0.3" fill="none" opacity="0.7" />
+      </g>
+    );
+  };
 
   return (
-    <g id="orchidsFlora">
+    <g id="orchidsFlora" style={agingStyle}>
       <defs>
-        <linearGradient id="orchidWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={orchidWing0} />
-          <stop offset="60%" stopColor={orchidWing60} />
-          <stop offset="100%" stopColor={orchidWing100} />
+        {/* 1. 蝴蝶兰大花瓣（翼瓣）柔润紫红立体渐变 */}
+        <radialGradient id="orchidPetalGrad" cx="15%" cy="15%" r="85%">
+          <stop offset="0%" stopColor={petalEdgeLight} />
+          <stop offset="35%" stopColor={petalMidMagenta} />
+          <stop offset="80%" stopColor={petalRichViolet} />
+          <stop offset="100%" stopColor={petalDeepShadow} />
+        </radialGradient>
+
+        {/* 2. 三枚外萼片透光紫红渐变 */}
+        <linearGradient id="orchidSepalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={petalEdgeLight} />
+          <stop offset="45%" stopColor={petalMidMagenta} />
+          <stop offset="100%" stopColor={petalDeepShadow} />
         </linearGradient>
+
+        {/* 3. 兰花唇瓣白黄渐变 */}
         <linearGradient id="orchidLipGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={orchidLip0} />
-          <stop offset="60%" stopColor={orchidLip60} />
-          <stop offset="100%" stopColor={orchidLip100} />
+          <stop offset="0%" stopColor={lipYellow} />
+          <stop offset="45%" stopColor={lipWhite} />
+          <stop offset="100%" stopColor={petalEdgeLight} />
         </linearGradient>
-        <linearGradient id="orchidStemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={stemCol0} />
-          <stop offset="60%" stopColor={stemCol60} />
-          <stop offset="100%" stopColor={stemCol100} />
+
+        {/* 4. 硬挺花葶枝茎圆柱渐变 */}
+        <linearGradient id="orchidHardStemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={stemDark} />
+          <stop offset="50%" stopColor={stemLight} />
+          <stop offset="100%" stopColor={stemDark} />
         </linearGradient>
-        <linearGradient id="orchidLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={leafCol0} />
-          <stop offset="60%" stopColor={leafCol60} />
-          <stop offset="100%" stopColor={leafCol100} />
+
+        {/* 5. 花骨朵青紫渐变 */}
+        <linearGradient id="orchidBudGrad" x1="0%" y1="100%" x2="50%" y2="0%">
+          <stop offset="0%" stopColor={budGreen} />
+          <stop offset="40%" stopColor={budPurple} />
+          <stop offset="85%" stopColor={petalRichViolet} />
+          <stop offset="100%" stopColor={petalEdgeLight} />
         </linearGradient>
       </defs>
 
-      {/* 典雅拱弧长花梗 */}
-      <g id="orchidStems">
-        {/* 主干左弧 */}
-        <path d="M 74 125 C 73 105, 68 85, 54 62 C 46 50, 36 44, 30 38" stroke="url(#orchidStemGrad)" strokeWidth="3.0" fill="none" strokeLinecap="round" />
-        {/* 主干右弧 */}
-        <path d="M 76 125 C 77 105, 84 82, 98 58 C 108 42, 118 36, 124 28" stroke="url(#orchidStemGrad)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-        {/* 中挺挺秀 */}
-        <path d="M 75 125 C 75 100, 76 75, 75 42 C 75 32, 74 24, 74 16" stroke="url(#orchidStemGrad)" strokeWidth="2.6" fill="none" strokeLinecap="round" />
-      </g>
-
-      {/* 蝴蝶兰特有标志性·基部横展肥厚肉质革质大叶 (平展于瓶口基部，倒卵状长圆形，深绿肥厚油润，花葶无叶光洁) */}
-      <g id="orchidLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
-        {/* 左侧平展厚肉质舌形大叶 */}
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 123px' }}>
-          <path
-            d="M 74 121 C 60 116 42 115 22 118 C 12 119 10 124 16 127 C 28 130 52 129 73 125 Z"
-            fill="url(#orchidLeafGrad)"
-          />
-          {/* 肉质凹槽主脉 */}
-          <path d="M 74 122 C 58 119 40 118 18 121" stroke="#86efac" strokeWidth="1.1" fill="none" opacity="0.7" />
-          {/* 叶缘微光 */}
-          <path d="M 73 121 C 58 116 40 115 22 117" stroke="#34d399" strokeWidth="0.6" fill="none" opacity="0.4" />
-        </g>
-
-        {/* 右侧横斜油亮厚肉质大叶 */}
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 123px' }}>
-          <path
-            d="M 76 121 C 90 116 108 115 128 118 C 138 119 140 124 134 127 C 122 130 98 129 77 125 Z"
-            fill="url(#orchidLeafGrad)"
-          />
-          <path d="M 76 122 C 92 119 110 118 132 121" stroke="#86efac" strokeWidth="1.1" fill="none" opacity="0.7" />
-          <path d="M 77 121 C 92 116 110 115 128 117" stroke="#34d399" strokeWidth="0.6" fill="none" opacity="0.4" />
-        </g>
-
-        {/* 基部中前叠生小厚叶 */}
+      {/* ── 架构 1：深褐青色硬挺花葶与小花梗（硬径遒劲、一径贯通、带竹节小苞） ── */}
+      <g id="orchidHardStemSpike">
+        {/* A. 主硬径：自瓶口 (75,125) 挺韧拔起，向左上方优雅拱折延伸至前端 (15,28) */}
         <path
-          d="M 72 124 C 64 120 54 121 46 125 C 56 127 66 127 75 125 Z"
-          fill="url(#orchidLeafGrad)"
-          opacity="0.9"
+          d="M 75 125 C 75 106, 76 92, 75 78 C 74 65, 71 52, 63 38 C 55 24, 42 16, 28 18 C 22 19, 18 22, 14 28"
+          stroke="url(#orchidHardStemGrad)"
+          strokeWidth="2.7"
+          fill="none"
+          strokeLinecap="round"
         />
+
+        {/* B. 各朵花的小着生柄 (Pedicels) 与花茎节点 */}
+        {/* 节点 1：主茎 (75,80) 连向花 1 (82,82) */}
+        <path d="M 75 80 Q 78 81 82 82" stroke="url(#orchidHardStemGrad)" strokeWidth="1.6" fill="none" />
+        <ellipse cx="75" cy="80" rx="1.6" ry="1.0" fill={nodeBract} />
+
+        {/* 节点 2：主茎 (74,62) 连向花 2 (67,63) */}
+        <path d="M 74 62 Q 71 62.5 67 63" stroke="url(#orchidHardStemGrad)" strokeWidth="1.6" fill="none" />
+        <ellipse cx="74" cy="62" rx="1.5" ry="1.0" fill={nodeBract} />
+
+        {/* 节点 3：主茎 (67,46) 连向花 3 (57,45) */}
+        <path d="M 67 46 Q 62 45.5 57 45" stroke="url(#orchidHardStemGrad)" strokeWidth="1.5" fill="none" />
+        <ellipse cx="67" cy="46" rx="1.5" ry="0.9" fill={nodeBract} />
+
+        {/* 节点 4：主茎 (55,30) 连向花 4 (45,28) */}
+        <path d="M 55 30 Q 50 29 45 28" stroke="url(#orchidHardStemGrad)" strokeWidth="1.4" fill="none" />
+        <ellipse cx="55" cy="30" rx="1.4" ry="0.8" fill={nodeBract} />
+
+        {/* 节点 5：主茎 (44,20) 连向花 5 (35,17) */}
+        <path d="M 44 20 Q 39 18.5 35 17" stroke="url(#orchidHardStemGrad)" strokeWidth="1.3" fill="none" />
+        <ellipse cx="44" cy="20" rx="1.3" ry="0.8" fill={nodeBract} />
+
+        {/* 节点 6：花骨朵 1 小花梗 (32,17) -> (26,12) */}
+        <path d="M 32 17 Q 29 14 26 12" stroke="url(#orchidHardStemGrad)" strokeWidth="1.2" fill="none" />
+
+        {/* 节点 7：花骨朵 2 小花梗 (24,19) -> (19,16) */}
+        <path d="M 24 19 Q 21 17 19 16" stroke="url(#orchidHardStemGrad)" strokeWidth="1.1" fill="none" />
+
+        {/* 节点 8：花骨朵 3 小花梗 (18,22) -> (14,21) */}
+        <path d="M 18 22 Q 16 21.5 14 21" stroke="url(#orchidHardStemGrad)" strokeWidth="1.0" fill="none" />
       </g>
 
-      {/* 5 朵出尘蝴蝶兰花朵 */}
-      <g id="orchidBlooms">
-        <g style={fl1}>{renderOrchidBloom(122, 30, 0.88, 18)}</g>
-        <g style={fl2}>{renderOrchidBloom(34, 40, 0.92, -22)}</g>
-        <g style={fl3}>{renderOrchidBloom(96, 56, 1.05, 12)}</g>
-        <g style={fl4}>{renderOrchidBloom(52, 60, 1.0, -15)}</g>
-        <g style={fl5}>{renderOrchidBloom(74, 20, 1.15, 0)}</g>
+      {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（大花 -> 中花 -> 小花 -> 串串花骨朵） ── */}
+      <g id="orchidBloomsRaceme">
+        {/* 1. 【基部第一朵·最大盛开花】(x:82, y:82)：靠近底部花朵最大（scale: 1.25），饱满盛放俯展 */}
+        <g style={fl1} transform="translate(82, 82)">
+          {renderOrchidBloom(1.25, 15)}
+        </g>
+
+        {/* 2. 【中下部第二朵·盛开大花】(x:67, y:63)：次大朵（scale: 1.12），向左微仰 */}
+        <g style={fl2} transform="translate(67, 63)">
+          {renderOrchidBloom(1.12, -12)}
+        </g>
+
+        {/* 3. 【中高部第三朵·端庄中花】(x:57, y:45)：中型朵（scale: 0.96），翩跹若飞 */}
+        <g style={fl3} transform="translate(57, 45)">
+          {renderOrchidBloom(0.96, -20)}
+        </g>
+
+        {/* 4. 【前段第四朵·初绽小花】(x:45, y:28)：逐渐缩小（scale: 0.78），初舒羽翼 */}
+        <g style={fl4} transform="translate(45, 28)">
+          {renderOrchidBloom(0.78, -28)}
+        </g>
+
+        {/* 5. 【前端第五朵·含苞微吐小花】(x:35, y:17)：小巧玲珑（scale: 0.62），半开掩映 */}
+        <g transform="translate(35, 17)">
+          {renderOrchidBloom(0.62, -35)}
+        </g>
+
+        {/* ── 前端未开放的花骨朵（依次递减变小） ── */}
+        {/* 6. 【前端大蕾】(x:26, y:12)：充实饱满的青紫花骨朵 (scale: 0.52) */}
+        <g transform="translate(26, 12)">
+          {renderOrchidBud(0.52, -45)}
+        </g>
+
+        {/* 7. 【前端中蕾】(x:19, y:16)：紧致微翘小蕾 (scale: 0.40) */}
+        <g transform="translate(19, 16)">
+          {renderOrchidBud(0.40, -60)}
+        </g>
+
+        {/* 8. 【前端初生嫩蕾】(x:14, y:21)：精巧青绿小蕾 (scale: 0.30) */}
+        <g transform="translate(14, 21)">
+          {renderOrchidBud(0.30, -78)}
+        </g>
+
+        {/* 9. 【极梢微型苞尖】(x:11, y:29)：梢头初生细蕾 (scale: 0.22) */}
+        <g transform="translate(11, 29)">
+          {renderOrchidBud(0.22, -95)}
+        </g>
       </g>
     </g>
   );
 };
+
