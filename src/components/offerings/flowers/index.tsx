@@ -61,6 +61,9 @@ export const FlowerVase: React.FC<VaseFlowerProps> = ({
     </g>
   ) : undefined;
 
+  const mouthAperture = getVaseMouthAperture(vaseStyle);
+  const spreadFactor = getVaseSpreadFactor(vaseStyle);
+
   return (
     <BaseVase
       vaseStyle={vaseStyle}
@@ -73,7 +76,14 @@ export const FlowerVase: React.FC<VaseFlowerProps> = ({
       fallingPetalsSlot={fallingPetalsSlot}
     >
       {FlowerComponent && (
-        <FlowerComponent health={health} dryFactor={dryFactor} isFaded={isFaded} />
+        <FlowerComponent
+          health={health}
+          dryFactor={dryFactor}
+          isFaded={isFaded}
+          vaseStyle={vaseStyle}
+          mouthAperture={mouthAperture}
+          spreadFactor={spreadFactor}
+        />
       )}
     </BaseVase>
   );

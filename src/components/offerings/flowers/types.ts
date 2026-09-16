@@ -28,6 +28,9 @@ export interface FlowerComponentProps {
   dryFactor: number;
   isFaded: boolean;
   timeOfDay?: string;
+  vaseStyle?: VaseStyle;
+  mouthAperture?: VaseMouthAperture;
+  spreadFactor?: number;
 }
 
 export interface VaseFlowerProps {

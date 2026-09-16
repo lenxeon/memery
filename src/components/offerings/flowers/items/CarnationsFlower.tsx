@@ -1,18 +1,14 @@
 /**
  * @file CarnationsFlower.tsx
- * @description 【写实温润蜜桃粉康乃馨】严格遵循用户要求：
- * 1. 保证一花一径：5 根细长青绿花茎各自从瓶口独立直通花底，无叶，绝无断开悬空。
- * 2. 杜绝开得太旺：
- *    - 3 支为精巧紧凑的【小花骨朵】（长青绿花托，顶端仅探出一小撮粉嫩卷褶花尖）；
- *    - 2 支为优雅含蓄的【小朵初绽花】（杯状聚拢微开，紧凑水润，绝无大平盘外翻）；
- * 3. 高低有致：
- *    - 5 枝高度与姿态错落有致，宛若花艺师精心插瓶：
- *      • 枝1 (左高-花骨朵): (36, 32)
- *      • 枝2 (左中-小绽花): (52, 60)
- *      • 枝3 (中高-花骨朵): (72, 38)
- *      • 枝4 (右中低-小绽花): (88, 66)
- *      • 枝5 (右高-花骨朵): (114, 46)
- * 4. 色彩渐变粉嫩：纯净柔粉、蜜桃腮红粉与奶白波浪锯齿，花托青绿过渡自然。
+ * @description 【写实温润蜜桃粉康乃馨】严格按照用户要求与花艺美学重构：
+ * 1. 整体大幅收拢（角度更聚拢自然，符合插花收束美学）：
+ *    - 引入动态 spreadFactor 变量（由花瓶口径驱动：小口花器自动聚拢，大口花器自然开放）；
+ * 2. 精妙构图（1旺花 + 2小花 + 2花骨朵，总计5朵）：
+ *    - 居中偏低：1 朵开得旺一点的饱满波浪层叠大花（深浅交融，立体生动）；
+ *    - 左右两侧中位：2 朵小巧初绽花（紧凑杯状，向上微放）；
+ *    - 左右高梢：2 支修长秀丽的【小花骨朵】（长青绿花托，顶端微吐娇嫩花尖）；
+ * 3. 严格一花一径：5 根细长青绿花茎各自直通瓶底，端点与花托 100% 严丝合缝相接，无叶相杂。
+ * 4. 粉嫩色彩：水润蜜桃粉、柔嫩粉白与奶白细碎波浪锯齿边，青绿花托层次细腻。
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
@@ -24,7 +20,12 @@ export const CARNATION_FALLING_PETALS: FallingPetalDef[] = [
   { id: 3, detachHealth: 0.15, fallSpan: 0.05, startX: 75, startY: 64, landX: 78, landY: 195, rx: 4.8, ry: 3.0, landRot: 14, swayAmp: 14, swayFreq: 3.8 },
 ];
 
-export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
+export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
+  health,
+  dryFactor,
+  isFaded,
+  spreadFactor = 1.0,
+}) => {
   // ── 娇嫩粉润蜜桃粉色系（水灵通透粉白、柔桃粉、腮红粉，杜绝浓重暗紫） ──
   const petalWhite = lerpColor('#ffffff', '#faf6f5', dryFactor);
   const petalSoftEdge = lerpColor('#fff1f2', '#f6ede8', dryFactor);
@@ -52,11 +53,11 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
 
   /**
    * 细长圆柱杯状青绿花托 (Calyx)
-   * 原点 (0, 0) 严格位于花托底端，与花茎端点 100% 严丝合缝
+   * 原点 (0, 0) 严格位于花托底端中央，与花茎端点 100% 严密贴合无缝！
    */
   const renderCalyx = (h: number = 22, wTop: number = 4.8, wBottom: number = 1.8) => (
     <g>
-      {/* 花托基部小鳞苞包片 */}
+      {/* 花托基部小苞片 */}
       <path
         d={`M -${wBottom * 1.3} 1 L -${wBottom * 1.5} -3.5 L -${wBottom * 0.7} -2.5 L 0 -4.5 L ${wBottom * 0.7} -2.5 L ${wBottom * 1.5} -3.5 L ${wBottom * 1.3} 1 Z`}
         fill={calyxTeeth}
@@ -80,7 +81,7 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
         opacity="0.85"
         fill="none"
       />
-      {/* 顶部包萼尖齿：紧贴花瓣基底 */}
+      {/* 顶部包萼尖齿：紧贴花瓣基底向上包拢 */}
       <path
         d={`M -${wTop} -${h} 
            L -${wTop * 0.75} -${h + 3.2} 
@@ -97,15 +98,12 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
   );
 
   /**
-   * 1. 【小小的花骨朵】（紧致修长，青绿花托顶端只探出一簇娇嫩细小的粉红尖芽）
+   * 1. 【小花骨朵】（紧致修长，青绿长花托顶端初吐一抹娇嫩粉蕾）
    */
-  const renderTinyBud = (scale: number = 1.0) => (
+  const renderTinyBud = (scale: number = 0.95) => (
     <g transform={`scale(${scale})`}>
-      {/* 花托基底位于 (0, 0) */}
       {renderCalyx(21, 4.2, 1.7)}
-      {/* 花托顶部探出的小花尖 */}
       <g transform="translate(0, -22)">
-        {/* 初探粉红花心尖瓣 */}
         <path
           d="M -3 1 C -4 -4, -3 -9, 0 -11 C 3 -9, 4 -4, 3 1 Z"
           fill="url(#petalCoreGrad)"
@@ -114,7 +112,6 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
           d="M -2 -1 Q -3 -7 0 -9 Q 3 -7 2 -1 Z"
           fill="url(#petalBlushGrad)"
         />
-        {/* 顶部微卷嫩白高光边缘 */}
         <path
           d="M -2 -7 Q 0 -10 2 -7"
           stroke={petalWhite}
@@ -127,15 +124,13 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
   );
 
   /**
-   * 2. 【小朵初绽花】（开的小一点，紧凑杯状向上微展，细密波浪皱褶，绝不过大）
+   * 2. 【小朵初绽花】（开的小一点，紧凑杯状向上微放，水润波浪碎褶）
    */
-  const renderSmallBloom = (scale: number = 1.0) => (
+  const renderSmallBloom = (scale: number = 0.98) => (
     <g transform={`scale(${scale})`}>
-      {/* 花托基底位于 (0, 0) */}
       {renderCalyx(19, 5.0, 1.8)}
-      {/* 花瓣群：紧凑杯状向上舒展 */}
       <g transform="translate(0, -20)">
-        {/* 底层小波浪外瓣 */}
+        {/* 外层舒展小波浪瓣 */}
         <path
           d="M -8 1 C -10 -5, -8 -13, -4 -16 C -1 -11, 0 -14, 1 -11 C 5 -14, 8 -11, 8 1 Z"
           fill="url(#petalLightGrad)"
@@ -177,6 +172,102 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
       </g>
     </g>
   );
+
+  /**
+   * 3. 【饱满盛开主花】（开得旺一点的柔粉大花：层次丰富、层叠波浪繁复，绝无生硬平盘）
+   */
+  const renderLushBloom = (scale: number = 1.06) => (
+    <g transform={`scale(${scale})`}>
+      {renderCalyx(18, 5.5, 2.0)}
+      <g transform="translate(0, -19)">
+        {/* 1. 外层柔粉大波浪衬裙 */}
+        <path
+          d="M -13 1 
+             C -16 -6, -12 -15, -7 -18 
+             C -3 -13, 0 -16, 2 -13 
+             C 5 -16, 9 -13, 12 -18 
+             C 16 -14, 15 -6, 13 1 
+             C 6 2.5, -6 2.5, -13 1 Z"
+          fill="url(#petalLightGrad)"
+        />
+        {/* 2. 次层细密波浪褶皱群 */}
+        <path
+          d="M -11 -3 
+             C -14 -9, -9 -15, -5 -17 
+             C -2 -12, 0 -14, 2 -12 
+             C 4 -14, 7 -12, 9 -16 
+             C 13 -13, 12 -6, 10 -3 
+             C 5 1, -5 1, -11 -3 Z"
+          fill="url(#petalBlushGrad)"
+        />
+        {/* 3. 内层重叠错落小波浪瓣 */}
+        <path
+          d="M -8 -5 
+             Q -11 -12 -6 -15 
+             Q -2 -10 0 -13 
+             Q 2 -10 6 -15 
+             Q 11 -12 8 -5 
+             Q 4 0 -4 0 Z"
+          fill="url(#petalCoreGrad)"
+        />
+        {/* 4. 纵深立体阴影褶痕 */}
+        <path
+          d="M -5 -6 Q -7 -11 -2 -13 Q 1 -10 3 -13 Q 6 -11 4 -6 Z"
+          fill={petalDeep}
+          opacity="0.85"
+        />
+        {/* 5. 顶部水润如丝的波浪锯齿高光轮廓 */}
+        <path
+          d="M -12 -13 Q -9 -17 -5 -14 Q -1 -18 2 -14 Q 5 -17 8 -13 Q 11 -15 12 -10"
+          stroke={petalWhite}
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M -8 -12 Q -4 -15 -1 -12 Q 2 -15 5 -12 Q 8 -14 9 -8"
+          stroke={petalSoftEdge}
+          strokeWidth="0.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M -4 -10 Q 0 -12 3 -10"
+          stroke="#ffffff"
+          strokeWidth="0.45"
+          fill="none"
+        />
+      </g>
+    </g>
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // 基于收束系数计算枝干坐标与倾角（收拢聚集，依花器口径自适应）：
+  // 枝1 (左高-花骨朵)
+  // 枝2 (左中-小初绽花)
+  // 枝3 (居中-旺一点的盛开主花)
+  // 枝4 (右中-小初绽花)
+  // 枝5 (右高-花骨朵)
+  // ─────────────────────────────────────────────────────────────
+  const b1x = 75 - 23 * spreadFactor;
+  const b1y = 34;
+  const b1rot = -8 * spreadFactor;
+
+  const b2x = 75 - 13 * spreadFactor;
+  const b2y = 56;
+  const b2rot = -4 * spreadFactor;
+
+  const b3x = 75;
+  const b3y = 68;
+  const b3rot = 0;
+
+  const b4x = 75 + 13 * spreadFactor;
+  const b4y = 54;
+  const b4rot = 4 * spreadFactor;
+
+  const b5x = 75 + 23 * spreadFactor;
+  const b5y = 40;
+  const b5rot = 8 * spreadFactor;
 
   return (
     <g id="carnationsFlora" style={{ opacity: overallOpacity }}>
@@ -220,54 +311,48 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
       </defs>
 
       {/* ─────────────────────────────────────────────────────────────
-          一花一径：5 根细长优雅的青绿花茎从瓶口 (125) 独立直通每朵花的花托底端
-          严格一一对应，绝无悬空或断裂：
-          1. 枝1 (左高-小花骨朵): 端点 (36, 32)
-          2. 枝2 (左中-小朵初绽): 端点 (52, 60)
-          3. 枝3 (中高-小花骨朵): 端点 (72, 38)
-          4. 枝4 (右中低-小朵初绽): 端点 (88, 66)
-          5. 枝5 (右高-小花骨朵): 端点 (114, 46)
+          一花一径：5 根细长优雅青绿花茎（无叶，端点与花托基底 100% 精确闭合）
       ───────────────────────────────────────────────────────────── */}
       <g id="carnationLongStems">
-        {/* 枝1 花茎：直通左高花骨朵 (36, 32) */}
+        {/* 枝1：直通左高花骨朵 */}
         <path
-          d="M 72 125 C 64 96, 44 64, 36 32"
+          d={`M ${75 - 3 * spreadFactor} 125 C ${75 - 8 * spreadFactor} 96, ${b1x + 3} 65, ${b1x} ${b1y}`}
           stroke="url(#carnationStemRealGrad)"
           strokeWidth="2.3"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* 枝2 花茎：直通左中小花朵 (52, 60) */}
+        {/* 枝2：直通左中小花 */}
         <path
-          d="M 73 125 C 69 104, 58 84, 52 60"
+          d={`M ${75 - 1.5 * spreadFactor} 125 C ${75 - 4 * spreadFactor} 102, ${b2x + 2} 80, ${b2x} ${b2y}`}
           stroke="url(#carnationStemRealGrad)"
           strokeWidth="2.4"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* 枝3 花茎：直通中高花骨朵 (72, 38) */}
+        {/* 枝3：直通居中旺盛主花 */}
         <path
-          d="M 74 125 C 74 100, 73 70, 72 38"
+          d={`M 75 125 C 75 106, 75 87, ${b3x} ${b3y}`}
           stroke="url(#carnationStemRealGrad)"
-          strokeWidth="2.3"
+          strokeWidth="2.5"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* 枝4 花茎：直通右中小花朵 (88, 66) */}
+        {/* 枝4：直通右中小花 */}
         <path
-          d="M 76 125 C 79 106, 85 86, 88 66"
+          d={`M ${75 + 1.5 * spreadFactor} 125 C ${75 + 4 * spreadFactor} 102, ${b4x - 2} 80, ${b4x} ${b4y}`}
           stroke="url(#carnationStemRealGrad)"
           strokeWidth="2.4"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* 枝5 花茎：直通右高花骨朵 (114, 46) */}
+        {/* 枝5：直通右高花骨朵 */}
         <path
-          d="M 78 125 C 86 100, 104 74, 114 46"
+          d={`M ${75 + 3 * spreadFactor} 125 C ${75 + 8 * spreadFactor} 96, ${b5x - 3} 68, ${b5x} ${b5y}`}
           stroke="url(#carnationStemRealGrad)"
           strokeWidth="2.3"
           fill="none"
@@ -276,32 +361,31 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
       </g>
 
       {/* ─────────────────────────────────────────────────────────────
-          总计五朵：三支小小的花骨朵 + 两支小朵初绽花，高低有致、粉嫩娇巧
-          花托基底坐标与花茎端点 100% 吻合对齐
+          五朵粉嫩高低有致花朵（1旺花 + 2小花 + 2花骨朵）
       ───────────────────────────────────────────────────────────── */}
       <g id="carnationFlowers">
-        {/* 枝1：【小花骨朵】左侧最高位，修长微倾 */}
-        <g transform="translate(36, 32) rotate(-16)" style={fl1}>
+        {/* 枝1：【小花骨朵】左侧高梢 */}
+        <g transform={`translate(${b1x}, ${b1y}) rotate(${b1rot})`} style={fl1}>
           {renderTinyBud(0.95)}
         </g>
 
-        {/* 枝2：【小朵初绽花】左中位，小巧水润 */}
-        <g transform="translate(52, 60) rotate(-9)" style={fl2}>
+        {/* 枝2：【小初绽花】左中位 */}
+        <g transform={`translate(${b2x}, ${b2y}) rotate(${b2rot})`} style={fl2}>
           {renderSmallBloom(0.98)}
         </g>
 
-        {/* 枝3：【小花骨朵】居中高位，挺拔含苞 */}
-        <g transform="translate(72, 38) rotate(-2)" style={fl3}>
-          {renderTinyBud(0.95)}
+        {/* 枝3：【饱满主花（旺一点）】居中焦点大花 */}
+        <g transform={`translate(${b3x}, ${b3y}) rotate(${b3rot})`} style={fl3}>
+          {renderLushBloom(1.08)}
         </g>
 
-        {/* 枝4：【小朵初绽花】右中偏低位，舒展呼应 */}
-        <g transform="translate(88, 66) rotate(10)" style={fl4}>
+        {/* 枝4：【小初绽花】右中位 */}
+        <g transform={`translate(${b4x}, ${b4y}) rotate(${b4rot})`} style={fl4}>
           {renderSmallBloom(1.0)}
         </g>
 
-        {/* 枝5：【小花骨朵】右侧高位，斜向探展 */}
-        <g transform="translate(114, 46) rotate(18)" style={fl5}>
+        {/* 枝5：【小花骨朵】右侧高梢 */}
+        <g transform={`translate(${b5x}, ${b5y}) rotate(${b5rot})`} style={fl5}>
           {renderTinyBud(0.92)}
         </g>
       </g>

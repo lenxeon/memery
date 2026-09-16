@@ -256,3 +256,45 @@ export const getVaseStyleMeta = (styleId?: VaseStyle): VaseStyleMeta => {
   const normId = normalizeVaseStyle(styleId);
   return VASE_STYLES.find((s) => s.id === normId) || VASE_STYLES[0];
 };
+
+export type VaseMouthAperture = 'narrow' | 'standard' | 'wide';
+
+/**
+ * 获取花瓶瓶口形制口径类别 (小口 / 标准口 / 大口)
+ */
+export const getVaseMouthAperture = (styleId?: VaseStyle): VaseMouthAperture => {
+  const normId = normalizeVaseStyle(styleId);
+  switch (normId) {
+    // 小口/细颈花器：枝干自然聚拢、夹角收紧
+    case 'minimal_drop_swan':
+    case 'melon_lobed_celadon':
+    case 'ribbed_fluted_white':
+      return 'narrow';
+
+    // 大口/阔口/翻边花器：枝干自然向外舒展开放
+    case 'pinched_clay_ruffle':
+    case 'fluted_trapezoid_mini':
+    case 'chiseled_stone_gray':
+      return 'wide';
+
+    // 经典标准口径
+    case 'organic_twist_cream':
+    case 'organic_twist_rose':
+    case 'pearlescent_turbine':
+    case 'twisted_helix_tower':
+    case 'gradient_sand_volcano':
+    case 'faceted_gem_prism':
+    default:
+      return 'standard';
+  }
+};
+
+/**
+ * 获取花器对插花枝干的收束散开系数 (小口0.72，标准1.0，大口1.25)
+ */
+export const getVaseSpreadFactor = (styleId?: VaseStyle): number => {
+  const aperture = getVaseMouthAperture(styleId);
+  if (aperture === 'narrow') return 0.72;
+  if (aperture === 'wide') return 1.25;
+  return 1.0;
+};
