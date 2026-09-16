@@ -232,17 +232,23 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
   // 枝3 (左侧低位大花托): (50, 68)
   // 瓶口汇聚基准点：Y=120，X=73~77
   // ─────────────────────────────────────────────────────────────
-  const b1x = 75 - 3 * spreadFactor;
-  const b1y = 42;
+  // ─────────────────────────────────────────────────────────────
+  // 紧凑收拢插花空间规划（符合花艺美学，角度大幅收拢）：
+  // 枝1 (中偏上主花): (73, 38)，最上层，金光璀璨
+  // 枝2 (右侧中位大花): (90, 52)，与花托严密相接
+  // 枝3 (左侧低位大花托): (57, 65)，位于最底层，被枝1花瓣部分遮挡
+  // ─────────────────────────────────────────────────────────────
+  const b1x = 75 - 2 * spreadFactor;
+  const b1y = 38;
   const b1rot = -2 * spreadFactor;
 
-  const b2x = 75 + 17 * spreadFactor;
-  const b2y = 54;
-  const b2rot = 12 * spreadFactor;
+  const b2x = 75 + 15 * spreadFactor;
+  const b2y = 52;
+  const b2rot = 10 * spreadFactor;
 
-  const b3x = 75 - 25 * spreadFactor;
-  const b3y = 68;
-  const b3rot = -16 * spreadFactor;
+  const b3x = 75 - 18 * spreadFactor;
+  const b3y = 65;
+  const b3rot = -10 * spreadFactor;
 
   return (
     <g id="sunflowersFlora" style={{ opacity: overallOpacity }}>
@@ -289,14 +295,14 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
       </defs>
 
       {/* ─────────────────────────────────────────────────────────────
-          发白且有细毛的粗壮多汁花茎 (无叶，瓶口聚集探出，自然毛感光晕)
+          发白且有细毛的粗壮多汁花茎 (收拢角度，瓶口中心聚集挺拔探出)
       ───────────────────────────────────────────────────────────── */}
       <g id="sunflowerFrostStems">
         {/* 枝1 花茎：直通中上正视大花 (b1x, b1y) */}
         <g>
           {/* 主茎圆柱体 */}
           <path
-            d={`M 75 125 C 75.6 104, ${b1x + 1} 76, ${b1x} ${b1y + 10}`}
+            d={`M 75 125 C 75.2 104, ${b1x + 0.5} 74, ${b1x} ${b1y + 10}`}
             stroke="url(#sunflowerStemNaturalGrad)"
             strokeWidth="4.6"
             fill="none"
@@ -304,15 +310,15 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
           />
           {/* 表面发白绒霜脊光 */}
           <path
-            d={`M 75 124 C 75.6 104, ${b1x + 1} 76, ${b1x} ${b1y + 10}`}
+            d={`M 75 124 C 75.2 104, ${b1x + 0.5} 74, ${b1x} ${b1y + 10}`}
             stroke={stemWhiteFrost}
             strokeWidth="1.5"
             fill="none"
             opacity="0.85"
           />
-          {/* 边缘细密白色柔毛微晕 (细毛感，杜绝粗大虚线) */}
+          {/* 边缘细密白色柔毛微晕 */}
           <path
-            d={`M 75 124 C 75.6 104, ${b1x + 1} 76, ${b1x} ${b1y + 10}`}
+            d={`M 75 124 C 75.2 104, ${b1x + 0.5} 74, ${b1x} ${b1y + 10}`}
             stroke="#ffffff"
             strokeWidth="5.4"
             fill="none"
@@ -320,24 +326,24 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
           />
         </g>
 
-        {/* 枝2 花茎：舒展微弧连入右侧大花花托基部 */}
+        {/* 枝2 花茎：舒展微弧连入右侧大花花托基部 (收拢角度) */}
         <g>
           <path
-            d={`M ${75 + 2 * spreadFactor} 125 C ${75 + 6 * spreadFactor} 104, ${b2x - 4} 82, ${b2x - 4} ${b2y + 6}`}
+            d={`M ${75 + 1.5 * spreadFactor} 125 C ${75 + 4 * spreadFactor} 104, ${b2x - 3} 82, ${b2x - 3} ${b2y + 6}`}
             stroke="url(#sunflowerStemNaturalGrad)"
             strokeWidth="4.4"
             fill="none"
             strokeLinecap="round"
           />
           <path
-            d={`M ${75 + 2 * spreadFactor} 125 C ${75 + 6 * spreadFactor} 104, ${b2x - 4} 82, ${b2x - 4} ${b2y + 6}`}
+            d={`M ${75 + 1.5 * spreadFactor} 125 C ${75 + 4 * spreadFactor} 104, ${b2x - 3} 82, ${b2x - 3} ${b2y + 6}`}
             stroke={stemWhiteFrost}
             strokeWidth="1.4"
             fill="none"
             opacity="0.85"
           />
           <path
-            d={`M ${75 + 2 * spreadFactor} 125 C ${75 + 6 * spreadFactor} 104, ${b2x - 4} 82, ${b2x - 4} ${b2y + 6}`}
+            d={`M ${75 + 1.5 * spreadFactor} 125 C ${75 + 4 * spreadFactor} 104, ${b2x - 3} 82, ${b2x - 3} ${b2y + 6}`}
             stroke="#ffffff"
             strokeWidth="5.2"
             fill="none"
@@ -345,24 +351,24 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
           />
         </g>
 
-        {/* 枝3 花茎：优美拱弧向左弯折，精准插入侧背花托底心 (b3x, b3y) */}
+        {/* 枝3 花茎：向左收拢微弧，精准插入侧背花托底心 (收拢角度) */}
         <g>
           <path
-            d={`M ${75 - 2 * spreadFactor} 125 C ${75 - 8 * spreadFactor} 104, ${b3x + 10} 88, ${b3x} ${b3y}`}
+            d={`M ${75 - 1.5 * spreadFactor} 125 C ${75 - 5 * spreadFactor} 104, ${b3x + 6} 86, ${b3x} ${b3y}`}
             stroke="url(#sunflowerStemNaturalGrad)"
             strokeWidth="4.5"
             fill="none"
             strokeLinecap="round"
           />
           <path
-            d={`M ${75 - 2 * spreadFactor} 125 C ${75 - 8 * spreadFactor} 104, ${b3x + 10} 88, ${b3x} ${b3y}`}
+            d={`M ${75 - 1.5 * spreadFactor} 125 C ${75 - 5 * spreadFactor} 104, ${b3x + 6} 86, ${b3x} ${b3y}`}
             stroke={stemWhiteFrost}
             strokeWidth="1.4"
             fill="none"
             opacity="0.85"
           />
           <path
-            d={`M ${75 - 2 * spreadFactor} 125 C ${75 - 8 * spreadFactor} 104, ${b3x + 10} 88, ${b3x} ${b3y}`}
+            d={`M ${75 - 1.5 * spreadFactor} 125 C ${75 - 5 * spreadFactor} 104, ${b3x + 6} 86, ${b3x} ${b3y}`}
             stroke="#ffffff"
             strokeWidth="5.3"
             fill="none"
