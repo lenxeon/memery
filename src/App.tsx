@@ -421,15 +421,27 @@ export default function App() {
     }
   };
 
+  const FLOWER_DISPLAY_NAMES: Record<FlowerType, string> = {
+    peonies: '富贵牡丹',
+    lilies: '纯白百合',
+    lotus: '出尘净莲',
+    chrysanthemum: '岁寒金菊',
+    roses: '长情玫瑰',
+    plum_blossoms: '傲霜寒梅',
+    sunflowers: '金色向阳',
+    carnations: '慈孝康乃馨',
+    calla_lilies: '圣洁马蹄莲',
+    tulips: '典雅郁金香',
+    narcissus: '凌波水仙',
+    lily_of_valley: '如意铃兰',
+    orchids: '幽谷素兰',
+    hydrangeas: '团圆绣球',
+    daisies: '清纯雏菊',
+  };
+
   const handleAddOfferedFlower = (flowerType: FlowerType) => {
     const newId = `offered_flower_${Date.now()}`;
-    const flowerNameMap: Record<FlowerType, string> = {
-      peonies: '粉白牡丹',
-      lilies: '白百合',
-      lotus: '出尘清莲',
-      chrysanthemum: '高洁白菊',
-      roses: '香槟玫瑰',
-    };
+    const name = FLOWER_DISPLAY_NAMES[flowerType] || '鲜花';
 
     // Calculate natural position near center/front of table
     const existingOffered = Object.keys(items).filter((k) => k.startsWith('offered_flower_')).length;
@@ -439,7 +451,7 @@ export default function App() {
     const newBouquet = FloraFactory.createOfferedBouquet(
       flowerType,
       { x: offsetX, y: offsetY },
-      { id: newId, name: `敬献 · ${flowerNameMap[flowerType]}` }
+      { id: newId, name: `敬献 · ${name}` }
     );
 
     setItems((prev) => ({
@@ -450,17 +462,11 @@ export default function App() {
     setLastOfferedFlower(flowerType);
     setPetalTrigger(Date.now());
     sound.playBell(560, 2);
-    showToast(`已将新鲜「${flowerNameMap[flowerType]}」奉献于供案桌面，可在案上随意拖拽摆放`);
+    showToast(`已将新鲜「${name}」奉献于供案桌面，可在案上随意拖拽摆放`);
   };
 
   const handleChangeVaseFlower = (side: 'left' | 'right' | 'both', flowerType: FlowerType) => {
-    const flowerNameMap: Record<FlowerType, string> = {
-      peonies: '粉白牡丹',
-      lilies: '白百合',
-      lotus: '出尘清莲',
-      chrysanthemum: '高洁白菊',
-      roses: '香槟玫瑰',
-    };
+    const name = FLOWER_DISPLAY_NAMES[flowerType] || '鲜花';
 
     setItems((prev) => {
       const next = { ...prev };
@@ -468,14 +474,14 @@ export default function App() {
         next.vase_left = {
           ...next.vase_left,
           flowerType,
-          name: `${flowerNameMap[flowerType]}花瓶 (左)`,
+          name: `${name}花瓶 (左)`,
         };
       }
       if (side === 'right' || side === 'both') {
         next.vase_right = {
           ...next.vase_right,
           flowerType,
-          name: `${flowerNameMap[flowerType]}花瓶 (右)`,
+          name: `${name}花瓶 (右)`,
         };
       }
       return next;
@@ -483,7 +489,7 @@ export default function App() {
 
     setLastOfferedFlower(flowerType);
     setPetalTrigger(Date.now());
-    showToast(`已更换花瓶插花为「${flowerNameMap[flowerType]}」`);
+    showToast(`已更换花瓶插花为「${name}」`);
   };
 
   const handleChangeVaseStyle = (side: 'left' | 'right' | 'both', vaseStyle: VaseStyle) => {

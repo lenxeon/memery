@@ -35,24 +35,94 @@ export const OfferedBouquet: React.FC<OfferedBouquetProps> = ({
         };
       case 'lotus':
         return {
-          title: '敬献 · 出尘清莲',
+          title: '敬献 · 出尘净莲',
           primaryColor: '#ec4899',
           secColor: '#fce7f3',
           ribbonColor: '#d9f99d',
         };
       case 'chrysanthemum':
         return {
-          title: '敬献 · 高洁白菊',
+          title: '敬献 · 岁寒金菊',
           primaryColor: '#fef08a',
           secColor: '#ffffff',
           ribbonColor: '#e2e8f0',
         };
       case 'roses':
         return {
-          title: '敬献 · 香槟玫瑰',
-          primaryColor: '#fb923c',
-          secColor: '#fed7aa',
-          ribbonColor: '#fef3c7',
+          title: '敬献 · 长情玫瑰',
+          primaryColor: '#f43f5e',
+          secColor: '#fecdd3',
+          ribbonColor: '#ffe4e6',
+        };
+      case 'plum_blossoms':
+        return {
+          title: '敬献 · 傲霜寒梅',
+          primaryColor: '#e11d48',
+          secColor: '#fecdd3',
+          ribbonColor: '#fef08a',
+        };
+      case 'sunflowers':
+        return {
+          title: '敬献 · 金色向阳',
+          primaryColor: '#eab308',
+          secColor: '#713f12',
+          ribbonColor: '#fef08a',
+        };
+      case 'carnations':
+        return {
+          title: '敬献 · 慈孝康乃馨',
+          primaryColor: '#f43f5e',
+          secColor: '#fbcfe8',
+          ribbonColor: '#fce7f3',
+        };
+      case 'calla_lilies':
+        return {
+          title: '敬献 · 圣洁马蹄莲',
+          primaryColor: '#ffffff',
+          secColor: '#facc15',
+          ribbonColor: '#bbf7d0',
+        };
+      case 'tulips':
+        return {
+          title: '敬献 · 典雅郁金香',
+          primaryColor: '#e11d48',
+          secColor: '#fde047',
+          ribbonColor: '#fbcfe8',
+        };
+      case 'narcissus':
+        return {
+          title: '敬献 · 凌波水仙',
+          primaryColor: '#ffffff',
+          secColor: '#facc15',
+          ribbonColor: '#fef08a',
+        };
+      case 'lily_of_valley':
+        return {
+          title: '敬献 · 如意铃兰',
+          primaryColor: '#ffffff',
+          secColor: '#e2e8f0',
+          ribbonColor: '#bbf7d0',
+        };
+      case 'orchids':
+        return {
+          title: '敬献 · 幽谷素兰',
+          primaryColor: '#c084fc',
+          secColor: '#fef08a',
+          ribbonColor: '#e9d5ff',
+        };
+      case 'hydrangeas':
+        return {
+          title: '敬献 · 团圆绣球',
+          primaryColor: '#818cf8',
+          secColor: '#c084fc',
+          ribbonColor: '#e0e7ff',
+        };
+      case 'daisies':
+        return {
+          title: '敬献 · 清纯雏菊',
+          primaryColor: '#ffffff',
+          secColor: '#facc15',
+          ribbonColor: '#fef08a',
         };
       case 'lilies':
       default:

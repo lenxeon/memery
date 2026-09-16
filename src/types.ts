@@ -9,7 +9,22 @@ export interface Position2D {
   y: number; // vertical depth offset on table
 }
 
-export type FlowerType = 'peonies' | 'lilies' | 'lotus' | 'chrysanthemum' | 'roses';
+export type FlowerType = 
+  | 'peonies' 
+  | 'lilies' 
+  | 'lotus' 
+  | 'chrysanthemum' 
+  | 'roses'
+  | 'plum_blossoms'
+  | 'sunflowers'
+  | 'carnations'
+  | 'calla_lilies'
+  | 'tulips'
+  | 'narcissus'
+  | 'lily_of_valley'
+  | 'orchids'
+  | 'hydrangeas'
+  | 'daisies';
 export type FruitType = 
   | 'apples' 
   | 'oranges' 

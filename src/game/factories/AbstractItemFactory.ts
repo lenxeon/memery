@@ -107,6 +107,16 @@ export class FloraFactory {
       lotus: '出尘清莲',
       chrysanthemum: '高洁白菊',
       roses: '淡雅香槟玫瑰',
+      plum_blossoms: '傲霜寒梅',
+      sunflowers: '金色向阳花',
+      carnations: '慈孝康乃馨',
+      calla_lilies: '圣洁马蹄莲',
+      tulips: '典雅郁金香',
+      narcissus: '凌波水仙',
+      lily_of_valley: '如意白铃兰',
+      orchids: '幽谷素兰',
+      hydrangeas: '团圆绣球花',
+      daisies: '清纯小白雏菊',
     };
 
     return itemRegistry.createItem<FlowerItemData>('flower', {

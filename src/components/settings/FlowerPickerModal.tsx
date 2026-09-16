@@ -93,6 +93,76 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
       desc: '温暖恬淡，心心相印，温润优雅，感恩常驻心间',
       tag: '深情永固',
     },
+    {
+      id: 'plum_blossoms',
+      name: '傲霜朱砂红梅',
+      emoji: '💮',
+      desc: '五瓣纯红，金丝长蕊，苍劲老枝，岁朝报春傲雪迎祥',
+      tag: '坚韧报春',
+    },
+    {
+      id: 'sunflowers',
+      name: '金色灿烂向阳',
+      emoji: '🌻',
+      desc: '硕大金黄辐射瓣配焦糖深褐大圆花盘，生生不息',
+      tag: '光明生机',
+    },
+    {
+      id: 'carnations',
+      name: '慈孝粉康乃馨',
+      emoji: '💐',
+      desc: '锯齿波浪折边重瓣配青杯花萼，温情感恩，寸草春晖',
+      tag: '温情慈孝',
+    },
+    {
+      id: 'calla_lilies',
+      name: '圣洁白马蹄莲',
+      emoji: '🤍',
+      desc: '流线卷折佛焰苞配金黄肉穗，肃穆高洁，现代悼念名品',
+      tag: '高洁肃穆',
+    },
+    {
+      id: 'tulips',
+      name: '典雅娇红郁金香',
+      emoji: '🌷',
+      desc: '圆润高脚酒杯形倒卵花杯配挺拔抱茎宽叶，庄重挺立',
+      tag: '典雅庄重',
+    },
+    {
+      id: 'narcissus',
+      name: '凌波金盏银台水仙',
+      emoji: '⭐',
+      desc: '六瓣平展素白雪瓣环绕金黄茶盏副花冠，岁朝清供名卉',
+      tag: '金盏银台',
+    },
+    {
+      id: 'lily_of_valley',
+      name: '如意晶莹白铃兰',
+      emoji: '🔔',
+      desc: '优雅拱曲花葶倒挂一串串洁白圆润小风铃，纯白如意',
+      tag: '福音归来',
+    },
+    {
+      id: 'orchids',
+      name: '幽谷飘逸蝴蝶兰',
+      emoji: '🦋',
+      desc: '展翅飞蝶般双大翼瓣配金斑小唇瓣，空谷幽兰君子之德',
+      tag: '君子空灵',
+    },
+    {
+      id: 'hydrangeas',
+      name: '团圆冰蓝粉紫绣球',
+      emoji: '💠',
+      desc: '数十朵十字四瓣小花聚成饱满圆滚大绣球，圆满美满',
+      tag: '圆满平安',
+    },
+    {
+      id: 'daisies',
+      name: '清纯雪白小雏菊',
+      emoji: '🌼',
+      desc: '辐射雪白细长花瓣配凸起金黄圆纽扣花心，纯真怀念',
+      tag: '纯真深念',
+    },
   ];
 
   const handleOfferBouquet = (flowerType: FlowerType) => {
@@ -293,7 +363,7 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
                   }`}
                 >
                   <span>🌸 插花品种</span>
-                  <span className="text-[10px] px-1 rounded-full bg-stone-800 text-stone-300">5款</span>
+                  <span className="text-[10px] px-1 rounded-full bg-stone-800 text-stone-300">15款</span>
                 </button>
               </div>
               <span className="text-[11px] text-amber-200/60">
@@ -374,7 +444,7 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
               </div>
             )}
 
-            {/* ── 子模式 2: 插花品种选择器 (5 款) ── */}
+            {/* ── 子模式 2: 插花品种选择器 (15 款一眼可辨传统名卉) ── */}
             {vaseSubTab === 'flowers' && (
               <div className="space-y-2.5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
