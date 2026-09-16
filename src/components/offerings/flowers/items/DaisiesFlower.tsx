@@ -2,24 +2,21 @@
  * @file DaisiesFlower.tsx
  * @description 【清纯小雏菊】
  * 核心特征：
- * 1. 高度挺秀适中，与案台各名花及白玉瓶身比例谐调（花冠高位展于 y:24 左右）；
- * 2. 多花高低有致、枝茎疏密相间，主小径分枝自然舒展；
- * 3. 角度丰富生动，绝无死板“大绿圆盘正对人”：
- *    - 【饱满盛放正视】：居中盛开，雪白层叠辐射舌状瓣，中央无数细密金黄花丝簇聚成绒毛花蕊；
- *    - 【生动侧向与半侧面】：优雅倾角透视，白瓣侧展，金蕊若隐若现微敛，绝无绿盘糊脸；
- *    - 【含苞娇嫩小花骨朵】：青绿细萼紧裹纯白尖束，挺立枝梢；
- * 4. 叶片小而细长，微卷微翘，层叠掩映于枝干瓶口之间。
+ * 1. 高度适中挺秀（高度增加 10px，花冠顶梢展于 y:16，比例饱满舒展）；
+ * 2. 突出翠绿微卷小叶，叶片更富生机地自枝干与花朵间舒展探出，形成鲜明花叶衬托；
+ * 3. 角度丰富生动，侧向与正面自然呼应，绝无死板背向糊脸；
+ * 4. 金黄细密花丝绒毛花蕊，雪白层叠辐射花瓣，纯真烂漫。
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
 import { lerpColor, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const DAISY_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.55, fallSpan: 0.08, startX: 96, startY: 42, landX: 104, landY: 194, rx: 5.0, ry: 2.2, landRot: 32, swayAmp: 12, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.42, fallSpan: 0.07, startX: 52, startY: 46, landX: 46, landY: 193, rx: 4.8, ry: 2.1, landRot: -28, swayAmp: 14, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.30, fallSpan: 0.06, startX: 98, startY: 70, landX: 106, landY: 195, rx: 5.2, ry: 2.3, landRot: 22, swayAmp: 10, swayFreq: 3.0 },
-  { id: 4, detachHealth: 0.18, fallSpan: 0.06, startX: 48, startY: 74, landX: 42, landY: 196, rx: 4.6, ry: 2.0, landRot: -35, swayAmp: 15, swayFreq: 3.8 },
-  { id: 5, detachHealth: 0.08, fallSpan: 0.05, startX: 75, startY: 26, landX: 82, landY: 195, rx: 5.0, ry: 2.2, landRot: 15, swayAmp: 11, swayFreq: 3.4 },
+  { id: 1, detachHealth: 0.55, fallSpan: 0.08, startX: 96, startY: 32, landX: 104, landY: 194, rx: 5.0, ry: 2.2, landRot: 32, swayAmp: 12, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.42, fallSpan: 0.07, startX: 52, startY: 36, landX: 46, landY: 193, rx: 4.8, ry: 2.1, landRot: -28, swayAmp: 14, swayFreq: 3.5 },
+  { id: 3, detachHealth: 0.30, fallSpan: 0.06, startX: 98, startY: 60, landX: 106, landY: 195, rx: 5.2, ry: 2.3, landRot: 22, swayAmp: 10, swayFreq: 3.0 },
+  { id: 4, detachHealth: 0.18, fallSpan: 0.06, startX: 48, startY: 64, landX: 42, landY: 196, rx: 4.6, ry: 2.0, landRot: -35, swayAmp: 15, swayFreq: 3.8 },
+  { id: 5, detachHealth: 0.08, fallSpan: 0.05, startX: 75, startY: 16, landX: 82, landY: 195, rx: 5.0, ry: 2.2, landRot: 15, swayAmp: 11, swayFreq: 3.4 },
 ];
 
 export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
@@ -149,7 +146,7 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
 
     return (
       <g transform={`rotate(${rot}) scale(${sx}, 1)`}>
-        {/* 小巧杯状青绿花托（仅侧视露出优雅小托萼，绝无臃肿大瓜） */}
+        {/* 小巧杯状青绿花托 */}
         <path
           d="M -3.2 2 C -3.8 0, -2.5 -2.0, 0 -2.6 C 2.5 -2.0, 3.8 0, 3.2 2 Z"
           fill="url(#daisyCalyxGrad)"
@@ -208,24 +205,26 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
   };
 
   /**
-   * 小而细长、微卷小叶 (Slender Curled Daisy Leaves)
+   * 突出、舒展且微卷的雏菊特有小叶 (Prominent Lobed & Curled Daisy Leaves)
    */
-  const renderSlenderLeaf = (x: number, y: number, length: number, rot: number, curlSign: number = 1) => {
-    const w = length * 0.16;
+  const renderDaisyLeaf = (x: number, y: number, length: number, rot: number, curlSign: number = 1) => {
+    const w = length * 0.25;
     return (
       <g transform={`translate(${x}, ${y}) rotate(${rot})`}>
+        {/* 突出舒展的波缘雏菊绿叶轮廓 */}
         <path
-          d={`M 0 0 C ${w * 0.8} -${length * 0.3}, ${w * 1.2 * curlSign} -${length * 0.7}, ${w * 2.0 * curlSign} -${length} C ${w * 0.5 * curlSign} -${length * 0.75}, -${w * 0.2} -${length * 0.35}, 0 0 Z`}
+          d={`M 0 0 C ${w * 0.9} -${length * 0.25}, ${w * 1.5 * curlSign} -${length * 0.55}, ${w * 2.2 * curlSign} -${length} C ${w * 0.8 * curlSign} -${length * 0.75}, -${w * 0.3} -${length * 0.35}, 0 0 Z`}
           fill="url(#daisyLeafGrad)"
           stroke={leafDark}
-          strokeWidth="0.3"
-        />
-        <path
-          d={`M 0 0 Q ${w * 0.6 * curlSign} -${length * 0.55} ${w * 1.6 * curlSign} -${length * 0.95}`}
-          stroke={leafLight}
           strokeWidth="0.35"
+        />
+        {/* 明晰主叶脉与侧微脉 */}
+        <path
+          d={`M 0 0 Q ${w * 0.8 * curlSign} -${length * 0.55} ${w * 1.8 * curlSign} -${length * 0.95}`}
+          stroke={leafLight}
+          strokeWidth="0.5"
           fill="none"
-          opacity="0.85"
+          opacity="0.9"
         />
       </g>
     );
@@ -260,7 +259,7 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
         {/* 4. 细长微卷绿叶渐变 */}
         <linearGradient id="daisyLeafGrad" x1="0%" y1="100%" x2="100%" y2="0%">
           <stop offset="0%" stopColor={leafDark} />
-          <stop offset="60%" stopColor={leafMid} />
+          <stop offset="55%" stopColor={leafMid} />
           <stop offset="100%" stopColor={leafLight} />
         </linearGradient>
 
@@ -272,65 +271,65 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
         </linearGradient>
       </defs>
 
-      {/* ── 架构 1：高度舒展适中、主小径自然分枝的花茎骨架（高位至 y:24） ── */}
+      {/* ── 架构 1：高度整体增高 10px，主小径自然舒展（高位顶花至 y:16） ── */}
       <g id="daisyBranchedStems">
-        {/* A. 中央主茎：自瓶口 (75,125) 挺立直上至顶花 (75,26) */}
+        {/* A. 中央主茎：自瓶口 (75,125) 挺立直上至顶花 (75,16) */}
         <path
-          d="M 75 125 C 75 102, 74 72, 75 48 C 75 38, 75 32, 75 26"
+          d="M 75 125 C 75 95, 74 62, 75 38 C 75 28, 75 22, 75 16"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="2.4"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* B. 右上高位小径：自 (75,70) 优雅斜逸至 (96,42) */}
+        {/* B. 右上高位小径：自 (75,60) 优雅斜逸至 (96,32) */}
         <path
-          d="M 75 70 C 82 58, 89 50, 96 42"
+          d="M 75 60 C 82 48, 89 40, 96 32"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="1.8"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* C. 左上高位小径：自 (75,75) 斜逸至 (52,44) */}
+        {/* C. 左上高位小径：自 (75,65) 斜逸至 (52,34) */}
         <path
-          d="M 75 75 C 68 64, 60 54, 52 44"
+          d="M 75 65 C 68 54, 60 44, 52 34"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="1.8"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* D. 左梢花蕾分枝：自 (62,56) 向上抽出至 (62,32) */}
+        {/* D. 左梢花蕾分枝：自 (62,46) 向上抽出至 (62,22) */}
         <path
-          d="M 62 56 C 62 46, 62 38, 62 32"
+          d="M 62 46 C 62 36, 62 28, 62 22"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="1.3"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* E. 右中侧分枝：自 (75,98) 向右下舒展至 (98,70) */}
+        {/* E. 右中侧分枝：自 (75,88) 向右下舒展至 (98,60) */}
         <path
-          d="M 75 98 C 84 88, 92 80, 98 70"
+          d="M 75 88 C 84 78, 92 70, 98 60"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="1.9"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* F. 左中侧分枝：自 (75,102) 向左下舒展至 (46,74) */}
+        {/* F. 左中侧分枝：自 (75,92) 向左下舒展至 (46,64) */}
         <path
-          d="M 75 102 C 64 92, 54 84, 46 74"
+          d="M 75 92 C 64 82, 54 74, 46 64"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="1.9"
           fill="none"
           strokeLinecap="round"
         />
 
-        {/* G. 右下花蕾小径：自 (75,112) 斜挑至 (82,90) */}
+        {/* G. 右下小花分枝：自 (75,102) 斜挑至 (82,80) */}
         <path
-          d="M 75 112 C 78 104, 80 97, 82 90"
+          d="M 75 102 C 78 94, 80 87, 82 80"
           stroke="url(#daisyRealStemGrad)"
           strokeWidth="1.4"
           fill="none"
@@ -338,81 +337,83 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
         />
       </g>
 
-      {/* ── 架构 2：小而细长、微卷小叶片群（层叠掩映于枝干与瓶口） ── */}
+      {/* ── 架构 2：突出醒目、青翠舒展的雏菊小叶群（生机盎然穿插衬托） ── */}
       <g id="daisySlenderLeaves">
-        {/* 瓶口基生微卷小叶 */}
-        {renderSlenderLeaf(73, 120, 20, -32, -1)}
-        {renderSlenderLeaf(77, 118, 20, 30, 1)}
-        {renderSlenderLeaf(74, 112, 18, -18, 1)}
-        {renderSlenderLeaf(76, 108, 18, 22, -1)}
+        {/* 瓶口基生向外舒展的大叶片（突出衬托白玉瓶口） */}
+        {renderDaisyLeaf(73, 122, 25, -45, -1)}
+        {renderDaisyLeaf(77, 120, 25, 42, 1)}
+        {renderDaisyLeaf(74, 114, 22, -22, 1)}
+        {renderDaisyLeaf(76, 110, 22, 25, -1)}
 
-        {/* 中下部主茎分叉微卷小叶 */}
-        {renderSlenderLeaf(69, 98, 18, -40, -1)}
-        {renderSlenderLeaf(81, 95, 18, 38, 1)}
-        {renderSlenderLeaf(64, 84, 16, -26, 1)}
-        {renderSlenderLeaf(85, 82, 16, 28, -1)}
+        {/* 中下层明显探出的舒展叶（增加枝叶丰满度） */}
+        {renderDaisyLeaf(68, 98, 23, -52, -1)}
+        {renderDaisyLeaf(82, 94, 23, 48, 1)}
+        {renderDaisyLeaf(58, 82, 21, -38, 1)}
+        {renderDaisyLeaf(88, 78, 21, 36, -1)}
 
-        {/* 中上部枝干掩映小叶 */}
-        {renderSlenderLeaf(72, 68, 15, -20, -1)}
-        {renderSlenderLeaf(77, 62, 15, 24, 1)}
-        {renderSlenderLeaf(58, 56, 14, -36, -1)}
-        {renderSlenderLeaf(88, 54, 14, 34, 1)}
+        {/* 中上部自花后探出的青翠绿叶（衬托白瓣） */}
+        {renderDaisyLeaf(64, 62, 19, -42, -1)}
+        {renderDaisyLeaf(86, 58, 19, 38, 1)}
+        {renderDaisyLeaf(72, 52, 17, -18, 1)}
+        {renderDaisyLeaf(78, 48, 17, 22, -1)}
 
-        {/* 顶梢娇嫩小叶 */}
-        {renderSlenderLeaf(72, 40, 13, -15, -1)}
-        {renderSlenderLeaf(76, 36, 13, 18, 1)}
-        {renderSlenderLeaf(64, 40, 11, -22, -1)}
+        {/* 高位梢头娇嫩小叶 */}
+        {renderDaisyLeaf(71, 30, 15, -20, -1)}
+        {renderDaisyLeaf(77, 26, 15, 24, 1)}
+        {renderDaisyLeaf(60, 28, 13, -28, -1)}
+        {renderDaisyLeaf(92, 28, 14, 30, 1)}
       </g>
 
-      {/* ── 架构 3：多花高低有致、侧向与正视生动呼应（绝无死板“大绿圆盘背向正对人”） ── */}
+      {/* ── 架构 3：多花高低有致、侧向与正视生动呼应（高度上移 10px） ── */}
       <g id="daisyMultiBlooms">
-        {/* 1. 【极顶挺秀·饱满盛放正视】(x:75, y:26)：高度挺秀适中，雪白层叠辐射瓣，金黄绒毛花蕊 */}
-        <g transform="translate(75, 26)">
+        {/* 1. 【极顶挺秀·饱满盛放正视】(x:75, y:16)：高标挺秀，高度增加 10px，全束冠顶 */}
+        <g transform="translate(75, 16)">
           {renderFrontBloom(16.0, 5.2)}
         </g>
 
-        {/* 2. 【高位右上·侧向舒展】(x:96, y:42)：优雅侧仰，白瓣向右上方轻灵展开，金蕊微倾透视 */}
-        <g transform="translate(96, 42)">
+        {/* 2. 【高位右上·侧向舒展】(x:96, y:32)：优雅侧仰，白瓣向右上方轻灵展开，金蕊微倾透视 */}
+        <g transform="translate(96, 32)">
           {renderSideBloom(14.5, 22, false, 0.55)}
         </g>
 
-        {/* 3. 【高位左上·侧向舒展】(x:52, y:44)：优雅侧仰，白瓣向左上方轻灵展开，金蕊微倾透视 */}
-        <g transform="translate(52, 44)">
+        {/* 3. 【高位左上·侧向舒展】(x:52, y:34)：优雅侧仰，白瓣向左上方轻灵展开，金蕊微倾透视 */}
+        <g transform="translate(52, 34)">
           {renderSideBloom(14.5, -20, true, 0.55)}
         </g>
 
-        {/* 4. 【左梢高位·娇嫩小花骨朵】(x:62, y:32)：挺立于高梢分枝，青绿细萼紧裹纯白尖 */}
-        <g transform="translate(62, 32)">
+        {/* 4. 【左梢高位·娇嫩小花骨朵】(x:62, y:22)：挺立于高梢分枝，青绿细萼紧裹纯白尖 */}
+        <g transform="translate(62, 22)">
           {renderFlowerBud(-12, 0.9)}
         </g>
 
-        {/* 5. 【中央主花·饱满盛放正视】(x:74, y:56)：全束视觉中心（r=16.5，密集金黄花丝绒毛花蕊） */}
-        <g transform="translate(74, 56)">
+        {/* 5. 【中央主花·饱满盛放正视】(x:74, y:46)：全束视觉中心（r=16.5，密集金黄花丝绒毛花蕊） */}
+        <g transform="translate(74, 46)">
           {renderFrontBloom(16.5, 5.4)}
         </g>
 
-        {/* 6. 【中层右侧·侧向微俯】(x:98, y:70)：向右微俯，透视白瓣层次生动，金蕊若隐若现 */}
-        <g transform="translate(98, 70)">
+        {/* 6. 【中层右侧·侧向微俯】(x:98, y:60)：向右微俯，透视白瓣层次生动，金蕊若隐若现 */}
+        <g transform="translate(98, 60)">
           {renderSideBloom(14.0, 32, false, 0.52)}
         </g>
 
-        {/* 7. 【中层左侧·侧向微俯】(x:46, y:74)：向左微俯，白瓣侧发展开，轻灵生动 */}
-        <g transform="translate(46, 74)">
+        {/* 7. 【中层左侧·侧向微俯】(x:46, y:64)：向左微俯，白瓣侧发展开，轻灵生动 */}
+        <g transform="translate(46, 64)">
           {renderSideBloom(14.0, -30, true, 0.52)}
         </g>
 
-        {/* 8. 【下层右侧·侧向初放雏菊】(x:82, y:90)：贴近瓶口高低错落，纯白小花微侧舒展 */}
-        <g transform="translate(82, 90)">
+        {/* 8. 【下层右侧·侧向初放雏菊】(x:82, y:80)：贴近瓶口高低错落，纯白小花微侧舒展 */}
+        <g transform="translate(82, 80)">
           {renderSideBloom(12.5, 26, false, 0.62)}
         </g>
 
-        {/* 9. 【瓶口左侧·鲜嫩小花骨朵】(x:68, y:98)：近瓶口抽出的小青蕾，含蓄初露白尖 */}
-        <g transform="translate(68, 98)">
+        {/* 9. 【瓶口左侧·鲜嫩小花骨朵】(x:68, y:88)：近瓶口抽出的小青蕾，含蓄初露白尖 */}
+        <g transform="translate(68, 88)">
           {renderFlowerBud(12, 0.85)}
         </g>
       </g>
     </g>
   );
 };
+
 
 
