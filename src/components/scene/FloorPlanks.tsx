@@ -85,41 +85,47 @@ export const FloorPlanks: React.FC<FloorPlanksProps> = ({
   };
 
   // 根据当前材质类型调整贴图尺寸与踢脚线用色（完全匹配暖木与禅意体系）
+  // 根据当前材质素材固有比例与最佳物理分辨率适配贴图尺寸与踢脚线
   const getStyleAttributes = () => {
     switch (floorStyle) {
       case 'marble_tile':
+        // 素材本身为 910x910 正方形 (1:1)，采用 160px 160px 正方形平铺，杜绝非等比横向拉伸变形，带来高密度细腻石纹
         return {
-          bgSize: '320px 180px',
+          bgSize: '160px 160px',
           baseboardBg: '#a89884',
           baseboardHighlight: '#ffffff',
           baseboardShadow: 'rgba(60, 50, 40, 0.45)',
         };
       case 'zen_tatami':
+        // 1376x768 席面比例 (~1.79:1)
         return {
-          bgSize: '360px 200px',
+          bgSize: '340px 190px',
           baseboardBg: '#4a3b2c',
           baseboardHighlight: '#8a735c',
           baseboardShadow: 'rgba(25, 18, 12, 0.75)',
         };
       case 'walnut_plank':
+        // 1376x768 长条木纹比例 (~1.79:1)
         return {
-          bgSize: '280px 180px',
+          bgSize: '280px 156px',
           baseboardBg: '#4e3322',
           baseboardHighlight: '#8c6044',
           baseboardShadow: 'rgba(30, 16, 8, 0.75)',
         };
       case 'herringbone_wood':
       case 'wood_planks':
+        // 1376x768 鱼骨拼木比例 (~1.79:1)
         return {
-          bgSize: '280px 155px',
+          bgSize: '280px 156px',
           baseboardBg: '#5a2e16',
           baseboardHighlight: '#a3633d',
           baseboardShadow: 'rgba(45, 24, 12, 0.65)',
         };
       case 'hinoki_wood':
       default:
+        // 1144x928 桧木板比例 (~1.23:1)
         return {
-          bgSize: '280px 180px',
+          bgSize: '240px 195px',
           baseboardBg: '#8c5a32',
           baseboardHighlight: '#e5ab75',
           baseboardShadow: 'rgba(60, 32, 14, 0.65)',
