@@ -271,7 +271,34 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
         </linearGradient>
       </defs>
 
-      {/* ── 架构 1：高度整体增高 10px，主小径自然舒展（高位顶花至 y:16） ── */}
+      {/* ── 架构 1：最底层背景叶片群（图层置于最底，绝不遮挡任何花朵，仅在花与花间探出青翠生机） ── */}
+      <g id="daisySlenderLeaves">
+        {/* 高位顶花与侧花之间的衬托小叶 */}
+        {renderDaisyLeaf(84, 24, 16, 26, 1)}
+        {renderDaisyLeaf(66, 25, 16, -24, -1)}
+
+        {/* 高位侧花外缘与空隙小叶 */}
+        {renderDaisyLeaf(50, 42, 17, -40, -1)}
+        {renderDaisyLeaf(98, 40, 17, 36, 1)}
+
+        {/* 中高层花朵之间掩映的小叶 */}
+        {renderDaisyLeaf(62, 52, 18, -32, -1)}
+        {renderDaisyLeaf(88, 50, 18, 30, 1)}
+
+        {/* 中层花朵与下层花朵之间空隙小叶 */}
+        {renderDaisyLeaf(48, 54, 18, -48, -1)}
+        {renderDaisyLeaf(100, 52, 18, 46, 1)}
+        {renderDaisyLeaf(60, 72, 19, -35, -1)}
+        {renderDaisyLeaf(89, 68, 19, 32, 1)}
+
+        {/* 中下层枝干间微卷小叶（绝不在瓶口横向飞出） */}
+        {renderDaisyLeaf(66, 82, 18, -28, 1)}
+        {renderDaisyLeaf(84, 78, 18, 25, -1)}
+        {renderDaisyLeaf(71, 92, 16, -18, -1)}
+        {renderDaisyLeaf(79, 90, 16, 20, 1)}
+      </g>
+
+      {/* ── 架构 2：自然舒展的分枝花茎骨架 ── */}
       <g id="daisyBranchedStems">
         {/* A. 中央主茎：自瓶口 (75,125) 挺立直上至顶花 (75,16) */}
         <path
@@ -337,36 +364,9 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
         />
       </g>
 
-      {/* ── 架构 2：突出醒目、青翠舒展的雏菊小叶群（生机盎然穿插衬托） ── */}
-      <g id="daisySlenderLeaves">
-        {/* 瓶口基生向外舒展的大叶片（突出衬托白玉瓶口） */}
-        {renderDaisyLeaf(73, 122, 25, -45, -1)}
-        {renderDaisyLeaf(77, 120, 25, 42, 1)}
-        {renderDaisyLeaf(74, 114, 22, -22, 1)}
-        {renderDaisyLeaf(76, 110, 22, 25, -1)}
-
-        {/* 中下层明显探出的舒展叶（增加枝叶丰满度） */}
-        {renderDaisyLeaf(68, 98, 23, -52, -1)}
-        {renderDaisyLeaf(82, 94, 23, 48, 1)}
-        {renderDaisyLeaf(58, 82, 21, -38, 1)}
-        {renderDaisyLeaf(88, 78, 21, 36, -1)}
-
-        {/* 中上部自花后探出的青翠绿叶（衬托白瓣） */}
-        {renderDaisyLeaf(64, 62, 19, -42, -1)}
-        {renderDaisyLeaf(86, 58, 19, 38, 1)}
-        {renderDaisyLeaf(72, 52, 17, -18, 1)}
-        {renderDaisyLeaf(78, 48, 17, 22, -1)}
-
-        {/* 高位梢头娇嫩小叶 */}
-        {renderDaisyLeaf(71, 30, 15, -20, -1)}
-        {renderDaisyLeaf(77, 26, 15, 24, 1)}
-        {renderDaisyLeaf(60, 28, 13, -28, -1)}
-        {renderDaisyLeaf(92, 28, 14, 30, 1)}
-      </g>
-
-      {/* ── 架构 3：多花高低有致、侧向与正视生动呼应（高度上移 10px） ── */}
+      {/* ── 架构 3：多花高低有致、侧向与正视生动呼应（图层位于最上，花朵完好展现） ── */}
       <g id="daisyMultiBlooms">
-        {/* 1. 【极顶挺秀·饱满盛放正视】(x:75, y:16)：高标挺秀，高度增加 10px，全束冠顶 */}
+        {/* 1. 【极顶挺秀·饱满盛放正视】(x:75, y:16)：高标挺秀，全束冠顶 */}
         <g transform="translate(75, 16)">
           {renderFrontBloom(16.0, 5.2)}
         </g>
