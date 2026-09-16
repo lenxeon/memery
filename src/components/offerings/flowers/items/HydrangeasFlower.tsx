@@ -90,13 +90,39 @@ export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
         <path d="M 75 125 C 75 95, 75 65, 75 38" stroke="url(#hydrangeaStemGrad)" strokeWidth="4.2" fill="none" strokeLinecap="round" />
       </g>
 
-      {/* 绣球宽大对生锯齿厚绿叶 */}
+      {/* 团圆绣球特有标志性·对生阔卵形粗锐锯齿厚大叶 (边缘密布尖锐锯齿，羽状深凹叶脉直达齿尖) */}
       <g id="hydrangeaLeaves" style={{ opacity: leafOpacity }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 105px' }}>
-          <path d="M 73 105 C 45 92, 18 100, 8 116 C 26 122, 54 116, 73 105 Z" fill={stemCol100} />
+        {/* 左侧阔卵形锐锯齿大叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '72px 108px' }}>
+          <path
+            d="M 72 108 L 62 103 L 57 98 L 50 101 L 43 95 L 36 99 L 28 93 L 20 98 L 12 94 C 8 104 10 114 18 118 L 26 116 L 34 122 L 44 120 L 54 122 L 64 116 L 72 110 Z"
+            fill={stemCol100}
+            stroke="#14532d"
+            strokeWidth="0.8"
+          />
+          {/* 主脉与侧齿脉 */}
+          <path d="M 72 108 Q 42 104 14 96" stroke="#86efac" strokeWidth="1.4" fill="none" opacity="0.85" />
+          <path d="M 57 106 L 50 101" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 46 105 L 36 99" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 34 103 L 20 98" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 52 108 L 44 120" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 40 106 L 26 116" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 108px' }}>
-          <path d="M 77 108 C 105 92, 132 100, 142 116 C 124 122, 96 116, 77 108 Z" fill={stemCol100} />
+
+        {/* 右侧阔卵形锐锯齿大叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '78px 108px' }}>
+          <path
+            d="M 78 108 L 88 103 L 93 98 L 100 101 L 107 95 L 114 99 L 122 93 L 130 98 L 138 94 C 142 104 140 114 132 118 L 124 116 L 116 122 L 106 120 L 96 122 L 86 116 L 78 110 Z"
+            fill={stemCol100}
+            stroke="#14532d"
+            strokeWidth="0.8"
+          />
+          <path d="M 78 108 Q 108 104 136 96" stroke="#86efac" strokeWidth="1.4" fill="none" opacity="0.85" />
+          <path d="M 93 106 L 100 101" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 104 105 L 114 99" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 116 103 L 130 98" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 98 108 L 106 120" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
+          <path d="M 110 106 L 124 116" stroke="#86efac" strokeWidth="0.8" opacity="0.65" />
         </g>
       </g>
 

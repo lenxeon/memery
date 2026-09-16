@@ -83,19 +83,38 @@ export const PeoniesFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
         <circle cx="75" cy="65" r="1.8" fill={stemCol100} opacity="0.8" />
       </g>
 
-      {/* 绿叶群落 */}
+      {/* 国画工笔经典·牡丹掌状三裂复叶 (每枚大叶端部深裂成三尖，叶脉三分叉，雍容华贵) */}
       <g id="peonyLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
+        {/* 左下掌状三裂大叶 */}
         <g className="animate-leaf-sway-1" style={{ transformOrigin: '52px 78px' }}>
-          <path d="M 52 78 C 30 68 14 76 8 86 C 22 92 42 90 54 81 Z" fill="url(#peonyLeafGrad)" />
+          <path
+            d="M 52 78 C 42 72 34 62 20 62 C 14 62 10 66 14 70 C 8 72 2 76 6 82 C 10 86 16 84 20 82 C 16 88 12 94 18 98 C 24 96 32 90 40 85 C 48 82 52 80 52 78 Z"
+            fill="url(#peonyLeafGrad)"
+          />
+          {/* 三叉主脉 */}
+          <path d="M 52 78 Q 32 72 16 68" stroke="#86efac" strokeWidth="1.1" fill="none" opacity="0.75" />
+          <path d="M 34 74 Q 22 78 12 80" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 40 76 Q 28 86 20 94" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
         </g>
+
+        {/* 右下掌状三裂大叶 */}
         <g className="animate-leaf-sway-2" style={{ transformOrigin: '90px 88px' }}>
-          <path d="M 90 88 C 112 80 130 86 138 96 C 122 102 104 98 90 90 Z" fill="url(#peonyLeafGrad)" />
+          <path
+            d="M 90 88 C 100 80 110 70 126 70 C 132 70 136 74 132 78 C 138 80 144 84 140 90 C 136 94 130 92 126 90 C 130 96 134 102 128 106 C 122 104 114 98 104 93 C 96 90 92 89 90 88 Z"
+            fill="url(#peonyLeafGrad)"
+          />
+          <path d="M 90 88 Q 110 80 128 76" stroke="#86efac" strokeWidth="1.1" fill="none" opacity="0.75" />
+          <path d="M 108 82 Q 120 86 134 88" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 102 84 Q 114 94 124 102" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
         </g>
+
+        {/* 左上舒展裂叶 */}
         <g className="animate-leaf-sway-3" style={{ transformOrigin: '42px 46px' }}>
-          <path d="M 42 46 C 24 34 12 42 8 52 C 20 58 36 54 44 48 Z" fill="url(#peonyLeafGrad)" />
-        </g>
-        <g className="animate-leaf-sway-4" style={{ transformOrigin: '94px 58px' }}>
-          <path d="M 94 58 C 114 48 128 54 134 64 C 120 70 106 66 94 60 Z" fill="url(#peonyLeafGrad)" />
+          <path
+            d="M 42 46 C 30 38 18 36 10 40 C 6 44 12 48 8 52 C 14 56 22 52 28 50 C 26 56 30 60 36 56 C 42 52 44 48 42 46 Z"
+            fill="url(#peonyLeafGrad)"
+          />
+          <path d="M 42 46 Q 26 42 12 42" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
         </g>
       </g>
 

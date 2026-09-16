@@ -77,15 +77,35 @@ export const LiliesFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
       </g>
 
       {/* 百合叶片 */}
+      {/* 百合特有标志性·互生狭长披针形平行脉长叶 (两头尖细、质光翠润，具平行纵脉) */}
       <g id="lilyLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
+        {/* 左侧平展狭披针形叶 */}
         <g className="animate-leaf-sway-1" style={{ transformOrigin: '64px 88px' }}>
-          <path d="M 64 88 C 42 76 24 88 18 98 C 30 102 52 96 64 90 Z" fill="url(#lilyLeafGrad)" />
+          <path
+            d="M 66 88 C 50 82 34 84 14 92 C 12 90 26 78 44 76 C 54 78 62 84 66 88 Z"
+            fill="url(#lilyLeafGrad)"
+          />
+          <path d="M 65 87 Q 40 82 16 90" stroke="#86efac" strokeWidth="1.0" fill="none" opacity="0.8" />
+          <path d="M 64 86 Q 44 79 26 82" stroke="#86efac" strokeWidth="0.6" fill="none" opacity="0.5" />
         </g>
+
+        {/* 右侧微展披针长叶 */}
         <g className="animate-leaf-sway-2" style={{ transformOrigin: '90px 84px' }}>
-          <path d="M 90 84 C 112 74 132 82 140 92 C 126 96 106 92 90 86 Z" fill="url(#lilyLeafGrad)" />
+          <path
+            d="M 88 84 C 104 78 122 80 142 88 C 140 86 126 74 108 72 C 98 74 90 80 88 84 Z"
+            fill="url(#lilyLeafGrad)"
+          />
+          <path d="M 89 83 Q 114 78 140 86" stroke="#86efac" strokeWidth="1.0" fill="none" opacity="0.8" />
+          <path d="M 90 82 Q 110 75 128 78" stroke="#86efac" strokeWidth="0.6" fill="none" opacity="0.5" />
         </g>
-        <g className="animate-leaf-sway-3" style={{ transformOrigin: '38px 72px' }}>
-          <path d="M 38 72 C 18 64 8 74 6 84 C 20 86 36 82 42 76 Z" fill="url(#lilyLeafGrad)" />
+
+        {/* 下部互生短披针叶 */}
+        <g className="animate-leaf-sway-3" style={{ transformOrigin: '48px 105px' }}>
+          <path
+            d="M 72 108 C 58 104 42 106 28 114 C 38 104 54 98 68 104 Z"
+            fill="url(#lilyLeafGrad)"
+          />
+          <path d="M 70 106 Q 50 102 32 112" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.7" />
         </g>
       </g>
 

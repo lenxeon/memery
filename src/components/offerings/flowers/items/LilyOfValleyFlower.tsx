@@ -68,13 +68,29 @@ export const LilyOfValleyFlower: React.FC<FlowerComponentProps> = ({ health, dry
         </linearGradient>
       </defs>
 
-      {/* 宽大椭圆碧绿鞘叶 */}
+      {/* 幽谷铃兰特有标志性·基生双生宽大阔椭圆形碧玉叶 (两片大阔叶相拥托起中央纤细拱垂铃铛花序) */}
       <g id="valleyLeaves" style={{ opacity: leafOpacity }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 115px' }}>
-          <path d="M 73 115 C 45 95, 20 88, 8 108 C 24 116, 52 118, 73 115 Z" fill={stemCol100} />
+        {/* 左侧宽大阔椭圆叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 125px' }}>
+          <path
+            d="M 74 125 C 68 108 52 86 34 70 C 22 72 14 82 12 94 C 10 108 24 118 48 122 C 60 124 70 125 74 125 Z"
+            fill={stemCol100}
+          />
+          {/* 纵向平行优雅弧形叶脉 */}
+          <path d="M 73 124 C 58 106 42 88 32 72" stroke="#86efac" strokeWidth="1.2" fill="none" opacity="0.8" />
+          <path d="M 71 124 C 48 112 30 100 20 84" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 66 125 C 40 120 22 112 14 96" stroke="#86efac" strokeWidth="0.7" fill="none" opacity="0.5" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 116px' }}>
-          <path d="M 77 116 C 105 95, 130 88, 142 108 C 126 116, 98 118, 77 116 Z" fill={stemCol100} />
+
+        {/* 右侧宽大舒展托叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 125px' }}>
+          <path
+            d="M 76 125 C 82 108 98 86 116 70 C 128 72 136 82 138 94 C 140 108 126 118 102 122 C 90 124 80 125 76 125 Z"
+            fill={stemCol100}
+          />
+          <path d="M 77 124 C 92 106 108 88 118 72" stroke="#86efac" strokeWidth="1.2" fill="none" opacity="0.8" />
+          <path d="M 79 124 C 102 112 120 100 130 84" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 84 125 C 110 120 128 112 136 96" stroke="#86efac" strokeWidth="0.7" fill="none" opacity="0.5" />
         </g>
       </g>
 

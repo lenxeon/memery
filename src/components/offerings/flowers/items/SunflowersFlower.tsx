@@ -98,14 +98,39 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
         <path d="M 76 125 C 77 108, 84 92, 98 72" stroke="url(#sunflowerStemGrad)" strokeWidth="3.8" fill="none" strokeLinecap="round" />
       </g>
 
-      {/* 阔大心形向日葵绿叶 */}
+      {/* 阔大心形向日葵锯齿大绿叶与羽状叶脉 (盛夏向日葵标志性叶形) */}
       <g id="sunflowerLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '65px 95px' }}>
-          <path d="M 65 95 C 42 86, 22 96, 12 110 C 28 116, 52 112, 65 102 Z" fill="url(#sunflowerLeafGrad)" />
+        {/* 左侧宽阔大葵叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '65px 96px' }}>
+          {/* 叶柄 */}
+          <path d="M 72 100 Q 64 98 58 97" stroke="url(#sunflowerStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+          {/* 阔卵心形带锯齿波折叶身 */}
+          <path
+            d="M 58 97 C 48 88 38 82 24 84 C 18 86 13 90 8 96 C 4 104 7 112 14 116 C 22 120 34 122 46 116 C 54 110 58 104 58 97 Z"
+            fill="url(#sunflowerLeafGrad)"
+          />
+          {/* 粗壮白色/黄绿主叶脉与向外分叉侧脉 */}
+          <path d="M 58 97 Q 36 100 12 104" stroke="#86efac" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.8" />
+          <path d="M 46 98 Q 38 90 28 88" stroke="#86efac" strokeWidth="0.9" fill="none" opacity="0.6" />
+          <path d="M 38 99 Q 30 110 20 114" stroke="#86efac" strokeWidth="0.9" fill="none" opacity="0.6" />
+          <path d="M 28 101 Q 20 96 14 94" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '85px 98px' }}>
-          <path d="M 85 98 C 108 88, 130 96, 138 112 C 122 118, 98 114, 85 104 Z" fill="url(#sunflowerLeafGrad)" />
+
+        {/* 右侧垂展心形大葵叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '84px 98px' }}>
+          <path d="M 77 102 Q 86 100 92 98" stroke="url(#sunflowerStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+          <path
+            d="M 92 98 C 102 88 114 84 128 86 C 134 88 139 92 143 98 C 146 106 142 114 135 118 C 125 122 112 120 102 115 C 96 110 92 104 92 98 Z"
+            fill="url(#sunflowerLeafGrad)"
+          />
+          <path d="M 92 98 Q 114 101 138 106" stroke="#86efac" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.8" />
+          <path d="M 104 99 Q 112 91 122 89" stroke="#86efac" strokeWidth="0.9" fill="none" opacity="0.6" />
+          <path d="M 112 100 Q 120 112 130 115" stroke="#86efac" strokeWidth="0.9" fill="none" opacity="0.6" />
+          <path d="M 124 102 Q 132 97 138 95" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
         </g>
+
+        {/* 瓶口上方正中低垂幼叶 */}
+        <path d="M 75 106 C 70 112 66 118 68 122 C 75 124 82 124 84 118 C 82 114 78 110 75 106 Z" fill="url(#sunflowerLeafGrad)" opacity="0.85" />
       </g>
 
       {/* 3 朵醒目硕大的向日葵花头 */}

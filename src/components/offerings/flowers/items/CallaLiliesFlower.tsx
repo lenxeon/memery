@@ -96,13 +96,33 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({ health, dryF
         <path d="M 73 125 C 72 112, 64 92, 58 72" stroke="url(#callaStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
       </g>
 
-      {/* 马蹄莲箭形肉质大叶片 */}
+      {/* 马蹄莲特有标志性·箭形戟状肉质大阔叶 (基部两耳深凹如箭头，叶脉羽状辐射) */}
       <g id="callaLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 105px' }}>
-          <path d="M 73 105 C 50 95, 26 102, 14 118 C 28 122, 56 116, 73 105 Z" fill={stemCol100} />
+        {/* 左侧向外挺拔大箭叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '70px 105px' }}>
+          {/* 肉质粗叶柄 */}
+          <path d="M 74 115 Q 66 108 58 100" stroke="url(#callaStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+          {/* 箭状戟形叶身：顶端尖、基部后裂成两耳 */}
+          <path
+            d="M 58 100 C 48 85 36 74 18 68 C 16 78 14 92 18 102 C 22 96 28 92 36 94 C 44 98 52 106 58 114 C 59 108 58 104 58 100 Z"
+            fill="url(#callaStemGrad)"
+          />
+          {/* 主脉与侧向羽脉 */}
+          <path d="M 58 100 Q 38 84 20 70" stroke="#86efac" strokeWidth="1.3" fill="none" opacity="0.85" />
+          <path d="M 44 88 Q 32 88 22 94" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 34 79 Q 26 82 20 86" stroke="#86efac" strokeWidth="0.7" fill="none" opacity="0.6" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 108px' }}>
-          <path d="M 77 108 C 100 96, 124 104, 136 120 C 122 124, 98 118, 77 108 Z" fill={stemCol100} />
+
+        {/* 右侧微卷舒展肉质箭叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '78px 108px' }}>
+          <path d="M 76 116 Q 84 110 92 102" stroke="url(#callaStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+          <path
+            d="M 92 102 C 102 88 114 76 132 72 C 134 82 136 94 132 104 C 128 98 122 94 114 96 C 106 100 98 108 92 116 C 91 110 92 106 92 102 Z"
+            fill="url(#callaStemGrad)"
+          />
+          <path d="M 92 102 Q 112 86 130 74" stroke="#86efac" strokeWidth="1.3" fill="none" opacity="0.85" />
+          <path d="M 106 90 Q 118 90 128 96" stroke="#86efac" strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 116 81 Q 124 84 130 88" stroke="#86efac" strokeWidth="0.7" fill="none" opacity="0.6" />
         </g>
       </g>
 

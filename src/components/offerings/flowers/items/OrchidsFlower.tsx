@@ -94,20 +94,36 @@ export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
         <path d="M 75 125 C 75 100, 76 75, 75 42 C 75 32, 74 24, 74 16" stroke="url(#orchidStemGrad)" strokeWidth="2.6" fill="none" strokeLinecap="round" />
       </g>
 
-      {/* 飘逸国兰修长绿叶 */}
+      {/* 蝴蝶兰特有标志性·基部横展肥厚肉质革质大叶 (平展于瓶口基部，倒卵状长圆形，深绿肥厚油润，花葶无叶光洁) */}
       <g id="orchidLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 115px' }}>
-          <path d="M 73 115 C 50 105 24 110 8 126 C 24 118 52 112 73 115 Z" fill="url(#orchidLeafGrad)" />
+        {/* 左侧平展厚肉质舌形大叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 123px' }}>
+          <path
+            d="M 74 121 C 60 116 42 115 22 118 C 12 119 10 124 16 127 C 28 130 52 129 73 125 Z"
+            fill="url(#orchidLeafGrad)"
+          />
+          {/* 肉质凹槽主脉 */}
+          <path d="M 74 122 C 58 119 40 118 18 121" stroke="#86efac" strokeWidth="1.1" fill="none" opacity="0.7" />
+          {/* 叶缘微光 */}
+          <path d="M 73 121 C 58 116 40 115 22 117" stroke="#34d399" strokeWidth="0.6" fill="none" opacity="0.4" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 116px' }}>
-          <path d="M 77 116 C 102 104 128 108 142 124 C 126 116 100 112 77 116 Z" fill="url(#orchidLeafGrad)" />
+
+        {/* 右侧横斜油亮厚肉质大叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 123px' }}>
+          <path
+            d="M 76 121 C 90 116 108 115 128 118 C 138 119 140 124 134 127 C 122 130 98 129 77 125 Z"
+            fill="url(#orchidLeafGrad)"
+          />
+          <path d="M 76 122 C 92 119 110 118 132 121" stroke="#86efac" strokeWidth="1.1" fill="none" opacity="0.7" />
+          <path d="M 77 121 C 92 116 110 115 128 117" stroke="#34d399" strokeWidth="0.6" fill="none" opacity="0.4" />
         </g>
-        <g className="animate-leaf-sway-3" style={{ transformOrigin: '74px 98px' }}>
-          <path d="M 74 98 C 45 80 20 86 12 96 C 26 88 54 86 74 98 Z" fill="url(#orchidLeafGrad)" />
-        </g>
-        <g className="animate-leaf-sway-4" style={{ transformOrigin: '76px 96px' }}>
-          <path d="M 76 96 C 105 78 132 82 140 92 C 124 86 100 84 76 96 Z" fill="url(#orchidLeafGrad)" />
-        </g>
+
+        {/* 基部中前叠生小厚叶 */}
+        <path
+          d="M 72 124 C 64 120 54 121 46 125 C 56 127 66 127 75 125 Z"
+          fill="url(#orchidLeafGrad)"
+          opacity="0.9"
+        />
       </g>
 
       {/* 5 朵出尘蝴蝶兰花朵 */}

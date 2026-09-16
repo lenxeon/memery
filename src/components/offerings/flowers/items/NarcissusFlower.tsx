@@ -83,16 +83,47 @@ export const NarcissusFlower: React.FC<FlowerComponentProps> = ({ health, dryFac
           <stop offset="0%" stopColor={stemCol0} />
           <stop offset="100%" stopColor={stemCol100} />
         </linearGradient>
+        <linearGradient id="narcissusStrapLeafGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor="#064e3b" />
+          <stop offset="50%" stopColor="#059669" />
+          <stop offset="100%" stopColor="#34d399" />
+        </linearGradient>
       </defs>
 
-      {/* 直挺翠绿带状花葶与叶丛 (水仙标志性直立带叶) */}
+      {/* 凌波水仙标志性·丛生扁平带状条形肉质叶（条形扁平如碧带，端部钝圆，簇生挺秀） */}
       <g id="narcissusLeaves" style={{ opacity: leafOpacity }}>
-        {/* 笔直向上剑带叶 */}
-        <path d="M 72 125 C 70 100, 60 70, 48 35" stroke="url(#narcissusStemGrad)" strokeWidth="4.2" fill="none" strokeLinecap="round" />
-        <path d="M 78 125 C 80 100, 90 70, 102 35" stroke="url(#narcissusStemGrad)" strokeWidth="4.2" fill="none" strokeLinecap="round" />
-        <path d="M 75 125 C 75 95, 75 60, 75 20" stroke="url(#narcissusStemGrad)" strokeWidth="4.0" fill="none" strokeLinecap="round" />
-        <path d="M 73 125 C 72 108, 66 85, 58 50" stroke="url(#narcissusStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
-        <path d="M 77 125 C 78 108, 84 85, 92 50" stroke="url(#narcissusStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+        {/* 左外侧长带叶 (微向左拱) */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 125px' }}>
+          <path
+            d="M 73 125 C 70 100 58 75 42 42 C 40 38 43 35 46 36 C 53 42 66 72 75 125 Z"
+            fill="url(#narcissusStrapLeafGrad)"
+          />
+          <path d="M 74 125 C 68 100 57 74 44 38" stroke="#a7f3d0" strokeWidth="0.8" fill="none" opacity="0.6" />
+        </g>
+
+        {/* 右外侧长带叶 (微向右拱) */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 125px' }}>
+          <path
+            d="M 77 125 C 80 100 92 75 108 42 C 110 38 107 35 104 36 C 97 42 84 72 75 125 Z"
+            fill="url(#narcissusStrapLeafGrad)"
+          />
+          <path d="M 76 125 C 82 100 93 74 106 38" stroke="#a7f3d0" strokeWidth="0.8" fill="none" opacity="0.6" />
+        </g>
+
+        {/* 居中两片挺直条带叶 */}
+        <path
+          d="M 74 125 C 73 98 71 70 68 28 C 68 24 72 24 73 28 C 76 68 76 98 75 125 Z"
+          fill="url(#narcissusStrapLeafGrad)"
+        />
+        <path
+          d="M 75 125 C 76 98 78 70 82 28 C 82 24 78 24 77 28 C 74 68 74 98 75 125 Z"
+          fill="url(#narcissusStrapLeafGrad)"
+        />
+
+        {/* 细实花葶 (花朵着生其上) */}
+        <path d="M 74 125 C 72 105 60 85 40 56" stroke="url(#narcissusStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+        <path d="M 76 125 C 78 105 90 85 108 52" stroke="url(#narcissusStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+        <path d="M 75 125 C 75 90 75 58 75 34" stroke="url(#narcissusStemGrad)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
       </g>
 
       {/* 5 朵清香扑鼻金盏银台水仙花 */}

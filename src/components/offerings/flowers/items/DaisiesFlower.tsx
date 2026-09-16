@@ -93,14 +93,31 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
         <path d="M 77 125 C 78 112, 86 95, 114 70" stroke="url(#daisyStemGrad)" strokeWidth="2.4" fill="none" strokeLinecap="round" />
       </g>
 
-      {/* 雏菊羽状深裂翠绿小叶 */}
+      {/* 清纯雏菊特有标志性·基生匙形波缘小叶（上部圆钝匙状、下部收狭成柄，波状钝齿） */}
       <g id="daisyLeaves" style={{ opacity: leafOpacity }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 105px' }}>
-          <path d="M 73 105 C 52 94, 30 102, 18 116 C 32 118, 58 114, 73 105 Z" fill={stemCol100} />
+        {/* 左侧平展匙形波缘叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 115px' }}>
+          <path
+            d="M 73 118 C 66 116 58 114 48 108 C 42 104 36 106 30 108 C 24 110 22 116 26 120 C 32 124 40 123 52 122 C 62 121 68 120 73 118 Z"
+            fill={stemCol100}
+          />
+          <path d="M 72 118 Q 46 114 26 114" stroke="#86efac" strokeWidth="1.0" fill="none" opacity="0.8" />
+          <path d="M 46 115 Q 38 108 30 108" stroke="#86efac" strokeWidth="0.6" fill="none" opacity="0.5" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 108px' }}>
-          <path d="M 77 108 C 98 94, 120 102, 132 116 C 118 118, 92 114, 77 108 Z" fill={stemCol100} />
+
+        {/* 右侧微斜匙形叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 116px' }}>
+          <path
+            d="M 77 118 C 84 116 92 114 102 108 C 108 104 114 106 120 108 C 126 110 128 116 124 120 C 118 124 110 123 98 122 C 88 121 82 120 77 118 Z"
+            fill={stemCol100}
+          />
+          <path d="M 78 118 Q 104 114 124 114" stroke="#86efac" strokeWidth="1.0" fill="none" opacity="0.8" />
+          <path d="M 104 115 Q 112 108 120 108" stroke="#86efac" strokeWidth="0.6" fill="none" opacity="0.5" />
         </g>
+
+        {/* 基部中央两枚幼匙叶 */}
+        <path d="M 74 122 C 68 118 64 112 66 108 C 70 107 74 112 75 120 Z" fill={stemCol100} opacity="0.85" />
+        <path d="M 76 122 C 82 118 86 112 84 108 C 80 107 76 112 75 120 Z" fill={stemCol100} opacity="0.85" />
       </g>
 
       {/* 5 朵明亮清新的白雏菊 */}

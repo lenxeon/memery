@@ -77,17 +77,40 @@ export const RosesFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor,
         <path d="M 64 86 L 60 90 L 64 91 Z" fill={stemCol100} />
       </g>
 
-      {/* ── 2. 玫瑰锯齿叶片 ── */}
+      {/* ── 2. 玫瑰特有标志性·奇数羽状复叶带细锯齿与花茎利刺 ── */}
+      <g id="roseStemsExtras">
+        {/* 茎上深红利刺 (Rose Thorns) */}
+        <polygon points="71,114 65,116 71,118" fill="#881337" opacity="0.9" />
+        <polygon points="77,104 83,106 77,108" fill="#881337" opacity="0.9" />
+        <polygon points="69,82 63,84 69,86" fill="#881337" opacity="0.85" />
+        <polygon points="81,76 87,78 81,80" fill="#881337" opacity="0.85" />
+      </g>
+
       <g id="roseLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
-        {/* 左叶 */}
+        {/* 左侧三出羽状复叶 (顶生小叶 + 对生两枚侧生小叶，边缘锐细锯齿) */}
         <g className="animate-leaf-sway-1" style={{ transformOrigin: '54px 84px' }}>
-          <path d="M 54 84 C 34 74 18 84 14 96 C 26 100 46 96 56 88 Z" fill="url(#roseLeafGrad)" />
-          <path d="M 54 84 Q 32 90 20 94" stroke={calyxCol} strokeWidth="0.8" fill="none" opacity="0.6" />
+          {/* 总叶柄 */}
+          <path d="M 68 96 Q 58 92 46 88" stroke="#166534" strokeWidth="1.6" fill="none" />
+          {/* 顶小叶 */}
+          <path d="M 46 88 C 36 84 26 88 18 92 C 26 98 38 98 46 92 Z" fill="url(#roseLeafGrad)" stroke="#14532d" strokeWidth="0.5" />
+          {/* 侧小叶上 */}
+          <path d="M 54 90 C 48 80 40 76 34 78 C 36 86 44 92 52 92 Z" fill="url(#roseLeafGrad)" stroke="#14532d" strokeWidth="0.5" />
+          {/* 侧小叶下 */}
+          <path d="M 58 93 C 54 102 46 108 38 106 C 42 98 50 94 56 93 Z" fill="url(#roseLeafGrad)" stroke="#14532d" strokeWidth="0.5" />
+          {/* 羽状叶脉 */}
+          <path d="M 46 88 Q 32 92 20 92" stroke="#86efac" strokeWidth="0.7" fill="none" opacity="0.7" />
         </g>
-        {/* 右叶 */}
+
+        {/* 右侧三出羽状复叶 */}
         <g className="animate-leaf-sway-2" style={{ transformOrigin: '92px 86px' }}>
-          <path d="M 92 86 C 112 76 128 86 132 98 C 120 102 100 98 90 90 Z" fill="url(#roseLeafGrad)" />
-          <path d="M 92 86 Q 114 92 126 96" stroke={calyxCol} strokeWidth="0.8" fill="none" opacity="0.6" />
+          <path d="M 80 96 Q 90 92 102 88" stroke="#166534" strokeWidth="1.6" fill="none" />
+          {/* 顶小叶 */}
+          <path d="M 102 88 C 112 84 122 88 130 92 C 122 98 110 98 102 92 Z" fill="url(#roseLeafGrad)" stroke="#14532d" strokeWidth="0.5" />
+          {/* 侧小叶上 */}
+          <path d="M 94 90 C 100 80 108 76 114 78 C 112 86 104 92 96 92 Z" fill="url(#roseLeafGrad)" stroke="#14532d" strokeWidth="0.5" />
+          {/* 侧小叶下 */}
+          <path d="M 90 93 C 94 102 102 108 110 106 C 106 98 98 94 92 93 Z" fill="url(#roseLeafGrad)" stroke="#14532d" strokeWidth="0.5" />
+          <path d="M 102 88 Q 116 92 128 92" stroke="#86efac" strokeWidth="0.7" fill="none" opacity="0.7" />
         </g>
       </g>
 

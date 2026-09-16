@@ -96,14 +96,35 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
         <path d="M 77 125 C 77 115, 85 96, 114 65" stroke="url(#tulipStemGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" />
       </g>
 
-      {/* 郁金香宽大挺秀抱茎叶 */}
+      {/* 郁金香特有标志性·直挺宽阔披针抱茎叶 (基生自下而上紧裹花茎，粉霜微凹纵脉，叶尖挺拔) */}
       <g id="tulipLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '74px 105px' }}>
-          <path d="M 74 105 C 45 88, 22 92, 10 112 C 26 116, 52 110, 74 105 Z" fill="url(#tulipLeafGrad)" />
+        {/* 左侧挺拔高耸抱茎大叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '73px 120px' }}>
+          <path
+            d="M 74 124 C 68 112 58 92 48 68 C 42 64 36 68 38 78 C 44 96 56 114 71 125 Z"
+            fill="url(#tulipLeafGrad)"
+          />
+          {/* 纵向平行浅凹槽脉 */}
+          <path d="M 72 122 Q 56 94 44 70" stroke="#bbf7d0" strokeWidth="1.2" fill="none" opacity="0.75" />
+          <path d="M 70 123 Q 50 96 38 76" stroke="#bbf7d0" strokeWidth="0.7" fill="none" opacity="0.5" />
         </g>
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '76px 108px' }}>
-          <path d="M 76 108 C 105 90, 128 94, 140 114 C 124 118, 98 112, 76 108 Z" fill="url(#tulipLeafGrad)" />
+
+        {/* 右侧优雅外翻抱茎大叶 */}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '77px 120px' }}>
+          <path
+            d="M 76 124 C 82 112 92 90 106 65 C 112 62 116 66 114 76 C 106 96 94 114 79 125 Z"
+            fill="url(#tulipLeafGrad)"
+          />
+          <path d="M 78 122 Q 94 92 108 67" stroke="#bbf7d0" strokeWidth="1.2" fill="none" opacity="0.75" />
+          <path d="M 80 123 Q 100 94 114 74" stroke="#bbf7d0" strokeWidth="0.7" fill="none" opacity="0.5" />
         </g>
+
+        {/* 居中抱茎短鞘叶 */}
+        <path
+          d="M 73 125 C 71 114 72 100 75 86 C 77 100 78 114 77 125 Z"
+          fill="url(#tulipLeafGrad)"
+          opacity="0.9"
+        />
       </g>
 
       {/* 5 朵高挺圆润酒杯形郁金香 */}

@@ -83,9 +83,10 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
           <stop offset="0%" stopColor={calyx0} />
           <stop offset="100%" stopColor={calyx100} />
         </linearGradient>
-        <linearGradient id="carnationStemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={stemCol0} />
-          <stop offset="100%" stopColor={stemCol100} />
+        <linearGradient id="carnationLinearLeafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#a7f3d0" />
+          <stop offset="60%" stopColor="#059669" />
+          <stop offset="100%" stopColor="#064e3b" />
         </linearGradient>
       </defs>
 
@@ -97,19 +98,32 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
         <path d="M 73 125 C 73 115, 66 100, 38 72" stroke="url(#carnationStemGrad)" strokeWidth="2.6" fill="none" strokeLinecap="round" />
         <path d="M 77 125 C 77 115, 85 98, 114 68" stroke="url(#carnationStemGrad)" strokeWidth="2.6" fill="none" strokeLinecap="round" />
 
-        {/* 茎节处小环 */}
-        <circle cx="74" cy="98" r="1.8" fill={calyx100} />
-        <circle cx="68" cy="80" r="1.8" fill={calyx100} />
-        <circle cx="82" cy="78" r="1.8" fill={calyx100} />
+        {/* 茎节处膨大环节 (Nodes) */}
+        <ellipse cx="74" cy="98" rx="2.4" ry="1.4" fill={calyx100} />
+        <ellipse cx="68" cy="80" rx="2.2" ry="1.3" fill={calyx100} />
+        <ellipse cx="82" cy="78" rx="2.2" ry="1.3" fill={calyx100} />
       </g>
 
-      {/* 康乃馨修长灰绿对生线形叶 */}
+      {/* 康乃馨标志性粉霜蓝绿·对生狭长剑状线形叶 (两层对生，绝非阔卵叶) */}
       <g id="carnationLeaves" style={{ opacity: leafOpacity, transition: 'opacity 0.8s ease-out' }}>
+        {/* 下节对生狭长线叶 (平展微上翘) */}
         <g className="animate-leaf-sway-1" style={{ transformOrigin: '74px 98px' }}>
-          <path d="M 74 98 C 58 92, 42 102, 34 112 C 48 106, 64 100, 74 98 Z" fill={calyx100} />
+          <path d="M 74 98 C 58 92 42 84 20 86 C 38 92 56 97 74 100 Z" fill="url(#carnationLinearLeafGrad)" />
+          <path d="M 74 99 Q 46 91 22 87" stroke="#ecfdf5" strokeWidth="0.7" fill="none" opacity="0.75" />
         </g>
         <g className="animate-leaf-sway-2" style={{ transformOrigin: '76px 98px' }}>
-          <path d="M 76 98 C 92 92, 108 102, 116 112 C 102 106, 86 100, 76 98 Z" fill={calyx100} />
+          <path d="M 76 98 C 92 92 108 84 130 86 C 112 92 94 97 76 100 Z" fill="url(#carnationLinearLeafGrad)" />
+          <path d="M 76 99 Q 104 91 128 87" stroke="#ecfdf5" strokeWidth="0.7" fill="none" opacity="0.75" />
+        </g>
+
+        {/* 上节对生轻盈线叶 */}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '68px 80px' }}>
+          <path d="M 68 80 C 54 75 42 70 30 72 C 42 76 54 80 68 82 Z" fill="url(#carnationLinearLeafGrad)" />
+          <path d="M 68 81 Q 48 74 32 73" stroke="#ecfdf5" strokeWidth="0.6" fill="none" opacity="0.7" />
+        </g>
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '82px 78px' }}>
+          <path d="M 82 78 C 96 73 108 68 120 70 C 108 74 96 78 82 80 Z" fill="url(#carnationLinearLeafGrad)" />
+          <path d="M 82 79 Q 102 72 118 71" stroke="#ecfdf5" strokeWidth="0.6" fill="none" opacity="0.7" />
         </g>
       </g>
 
