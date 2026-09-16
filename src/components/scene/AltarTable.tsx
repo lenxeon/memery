@@ -27,6 +27,7 @@ export interface AltarTableProps {
   onResetLayout: () => void;
   onRemoveItem?: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
+  onToggleVase?: (id: SceneItemId) => void;
   showTableRunner?: boolean;
   tableclothStyle?: TableclothStyle;
   showPetals?: boolean;
@@ -136,6 +137,7 @@ export const DraggableAltarTableComponent: React.FC<DraggableAltarTableProps> = 
   onResetLayout,
   onRemoveItem,
   onToggleFruit,
+  onToggleVase,
   showTableRunner = true,
   tableclothStyle = 'autumn_gold',
   showPetals = true,
