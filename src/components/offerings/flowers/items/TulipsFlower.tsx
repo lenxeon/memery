@@ -49,8 +49,8 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
   const overallOpacity = isFaded ? 0.45 : Math.max(0.65, health);
 
   /**
-   * 宽阔肥厚、具明显内卷肉质厚度与强光泽的郁金香单片大厚叶
-   * 宽大肉厚（宽 18~24px），由瓶口沿花茎一路向上包裹，具明显向内合卷的深凹腹槽与肥厚背肉
+   * 肥厚硬挺、内卷如槽的郁金香抱茎叶片
+   * 缩小一半、不向外过度展开（maxW约8~11px），起始于中上段紧贴花茎上延护蕾
    */
   const renderRigidCuppedLeaf = (
     x0: number,
@@ -59,48 +59,48 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
     cy1: number,
     tx: number,
     ty: number,
-    maxW: number = 20,
+    maxW: number = 9.5,
     side: number = 1,
     curlRatio: number = 0.45
   ) => {
     const outerX = cx1 + side * maxW;
     const outerY = cy1;
     const innerRimX = cx1 + side * (maxW * (1 - curlRatio));
-    const innerRimY = cy1 - 3;
+    const innerRimY = cy1 - 2;
     const ridgeX = cx1 + side * (maxW * 0.45);
     const ridgeY = cy1 - 1;
 
     return (
       <g>
-        {/* 1. 外背饱满阔大肉厚叶身底面 */}
+        {/* 1. 外背肥厚叶肉底面 */}
         <path
-          d={`M ${x0} ${y0} C ${cx1 + side * (maxW * 0.35)} ${y0 - 12}, ${outerX} ${outerY + 16}, ${outerX} ${outerY} C ${outerX} ${outerY - 18}, ${tx + side * 5} ${ty + 12}, ${tx} ${ty} C ${tx - side * 3} ${ty + 10}, ${innerRimX} ${innerRimY - 8}, ${innerRimX} ${innerRimY} C ${innerRimX} ${innerRimY + 10}, ${x0 + side * 4} ${y0 - 8}, ${x0} ${y0} Z`}
+          d={`M ${x0} ${y0} C ${cx1 + side * (maxW * 0.35)} ${y0 - 6}, ${outerX} ${outerY + 8}, ${outerX} ${outerY} C ${outerX} ${outerY - 10}, ${tx + side * 3} ${ty + 6}, ${tx} ${ty} C ${tx - side * 1.5} ${ty + 5}, ${innerRimX} ${innerRimY - 4}, ${innerRimX} ${innerRimY} C ${innerRimX} ${innerRimY + 6}, ${x0 + side * 2} ${y0 - 4}, ${x0} ${y0} Z`}
           fill="url(#leafBodyGrad)"
           stroke={leafDeep}
-          strokeWidth="0.6"
+          strokeWidth="0.5"
         />
 
-        {/* 2. 肥厚叶侧缘肉质厚唇与亮光 */}
+        {/* 2. 肥厚叶侧缘肉质亮线 */}
         <path
-          d={`M ${outerX} ${outerY + 12} C ${outerX + side * 2} ${outerY}, ${tx + side * 2.5} ${ty + 8}, ${tx} ${ty}`}
+          d={`M ${outerX} ${outerY + 6} C ${outerX + side * 1.2} ${outerY}, ${tx + side * 1.5} ${ty + 4}, ${tx} ${ty}`}
           stroke={leafHighlight}
-          strokeWidth="1.1"
+          strokeWidth="0.8"
           fill="none"
           opacity="0.9"
         />
 
-        {/* 3. 内卷槽深凹阴影（生动体现厚叶内合卷曲的U型厚度腔体） */}
+        {/* 3. 内卷槽深凹阴影 */}
         <path
-          d={`M ${x0} ${y0} Q ${innerRimX} ${innerRimY} ${tx} ${ty} Q ${cx1 + side * 1.5} ${cy1 + 6} ${x0} ${y0} Z`}
+          d={`M ${x0} ${y0} Q ${innerRimX} ${innerRimY} ${tx} ${ty} Q ${cx1 + side * 1.0} ${cy1 + 3} ${x0} ${y0} Z`}
           fill={leafShadowInner}
-          opacity="0.7"
+          opacity="0.65"
         />
 
         {/* 4. 迎光面硬挺多汁的凸起主叶肉高光宽带 */}
         <path
-          d={`M ${x0 + side * 3} ${y0 - 3} Q ${ridgeX} ${ridgeY} ${tx} ${ty}`}
+          d={`M ${x0 + side * 1.5} ${y0 - 2} Q ${ridgeX} ${ridgeY} ${tx} ${ty}`}
           stroke="url(#leafSpineHighlightGrad)"
-          strokeWidth="2.8"
+          strokeWidth="1.8"
           fill="none"
           strokeLinecap="round"
           opacity="0.95"
@@ -108,29 +108,28 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
 
         {/* 5. 纵向微凹平行辅助光纹 */}
         <path
-          d={`M ${x0 + side * 6} ${y0 - 2} Q ${outerX - side * 3} ${outerY + 2} ${tx} ${ty}`}
+          d={`M ${x0 + side * 3} ${y0 - 1} Q ${outerX - side * 1.5} ${outerY + 1} ${tx} ${ty}`}
           stroke="#dcfce7"
-          strokeWidth="0.9"
+          strokeWidth="0.6"
           fill="none"
           strokeLinecap="round"
           opacity="0.5"
         />
 
         {/* 6. 硬挺尖锐叶尖反光 */}
-        <circle cx={tx} cy={ty} r="1.1" fill="#f0fdf4" />
+        <circle cx={tx} cy={ty} r="0.8" fill="#f0fdf4" />
       </g>
     );
   };
 
   /**
-   * 更加肥厚硕大、圆润饱满的倒卵形郁金香含苞花杯 (Plump Tulip Bud Cup)
-   * 放大体量，瓣片紧凑合抱微露瓣尖，强立体玉润高光
+   * 倒卵形郁金香含苞花杯 (Tulip Bud Cup)
    */
   const renderTulipBud = (
     cx: number,
     cy: number,
     colorType: 'pink' | 'white' | 'rose',
-    scale: number = 1.35,
+    scale: number = 1.05,
     rot: number = 0
   ) => {
     const gradId =
@@ -141,48 +140,48 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
     return (
       <g transform={`translate(${cx}, ${cy}) rotate(${rot}) scale(${scale})`}>
         {/* 基部肉厚花托小绿圈 */}
-        <ellipse cx="0" cy="11.5" rx="4.5" ry="2.6" fill={leafMid} stroke={leafDeep} strokeWidth="0.6" />
+        <ellipse cx="0" cy="11" rx="4.0" ry="2.3" fill={leafMid} stroke={leafDeep} strokeWidth="0.5" />
 
-        {/* 1. 后背合抱瓣（圆润大顶端） */}
+        {/* 1. 后背合抱瓣 */}
         <path
-          d="M -5 10 C -12 0, -13 -22, 0 -31 C 13 -22, 12 0, 5 10 Z"
+          d="M -4.5 9 C -11 0, -12 -20, 0 -29 C 12 -20, 11 0, 4.5 9 Z"
           fill={gradId}
           opacity="0.9"
         />
 
         {/* 2. 左侧紧裹内合肥厚主瓣 */}
         <path
-          d="M 0 11 C -13 8, -15 -10, -8 -29 C -2 -23, 1 -10, 0 11 Z"
+          d="M 0 10 C -12 7, -14 -9, -7 -27 C -2 -21, 1 -9, 0 10 Z"
+          fill={gradId}
+          stroke={rimCol}
+          strokeWidth="0.35"
+        />
+
+        {/* 3. 右侧肥厚包裹大瓣 */}
+        <path
+          d="M 0 10.5 C 13 8, 15 -7, 5 -28 C -2 -22, -4 -7, 0 10.5 Z"
           fill={gradId}
           stroke={rimCol}
           strokeWidth="0.4"
         />
 
-        {/* 3. 右侧肥厚包裹大瓣（丰润圆隆，自外侧大面积向内包裹，呈典型肥润含苞初绽姿态） */}
+        {/* 4. 居中合抱正面大腹瓣 */}
         <path
-          d="M 0 11.5 C 14 9, 16 -8, 6 -30 C -2 -24, -5 -8, 0 11.5 Z"
-          fill={gradId}
-          stroke={rimCol}
-          strokeWidth="0.45"
-        />
-
-        {/* 4. 居中合抱正面大腹瓣（圆润丰满，极显花苞肥厚） */}
-        <path
-          d="M -5 11.5 C -11 6, -12 -10, -3 -29.5 C 3 -30, 9 -18, 5 11.5 Z"
+          d="M -4.5 10.5 C -10 5.5, -11 -9, -2.5 -27.5 C 2.5 -28, 8 -16, 4.5 10.5 Z"
           fill={gradId}
         />
 
-        {/* 5. 强烈立体弧形高光（表现花苞玉石般光泽） */}
+        {/* 5. 强烈立体弧形高光 */}
         <path
-          d="M -1 8 C -6.5 0, -8 -13, -2 -25"
+          d="M -1 7 C -6 0, -7.5 -12, -2 -23"
           stroke="#ffffff"
-          strokeWidth="1.5"
+          strokeWidth="1.3"
           fill="none"
           strokeLinecap="round"
-          opacity={colorType === 'white' ? 0.95 : 0.72}
+          opacity={colorType === 'white' ? 0.95 : 0.7}
         />
-        {/* 尖头聚拢点娇柔光晕 */}
-        <ellipse cx="-0.5" cy="-28" rx="2.5" ry="1.3" fill={topCol} opacity="0.95" />
+        {/* 尖头聚拢点光晕 */}
+        <ellipse cx="-0.5" cy="-26" rx="2.2" ry="1.2" fill={topCol} opacity="0.95" />
       </g>
     );
   };
@@ -238,39 +237,42 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
       </defs>
 
       {/* ─────────────────────────────────────────────────────────────
-          第一支（居中·最高）：一花一径一叶 · 纯雅奶白大肥厚花苞
+          第一支（居中·高位·最大）：纯雅奶白含苞花苞（scale=1.16，y=14）
+          高挺耸立，叶片紧贴中上段花径上延，叶尖贴近花苞基部
       ───────────────────────────────────────────────────────────── */}
       <g id="tulipUnit_CenterWhite">
-        {/* 直挺粗硕花径 */}
-        <path d="M 75 125 L 75 74 L 75 26" stroke="url(#tulipJuicyStemGrad)" strokeWidth="4.4" fill="none" strokeLinecap="round" />
-        {/* 一花留一叶：左后侧大肥厚抱茎内卷叶（宽20px，自下而上挺拔直立） */}
-        {renderRigidCuppedLeaf(74, 120, 60, 70, 52, 28, 20, -1, 0.48)}
-        {/* 居中高位大花苞 (奶白，高挑错落，最顶峰) */}
-        <g style={fl1}>{renderTulipBud(75, 16, 'white', 1.38, 0)}</g>
+        {/* 直挺修长花径 */}
+        <path d="M 75 125 L 75 68 L 75 22" stroke="url(#tulipJuicyStemGrad)" strokeWidth="4.0" fill="none" strokeLinecap="round" />
+        {/* 一花一叶：靠近花苞位置（从 y=82 起包裹至 y=32），不大幅外翻（宽9.5px） */}
+        {renderRigidCuppedLeaf(74, 82, 68, 56, 68, 30, 9.5, -1, 0.46)}
+        {/* 居中高位大花苞 (纯雅奶白，体量最大，姿态端正高拔) */}
+        <g style={fl1}>{renderTulipBud(75, 14, 'white', 1.16, 0)}</g>
       </g>
 
       {/* ─────────────────────────────────────────────────────────────
-          第二支（左侧·中位）：一花一径一叶 · 娇嫩浅粉大肥厚花苞
+          第二支（左侧·中位·中等大小）：娇粉含苞花苞（scale=1.05，y=30）
+          向左适度斜展，叶片从花茎中段向上包贴，护在花苞左侧下方
       ───────────────────────────────────────────────────────────── */}
       <g id="tulipUnit_LeftPink">
-        {/* 向左微斜挺立花径 */}
-        <path d="M 73 125 Q 66 84 42 38" stroke="url(#tulipJuicyStemGrad)" strokeWidth="4.5" fill="none" strokeLinecap="round" />
-        {/* 一花留一叶：外展阔大肥厚内卷叶（宽22px，阔披针形，内卷深槽，强脊光） */}
-        {renderRigidCuppedLeaf(72, 122, 44, 84, 22, 46, 22, -1, 0.52)}
-        {/* 左侧中位大花苞 (娇粉，微向左倾斜8度) */}
-        <g style={fl2}>{renderTulipBud(41, 26, 'pink', 1.42, -8)}</g>
+        {/* 向左微倾挺立花径 */}
+        <path d="M 73 125 Q 67 85 48 40" stroke="url(#tulipJuicyStemGrad)" strokeWidth="3.8" fill="none" strokeLinecap="round" />
+        {/* 一花一叶：靠近花苞中上部（从 y=86 起至 y=44），不过度外张（宽10px） */}
+        {renderRigidCuppedLeaf(68, 86, 52, 64, 40, 42, 10, -1, 0.48)}
+        {/* 左侧中位花苞 (娇粉，中等体量，微向左倾斜-7度) */}
+        <g style={fl2}>{renderTulipBud(47, 30, 'pink', 1.05, -7)}</g>
       </g>
 
       {/* ─────────────────────────────────────────────────────────────
-          第三支（右侧·前低位）：一花一径一叶 · 浓郁玫红大肥厚花苞
+          第三支（右侧·低位·紧致小巧）：浓郁玫红含苞花苞（scale=0.92，y=45）
+          位于右前侧低位，娇小紧凑，叶片紧贴护持，高低错落分明
       ───────────────────────────────────────────────────────────── */}
       <g id="tulipUnit_RightRose">
-        {/* 向右挺立花径 */}
-        <path d="M 77 125 Q 85 86 108 42" stroke="url(#tulipJuicyStemGrad)" strokeWidth="4.5" fill="none" strokeLinecap="round" />
-        {/* 一花留一叶：向右外展阔大肥厚内卷叶（宽23px，饱满厚重，叶尖硬朗直挺） */}
-        {renderRigidCuppedLeaf(78, 122, 106, 84, 128, 48, 23, 1, 0.52)}
-        {/* 右侧前低位大花苞 (玫红，向右微倾10度，形成左中右高低自然错落) */}
-        <g style={fl3}>{renderTulipBud(109, 30, 'rose', 1.45, 10)}</g>
+        {/* 向右挺立短花径 */}
+        <path d="M 77 125 Q 85 92 102 55" stroke="url(#tulipJuicyStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+        {/* 一花一叶：靠近低位花苞（从 y=92 起至 y=58），紧贴茎干（宽9px） */}
+        {renderRigidCuppedLeaf(82, 92, 94, 74, 108, 56, 9.0, 1, 0.48)}
+        {/* 右侧前低位小巧花苞 (玫红，紧致小巧，微向右倾斜9度) */}
+        <g style={fl3}>{renderTulipBud(103, 44, 'rose', 0.92, 9)}</g>
       </g>
     </g>
   );
