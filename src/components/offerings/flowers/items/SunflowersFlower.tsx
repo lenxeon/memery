@@ -12,20 +12,22 @@
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
-import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
+import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const SUNFLOWER_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.5, fallSpan: 0.06, startX: 98, startY: 54, landX: 106, landY: 194, rx: 6.8, ry: 3.5, landRot: 28, swayAmp: 14, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.35, fallSpan: 0.06, startX: 48, startY: 66, landX: 52, landY: 193, rx: 7.0, ry: 3.6, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.15, fallSpan: 0.05, startX: 72, startY: 42, landX: 76, landY: 195, rx: 7.2, ry: 3.8, landRot: 14, swayAmp: 15, swayFreq: 3.8 },
+  { id: 1, detachHealth: 0.45, fallSpan: 0.08, startX: 95, startY: 60, landX: 104, landY: 194, rx: 7.2, ry: 2.8, landRot: 32, swayAmp: 14, swayFreq: 2.8 },
+  { id: 2, detachHealth: 0.3, fallSpan: 0.07, startX: 62, startY: 55, landX: 48, landY: 193, rx: 7.0, ry: 2.6, landRot: -25, swayAmp: 16, swayFreq: 3.2 },
+  { id: 3, detachHealth: 0.15, fallSpan: 0.06, startX: 78, startY: 65, landX: 82, landY: 195, rx: 7.5, ry: 2.9, landRot: 15, swayAmp: 12, swayFreq: 3.0 },
 ];
 
 export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
   health,
   dryFactor,
   isFaded,
+  mouthAperture = 'standard',
   spreadFactor = 1.0,
 }) => {
+  const agingStyle = getFlowerAgingFilter(health, isFaded);
   // ── 向日葵金黄与暖橙渐变 ──
   const goldLight = lerpColor('#fef08a', '#e8d2a2', dryFactor);
   const goldPrimary = lerpColor('#facc15', '#cca656', dryFactor);
@@ -53,8 +55,6 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
   const fl1 = getBlossomDropStyle(health, 0.45);
   const fl2 = getBlossomDropStyle(health, 0.3);
   const fl3 = getBlossomDropStyle(health, 0.12);
-
-  const overallOpacity = isFaded ? 0.45 : Math.max(0.65, health);
 
   /**
    * 1. 硕大正视微仰【盛开向日葵】（居中偏上，主视觉焦点）
@@ -251,7 +251,7 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
   const b3rot = -10 * spreadFactor;
 
   return (
-    <g id="sunflowersFlora" style={{ opacity: overallOpacity }}>
+    <g id="sunflowersFlora" style={agingStyle}>
       <defs>
         {/* 1. 外层向日葵金黄渐变 */}
         <linearGradient id="sunflowerGoldOuterGrad" x1="0%" y1="100%" x2="0%" y2="0%">

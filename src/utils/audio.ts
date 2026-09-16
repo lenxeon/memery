@@ -609,6 +609,42 @@ class SoundEngine {
       // ignore
     }
   }
+
+  // 清脆风铃轻吟
+  playWindChimes() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      // 五度/五声空灵风铃频率 (E6, G6, A6, B6, E7)
+      const freqs = [1318.5, 1567.98, 1760.0, 1975.53, 2637.0];
+      freqs.forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const delay = idx * 0.045 + Math.random() * 0.02;
+        const noteStart = now + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, noteStart);
+        // 微小微颤
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.996, noteStart + 0.8);
+
+        gain.gain.setValueAtTime(0.0001, noteStart);
+        gain.gain.linearRampToValueAtTime(0.08, noteStart + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.85);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(noteStart);
+        osc.stop(noteStart + 0.9);
+      });
+    } catch {
+      // ignore
+    }
+  }
 }
 
 export const sound = new SoundEngine();

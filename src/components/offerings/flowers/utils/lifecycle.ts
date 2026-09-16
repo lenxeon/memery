@@ -37,3 +37,24 @@ export function getBlossomDropStyle(health: number, dropThreshold: number) {
     isShed: true,
   };
 }
+
+/**
+ * 花卉生命周期通用色彩老化视觉滤镜
+ * 坚决保持 100% 物理不透明度（拒绝幽灵半透明透景），真实模拟现实花枝水分散失、色泽变暗、枯黄褐变过程。
+ */
+export function getFlowerAgingFilter(health: number, isFaded: boolean = false): React.CSSProperties {
+  const clampedHealth = Math.max(0, Math.min(1.0, health));
+  // 亮度：1.0(盛开) -> 0.78(微枯55%) -> 0.55(岁暮15%)
+  const brightness = isFaded ? 0.45 : Math.max(0.5, 0.52 + 0.48 * clampedHealth);
+  // 饱和度：1.0(盛开) -> 0.71(微枯55%) -> 0.44(岁暮15%)
+  const saturate = isFaded ? 0.25 : Math.max(0.32, 0.35 + 0.65 * clampedHealth);
+  // 枯黄褐变 (sepia)：随着生机减退逐步渗入干黄褐调
+  const sepia = Math.max(0, Math.min(0.35, (0.8 - clampedHealth) * 0.45));
+
+  return {
+    filter: `brightness(${brightness.toFixed(3)}) saturate(${saturate.toFixed(3)}) sepia(${sepia.toFixed(3)})`,
+    opacity: 1,
+    transition: 'filter 0.6s ease-out',
+  };
+}
+

@@ -12,7 +12,7 @@
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
-import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
+import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const CARNATION_FALLING_PETALS: FallingPetalDef[] = [
   { id: 1, detachHealth: 0.5, fallSpan: 0.06, startX: 104, startY: 42, landX: 110, landY: 194, rx: 4.5, ry: 2.8, landRot: 28, swayAmp: 12, swayFreq: 3.2 },
@@ -26,6 +26,7 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
   isFaded,
   spreadFactor = 1.0,
 }) => {
+  const agingStyle = getFlowerAgingFilter(health, isFaded);
   // ── 娇嫩粉润蜜桃粉色系（水灵通透粉白、柔桃粉、腮红粉，杜绝浓重暗紫） ──
   const petalWhite = lerpColor('#ffffff', '#faf6f5', dryFactor);
   const petalSoftEdge = lerpColor('#fff1f2', '#f6ede8', dryFactor);
@@ -48,8 +49,6 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
   const fl3 = getBlossomDropStyle(health, 0.28);
   const fl4 = getBlossomDropStyle(health, 0.16);
   const fl5 = getBlossomDropStyle(health, 0.05);
-
-  const overallOpacity = isFaded ? 0.45 : Math.max(0.65, health);
 
   /**
    * 细长圆柱杯状青绿花托 (Calyx)
@@ -270,7 +269,7 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
   const b5rot = 8 * spreadFactor;
 
   return (
-    <g id="carnationsFlora" style={{ opacity: overallOpacity }}>
+    <g id="carnationsFlora" style={agingStyle}>
       <defs>
         {/* 青绿花托立体渐变 */}
         <linearGradient id="carnationCalyxGrad" x1="0%" y1="100%" x2="0%" y2="0%">

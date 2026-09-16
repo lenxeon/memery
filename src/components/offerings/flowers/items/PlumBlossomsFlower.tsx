@@ -10,17 +10,23 @@
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
-import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
+import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const PLUM_FALLING_PETALS: FallingPetalDef[] = [
-  { id: 1, detachHealth: 0.5, fallSpan: 0.05, startX: 104, startY: -25, landX: 108, landY: 194, rx: 2.8, ry: 2.3, landRot: 25, swayAmp: 14, swayFreq: 3.2 },
-  { id: 2, detachHealth: 0.4, fallSpan: 0.05, startX: 52, startY: 15, landX: 58, landY: 193, rx: 2.9, ry: 2.4, landRot: -30, swayAmp: 12, swayFreq: 3.5 },
-  { id: 3, detachHealth: 0.3, fallSpan: 0.05, startX: 92, startY: -5, landX: 96, landY: 195, rx: 2.7, ry: 2.2, landRot: -18, swayAmp: 16, swayFreq: 3.8 },
-  { id: 4, detachHealth: 0.2, fallSpan: 0.05, startX: 74, startY: 35, landX: 80, landY: 197, rx: 3.0, ry: 2.5, landRot: 35, swayAmp: 18, swayFreq: 4.0 },
-  { id: 5, detachHealth: 0.08, fallSpan: 0.04, startX: 68, startY: -45, landX: 74, landY: 196, rx: 3.1, ry: 2.6, landRot: 12, swayAmp: 14, swayFreq: 4.2 },
+  { id: 1, detachHealth: 0.65, fallSpan: 0.08, startX: 84, startY: 32, landX: 62, landY: 194, rx: 3.2, ry: 2.2, landRot: 35, swayAmp: 12, swayFreq: 3.2 },
+  { id: 2, detachHealth: 0.45, fallSpan: 0.08, startX: 102, startY: -2, landX: 96, landY: 193, rx: 3.4, ry: 2.3, landRot: -20, swayAmp: 15, swayFreq: 3.0 },
+  { id: 3, detachHealth: 0.3, fallSpan: 0.07, startX: 68, startY: 2, landX: 45, landY: 195, rx: 3.1, ry: 2.1, landRot: 45, swayAmp: 10, swayFreq: 3.5 },
+  { id: 4, detachHealth: 0.18, fallSpan: 0.06, startX: 108, startY: -25, landX: 108, landY: 194, rx: 3.0, ry: 2.0, landRot: -40, swayAmp: 16, swayFreq: 2.8 },
+  { id: 5, detachHealth: 0.08, fallSpan: 0.05, startX: 64, startY: -26, landX: 52, landY: 195, rx: 2.8, ry: 1.9, landRot: 15, swayAmp: 14, swayFreq: 3.3 },
 ];
 
-export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
+export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({
+  health,
+  dryFactor,
+  isFaded,
+}) => {
+  const agingStyle = getFlowerAgingFilter(health, isFaded);
+
   // 纯白花瓣衰变色：冰洁玉白 -> 微泛淡黄素宣纸白 -> 枯萎温润浅赭
   const petalWhite0 = lerpColor('#ffffff', '#faf6ee', dryFactor);
   const petalWhite50 = lerpColor('#fcfbf8', '#eedec7', dryFactor);
@@ -45,8 +51,6 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
   const fl3 = getBlossomDropStyle(health, 0.3);
   const fl4 = getBlossomDropStyle(health, 0.2);
   const fl5 = getBlossomDropStyle(health, 0.1);
-
-  const branchOpacity = isFaded ? 0.45 : Math.max(0.7, health);
 
   // ── 纯白五瓣梅神态渲染（花朵极小，各异神态，绝非单一千篇一律正面） ──
   /**
@@ -212,7 +216,7 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
   );
 
   return (
-    <g id="plumBlossomsFlora">
+    <g id="plumBlossomsFlora" style={agingStyle}>
       <defs>
         {/* 白梅花瓣莹洁玉白渐变 */}
         <radialGradient id="whitePlumPetalGrad" cx="50%" cy="35%" r="65%">
@@ -238,7 +242,7 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
 
       {/* ── 骨：枝干形态“瘦、硬、折” ──
           枝干加高一半（从原本瓶口 125 一路破空耸立至 -75，高挑清朗，中后段错落折枝，通体绝不生叶） */}
-      <g id="plumThinStems" style={{ opacity: branchOpacity }}>
+      <g id="plumThinStems">
         {/* 1. 下部木质老主干（自瓶口 75,125 挺拔直上，极度清瘦 2.0px，至中段 74,48 破空顿挫） */}
         <path
           d="M 75 125 L 75 106 L 73 88 L 76 70 L 74 48"
@@ -306,7 +310,7 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({ health, dry
       </g>
 
       {/* ── 神：水滴形直立嫩青绿色小花苞（仅稀疏点缀在中后高段枝节与梢头） ── */}
-      <g id="plumGreenBuds" style={{ opacity: branchOpacity }}>
+      <g id="plumGreenBuds">
         {/* 极顶高梢直立水滴嫩蕾 */}
         {renderWaterDropBud(58, -82, -18, 0.85)}
         {renderWaterDropBud(72, -64, 22, 0.8)}

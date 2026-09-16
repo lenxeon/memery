@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
-import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
+import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const TULIP_FALLING_PETALS: FallingPetalDef[] = [
   { id: 1, detachHealth: 0.5, fallSpan: 0.06, startX: 106, startY: 36, landX: 112, landY: 194, rx: 7.2, ry: 4.8, landRot: 28, swayAmp: 12, swayFreq: 3.2 },
@@ -13,6 +13,7 @@ export const TULIP_FALLING_PETALS: FallingPetalDef[] = [
 ];
 
 export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
+  const agingStyle = getFlowerAgingFilter(health, isFaded);
   // ── 茎叶色彩与光影衰变 ──
   const stemBase = lerpColor('#2f7225', '#5a4c33', dryFactor);
   const stemLight = lerpColor('#5cb843', '#887a58', dryFactor);
@@ -45,8 +46,6 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
   const fl1 = getBlossomDropStyle(health, 0.5);
   const fl2 = getBlossomDropStyle(health, 0.35);
   const fl3 = getBlossomDropStyle(health, 0.15);
-
-  const overallOpacity = isFaded ? 0.45 : Math.max(0.65, health);
 
   /**
    * 肥厚硬挺、内卷如槽的郁金香抱茎叶片
@@ -187,7 +186,7 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
   };
 
   return (
-    <g id="tulipsFlora" style={{ opacity: overallOpacity }}>
+    <g id="tulipsFlora" style={agingStyle}>
       <defs>
         {/* 肥厚叶肉立体渐变 */}
         <linearGradient id="leafBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">

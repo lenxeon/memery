@@ -17,7 +17,7 @@
  */
 import React from 'react';
 import { FlowerComponentProps, FallingPetalDef } from '../types';
-import { lerpColor, getBlossomDropStyle } from '../utils/lifecycle';
+import { lerpColor, getBlossomDropStyle, getFlowerAgingFilter } from '../utils/lifecycle';
 
 export const CALLA_FALLING_PETALS: FallingPetalDef[] = [
   { id: 1, detachHealth: 0.45, fallSpan: 0.06, startX: 96, startY: 46, landX: 104, landY: 194, rx: 5.8, ry: 3.0, landRot: 28, swayAmp: 14, swayFreq: 3.2 },
@@ -31,6 +31,7 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   isFaded,
   spreadFactor = 1.0,
 }) => {
+  const agingStyle = getFlowerAgingFilter(health, isFaded);
   // ── 粉晕色彩色阶（参考图中迷人的玫瑰蜜桃粉渐变） ──
   const pinkEdge = lerpColor('#f43f5e', '#b04a5a', dryFactor);
   const pinkMid = lerpColor('#fb7185', '#c26d7c', dryFactor);
@@ -58,8 +59,6 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   const fl1 = getBlossomDropStyle(health, 0.45);
   const fl2 = getBlossomDropStyle(health, 0.3);
   const fl3 = getBlossomDropStyle(health, 0.12);
-
-  const overallOpacity = isFaded ? 0.45 : Math.max(0.65, health);
 
   /**
    * 1. 侧仰/半侧面【粉晕马蹄莲】（参考图中部及上方花朵）
@@ -286,7 +285,7 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
   const b3rot = -4 * spreadFactor;
 
   return (
-    <g id="callaLiliesFlora" style={{ opacity: overallOpacity }}>
+    <g id="callaLiliesFlora" style={agingStyle}>
       <defs>
         {/* 1. 佛焰苞正面粉晕渐变（基部嫩绿 -> 象牙白身 -> 娇嫩桃粉唇边） */}
         <linearGradient id="callaPinkFrontGrad" x1="0%" y1="100%" x2="0%" y2="0%">
