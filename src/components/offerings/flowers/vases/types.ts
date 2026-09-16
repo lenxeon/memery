@@ -50,6 +50,17 @@ export interface VaseStyleMeta {
   borderColor: string;
 }
 
+export interface VaseItemDefinition extends VaseStyleMeta {
+  mouthAperture: VaseMouthAperture;
+  mouthWidth: number;
+  mouthCenter: { x: number; y: number };
+  vaseHeight: number;
+  spreadFactor: number;
+  renderDefs?: () => React.ReactNode;
+  renderMouthBack: () => React.ReactNode;
+  renderBody: () => React.ReactNode;
+}
+
 export const VASE_STYLES: VaseStyleMeta[] = [
   // ── 奇特器型 1: 手作泥捏翻边陶瓶 (新图1) ──
   {
