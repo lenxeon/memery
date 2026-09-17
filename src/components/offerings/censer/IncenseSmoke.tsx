@@ -154,37 +154,72 @@ export const IncenseSmoke: React.FC<IncenseSmokeProps> = ({
         }
       }
 
-      // ── 环境自然呼吸与偶尔阵风系统 (Organic Breeze & Breathing Gusts) ──
-      // 1. 低频主呼吸律动 (周期约 6.8 秒，缓和平稳)
-      const breathCycle = Math.sin(time * 0.92);
-      // 2. 偶尔拂过的一抹自然清风 (模拟门窗微启掠过的一阵柔风，起伏舒卷)
-      const gustPulse = Math.pow(Math.max(0, Math.sin(time * 0.35)), 2.6) * 1.4;
-      const organicWind = (wind * 1.2) + (breathCycle * 0.45) + (gustPulse * (breathCycle >= 0 ? 0.7 : -0.7));
+      // ── 三炷香差异化配置：整体缩小 30%，三缕各具高低粗细与 S 弯波纹形态（对标设计图二） ──
+      const STREAM_PROFILES = [
+        {
+          // s = 0: 左侧香（纤巧柔美，偏左起弯，高度约 38px，宽度约 2.2px）
+          ageMultiplier: 0.86,
+          baseW: 0.75,
+          maxW: 2.2,
+          tipW: 0.18,
+          waveFreq: 0.165,
+          waveTimeSpeed: 1.25,
+          wavePhaseOffset: -0.7,
+          amplitude: 1.6,
+          laneBias: -1.3,
+        },
+        {
+          // s = 1: 中央主香（最挺拔高挑，主干饱满，S 弯舒朗正气，高度约 46px，宽度约 3.3px）
+          ageMultiplier: 1.0,
+          baseW: 0.95,
+          maxW: 3.3,
+          tipW: 0.25,
+          waveFreq: 0.140,
+          waveTimeSpeed: 1.35,
+          wavePhaseOffset: 0.0,
+          amplitude: 2.1,
+          laneBias: 0.0,
+        },
+        {
+          // s = 2: 右侧香（中等舒朗，偏右起弯，相差错落，高度约 42px，宽度约 2.7px）
+          ageMultiplier: 0.92,
+          baseW: 0.85,
+          maxW: 2.7,
+          tipW: 0.20,
+          waveFreq: 0.150,
+          waveTimeSpeed: 1.45,
+          wavePhaseOffset: 0.8,
+          amplitude: 1.8,
+          laneBias: 1.3,
+        },
+      ];
 
       // ── 2. 真实热对流缓缓升腾与自然扩散模拟 (Advection Simulation) ────────
       const trails = trailsRef.current;
 
-      // 生成新烟气质点 (每 2 帧发射一个，平滑连续)
+      // 每 2 帧发射一个新烟气质点
       if (litTransition > 0.02 && frameCount % 2 === 0) {
         for (let s = 0; s < dynamicEmbers.length; s++) {
           const emb = dynamicEmbers[s];
+          const prof = STREAM_PROFILES[s];
           trails[s].unshift({
             x: emb.x,
             y: emb.y - 0.5,
             vx: 0,
-            vy: -(0.54 + Math.random() * 0.06) * lateFactor,
+            vy: -(0.58 + Math.random() * 0.04) * lateFactor,
             age: 0,
-            maxAge: 70 + Math.random() * 10,
-            width: 1.0,
+            maxAge: Math.round((68 + Math.random() * 8) * prof.ageMultiplier),
+            width: prof.baseW,
             alpha: 0,
           });
         }
       }
 
-      // 更新已发射烟气粒子（三缕同向谐和升腾，各安其道，微风优雅波纹，尾部变尖细）
+      // 更新已发射烟气粒子（三缕各具形态与尺寸，微风优雅 S 弯波纹，尾部变尖细）
       for (let s = 0; s < trails.length; s++) {
         const trail = trails[s];
         const emb = dynamicEmbers[s];
+        const prof = STREAM_PROFILES[s];
 
         for (let i = trail.length - 1; i >= 0; i--) {
           const node = trail[i];
@@ -200,41 +235,37 @@ export const IncenseSmoke: React.FC<IncenseSmokeProps> = ({
 
           // 2. 垂直高度与归一化比例
           const distFromEmber = Math.max(0, emb.y - node.y);
-          const p = Math.min(1.0, distFromEmber / 64);
+          const p = Math.min(1.0, distFromEmber / 48);
 
-          // 1. 曲线摇曳：微风中柔美起伏的优雅 S 形波纹（空间波长 ~46px，周期 ~4.2s，动作克制从容）
-          const wavePhase = distFromEmber * 0.136 - time * 1.35;
-          const streamPhase = (s - 1) * 0.5;
-          const amplitude = 3.0 * Math.sin(Math.min(1.0, p * 1.1) * Math.PI * 0.82);
-          const sCurveWave = Math.sin(wavePhase + streamPhase) * amplitude;
+          // 1. 各自独立的曲线摇曳（不同波长、周期与相位，动作克制从容）：
+          const wavePhase = distFromEmber * prof.waveFreq - time * prof.waveTimeSpeed + prof.wavePhaseOffset;
+          const amplitude = prof.amplitude * Math.sin(Math.min(1.0, p * 1.1) * Math.PI * 0.82);
+          const sCurveWave = Math.sin(wavePhase) * amplitude;
 
-          // 2. 三缕烟各自独立微展安全通道（左向左展 1.5px，右向右展 1.5px，中立居中，绝对互不缠绕相交）
-          const laneSpread = (s - 1) * (1.5 * Math.pow(p, 1.15));
+          // 2. 独立安全间距通道与偏向（绝对互不缠绕）
+          const laneSpread = prof.laneBias * Math.pow(p, 1.15);
 
           // 3. 室内极微弱的自然微风协同漂移
-          const windDrift = (wind * 0.15) * (2.0 * Math.pow(p, 1.1));
+          const windDrift = (wind * 0.14) * (1.6 * Math.pow(p, 1.1));
 
           // 目标横向位置与平滑过渡
           const targetX = emb.x + sCurveWave + laneSpread + windDrift;
           node.x += (targetX - node.x) * 0.22;
 
-          // 3. 烟体造型：对标设计图，中段舒展成宽约 4.6px 的工笔柔带，尾部变尖细！
+          // 4. 差异化烟体造型：对标设计图，各自拥有独立中段宽度，尾部变尖细！
           const prog = node.age / node.maxAge;
           if (prog < 0.22) {
-            // 根部出烟段：自香尖 (1.2px) 渐次展开至 3.8px
             const t = prog / 0.22;
-            node.width = 1.2 + t * 2.6;
+            node.width = prof.baseW + t * (prof.maxW - prof.baseW);
             node.alpha = 0.2 + t * 0.6;
           } else if (prog < 0.62) {
-            // 中段躯干：饱满丰盈、柔美流转的工笔主幔（3.8 ~ 4.8px）
             const t = (prog - 0.22) / 0.40;
             const arch = Math.sin(t * Math.PI);
-            node.width = 3.8 + arch * 1.0;
+            node.width = prof.maxW * (0.88 + arch * 0.12);
             node.alpha = 0.8 - t * 0.12;
           } else {
-            // 尾部渐尖段（变尖细！从 3.8px 优雅收束至 0.25px 锋芒尖梢）
             const t = (prog - 0.62) / 0.38;
-            node.width = Math.max(0.25, 3.8 * Math.pow(1.0 - t, 1.35));
+            node.width = Math.max(prof.tipW, prof.maxW * Math.pow(1.0 - t, 1.35));
             node.alpha = 0.68 * Math.pow(1.0 - t, 1.25);
           }
         }

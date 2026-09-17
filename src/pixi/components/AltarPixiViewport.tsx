@@ -100,14 +100,14 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     return { width: Math.round(w), height: Math.round(h) };
   }, []);
 
-  // 供案透视布局几何（将供桌从靠墙深处向人的面前大幅推进，拉开建筑与大厅纵深）
+  // 供案透视布局几何（后移 30px，同时桌面显著加宽，呈现端庄沉浸的大厅视野）
   const getTableLayout = useCallback((width: number, height: number) => {
     const centerX = width * 0.5;
-    // 供案适度舒展（桌面更显沉浸大气）
-    const tableWidth = Math.min(width - 24, width < 640 ? 530 : 580);
+    // 桌面加宽（由 580 加宽至 640，移动端由 530 加宽至 560，更加端庄沉稳）
+    const tableWidth = Math.min(width - 16, width < 640 ? 560 : 640);
     const tableHeight = tableWidth * (160 / 560);
-    // 底部余量由原本贴墙的 112px 缩减至 36px，使供案真正置身于用户面前的前景地坪上
-    const tableBottomOffset = width < 640 ? 26 : 36;
+    // 供案后移 30px（由原本 36px 增加 30px 至 66px，移动端由 26px 增至 56px）
+    const tableBottomOffset = width < 640 ? 56 : 66;
     const tableTopY = height - tableBottomOffset - tableHeight * 0.71;
     return { centerX, tableTopY, tableWidth, tableHeight };
   }, []);

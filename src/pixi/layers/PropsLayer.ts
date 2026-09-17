@@ -400,40 +400,43 @@ export class PropsLayer {
     }
 
     // 3. 将蜡烛实时三维位置与光晕传递给光影层
-    if (this.pixiEffects) {
-      const leftCandleCont = this.propContainers.get('candle_left');
-      const rightCandleCont = this.propContainers.get('candle_right');
+    this.syncCandlesToEffects();
+  }
 
-      const leftCandle = items.candle_left;
-      const rightCandle = items.candle_right;
+  private syncCandlesToEffects(): void {
+    if (!this.pixiEffects) return;
+    const leftCandleCont = this.propContainers.get('candle_left');
+    const rightCandleCont = this.propContainers.get('candle_right');
 
-      const leftHealth = Number(leftCandle?.waxHeight ?? (leftCandle?.lifecycle?.health ?? 1.0));
-      const rightHealth = Number(rightCandle?.waxHeight ?? (rightCandle?.lifecycle?.health ?? 1.0));
+    const leftCandle = this.latestItems.candle_left;
+    const rightCandle = this.latestItems.candle_right;
 
-      const leftCurrentWax = Math.max(0.08, Math.min(1.0, Math.round(leftHealth * 10) / 10));
-      const rightCurrentWax = Math.max(0.08, Math.min(1.0, Math.round(rightHealth * 10) / 10));
+    const leftHealth = Number(leftCandle?.waxHeight ?? (leftCandle?.lifecycle?.health ?? 1.0));
+    const rightHealth = Number(rightCandle?.waxHeight ?? (rightCandle?.lifecycle?.health ?? 1.0));
 
-      const leftCandleH = Math.round(18 + 54 * leftCurrentWax);
-      const rightCandleH = Math.round(18 + 54 * rightCurrentWax);
+    const leftCurrentWax = Math.max(0.08, Math.min(1.0, Math.round(leftHealth * 10) / 10));
+    const rightCurrentWax = Math.max(0.08, Math.min(1.0, Math.round(rightHealth * 10) / 10));
 
-      // 火苗中心位于蜡烛凹槽向上 (candleH + 5) 处，精准对准跳动的火苗核心
-      const leftFlameCenterY = leftCandleCont
-        ? leftCandleCont.y - (leftCandleH + 5) * this.currentScaleFactor
-        : altarTopY - (leftCandleH + 5) * this.currentScaleFactor;
-      const rightFlameCenterY = rightCandleCont
-        ? rightCandleCont.y - (rightCandleH + 5) * this.currentScaleFactor
-        : altarTopY - (rightCandleH + 5) * this.currentScaleFactor;
+    const leftCandleH = Math.round(18 + 54 * leftCurrentWax);
+    const rightCandleH = Math.round(18 + 54 * rightCurrentWax);
 
-      this.pixiEffects.updateCandles(
-        leftCandleCont ? leftCandleCont.x : altarCenterX - 74 * this.currentScaleFactor,
-        leftFlameCenterY,
-        !!leftCandle?.isLit,
-        rightCandleCont ? rightCandleCont.x : altarCenterX + 74 * this.currentScaleFactor,
-        rightFlameCenterY,
-        !!rightCandle?.isLit,
-        this.currentScaleFactor
-      );
-    }
+    // 火苗中心位于蜡烛凹槽向上 (candleH + 5) 处，精准对准跳动的火苗核心
+    const leftFlameCenterY = leftCandleCont
+      ? leftCandleCont.y - (leftCandleH + 5) * this.currentScaleFactor
+      : this.currentAltarTopY - (leftCandleH + 5) * this.currentScaleFactor;
+    const rightFlameCenterY = rightCandleCont
+      ? rightCandleCont.y - (rightCandleH + 5) * this.currentScaleFactor
+      : this.currentAltarTopY - (rightCandleH + 5) * this.currentScaleFactor;
+
+    this.pixiEffects.updateCandles(
+      leftCandleCont ? leftCandleCont.x : this.currentAltarCenterX - 74 * this.currentScaleFactor,
+      leftFlameCenterY,
+      !!leftCandle?.isLit,
+      rightCandleCont ? rightCandleCont.x : this.currentAltarCenterX + 74 * this.currentScaleFactor,
+      rightFlameCenterY,
+      !!rightCandle?.isLit,
+      this.currentScaleFactor
+    );
   }
 
   public update(delta: number = 1): void {
@@ -466,6 +469,9 @@ export class PropsLayer {
       const censerHealth = Number(censerItem?.lifecycle?.health ?? (censerItem?.incenseHealth ?? 1.0));
       this.incenseSmoke.update(delta, isCenserLit, 0.15, 1.0, censerHealth, 'day');
     }
+
+    // 每一帧同步烛光位置与光晕
+    this.syncCandlesToEffects();
   }
 
   public destroy(): void {

@@ -122,6 +122,17 @@ export class PixiEffects {
     }
   }
 
+  private candleState = {
+    leftX: 0,
+    leftY: 0,
+    leftLit: false,
+    rightX: 0,
+    rightY: 0,
+    rightLit: false,
+    scale: 1.0,
+    hasState: false,
+  };
+
   /**
    * 更新烛火光晕位置与呼吸动态
    */
@@ -135,7 +146,14 @@ export class PixiEffects {
     scale: number = 1.0,
     windForce: number = 0.15
   ): void {
-    const breathe = Math.sin(this.time * 0.06) * 0.08 + Math.cos(this.time * 0.11) * 0.05;
+    this.candleState = { leftX, leftY, leftLit, rightX, rightY, rightLit, scale, hasState: true };
+    this.applyCandleGlow();
+  }
+
+  public applyCandleGlow(): void {
+    if (!this.candleState.hasState) return;
+    const { leftX, leftY, leftLit, rightX, rightY, rightLit, scale } = this.candleState;
+    const breathe = Math.sin(this.time * 0.08) * 0.06 + Math.cos(this.time * 0.17) * 0.04;
 
     // 烛光光晕精准环绕火苗核心，轻柔漫射于烛顶蜡池（对标参考图二中圆润集中的暖金辉光）
     if (this.leftCandleGlow) {
@@ -143,9 +161,10 @@ export class PixiEffects {
       if (leftLit) {
         this.leftCandleGlow.x = leftX;
         this.leftCandleGlow.y = leftY;
-        const glowScale = (0.34 + breathe * 0.03) * scale;
+        // 在 256px 贴图上，scale 0.58 对应直径约 150px，半径 75px，形成图二中温暖醒目的真实烛照
+        const glowScale = (0.58 + breathe * 0.04) * scale;
         this.leftCandleGlow.scale.set(glowScale);
-        this.leftCandleGlow.alpha = 0.58 + breathe * 0.12;
+        this.leftCandleGlow.alpha = 0.85 + breathe * 0.12;
       }
       this.leftCandleFlame.clear();
     }
@@ -155,9 +174,9 @@ export class PixiEffects {
       if (rightLit) {
         this.rightCandleGlow.x = rightX;
         this.rightCandleGlow.y = rightY;
-        const glowScale = (0.34 - breathe * 0.03) * scale;
+        const glowScale = (0.58 - breathe * 0.04) * scale;
         this.rightCandleGlow.scale.set(glowScale);
-        this.rightCandleGlow.alpha = 0.58 - breathe * 0.12;
+        this.rightCandleGlow.alpha = 0.85 - breathe * 0.12;
       }
       this.rightCandleFlame.clear();
     }
@@ -168,24 +187,22 @@ export class PixiEffects {
    */
   public updateGodRays(width: number, height: number, intensity: number = 0.6): void {
     this.raysGraphics.clear();
-    if (intensity <= 0.01) return;
+    if (intensity <= 0.05) return;
 
-    // 从上方月洞门斜向右下投射 4 条光束
-    const rayAlpha = Math.min(0.25, intensity * 0.22);
-    const originX = width * 0.48;
-    const originY = height * 0.24;
+    const originX = width * 0.5;
+    const originY = -40;
+    const rayAlpha = Math.min(0.28, intensity * 0.22);
 
     const beams = [
-      { spread: 60, targetOffset: -120 },
-      { spread: 90, targetOffset: 0 },
-      { spread: 110, targetOffset: 160 },
-      { spread: 70, targetOffset: 280 },
+      { targetOffset: -180, spread: 45 },
+      { targetOffset: -70, spread: 55 },
+      { targetOffset: 60, spread: 50 },
+      { targetOffset: 170, spread: 60 },
     ];
 
     beams.forEach((b) => {
       this.raysGraphics.beginPath();
-      this.raysGraphics.moveTo(originX - 30, originY);
-      this.raysGraphics.lineTo(originX + 30, originY);
+      this.raysGraphics.moveTo(originX, originY);
       this.raysGraphics.lineTo(originX + b.targetOffset + b.spread, height);
       this.raysGraphics.lineTo(originX + b.targetOffset - b.spread, height);
       this.raysGraphics.closePath();
@@ -198,6 +215,7 @@ export class PixiEffects {
    */
   public update(delta: number = 1): void {
     this.time += delta;
+    this.applyCandleGlow();
 
     for (let i = 0; i < this.petalPool.length; i++) {
       const p = this.petalPool[i];

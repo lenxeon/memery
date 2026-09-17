@@ -81,7 +81,7 @@ export class TexturePipeline {
     try {
       // 1. 生成程序化柔和烟雾与烛光粒子纹理 (同步即时生成)
       this.smokeParticleTexture = this.generateSoftRadialTexture(64, 'rgba(235, 230, 222, 0.45)');
-      this.glowTexture = this.generateSoftRadialTexture(128, 'rgba(255, 195, 110, 0.7)');
+      this.glowTexture = this.generateCandleGlowTexture();
 
       // 2. 生成各花系落花粒子纹理
       const petalColors: Record<FlowerType, string> = {
@@ -325,6 +325,32 @@ export class TexturePipeline {
     grad.addColorStop(0, centerColor);
     grad.addColorStop(0.4, centerColor.replace(/[\d.]+\)$/, '0.2)'));
     grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(center, center, center, 0, Math.PI * 2);
+    ctx.fill();
+
+    return Texture.from(canvas);
+  }
+
+  /**
+   * 生成华贵温润的多层烛光光晕纹理 (对标设计稿图二中圆润温暖的烛照氛围)
+   */
+  public generateCandleGlowTexture(): Texture {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+
+    const center = size / 2;
+    const grad = ctx.createRadialGradient(center, center, 2, center, center, center);
+    grad.addColorStop(0, 'rgba(255, 242, 195, 0.95)');   // 核心炽亮白金暖心
+    grad.addColorStop(0.18, 'rgba(255, 190, 70, 0.82)'); // 金黄炽烈内圈
+    grad.addColorStop(0.42, 'rgba(255, 135, 30, 0.48)'); // 醇厚温暖琥珀橙
+    grad.addColorStop(0.70, 'rgba(240, 85, 15, 0.18)');  // 柔和外展光晕
+    grad.addColorStop(1.0, 'rgba(200, 50, 0, 0)');        // 渐隐消散
 
     ctx.fillStyle = grad;
     ctx.beginPath();

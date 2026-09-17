@@ -77,8 +77,8 @@ export class CandleFlameRenderer {
       const flameWidth = (14 + Math.cos(this.time * 5) * 1.5) * scale * Math.max(0.55, lateFlameFactor);
 
       // 1. Soft Warm Ambient Glow (4 段暖橙柔光漫射)
-      const effectiveGlow = glowIntensity * (0.35 + 0.65 * lateFlameFactor);
-      const maxGlowRadius = 28 * scale * Math.max(0.5, lateFlameFactor);
+      const effectiveGlow = glowIntensity * (0.45 + 0.55 * lateFlameFactor);
+      const maxGlowRadius = 38 * scale * Math.max(0.5, lateFlameFactor);
       const glowCenterY = baseY - flameHeight * 0.45;
       const radialGlow = ctx.createRadialGradient(
         centerX + windTilt * 0.3,
@@ -88,10 +88,10 @@ export class CandleFlameRenderer {
         glowCenterY,
         maxGlowRadius
       );
-      radialGlow.addColorStop(0, `rgba(255, 180, 50, ${0.4 * effectiveGlow})`);
-      radialGlow.addColorStop(0.4, `rgba(255, 130, 20, ${0.18 * effectiveGlow})`);
-      radialGlow.addColorStop(0.75, `rgba(255, 90, 0, ${0.04 * effectiveGlow})`);
-      radialGlow.addColorStop(1, 'rgba(255, 90, 0, 0)');
+      radialGlow.addColorStop(0, `rgba(255, 210, 100, ${0.75 * effectiveGlow})`);
+      radialGlow.addColorStop(0.35, `rgba(255, 150, 40, ${0.45 * effectiveGlow})`);
+      radialGlow.addColorStop(0.70, `rgba(255, 100, 10, ${0.15 * effectiveGlow})`);
+      radialGlow.addColorStop(1, 'rgba(255, 80, 0, 0)');
 
       ctx.fillStyle = radialGlow;
       ctx.beginPath();
