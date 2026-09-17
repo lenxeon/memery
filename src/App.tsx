@@ -23,23 +23,31 @@ import {
   FloorStyle,
   AuditCategory,
   AuditGroup,
+  VaseAuditGroup,
+  FlowerAuditGroup,
   UserProfile,
   MemorialHallItem
 } from './types';
-import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait, FLOOR_STYLE_OPTIONS } from './components/scene';
-import { VolumetricRays, DustMotes, PetalShower } from './components/effects';
+import { AltarWall, FloorPlanks, FLOOR_STYLE_OPTIONS, VolumetricRays, DustMotes, PetalShower } from './pixi/environment';
 import { AltarPixiViewport } from './pixi/components/AltarPixiViewport';
 
-import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerModal, BlessingModal, UserAgreementModal } from './components/settings';
-import { AuthPage } from './components/auth';
-import { MemorialListModal, CreateMemorialModal } from './components/memorial';
-
-import { BottomDock } from './components/controls';
-import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
-import { VaseStyle, getVaseStyleMeta } from './components/offerings/flowers/vases';
-import { FLOWER_REGISTRY } from './components/offerings/flowers';
-import { CinnabarSealBadge } from './components/common/ChineseDecorations';
-import { useWorldLoop } from './game/lifecycle/useWorldLoop';
+import { 
+  EnvironmentDrawer, 
+  WALL_STYLE_OPTIONS, 
+  FlowerPickerModal, 
+  FruitPickerModal, 
+  BlessingModal, 
+  UserAgreementModal,
+  AuthPage,
+  MemorialListModal, 
+  CreateMemorialModal,
+  BottomDock,
+  MemorialPortrait,
+  CinnabarSealBadge 
+} from './ui';
+import { VaseStyle, getVaseStyleMeta } from './pixi/assets/templates/flowers/vases';
+import { FLOWER_REGISTRY } from './pixi/assets/templates/flowers';
+import { useWorldLoop } from './utils/useWorldLoop';
 import { sound } from './utils/audio';
 import {
   Sun,
@@ -60,21 +68,91 @@ import {
   Compass
 } from 'lucide-react';
 
-// ── 供案常规陈设 (五供齐备) ──
-export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
-  vase_left: FloraFactory.createVase('left', 'peonies', { x: -164, y: -4 }, 'warm_white_plain'),
-  vase_right: FloraFactory.createVase('right', 'lilies', { x: 164, y: -4 }, 'painted_iris'),
-  candle_left: RitualFactory.createCandle('left', { x: -74, y: 3 }, true),
-  candle_right: RitualFactory.createCandle('right', { x: 74, y: 3 }, true),
-  censer: RitualFactory.createCenser({ x: 0, y: 6 }, true),
-  fruit_left: VesselFactory.createFruitPlatter('left', 'apples', { x: -118, y: 16 }),
-  fruit_right: VesselFactory.createFruitPlatter('right', 'oranges', { x: 118, y: 16 }),
-  tea_cups: VesselFactory.createTeaCups({ x: 0, y: 22 }),
-  singing_bowl: RitualFactory.createSingingBowl({ x: -62, y: 32 }),
+// ── 供案摆件纯数据构造器 ──
+const createVaseItem = (
+  id: string,
+  flowerType: FlowerType | 'none',
+  position: { x: number; y: number },
+  vaseStyle: VaseStyle = 'warm_white_plain',
+  name: string = '花瓶',
+  scale: number = 0.95
+): SceneItem => ({
+  id,
+  type: 'vase',
+  name,
+  flowerType: flowerType as FlowerType,
+  vaseStyle,
+  position,
+  scale,
 });
 
-// ── 🔍 专项审计展台 (台面清空其它所有物品，并列陈列供逐一审计花器形制、微观肌理与名花形神) ──
-export type { AuditCategory, VaseAuditGroup, FlowerAuditGroup, AuditGroup } from './types';
+const createBouquetItem = (
+  flowerType: FlowerType,
+  position: { x: number; y: number },
+  options?: { id?: string; name?: string }
+): SceneItem => ({
+  id: options?.id || 'bouquet',
+  type: 'flower',
+  name: options?.name || `敬献 · ${flowerType}`,
+  flowerType,
+  position,
+  scale: 0.95,
+});
+
+// ── 供案常规陈设 (五供齐备) ──
+export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
+  vase_left: createVaseItem('vase_left', 'peonies', { x: -164, y: -4 }, 'warm_white_plain', '富贵牡丹花瓶 (左)'),
+  vase_right: createVaseItem('vase_right', 'lilies', { x: 164, y: -4 }, 'painted_iris', '纯洁百合花瓶 (右)'),
+  candle_left: {
+    id: 'candle_left',
+    type: 'candle',
+    name: '长明红烛 (左)',
+    position: { x: -74, y: 3 },
+    isLit: true,
+  },
+  candle_right: {
+    id: 'candle_right',
+    type: 'candle',
+    name: '长明红烛 (右)',
+    position: { x: 74, y: 3 },
+    isLit: true,
+  },
+  censer: {
+    id: 'censer',
+    type: 'censer',
+    name: '青瓷清香香炉 (中)',
+    position: { x: 0, y: 6 },
+    isLit: true,
+  },
+  fruit_left: {
+    id: 'fruit_left',
+    type: 'fruit',
+    name: '平安红富士苹果盘 (左)',
+    fruitType: 'apples',
+    position: { x: -118, y: 16 },
+  },
+  fruit_right: {
+    id: 'fruit_right',
+    type: 'fruit',
+    name: '吉祥砂糖橘盘 (右)',
+    fruitType: 'oranges',
+    position: { x: 118, y: 16 },
+  },
+  tea_cups: {
+    id: 'tea_cups',
+    type: 'tea_cups',
+    name: '虔诚敬茶三盏',
+    position: { x: 0, y: 22 },
+  },
+  singing_bowl: {
+    id: 'singing_bowl',
+    type: 'singing_bowl',
+    name: '静心铜磬颂钵 (左前)',
+    position: { x: -62, y: 32 },
+  },
+});
+
+export type { AuditCategory, VaseAuditGroup, FlowerAuditGroup, AuditGroup };
 
 // 1. 雅瓷花器形制专项审计
 export const buildAuditVaseItems = (
@@ -84,7 +162,7 @@ export const buildAuditVaseItems = (
   if (group === 'new_unique') {
     // 4 款全新异形与手作/旋涡/流沙微观质感花器 (最新参考图提炼打造)
     return {
-      vase_audit_1: FloraFactory.createVase(
+      vase_audit_1: createVaseItem(
         'vase_audit_1',
         withFlowers ? 'peonies' : 'none',
         { x: -140, y: 0 },
@@ -92,7 +170,7 @@ export const buildAuditVaseItems = (
         '1. 手作泥捏翻边陶瓶 (梳齿拉坯刮痕粗陶)',
         0.96
       ),
-      vase_audit_2: FloraFactory.createVase(
+      vase_audit_2: createVaseItem(
         'vase_audit_2',
         withFlowers ? 'lilies' : 'none',
         { x: -46, y: -4 },
@@ -100,7 +178,7 @@ export const buildAuditVaseItems = (
         '2. 银曜珠光螺旋涡轮瓶 (8道3D旋转刀锋棱)',
         0.96
       ),
-      vase_audit_3: FloraFactory.createVase(
+      vase_audit_3: createVaseItem(
         'vase_audit_3',
         withFlowers ? 'lotus' : 'none',
         { x: 46, y: -4 },
@@ -108,7 +186,7 @@ export const buildAuditVaseItems = (
         '3. 极简莫兰迪旋转扭扭塔 (90°沙漏扭转腰)',
         0.96
       ),
-      vase_audit_4: FloraFactory.createVase(
+      vase_audit_4: createVaseItem(
         'vase_audit_4',
         withFlowers ? 'roses' : 'none',
         { x: 140, y: 0 },
@@ -121,14 +199,14 @@ export const buildAuditVaseItems = (
 
   // designer_twist: 8 款现代几何折痕与器形
   return {
-    vase_audit_1: FloraFactory.createVase('vase_audit_1', withFlowers ? 'peonies' : 'none', { x: -189, y: 4 }, 'ribbed_fluted_white', '1. 极细百褶密棱瓶', 0.82),
-    vase_audit_2: FloraFactory.createVase('vase_audit_2', withFlowers ? 'lilies' : 'none', { x: -135, y: 0 }, 'organic_twist_cream', '2. 旋风波浪奶油瓶', 0.82),
-    vase_audit_3: FloraFactory.createVase('vase_audit_3', withFlowers ? 'peonies' : 'none', { x: -81, y: -4 }, 'organic_twist_rose', '3. 落樱粉旋风波纹瓶', 0.82),
-    vase_audit_4: FloraFactory.createVase('vase_audit_4', withFlowers ? 'roses' : 'none', { x: -27, y: -6 }, 'chiseled_stone_gray', '4. 侘寂砂岩横纹瓶', 0.82),
-    vase_audit_5: FloraFactory.createVase('vase_audit_5', withFlowers ? 'lotus' : 'none', { x: 27, y: -6 }, 'fluted_trapezoid_mini', '5. 圆台百褶梯形瓶', 0.82),
-    vase_audit_6: FloraFactory.createVase('vase_audit_6', withFlowers ? 'chrysanthemum' : 'none', { x: 81, y: -4 }, 'faceted_gem_prism', '6. 钻石晶体切角瓶', 0.82),
-    vase_audit_7: FloraFactory.createVase('vase_audit_7', withFlowers ? 'lilies' : 'none', { x: 135, y: 0 }, 'melon_lobed_celadon', '7. 海棠瓜棱秀颈瓶', 0.82),
-    vase_audit_8: FloraFactory.createVase('vase_audit_8', withFlowers ? 'lotus' : 'none', { x: 189, y: 4 }, 'minimal_drop_swan', '8. 极简水滴天鹅瓶', 0.82),
+    vase_audit_1: createVaseItem('vase_audit_1', withFlowers ? 'peonies' : 'none', { x: -189, y: 4 }, 'ribbed_fluted_white', '1. 极细百褶密棱瓶', 0.82),
+    vase_audit_2: createVaseItem('vase_audit_2', withFlowers ? 'lilies' : 'none', { x: -135, y: 0 }, 'organic_twist_cream', '2. 旋风波浪奶油瓶', 0.82),
+    vase_audit_3: createVaseItem('vase_audit_3', withFlowers ? 'peonies' : 'none', { x: -81, y: -4 }, 'organic_twist_rose', '3. 落樱粉旋风波纹瓶', 0.82),
+    vase_audit_4: createVaseItem('vase_audit_4', withFlowers ? 'roses' : 'none', { x: -27, y: -6 }, 'chiseled_stone_gray', '4. 侘寂砂岩横纹瓶', 0.82),
+    vase_audit_5: createVaseItem('vase_audit_5', withFlowers ? 'lotus' : 'none', { x: 27, y: -6 }, 'fluted_trapezoid_mini', '5. 圆台百褶梯形瓶', 0.82),
+    vase_audit_6: createVaseItem('vase_audit_6', withFlowers ? 'chrysanthemum' : 'none', { x: 81, y: -4 }, 'faceted_gem_prism', '6. 钻石晶体切角瓶', 0.82),
+    vase_audit_7: createVaseItem('vase_audit_7', withFlowers ? 'lilies' : 'none', { x: 135, y: 0 }, 'melon_lobed_celadon', '7. 海棠瓜棱秀颈瓶', 0.82),
+    vase_audit_8: createVaseItem('vase_audit_8', withFlowers ? 'lotus' : 'none', { x: 189, y: 4 }, 'minimal_drop_swan', '8. 极简水滴天鹅瓶', 0.82),
   };
 };
 
@@ -150,7 +228,7 @@ export const buildAuditFlowerItems = (
     // 5 款第一梯队名花 (前5)
     return {
       vase_audit_flower_1: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_1',
           'plum_blossoms',
           { x: -144, y: 0 },
@@ -161,7 +239,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_2: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_2',
           'sunflowers',
           { x: -72, y: -4 },
@@ -172,7 +250,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_3: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_3',
           'carnations',
           { x: 0, y: -6 },
@@ -183,7 +261,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_4: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_4',
           'calla_lilies',
           { x: 72, y: -4 },
@@ -194,7 +272,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_5: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_5',
           'tulips',
           { x: 144, y: 0 },
@@ -211,7 +289,7 @@ export const buildAuditFlowerItems = (
     // 5 款第一梯队名花 (后5)
     return {
       vase_audit_flower_6: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_6',
           'narcissus',
           { x: -144, y: 0 },
@@ -222,7 +300,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_7: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_7',
           'lily_of_valley',
           { x: -72, y: -4 },
@@ -233,7 +311,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_8: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_8',
           'orchids',
           { x: 0, y: -6 },
@@ -244,7 +322,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_9: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_9',
           'hydrangeas',
           { x: 72, y: -4 },
@@ -255,7 +333,7 @@ export const buildAuditFlowerItems = (
         lifecycle,
       },
       vase_audit_flower_10: {
-        ...FloraFactory.createVase(
+        ...createVaseItem(
           'vase_audit_flower_10',
           'daisies',
           { x: 144, y: 0 },
@@ -273,45 +351,45 @@ export const buildAuditFlowerItems = (
     return {
       // 后排 5 款 (微靠后、略小尺寸营造进深感)
       vase_audit_flower_6: {
-        ...FloraFactory.createVase('vase_audit_flower_6', 'narcissus', { x: -148, y: -10 }, 'melon_lobed_celadon', '6. 凌波水仙', 0.84),
+        ...createVaseItem('vase_audit_flower_6', 'narcissus', { x: -148, y: -10 }, 'melon_lobed_celadon', '6. 凌波水仙', 0.84),
         lifecycle,
       },
       vase_audit_flower_7: {
-        ...FloraFactory.createVase('vase_audit_flower_7', 'lily_of_valley', { x: -74, y: -12 }, 'fluted_trapezoid_mini', '7. 幽谷铃兰', 0.84),
+        ...createVaseItem('vase_audit_flower_7', 'lily_of_valley', { x: -74, y: -12 }, 'fluted_trapezoid_mini', '7. 幽谷铃兰', 0.84),
         lifecycle,
       },
       vase_audit_flower_8: {
-        ...FloraFactory.createVase('vase_audit_flower_8', 'orchids', { x: 0, y: -14 }, 'twisted_helix_tower', '8. 蝴蝶兰', 0.84),
+        ...createVaseItem('vase_audit_flower_8', 'orchids', { x: 0, y: -14 }, 'twisted_helix_tower', '8. 蝴蝶兰', 0.84),
         lifecycle,
       },
       vase_audit_flower_9: {
-        ...FloraFactory.createVase('vase_audit_flower_9', 'hydrangeas', { x: 74, y: -12 }, 'pinched_clay_ruffle', '9. 紫绣球', 0.84),
+        ...createVaseItem('vase_audit_flower_9', 'hydrangeas', { x: 74, y: -12 }, 'pinched_clay_ruffle', '9. 紫绣球', 0.84),
         lifecycle,
       },
       vase_audit_flower_10: {
-        ...FloraFactory.createVase('vase_audit_flower_10', 'daisies', { x: 148, y: -10 }, 'organic_twist_cream', '10. 小雏菊', 0.84),
+        ...createVaseItem('vase_audit_flower_10', 'daisies', { x: 148, y: -10 }, 'organic_twist_cream', '10. 小雏菊', 0.84),
         lifecycle,
       },
 
       // 前排 5 款
       vase_audit_flower_1: {
-        ...FloraFactory.createVase('vase_audit_flower_1', 'plum_blossoms', { x: -148, y: 12 }, 'ribbed_fluted_white', '1. 傲霜冷香白梅', 0.88),
+        ...createVaseItem('vase_audit_flower_1', 'plum_blossoms', { x: -148, y: 12 }, 'ribbed_fluted_white', '1. 傲霜冷香白梅', 0.88),
         lifecycle,
       },
       vase_audit_flower_2: {
-        ...FloraFactory.createVase('vase_audit_flower_2', 'sunflowers', { x: -74, y: 14 }, 'chiseled_stone_gray', '2. 向日葵', 0.88),
+        ...createVaseItem('vase_audit_flower_2', 'sunflowers', { x: -74, y: 14 }, 'chiseled_stone_gray', '2. 向日葵', 0.88),
         lifecycle,
       },
       vase_audit_flower_3: {
-        ...FloraFactory.createVase('vase_audit_flower_3', 'carnations', { x: 0, y: 16 }, 'organic_twist_rose', '3. 康乃馨', 0.88),
+        ...createVaseItem('vase_audit_flower_3', 'carnations', { x: 0, y: 16 }, 'organic_twist_rose', '3. 康乃馨', 0.88),
         lifecycle,
       },
       vase_audit_flower_4: {
-        ...FloraFactory.createVase('vase_audit_flower_4', 'calla_lilies', { x: 74, y: 14 }, 'minimal_drop_swan', '4. 马蹄莲', 0.88),
+        ...createVaseItem('vase_audit_flower_4', 'calla_lilies', { x: 74, y: 14 }, 'minimal_drop_swan', '4. 马蹄莲', 0.88),
         lifecycle,
       },
       vase_audit_flower_5: {
-        ...FloraFactory.createVase('vase_audit_flower_5', 'tulips', { x: 148, y: 12 }, 'pearlescent_turbine', '5. 郁金香', 0.88),
+        ...createVaseItem('vase_audit_flower_5', 'tulips', { x: 148, y: 12 }, 'pearlescent_turbine', '5. 郁金香', 0.88),
         lifecycle,
       },
     };
@@ -321,23 +399,23 @@ export const buildAuditFlowerItems = (
     // 5 款经典名花
     return {
       vase_audit_flower_c1: {
-        ...FloraFactory.createVase('vase_audit_flower_c1', 'peonies', { x: -144, y: 0 }, 'warm_white_plain', '经典 · 富贵牡丹', 0.96),
+        ...createVaseItem('vase_audit_flower_c1', 'peonies', { x: -144, y: 0 }, 'warm_white_plain', '经典 · 富贵牡丹', 0.96),
         lifecycle,
       },
       vase_audit_flower_c2: {
-        ...FloraFactory.createVase('vase_audit_flower_c2', 'lilies', { x: -72, y: -4 }, 'painted_iris', '经典 · 纯白百合', 0.96),
+        ...createVaseItem('vase_audit_flower_c2', 'lilies', { x: -72, y: -4 }, 'painted_iris', '经典 · 纯白百合', 0.96),
         lifecycle,
       },
       vase_audit_flower_c3: {
-        ...FloraFactory.createVase('vase_audit_flower_c3', 'lotus', { x: 0, y: -6 }, 'celadon_ru', '经典 · 出尘净莲', 0.96),
+        ...createVaseItem('vase_audit_flower_c3', 'lotus', { x: 0, y: -6 }, 'celadon_ru', '经典 · 出尘净莲', 0.96),
         lifecycle,
       },
       vase_audit_flower_c4: {
-        ...FloraFactory.createVase('vase_audit_flower_c4', 'chrysanthemum', { x: 72, y: -4 }, 'ribbed_fluted_white', '经典 · 傲霜白菊', 0.96),
+        ...createVaseItem('vase_audit_flower_c4', 'chrysanthemum', { x: 72, y: -4 }, 'ribbed_fluted_white', '经典 · 傲霜白菊', 0.96),
         lifecycle,
       },
       vase_audit_flower_c5: {
-        ...FloraFactory.createVase('vase_audit_flower_c5', 'roses', { x: 144, y: 0 }, 'chiseled_stone_gray', '经典 · 长情玫瑰', 0.96),
+        ...createVaseItem('vase_audit_flower_c5', 'roses', { x: 144, y: 0 }, 'chiseled_stone_gray', '经典 · 长情玫瑰', 0.96),
         lifecycle,
       },
     };
@@ -346,18 +424,18 @@ export const buildAuditFlowerItems = (
   // flowers_bouquets: 案前敬献花束平铺比对
   return {
     // 后排 5 束花
-    offered_flower_b6: FloraFactory.createOfferedBouquet('narcissus', { x: -140, y: -4 }, { id: 'offered_flower_b6', name: '水仙花束' }),
-    offered_flower_b7: FloraFactory.createOfferedBouquet('lily_of_valley', { x: -70, y: -4 }, { id: 'offered_flower_b7', name: '铃兰花束' }),
-    offered_flower_b8: FloraFactory.createOfferedBouquet('orchids', { x: 0, y: -4 }, { id: 'offered_flower_b8', name: '蝴蝶兰花束' }),
-    offered_flower_b9: FloraFactory.createOfferedBouquet('hydrangeas', { x: 70, y: -4 }, { id: 'offered_flower_b9', name: '绣球花束' }),
-    offered_flower_b10: FloraFactory.createOfferedBouquet('daisies', { x: 140, y: -4 }, { id: 'offered_flower_b10', name: '雏菊花束' }),
+    offered_flower_b6: createBouquetItem('narcissus', { x: -140, y: -4 }, { id: 'offered_flower_b6', name: '水仙花束' }),
+    offered_flower_b7: createBouquetItem('lily_of_valley', { x: -70, y: -4 }, { id: 'offered_flower_b7', name: '铃兰花束' }),
+    offered_flower_b8: createBouquetItem('orchids', { x: 0, y: -4 }, { id: 'offered_flower_b8', name: '蝴蝶兰花束' }),
+    offered_flower_b9: createBouquetItem('hydrangeas', { x: 70, y: -4 }, { id: 'offered_flower_b9', name: '绣球花束' }),
+    offered_flower_b10: createBouquetItem('daisies', { x: 140, y: -4 }, { id: 'offered_flower_b10', name: '雏菊花束' }),
 
     // 前排 5 束花
-    offered_flower_b1: FloraFactory.createOfferedBouquet('plum_blossoms', { x: -140, y: 18 }, { id: 'offered_flower_b1', name: '冷香素白梅' }),
-    offered_flower_b2: FloraFactory.createOfferedBouquet('sunflowers', { x: -70, y: 18 }, { id: 'offered_flower_b2', name: '向日葵花束' }),
-    offered_flower_b3: FloraFactory.createOfferedBouquet('carnations', { x: 0, y: 18 }, { id: 'offered_flower_b3', name: '康乃馨花束' }),
-    offered_flower_b4: FloraFactory.createOfferedBouquet('calla_lilies', { x: 70, y: 18 }, { id: 'offered_flower_b4', name: '马蹄莲花束' }),
-    offered_flower_b5: FloraFactory.createOfferedBouquet('tulips', { x: 140, y: 18 }, { id: 'offered_flower_b5', name: '郁金香花束' }),
+    offered_flower_b1: createBouquetItem('plum_blossoms', { x: -140, y: 18 }, { id: 'offered_flower_b1', name: '冷香素白梅' }),
+    offered_flower_b2: createBouquetItem('sunflowers', { x: -70, y: 18 }, { id: 'offered_flower_b2', name: '向日葵花束' }),
+    offered_flower_b3: createBouquetItem('carnations', { x: 0, y: 18 }, { id: 'offered_flower_b3', name: '康乃馨花束' }),
+    offered_flower_b4: createBouquetItem('calla_lilies', { x: 70, y: 18 }, { id: 'offered_flower_b4', name: '马蹄莲花束' }),
+    offered_flower_b5: createBouquetItem('tulips', { x: 140, y: 18 }, { id: 'offered_flower_b5', name: '郁金香花束' }),
   };
 };
 
@@ -698,17 +776,19 @@ export default function App() {
     setItems((prev) => {
       const item = prev[id];
       if (!item) return prev;
-      const inferredType: EntityTypeId = (item.type || (
-        id.startsWith('candle') ? 'candle' :
-          id === 'censer' ? 'censer' : 'candle'
-      )) as EntityTypeId;
-      const worldContext: WorldContext = {
-        deltaSec: 0,
-        timeScale,
-        lighting,
-        soundEnabled,
+      const nextLit = !item.isLit;
+      const updated: SceneItem = {
+        ...item,
+        isLit: nextLit,
+        lifecycle: (item.lifecycle?.stage === 'expired' || (item.lifecycle?.health ?? 1) <= 0.05) && nextLit
+          ? {
+              ...item.lifecycle,
+              stage: 'blooming',
+              age: 0,
+              health: 1.0,
+            }
+          : item.lifecycle,
       };
-      const updated = itemRegistry.interactItem({ ...item, type: inferredType }, 'toggle_lit', worldContext);
       if (item.lifecycle?.stage === 'expired' || (item.lifecycle?.health ?? 1) <= 0.05) {
         showToast(id.startsWith('candle') ? '已添上崭新长明红烛并点燃' : '已敬奉崭新三炷高香并点燃');
       }
@@ -938,7 +1018,7 @@ export default function App() {
     const offsetX = existingOffered === 0 ? 0 : (existingOffered % 2 === 1 ? -65 : 65);
     const offsetY = Math.min(24, 14 + (existingOffered % 4) * 3);
 
-    const newBouquet = FloraFactory.createOfferedBouquet(
+    const newBouquet = createBouquetItem(
       flowerType,
       { x: offsetX, y: offsetY },
       { id: newId, name: `敬献 · ${name}` }
@@ -1124,12 +1204,14 @@ export default function App() {
     const offsetX = existingFruits === 0 ? 0 : (existingFruits % 2 === 1 ? -150 : 150);
     const offsetY = Math.min(32, 22 + (existingFruits % 3) * 4);
 
-    const newFruitDish = VesselFactory.createFruitPlatter(
-      `offered_${Date.now()}`,
+    const newFruitDish: SceneItem = {
+      id: newId,
+      type: 'fruit',
+      name: `敬奉 · ${fruitNames[fruitType]}`,
       fruitType,
-      { x: offsetX, y: offsetY },
-      { id: newId, name: `敬奉 · ${fruitNames[fruitType]}` }
-    );
+      position: { x: offsetX, y: offsetY },
+      scale: 0.95,
+    };
 
     setItems((prev) => ({
       ...prev,

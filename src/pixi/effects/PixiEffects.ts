@@ -161,10 +161,9 @@ export class PixiEffects {
       if (leftLit) {
         this.leftCandleGlow.x = leftX;
         this.leftCandleGlow.y = leftY;
-        // 在 256px 贴图上，scale 0.58 对应直径约 150px，半径 75px，形成图二中温暖醒目的真实烛照
-        const glowScale = (0.58 + breathe * 0.04) * scale;
+        const glowScale = (0.42 + breathe * 0.03) * scale;
         this.leftCandleGlow.scale.set(glowScale);
-        this.leftCandleGlow.alpha = 0.85 + breathe * 0.12;
+        this.leftCandleGlow.alpha = 0.45 + breathe * 0.08;
       }
       this.leftCandleFlame.clear();
     }
@@ -174,9 +173,9 @@ export class PixiEffects {
       if (rightLit) {
         this.rightCandleGlow.x = rightX;
         this.rightCandleGlow.y = rightY;
-        const glowScale = (0.58 - breathe * 0.04) * scale;
+        const glowScale = (0.42 - breathe * 0.03) * scale;
         this.rightCandleGlow.scale.set(glowScale);
-        this.rightCandleGlow.alpha = 0.85 - breathe * 0.12;
+        this.rightCandleGlow.alpha = 0.45 - breathe * 0.08;
       }
       this.rightCandleFlame.clear();
     }

@@ -10,7 +10,7 @@ import { PixiEffects } from '../effects/PixiEffects';
 import { CandleFlameRenderer } from '../effects/CandleFlameRenderer';
 import { IncenseSmokeRenderer } from '../effects/IncenseSmokeRenderer';
 import { SceneItem, SceneItemId, FlowerType, FruitType } from '../../types';
-import { VaseStyle } from '../../components/offerings/flowers/vases';
+import { VaseStyle } from '../assets/templates/flowers/vases';
 import { sound } from '../../utils/audio';
 
 export interface PropsLayerCallbacks {
@@ -181,7 +181,6 @@ export class PropsLayer {
             const spread = this.currentAltarWidth / 560;
             const relX = (cont!.x - this.currentAltarCenterX) / spread / this.currentScaleFactor;
             const relY = (cont!.y - this.currentAltarTopY) / this.currentScaleFactor;
-            this.callbacks.onUpdateItemPosition?.(id as SceneItemId, { x: relX, y: relY });
             this.callbacks.onUpdatePosition?.(id as SceneItemId, {
               x: Math.round(relX),
               y: Math.round(relY),
@@ -191,7 +190,6 @@ export class PropsLayer {
             if (id.startsWith('candle_')) {
               if (item.isLit) sound.playExtinguish();
               else sound.playMatchStrike();
-              this.callbacks.onToggleItemLit?.(id as SceneItemId);
               this.callbacks.onToggleLit?.(id as SceneItemId);
             } else if (id.startsWith('fruit_')) {
               sound.playWoodPlacement();
@@ -204,7 +202,6 @@ export class PropsLayer {
             } else if (id === 'censer') {
               if (item.isLit) sound.playExtinguish();
               else sound.playMatchStrike();
-              this.callbacks.onToggleItemLit?.(id as SceneItemId);
               this.callbacks.onToggleLit?.(id as SceneItemId);
             }
           }
@@ -291,7 +288,7 @@ export class PropsLayer {
         this.incenseSmoke.sprite.x = 0;
         this.incenseSmoke.sprite.y = -34;
       } else if (id.startsWith('candle_')) {
-        const health = item.waxHeight ?? (item.lifecycle?.health ?? 1.0);
+        const health = Number(item.waxHeight ?? item.lifecycle?.health ?? 1.0);
         const isLit = !!item.isLit;
         const qHealth = Math.round(health * 10) / 10;
         const currentWaxFactor = Math.max(0.08, Math.min(1.0, qHealth));

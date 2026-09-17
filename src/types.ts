@@ -45,7 +45,7 @@ export type FruitType =
   | 'pineapples'
   | 'pears';
 
-export type { VaseStyle } from './components/offerings/flowers/vases';
+export type { VaseStyle } from './pixi/assets/templates/flowers/vases';
 
 export type TableclothStyle = 
   | 'autumn_gold'       // 👑 秋香金 · 宫廷织锦 (如参考图2)
@@ -66,9 +66,9 @@ export type WallBackgroundStyle =
 export type SceneItemId = string;
 
 // Re-export game entity types
-export * from './game/types/entity';
+export * from './types/entity';
 
-import { GameItemData } from './game/types/entity';
+import { GameItemData } from './types/entity';
 
 export interface SceneItem extends GameItemData {}
 

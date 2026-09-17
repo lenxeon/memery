@@ -4,17 +4,35 @@
  * 100% 渲染真实 3D 禅意红木雕花供案与华美垂悬织锦桌布 (来自 AltarTableSvg 高清 GPU 纹理)。
  */
 import { Container, Sprite } from 'pixi.js';
-import { TableclothStyle } from '../../types';
+import { TableclothStyle, LightingSettings } from '../../types';
 import { TexturePipeline } from '../assets/TexturePipeline';
 
 export class AltarTableLayer {
   public container: Container = new Container();
   private tableSprite: Sprite = new Sprite();
   private currentKey: string = '';
+  private currentLighting: LightingSettings | null = null;
 
   constructor() {
     this.tableSprite.visible = false;
     this.container.addChild(this.tableSprite);
+  }
+
+  /**
+   * 根据灯光状态给桌面 sprite 施加 tint 暗化，与 FloorLayer 保持视觉一致。
+   */
+  public setLighting(lighting: LightingSettings): void {
+    this.currentLighting = lighting;
+    if (!lighting.masterOn) {
+      // 关灯 — 深暖棕，与地板暗部协调
+      this.tableSprite.tint = 0x241a12;
+    } else if (lighting.timeOfDay === 'sunset') {
+      this.tableSprite.tint = 0xffe0c0;
+    } else if (lighting.timeOfDay === 'night') {
+      this.tableSprite.tint = 0x7a8fa8;
+    } else {
+      this.tableSprite.tint = 0xffffff;
+    }
   }
 
   /**
@@ -53,6 +71,8 @@ export class AltarTableLayer {
           if (!this.tableSprite.destroyed) {
             this.tableSprite.texture = tex;
             this.tableSprite.visible = true;
+            // 纹理加载完成后重新应用当前灯光 tint（避免异步导致的状态遗漏）
+            if (this.currentLighting) this.setLighting(this.currentLighting);
           }
         })
         .catch((err) => {

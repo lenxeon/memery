@@ -14,12 +14,12 @@ interface TextureCacheEntry {
 
 const textureCache = new Map<string, TextureCacheEntry>();
 
-function createFallbackTexture(width: number, height: number, color: string = '#c29a67'): Texture {
+function createFallbackTexture(width: number, height: number, color: string = 'rgba(0,0,0,0)'): Texture {
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(32, Math.round(width));
-  canvas.height = Math.max(32, Math.round(height));
+  canvas.width = Math.max(1, Math.round(width));
+  canvas.height = Math.max(1, Math.round(height));
   const ctx = canvas.getContext('2d');
-  if (ctx) {
+  if (ctx && color !== 'rgba(0,0,0,0)') {
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
@@ -49,13 +49,13 @@ export async function rasterizeSvgToTexture(
   }
 
   return new Promise((resolve) => {
-    // 500ms 超时保护，避免任何原因导致 Promise 永久挂起
+    // 8000ms 超时保护，避免复杂矢量首帧光栅化被异常阻断
     const timer = setTimeout(() => {
-      console.warn(`Rasterize SVG timeout for key: ${cacheKey}, using fallback`);
+      console.warn(`Rasterize SVG timeout for key: ${cacheKey}, using temporary fallback`);
       const fallback = createFallbackTexture(width, height);
-      textureCache.set(cacheKey, { texture: fallback, width, height });
+      // 绝不将 fallback 写入永久缓存，避免后续永远加载不出真纹理
       resolve(fallback);
-    }, 600);
+    }, 8000);
 
     // 确保包含 W3C SVG 命名空间，否则浏览器独立 Image 解析会直接报错
     let sanitizedSvg = svgString;
@@ -116,7 +116,6 @@ export async function rasterizeSvgToTexture(
       URL.revokeObjectURL(url);
       console.error(`Failed to rasterize SVG for key: ${cacheKey}`, err);
       const fallback = createFallbackTexture(width, height);
-      textureCache.set(cacheKey, { texture: fallback, width, height });
       resolve(fallback);
     };
   });

@@ -23,5 +23,7 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["legacy_reference_backup", "node_modules", "dist"]
 }

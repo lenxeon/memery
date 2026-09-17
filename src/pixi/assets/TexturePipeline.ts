@@ -17,12 +17,11 @@ import {
   getSingleBouquetSvg,
 } from './PropSvgTemplates';
 import { FlowerType, FruitType, FloorStyle, WallBackgroundStyle, TableclothStyle, TimeOfDay } from '../../types';
-import { FLOWER_REGISTRY } from '../../components/offerings/flowers/registry';
-import { VaseDefs, renderVaseBody, renderVaseMouthBack, VaseStyle } from '../../components/offerings/flowers/vases';
-import { getVaseMouthAperture, getVaseSpreadFactor } from '../../components/offerings/flowers/types';
-import { FruitDish } from '../../components/offerings/fruits';
-import { AltarTableSvg } from '../../components/scene/AltarTableSvg';
-import { getWallModule, renderWallDefs } from '../../components/scene/walls/registry';
+import { VaseStyle } from './templates/flowers/vases';
+import { getVaseFlowerSvg } from './templates/FlowerTemplate';
+import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
+import { getAltarTableSvg } from './templates/AltarTableTemplate';
+import { getWallModule, renderWallDefs } from '../environment/walls/registry';
 
 export class TexturePipeline {
   private static instance: TexturePipeline;
@@ -172,6 +171,8 @@ export class TexturePipeline {
       // 茶杯与颂钵
       this.getTeaCupsTexture(),
       this.getSingingBowlTexture(),
+      // 真实红木供案与秋香金宫廷桌布
+      this.getAltarTableTexture('autumn_gold', true, true),
     ];
 
     await Promise.allSettled(tasks);
@@ -189,58 +190,12 @@ export class TexturePipeline {
     if (cached) return Promise.resolve(cached);
 
     try {
-      const hasFlower = flowerType && flowerType !== 'none';
-      const flowerModule = hasFlower ? (FLOWER_REGISTRY[flowerType as FlowerType] || FLOWER_REGISTRY.peonies) : null;
-      const FlowerComp = flowerModule?.Component;
-      const mouthAperture = getVaseMouthAperture(vaseStyle);
-      const spreadFactor = getVaseSpreadFactor(vaseStyle);
-
-      const steppedHealth = rawHealth;
-      const steppedDry = Math.round(Math.max(0, Math.min(1.0, (0.75 - steppedHealth) / 0.7)) * 50) / 50;
-      const isFaded = steppedHealth <= 0.05;
-
-      const element = React.createElement(
-        'svg',
-        {
-          xmlns: 'http://www.w3.org/2000/svg',
-          viewBox: '-50 -70 250 280',
-          width: '250',
-          height: '280',
-        },
-        React.createElement(
-          'defs',
-          null,
-          React.createElement(VaseDefs, null)
-        ),
-        React.createElement('ellipse', {
-          cx: 75,
-          cy: 193,
-          rx: 26,
-          ry: 6,
-          fill: '#140d07',
-          opacity: 0.4,
-        }),
-        React.createElement(
-          'g',
-          { transform: isRight ? 'translate(150, 0) scale(-1, 1)' : undefined },
-          React.createElement('g', { id: 'vaseMouthBack' }, renderVaseMouthBack(vaseStyle)),
-          FlowerComp ? React.createElement(
-            'g',
-            { id: 'flowerMain' },
-            React.createElement(FlowerComp, {
-              health: steppedHealth,
-              dryFactor: steppedDry,
-              isFaded,
-              vaseStyle,
-              mouthAperture,
-              spreadFactor,
-            })
-          ) : null,
-          React.createElement('g', { id: 'vaseBody' }, renderVaseBody(vaseStyle))
-        )
-      );
-
-      const svg = renderToStaticMarkup(element);
+      const svg = getVaseFlowerSvg({
+        flowerType,
+        isRight,
+        vaseStyle,
+        health,
+      });
       return rasterizeSvgToTexture(key, svg, 250, 280, 2.5);
     } catch (e) {
       console.warn('Failed to render real flower vase, falling back to template:', e);
@@ -275,9 +230,7 @@ export class TexturePipeline {
     if (cached) return Promise.resolve(cached);
 
     try {
-      const raw = renderToStaticMarkup(React.createElement(FruitDish, { fruitType }));
-      const svgMatch = raw.match(/<svg[\s\S]*<\/svg>/);
-      const svg = svgMatch ? svgMatch[0] : raw;
+      const svg = getFruitDishTemplateSvg(fruitType);
       return rasterizeSvgToTexture(key, svg, 108, 92, 2.5);
     } catch (e) {
       console.warn('Failed to render real fruit dish, falling back to template:', e);
@@ -346,10 +299,9 @@ export class TexturePipeline {
 
     const center = size / 2;
     const grad = ctx.createRadialGradient(center, center, 2, center, center, center);
-    grad.addColorStop(0, 'rgba(255, 242, 195, 0.95)');   // 核心炽亮白金暖心
-    grad.addColorStop(0.18, 'rgba(255, 190, 70, 0.82)'); // 金黄炽烈内圈
-    grad.addColorStop(0.42, 'rgba(255, 135, 30, 0.48)'); // 醇厚温暖琥珀橙
-    grad.addColorStop(0.70, 'rgba(240, 85, 15, 0.18)');  // 柔和外展光晕
+    grad.addColorStop(0, 'rgba(255, 180, 45, 0.35)');    // 柔和暖金透光，绝不过曝洗白火苗
+    grad.addColorStop(0.25, 'rgba(255, 140, 30, 0.22)'); // 温暖琥珀橙
+    grad.addColorStop(0.60, 'rgba(230, 85, 15, 0.08)');  // 幽微余韵
     grad.addColorStop(1.0, 'rgba(200, 50, 0, 0)');        // 渐隐消散
 
     ctx.fillStyle = grad;
@@ -389,12 +341,11 @@ export class TexturePipeline {
     if (cached) return Promise.resolve(cached);
 
     try {
-      const element = React.createElement(AltarTableSvg, {
+      const svg = getAltarTableSvg({
         tableclothStyle,
         showTableRunner,
         showPetals,
       });
-      const svg = renderToStaticMarkup(element);
       return rasterizeSvgToTexture(key, svg, 1120, 320, 2.0);
     } catch (e) {
       console.warn('Failed to rasterize altar table:', e);

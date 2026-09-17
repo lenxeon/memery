@@ -139,42 +139,42 @@ export class IncenseSmokeRenderer {
     // ── 2. 真实热对流缓缓升腾与自然扩散模拟 ──
     const trails = this.trails;
 
-    // ── 三炷香差异化配置：整体缩小 30%，三缕各具高低粗细与 S 弯波纹形态（对标设计图二） ──
+    // ── 三炷香差异化配置：更加纤巧薄透，三缕各具高低粗细与 S 弯波纹形态 ──
     const STREAM_PROFILES = [
       {
-        // s = 0: 左侧香（纤巧柔美，偏左起弯，高度约 38px，宽度约 2.2px）
+        // s = 0: 左侧香（纤巧柔美，偏左起弯，高度约 38px，宽度约 1.5px）
         ageMultiplier: 0.86,
-        baseW: 0.75,
-        maxW: 2.2,
-        tipW: 0.18,
+        baseW: 0.50,
+        maxW: 1.5,
+        tipW: 0.12,
         waveFreq: 0.165,
         waveTimeSpeed: 1.25,
         wavePhaseOffset: -0.7,
-        amplitude: 1.6,
+        amplitude: 1.5,
         laneBias: -1.3,
       },
       {
-        // s = 1: 中央主香（最挺拔高挑，主干饱满，S 弯舒朗正气，高度约 46px，宽度约 3.3px）
+        // s = 1: 中央主香（最挺拔高挑，主干饱满舒朗，高度约 46px，宽度约 2.0px）
         ageMultiplier: 1.0,
-        baseW: 0.95,
-        maxW: 3.3,
-        tipW: 0.25,
+        baseW: 0.60,
+        maxW: 2.0,
+        tipW: 0.15,
         waveFreq: 0.140,
         waveTimeSpeed: 1.35,
         wavePhaseOffset: 0.0,
-        amplitude: 2.1,
+        amplitude: 1.8,
         laneBias: 0.0,
       },
       {
-        // s = 2: 右侧香（中等舒朗，偏右起弯，相差错落，高度约 42px，宽度约 2.7px）
+        // s = 2: 右侧香（中等舒朗，偏右起弯，高度约 42px，宽度约 1.7px）
         ageMultiplier: 0.92,
-        baseW: 0.85,
-        maxW: 2.7,
-        tipW: 0.20,
+        baseW: 0.55,
+        maxW: 1.7,
+        tipW: 0.12,
         waveFreq: 0.150,
         waveTimeSpeed: 1.45,
         wavePhaseOffset: 0.8,
-        amplitude: 1.8,
+        amplitude: 1.6,
         laneBias: 1.3,
       },
     ];
@@ -191,7 +191,7 @@ export class IncenseSmokeRenderer {
           // 缓缓上升：静谧平缓的对流速度 (-0.56 ~ -0.62 px/frame)
           vy: -(0.58 + Math.random() * 0.04) * lateFactor,
           age: 0,
-          // 整体缩小 30%：基准生命周期缩减至 68 帧（上升高度约 38~46px）
+          // 基准生命周期缩减至 68 帧（上升高度约 38~46px）
           maxAge: Math.round((68 + Math.random() * 8) * prof.ageMultiplier),
           width: prof.baseW,
           alpha: 0,
@@ -238,7 +238,7 @@ export class IncenseSmokeRenderer {
         // 平滑向目标位置过渡
         node.x += (targetX - node.x) * 0.22;
 
-        // 4. 差异化烟体造型：对标设计图，各自拥有独立中段宽度，尾部变尖细！
+        // 4. 差异化烟体造型：优雅收束变细
         const prog = node.age / node.maxAge;
         if (prog < 0.22) {
           // 根部出烟段：自香尖渐次展开
@@ -260,9 +260,10 @@ export class IncenseSmokeRenderer {
       }
     }
 
-    // ── 3. 绘制缓缓上升、曲线摇曳且尾端变尖细的柔光工笔缕烟 ──
+    // ── 3. 绘制缓缓上升、薄透轻灵且尾端变尖细的柔光工笔缕烟 ──
     if (this.litTransition > 0.02) {
-      const baseAlpha = Math.min(0.9, density * 0.8) * lateFactor * this.litTransition;
+      // 降低基准不透明度，呈现若隐若现的空气通透感
+      const baseAlpha = Math.min(0.65, density * 0.55) * lateFactor * this.litTransition;
 
       for (let s = 0; s < trails.length; s++) {
         const trail = trails[s];
@@ -273,12 +274,13 @@ export class IncenseSmokeRenderer {
 
         for (let i = 0; i < trail.length; i++) {
           const node = trail[i];
-          const halfW = (node.width * 0.5) * (0.75 + 0.25 * lateFactor);
+          // 稍微收细半宽，使烟雾更显清瘦灵动
+          const halfW = (node.width * 0.45) * (0.75 + 0.25 * lateFactor);
           leftPoints.push({ x: node.x - halfW, y: node.y });
           rightPoints.push({ x: node.x + halfW, y: node.y });
         }
 
-        // Pass 1: 纤巧柔光缕烟多边形（柔美 S 弯工笔流体，尾部尖细闭合）
+        // Pass 1: 纤巧轻透缕烟多边形（柔美 S 弯工笔流体，尾部尖细闭合）
         ctx.beginPath();
         ctx.moveTo(leftPoints[0].x, leftPoints[0].y);
         for (let i = 0; i < leftPoints.length - 1; i++) {
@@ -302,16 +304,16 @@ export class IncenseSmokeRenderer {
         const streamGrad = ctx.createLinearGradient(0, bottomY, 0, topY);
 
         if (isNightMode) {
-          streamGrad.addColorStop(0, `rgba(252, 246, 236, 0.2)`);
-          streamGrad.addColorStop(0.18, `rgba(250, 244, 232, ${0.72 * baseAlpha})`);
-          streamGrad.addColorStop(0.58, `rgba(244, 238, 226, ${0.68 * baseAlpha})`);
-          streamGrad.addColorStop(0.85, `rgba(235, 228, 216, ${0.40 * baseAlpha})`);
+          streamGrad.addColorStop(0, `rgba(252, 246, 236, 0.05)`);
+          streamGrad.addColorStop(0.18, `rgba(250, 244, 232, ${0.52 * baseAlpha})`);
+          streamGrad.addColorStop(0.55, `rgba(244, 238, 226, ${0.42 * baseAlpha})`);
+          streamGrad.addColorStop(0.82, `rgba(235, 228, 216, ${0.20 * baseAlpha})`);
           streamGrad.addColorStop(1.0, `rgba(220, 212, 200, 0)`);
         } else {
-          streamGrad.addColorStop(0, `rgba(255, 254, 250, 0.25)`);
-          streamGrad.addColorStop(0.18, `rgba(254, 251, 244, ${0.78 * baseAlpha})`);
-          streamGrad.addColorStop(0.58, `rgba(250, 246, 238, ${0.72 * baseAlpha})`);
-          streamGrad.addColorStop(0.85, `rgba(242, 238, 230, ${0.42 * baseAlpha})`);
+          streamGrad.addColorStop(0, `rgba(255, 254, 250, 0.06)`);
+          streamGrad.addColorStop(0.18, `rgba(254, 251, 244, ${0.56 * baseAlpha})`);
+          streamGrad.addColorStop(0.55, `rgba(250, 246, 238, ${0.45 * baseAlpha})`);
+          streamGrad.addColorStop(0.82, `rgba(242, 238, 230, ${0.22 * baseAlpha})`);
           streamGrad.addColorStop(1.0, `rgba(225, 220, 210, 0)`);
         }
 
@@ -330,12 +332,12 @@ export class IncenseSmokeRenderer {
 
         const coreGrad = ctx.createLinearGradient(0, bottomY, 0, topY);
         coreGrad.addColorStop(0, `rgba(255, 255, 255, 0)`);
-        coreGrad.addColorStop(0.14, `rgba(255, 255, 255, ${0.32 * baseAlpha})`);
-        coreGrad.addColorStop(0.45, `rgba(254, 252, 248, ${0.24 * baseAlpha})`);
+        coreGrad.addColorStop(0.14, `rgba(255, 255, 255, ${0.20 * baseAlpha})`);
+        coreGrad.addColorStop(0.45, `rgba(254, 252, 248, ${0.12 * baseAlpha})`);
         coreGrad.addColorStop(0.75, `rgba(245, 240, 232, 0)`);
 
         ctx.strokeStyle = coreGrad;
-        ctx.lineWidth = 0.7;
+        ctx.lineWidth = 0.35;
         ctx.stroke();
       }
     }

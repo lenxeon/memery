@@ -122,9 +122,12 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     const { centerX, tableTopY, tableWidth, tableHeight } = getTableLayout(width, height);
     tableLayerRef.current?.render(centerX, tableTopY, tableWidth, tableHeight, tableclothStyle, showTableRunner);
 
+    // 1b. 同步供案台面灯光暗化
+    if (tableLayerRef.current) tableLayerRef.current.setLighting(lighting);
+
     // 2. 供品与道具 (1:1 同步置于供案台面)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items, tableclothStyle, showTableRunner, getViewportDimensions, getTableLayout]);
+  }, [items, tableclothStyle, showTableRunner, lighting, getViewportDimensions, getTableLayout]);
 
   // 1. 初始化 PixiJS 舞台
   useEffect(() => {
