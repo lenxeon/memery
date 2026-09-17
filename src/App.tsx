@@ -25,7 +25,7 @@ import {
 import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait, FLOOR_STYLE_OPTIONS } from './components/scene';
 import { VolumetricRays, DustMotes, PetalShower } from './components/effects';
 import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerModal, BlessingModal, UserAgreementModal } from './components/settings';
-import { BottomDock, FpsMonitor } from './components/controls';
+import { BottomDock } from './components/controls';
 import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
 import { VaseStyle, getVaseStyleMeta } from './components/offerings/flowers/vases';
 import { FLOWER_REGISTRY } from './components/offerings/flowers';
@@ -1060,7 +1060,6 @@ export default function App() {
             <span className="w-1 h-1 rounded-full bg-amber-400/60" />
             <span className="text-[10px] text-amber-400/80 group-hover:text-amber-300 font-normal">公约与立意</span>
           </button>
-          {import.meta.env.DEV && <FpsMonitor />}
         </div>
 
         {/* Quick controls on right */}
