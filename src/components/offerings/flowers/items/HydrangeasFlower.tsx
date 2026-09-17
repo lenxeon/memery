@@ -33,12 +33,12 @@ export const HYDRANGEA_FALLING_PETALS: FallingPetalDef[] = [
 export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor, isFaded }) => {
   const agingStyle = getFlowerAgingFilter(health, isFaded);
 
-  // ── 花色：淡紫中透着白色（纯白 -> 柔淡丁香紫 -> 优雅温润紫蓝） ──
-  const floretWhite = lerpColor('#ffffff', '#f6f0e8', dryFactor);
-  const floretLilacLight = lerpColor('#f3e8ff', '#e5d7ca', dryFactor);
-  const floretLilacMid = lerpColor('#d8b4fe', '#c4af9c', dryFactor);
-  const floretLilacDark = lerpColor('#a855f7', '#977d69', dryFactor);
-  const floretShadow = lerpColor('#7e22ce', '#69513e', dryFactor);
+  // ── 花色：淡紫中透着白色（温润白透丁香紫，去燥降曝，保留花瓣纹理与通透层叠） ──
+  const floretSoftWhite = lerpColor('#f8f4ff', '#f3ebd6', dryFactor);
+  const floretLilacLight = lerpColor('#e9d5ff', '#decaba', dryFactor);
+  const floretLilacMid = lerpColor('#c084fc', '#b79e8c', dryFactor);
+  const floretLilacDark = lerpColor('#9333ea', '#8b6f5b', dryFactor);
+  const floretShadow = lerpColor('#6b21a8', '#5c4533', dryFactor);
   const floretPistil = lerpColor('#fef08a', '#c2b07e', dryFactor);
 
   // ── 枝茎、木质化茎节与草叶 ──
@@ -87,29 +87,29 @@ export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
         <path
           d={`M 0 0 C -${r * 0.55} -${r * 0.4}, -${r * 0.45} -${r}, 0 -${r * 1.05} C ${r * 0.45} -${r}, ${r * 0.55} -${r * 0.4}, 0 0 Z`}
           fill={fillId}
-          stroke={floretLilacLight}
-          strokeWidth="0.28"
+          stroke={floretLilacMid}
+          strokeWidth="0.3"
         />
         <path
           d={`M 0 0 C -${r * 0.55} ${r * 0.4}, -${r * 0.45} ${r}, 0 ${r * 1.05} C ${r * 0.45} ${r}, ${r * 0.55} ${r * 0.4}, 0 0 Z`}
           fill={fillId}
-          stroke={floretLilacLight}
-          strokeWidth="0.28"
+          stroke={floretLilacMid}
+          strokeWidth="0.3"
         />
         <path
           d={`M 0 0 C -${r * 0.4} -${r * 0.55}, -${r} -${r * 0.45}, -${r * 1.05} 0 C -${r} ${r * 0.45}, -${r * 0.4} ${r * 0.55}, 0 0 Z`}
           fill={fillId}
-          stroke={floretLilacLight}
-          strokeWidth="0.28"
+          stroke={floretLilacMid}
+          strokeWidth="0.3"
         />
         <path
           d={`M 0 0 C ${r * 0.4} -${r * 0.55}, ${r} -${r * 0.45}, ${r * 1.05} 0 C ${r} ${r * 0.45}, ${r * 0.4} ${r * 0.55}, 0 0 Z`}
           fill={fillId}
-          stroke={floretLilacLight}
-          strokeWidth="0.28"
+          stroke={floretLilacMid}
+          strokeWidth="0.3"
         />
         {/* 花心微小圆蕊 */}
-        <circle cx="0" cy="0" r="0.8" fill={floretWhite} />
+        <circle cx="0" cy="0" r="0.8" fill={floretLilacLight} />
         <circle cx="0" cy="0" r="0.4" fill={floretPistil} opacity="0.9" />
       </g>
     );
@@ -253,19 +253,18 @@ export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
   return (
     <g id="hydrangeasFlora" style={agingStyle}>
       <defs>
-        {/* 1. 绣球球体柔和深邃渐变底模 */}
+        {/* 1. 绣球球体柔和深邃渐变底模（柔和丁香紫底色，去燥降曝） */}
         <radialGradient id="hydrangeaSphereShadeGrad" cx="35%" cy="32%" r="68%">
-          <stop offset="0%" stopColor={floretWhite} stopOpacity="0.95" />
-          <stop offset="40%" stopColor={floretLilacLight} stopOpacity="0.9" />
-          <stop offset="76%" stopColor={floretLilacMid} stopOpacity="0.88" />
-          <stop offset="92%" stopColor={floretLilacDark} stopOpacity="0.85" />
-          <stop offset="100%" stopColor={floretShadow} stopOpacity="0.8" />
+          <stop offset="0%" stopColor={floretLilacLight} stopOpacity="0.85" />
+          <stop offset="42%" stopColor={floretLilacMid} stopOpacity="0.82" />
+          <stop offset="78%" stopColor={floretLilacDark} stopOpacity="0.8" />
+          <stop offset="100%" stopColor={floretShadow} stopOpacity="0.75" />
         </radialGradient>
 
-        {/* 2. 表层受光小花渐变（淡紫透白，通透清雅） */}
+        {/* 2. 表层受光小花渐变（温润丁香白透浅紫，层次丰富细腻） */}
         <linearGradient id="floretBrightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={floretWhite} />
-          <stop offset="55%" stopColor={floretLilacLight} />
+          <stop offset="0%" stopColor={floretSoftWhite} />
+          <stop offset="45%" stopColor={floretLilacLight} />
           <stop offset="100%" stopColor={floretLilacMid} />
         </linearGradient>
 
