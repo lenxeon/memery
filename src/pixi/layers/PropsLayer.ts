@@ -410,19 +410,28 @@ export class PropsLayer {
       const leftHealth = Number(leftCandle?.waxHeight ?? (leftCandle?.lifecycle?.health ?? 1.0));
       const rightHealth = Number(rightCandle?.waxHeight ?? (rightCandle?.lifecycle?.health ?? 1.0));
 
-      const leftH = Math.round(22 + 76 * Math.max(0.08, Math.min(1.0, leftHealth)));
-      const rightH = Math.round(22 + 76 * Math.max(0.08, Math.min(1.0, rightHealth)));
+      const leftCurrentWax = Math.max(0.08, Math.min(1.0, Math.round(leftHealth * 10) / 10));
+      const rightCurrentWax = Math.max(0.08, Math.min(1.0, Math.round(rightHealth * 10) / 10));
 
-      const leftWickY = leftCandleCont ? leftCandleCont.y - (leftH - 1) * this.currentScaleFactor : altarTopY - (leftH - 1) * this.currentScaleFactor;
-      const rightWickY = rightCandleCont ? rightCandleCont.y - (rightH - 1) * this.currentScaleFactor : altarTopY - (rightH - 1) * this.currentScaleFactor;
+      const leftCandleH = Math.round(18 + 54 * leftCurrentWax);
+      const rightCandleH = Math.round(18 + 54 * rightCurrentWax);
+
+      // 火苗中心位于蜡烛凹槽向上 (candleH + 5) 处，精准对准跳动的火苗核心
+      const leftFlameCenterY = leftCandleCont
+        ? leftCandleCont.y - (leftCandleH + 5) * this.currentScaleFactor
+        : altarTopY - (leftCandleH + 5) * this.currentScaleFactor;
+      const rightFlameCenterY = rightCandleCont
+        ? rightCandleCont.y - (rightCandleH + 5) * this.currentScaleFactor
+        : altarTopY - (rightCandleH + 5) * this.currentScaleFactor;
 
       this.pixiEffects.updateCandles(
         leftCandleCont ? leftCandleCont.x : altarCenterX - 74 * this.currentScaleFactor,
-        leftWickY,
+        leftFlameCenterY,
         !!leftCandle?.isLit,
         rightCandleCont ? rightCandleCont.x : altarCenterX + 74 * this.currentScaleFactor,
-        rightWickY,
-        !!rightCandle?.isLit
+        rightFlameCenterY,
+        !!rightCandle?.isLit,
+        this.currentScaleFactor
       );
     }
   }

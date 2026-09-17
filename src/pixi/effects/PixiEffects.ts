@@ -132,18 +132,20 @@ export class PixiEffects {
     rightX: number,
     rightY: number,
     rightLit: boolean,
+    scale: number = 1.0,
     windForce: number = 0.15
   ): void {
     const breathe = Math.sin(this.time * 0.06) * 0.08 + Math.cos(this.time * 0.11) * 0.05;
-    const windTilt = windForce * 6;
 
+    // 烛光光晕精准环绕火苗核心，轻柔漫射于烛顶蜡池（对标参考图二中圆润集中的暖金辉光）
     if (this.leftCandleGlow) {
       this.leftCandleGlow.visible = leftLit;
       if (leftLit) {
         this.leftCandleGlow.x = leftX;
-        this.leftCandleGlow.y = leftY - 16;
-        this.leftCandleGlow.scale.set(1.1 + breathe);
-        this.leftCandleGlow.alpha = 0.5 + breathe * 0.2;
+        this.leftCandleGlow.y = leftY;
+        const glowScale = (0.34 + breathe * 0.03) * scale;
+        this.leftCandleGlow.scale.set(glowScale);
+        this.leftCandleGlow.alpha = 0.58 + breathe * 0.12;
       }
       this.leftCandleFlame.clear();
     }
@@ -152,9 +154,10 @@ export class PixiEffects {
       this.rightCandleGlow.visible = rightLit;
       if (rightLit) {
         this.rightCandleGlow.x = rightX;
-        this.rightCandleGlow.y = rightY - 16;
-        this.rightCandleGlow.scale.set(1.1 - breathe * 0.8);
-        this.rightCandleGlow.alpha = 0.5 - breathe * 0.2;
+        this.rightCandleGlow.y = rightY;
+        const glowScale = (0.34 - breathe * 0.03) * scale;
+        this.rightCandleGlow.scale.set(glowScale);
+        this.rightCandleGlow.alpha = 0.58 - breathe * 0.12;
       }
       this.rightCandleFlame.clear();
     }
