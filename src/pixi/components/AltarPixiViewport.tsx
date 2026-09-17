@@ -100,23 +100,31 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     return { width: Math.round(w), height: Math.round(h) };
   }, []);
 
+  // 供案透视布局几何（将供桌从靠墙深处向人的面前大幅推进，拉开建筑与大厅纵深）
+  const getTableLayout = useCallback((width: number, height: number) => {
+    const centerX = width * 0.5;
+    // 供案适度舒展（桌面更显沉浸大气）
+    const tableWidth = Math.min(width - 24, width < 640 ? 530 : 580);
+    const tableHeight = tableWidth * (160 / 560);
+    // 底部余量由原本贴墙的 112px 缩减至 36px，使供案真正置身于用户面前的前景地坪上
+    const tableBottomOffset = width < 640 ? 26 : 36;
+    const tableTopY = height - tableBottomOffset - tableHeight * 0.71;
+    return { centerX, tableTopY, tableWidth, tableHeight };
+  }, []);
+
   // 重绘全部图层
   const renderAll = useCallback(() => {
     if (!isReadyRef.current) return;
     const { width, height } = getViewportDimensions();
     viewportSizeRef.current = { width, height };
 
-    // 1. 供案几何与桌布 (对标原版 560x160 黄金比例与底部边距)
-    const centerX = width * 0.5;
-    const tableWidth = Math.min(width - 32, 560);
-    const tableHeight = tableWidth * (160 / 560);
-    const tableBottomOffset = width < 640 ? 88 : 112;
-    const tableTopY = height - tableBottomOffset - tableHeight * 0.71;
+    // 1. 供案几何与桌布 (置于用户近前前景，开阔背景纵深)
+    const { centerX, tableTopY, tableWidth, tableHeight } = getTableLayout(width, height);
     tableLayerRef.current?.render(centerX, tableTopY, tableWidth, tableHeight, tableclothStyle, showTableRunner);
 
-    // 2. 供品与道具 (1:1 视觉真理源比例：鲜花高挑雅致 265px，烛身纤巧 28x72px，烛火灵动 24px)
+    // 2. 供品与道具 (1:1 同步置于供案台面)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items, tableclothStyle, showTableRunner, getViewportDimensions]);
+  }, [items, tableclothStyle, showTableRunner, getViewportDimensions, getTableLayout]);
 
   // 1. 初始化 PixiJS 舞台
   useEffect(() => {
@@ -221,13 +229,9 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   useEffect(() => {
     if (!isReadyRef.current) return;
     const { width, height } = viewportSizeRef.current;
-    const centerX = width * 0.5;
-    const tableWidth = Math.min(width - 32, 560);
-    const tableHeight = tableWidth * (160 / 560);
-    const tableBottomOffset = width < 640 ? 88 : 112;
-    const tableTopY = height - tableBottomOffset - tableHeight * 0.71;
+    const { centerX, tableTopY, tableWidth } = getTableLayout(width, height);
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items]);
+  }, [items, getTableLayout]);
 
   // 4. 落花飘落动效触发
   useEffect(() => {
