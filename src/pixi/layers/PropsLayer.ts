@@ -11,6 +11,7 @@ import { CandleFlameRenderer } from '../effects/CandleFlameRenderer';
 import { IncenseSmokeRenderer } from '../effects/IncenseSmokeRenderer';
 import { SceneItem, SceneItemId, FlowerType, FruitType } from '../../types';
 import { VaseStyle } from '../../components/offerings/flowers/vases';
+import { sound } from '../../utils/audio';
 
 export interface PropsLayerCallbacks {
   onToggleLit?: (id: SceneItemId) => void;
