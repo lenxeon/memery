@@ -398,13 +398,11 @@ export const AltarTableSvg: React.FC<AltarTableSvgProps> = ({
                 strokeWidth="1.2"
               />
             ))}
+            <line x1="4" y1="74" x2="556" y2="74" stroke="#52361d" strokeWidth="1.5" />
+            <polygon points="14,16 4,52 4,74 8,74 16,16" fill="url(#endgrainLeft)" opacity="0.6" />
+            <polygon points="546,16 556,52 556,74 552,74 544,16" fill="url(#endgrainRight)" opacity="0.6" />
           </g>
         )}
-
-        <line x1="4" y1="74" x2="556" y2="74" stroke="#52361d" strokeWidth="1.5" />
-
-        <polygon points="14,16 4,52 4,74 8,74 16,16" fill="url(#endgrainLeft)" opacity="0.6" />
-        <polygon points="546,16 556,52 556,74 552,74 544,16" fill="url(#endgrainRight)" opacity="0.6" />
       </g>
 
       {/* === FLOOR CONTACT SHADOW === */}

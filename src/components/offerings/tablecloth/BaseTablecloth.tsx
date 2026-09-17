@@ -38,28 +38,21 @@ export const TableclothTopSurface: React.FC<{
       opacity="0.35"
     />
 
-    {/* 4. Classical Border Ribbon Trim (沉稳中式织锦滚边) */}
+    {/* 4. Tabletop Edge Perimeter Hem & Piping (沿案台四边严谨贴合的精细滚边与暗缝，消灭浮空错位线框) */}
     <polygon
-      points="26,18 534,18 544,49 16,49"
-      fill="none"
-      stroke={`url(#${theme.borderPatternId})`}
-      strokeWidth="4.5"
-      opacity="0.9"
-    />
-    {/* Double Stitched Piping (内外双道真丝缝线) */}
-    <polygon
-      points="22,15 538,15 548,52 12,52"
+      points="14,16 546,16 556,52 4,52"
       fill="none"
       stroke={theme.pipingStroke}
-      strokeWidth="0.8"
-      opacity="0.8"
+      strokeWidth="1.0"
+      opacity="0.85"
     />
     <polygon
-      points="30,22 530,22 540,46 20,46"
+      points="16,18 544,18 553,50 7,50"
       fill="none"
       stroke={theme.pipingStroke}
-      strokeWidth="0.7"
-      opacity="0.75"
+      strokeWidth="0.6"
+      strokeDasharray="3,2"
+      opacity="0.35"
     />
 
     {/* 5. Distinct Artistic Centerpiece & Embroidery Motifs */}
@@ -68,66 +61,84 @@ export const TableclothTopSurface: React.FC<{
     {/* Center Auspicious Roundel */}
     <TableclothRoundel theme={theme} />
 
-    {/* 6. Volumetric 3D Corner Draping (真实桌角自然对折下垂) */}
-    {/* ── Left Corner Drop (左桌角自然下垂大折角) ── */}
-    <g id="leftCornerDrape">
-      {/* Inner Fold Shadow (对折内层深邃暗影) */}
+    {/* 6. Volumetric 3D Side Drape Planes (严谨 3D 纵深侧垂面，彻底清除外撇的折纸飞角与透视失真) */}
+    {/* ── Left Side Receding Drape (左侧纵深斜面，自后角 14,16 延展至前角 4,52) ── */}
+    <g id="leftSideDrape">
+      {/* 侧面织物阴影底布 (背光侧自然沉暗) */}
       <polygon
-        points="4,52 -10,126 -2,130 18,72"
+        points="14,16 4,52 4,118 14,110"
         fill="url(#cornerDropShadowLeft)"
-      />
-      {/* Outer Folded Drape Face (外层垂布) */}
-      <polygon
-        points="14,16 4,52 -10,126 12,118 18,17"
-        fill="url(#brocadeGoldDrape)"
         stroke={theme.hemStroke}
         strokeWidth="0.8"
       />
+      {/* 侧面织物经纬提花贴图 */}
       <polygon
-        points="14,16 4,52 -10,126 12,118 18,17"
+        points="14,16 4,52 4,118 14,110"
         fill={`url(#${theme.weavePatternId})`}
         opacity={theme.weaveOpacity * 0.7}
       />
-      {/* Corner Ribbon Trim */}
-      <line x1="4" y1="52" x2="-10" y2="126" stroke={`url(#${theme.borderPatternId})`} strokeWidth="3.5" />
-      <line x1="4" y1="52" x2="-10" y2="126" stroke={theme.pipingStroke} strokeWidth="0.8" />
-      {/* Corner Tassel Pendant (角端吊坠) */}
-      <g transform="translate(-10, 126)">
-        <line x1="0" y1="0" x2="0" y2="6" stroke={theme.tasselColor.cord} strokeWidth="1.2" />
-        <circle cx="0" cy="5" r="1.8" fill={theme.tasselColor.bead} stroke={theme.tasselColor.beadStroke} strokeWidth="0.6" />
-        <ellipse cx="0" cy="11" rx="3.5" ry="5.5" fill="url(#amberPendantGrad)" stroke={theme.pipingStroke} strokeWidth="0.6" />
-        <polygon points="-2.5,16 2.5,16 3.8,28 -3.8,28" fill="url(#goldFringeFull)" />
+      {/* 侧面下摆回纹锦带透视延伸 (自 4,104 纵深退行至 14,97) */}
+      <polygon
+        points="14,97 4,104 4,118 14,110"
+        fill={`url(#${theme.borderPatternId})`}
+        opacity="0.88"
+      />
+      <line x1="14" y1="97" x2="4" y2="104" stroke="#24170d" strokeWidth="1.2" />
+      <line x1="14" y1="110" x2="4" y2="118" stroke="#24170d" strokeWidth="1.2" />
+
+      {/* 左前桌角立面转折挺括压缝线 (界定前立面与侧立面的清爽几何折线) */}
+      <line x1="4" y1="52" x2="4" y2="118" stroke={theme.pipingStroke} strokeWidth="1.2" opacity="0.9" />
+      <line x1="4" y1="52" x2="4" y2="118" stroke="#24170d" strokeWidth="0.5" />
+
+      {/* 左侧下摆退行小流苏 */}
+      <g opacity="0.8">
+        <line x1="10" y1="112" x2="10" y2="120" stroke={theme.tasselColor.cord} strokeWidth="1.0" />
+        <circle cx="10" cy="114" r="1.4" fill={theme.tasselColor.bead} stroke="#24170d" strokeWidth="0.5" />
+        <polygon points="9,115 11,115 11.4,121 8.6,121" fill="url(#goldFringeFull)" />
+
+        <line x1="6.5" y1="115" x2="6.5" y2="124" stroke={theme.tasselColor.cord} strokeWidth="1.0" />
+        <circle cx="6.5" cy="117" r="1.5" fill={theme.tasselColor.bead} stroke="#24170d" strokeWidth="0.5" />
+        <polygon points="5.4,118 7.6,118 8,125 5,125" fill="url(#goldFringeFull)" />
       </g>
     </g>
 
-    {/* ── Right Corner Drop (右桌角自然下垂大折角) ── */}
-    <g id="rightCornerDrape">
-      {/* Inner Fold Shadow */}
+    {/* ── Right Side Receding Drape (右侧纵深斜面，自前角 556,52 延展至后角 546,16) ── */}
+    <g id="rightSideDrape">
+      {/* 侧面织物阴影底布 */}
       <polygon
-        points="556,52 570,126 562,130 542,72"
+        points="546,16 556,52 556,118 546,110"
         fill="url(#cornerDropShadowRight)"
-      />
-      {/* Outer Folded Drape Face */}
-      <polygon
-        points="546,16 556,52 570,126 548,118 542,17"
-        fill="url(#brocadeGoldDrape)"
         stroke={theme.hemStroke}
         strokeWidth="0.8"
       />
+      {/* 侧面织物经纬提花贴图 */}
       <polygon
-        points="546,16 556,52 570,126 548,118 542,17"
+        points="546,16 556,52 556,118 546,110"
         fill={`url(#${theme.weavePatternId})`}
         opacity={theme.weaveOpacity * 0.7}
       />
-      {/* Corner Ribbon Trim */}
-      <line x1="556" y1="52" x2="570" y2="126" stroke={`url(#${theme.borderPatternId})`} strokeWidth="3.5" />
-      <line x1="556" y1="52" x2="570" y2="126" stroke={theme.pipingStroke} strokeWidth="0.8" />
-      {/* Corner Tassel Pendant */}
-      <g transform="translate(570, 126)">
-        <line x1="0" y1="0" x2="0" y2="6" stroke={theme.tasselColor.cord} strokeWidth="1.2" />
-        <circle cx="0" cy="5" r="1.8" fill={theme.tasselColor.bead} stroke={theme.tasselColor.beadStroke} strokeWidth="0.6" />
-        <ellipse cx="0" cy="11" rx="3.5" ry="5.5" fill="url(#amberPendantGrad)" stroke={theme.pipingStroke} strokeWidth="0.6" />
-        <polygon points="-2.5,16 2.5,16 3.8,28 -3.8,28" fill="url(#goldFringeFull)" />
+      {/* 右侧下摆回纹锦带透视延伸 (自 556,104 纵深退行至 546,97) */}
+      <polygon
+        points="556,104 546,97 546,110 556,118"
+        fill={`url(#${theme.borderPatternId})`}
+        opacity="0.88"
+      />
+      <line x1="556" y1="104" x2="546" y2="97" stroke="#24170d" strokeWidth="1.2" />
+      <line x1="556" y1="118" x2="546" y2="110" stroke="#24170d" strokeWidth="1.2" />
+
+      {/* 右前桌角立面转折挺括压缝线 */}
+      <line x1="556" y1="52" x2="556" y2="118" stroke={theme.pipingStroke} strokeWidth="1.2" opacity="0.9" />
+      <line x1="556" y1="52" x2="556" y2="118" stroke="#24170d" strokeWidth="0.5" />
+
+      {/* 右侧下摆退行小流苏 */}
+      <g opacity="0.8">
+        <line x1="550" y1="112" x2="550" y2="120" stroke={theme.tasselColor.cord} strokeWidth="1.0" />
+        <circle cx="550" cy="114" r="1.4" fill={theme.tasselColor.bead} stroke="#24170d" strokeWidth="0.5" />
+        <polygon points="549,115 551,115 551.4,121 548.6,121" fill="url(#goldFringeFull)" />
+
+        <line x1="553.5" y1="115" x2="553.5" y2="124" stroke={theme.tasselColor.cord} strokeWidth="1.0" />
+        <circle cx="553.5" cy="117" r="1.5" fill={theme.tasselColor.bead} stroke="#24170d" strokeWidth="0.5" />
+        <polygon points="552.4,118 554.6,118 555,125 552,125" fill="url(#goldFringeFull)" />
       </g>
     </g>
   </g>
@@ -139,9 +150,9 @@ export const TableclothFrontValance: React.FC<{
   drapePath: string;
   CenterpieceComponent: React.FC<{ theme: TableclothTheme }>;
 }> = ({ style, theme, drapePath, CenterpieceComponent }) => {
-  // 34 颗密集精致的垂金流苏穗子
-  const tasselCount = 34;
-  const tasselStep = 528 / (tasselCount - 1);
+  // 32 颗密集精致的垂金流苏穗子，严格分布于前立面宽度 (4..556)
+  const tasselCount = 32;
+  const tasselStep = 520 / (tasselCount - 1);
 
   // 顶部折景鲁班尺吉度标尺刻度与装饰印记 (对标参考图中的 8- 18- 18- 18- 16- 16- 18- 18-)
   const topTabs = [
@@ -160,9 +171,9 @@ export const TableclothFrontValance: React.FC<{
         <line x1="506" y1="136" x2="532" y2="136" stroke="#0a0502" strokeWidth="1.8" />
       </g>
 
-      {/* ── 1. 主垂帷布面 (梯形悬垂织锦，平整垂顺) ── */}
+      {/* ── 1. 主垂帷前立面 (严格对齐案台前缘 4..556，垂直平顺悬垂至 y=118) ── */}
       <polygon
-        points="4,52 556,52 560,118 0,118"
+        points="4,52 556,52 556,118 4,118"
         fill="url(#brocadeGoldDrape)"
         stroke={theme.hemStroke}
         strokeWidth="1.0"
@@ -170,31 +181,31 @@ export const TableclothFrontValance: React.FC<{
 
       {/* ── 2. 面料暗纹提花经纬机理 (高保真织物触感) ── */}
       <polygon
-        points="4,52 556,52 560,118 0,118"
+        points="4,52 556,52 556,118 4,118"
         fill={`url(#${theme.weavePatternId})`}
         opacity={theme.weaveOpacity}
       />
 
       {/* ── 2.1 案唇在布面上方的柔和遮光落影 (极具织物空间深度的 Ambient Shadow) ── */}
       <polygon
-        points="4,52 556,52 557,66 3,66"
+        points="4,52 556,52 556,66 4,66"
         fill="url(#clothLipShadow)"
       />
 
-      {/* ── 3. 顶部折叠包边横带 (带鲁班吉度折景刻度印记) ── */}
+      {/* ── 3. 顶部折叠包边横带 (带鲁班吉度折景刻度印记，宽度 4..556) ── */}
       <g id="topPleatRulerRibbon">
-        <rect x="0" y="52" width="560" height="9.5" fill="#caa44e" opacity="0.95" />
-        <line x1="0" y1="52" x2="560" y2="52" stroke="#24170d" strokeWidth="1.4" />
-        <line x1="0" y1="61.5" x2="560" y2="61.5" stroke="#24170d" strokeWidth="1.0" />
+        <rect x="4" y="52" width="552" height="9.5" fill="#caa44e" opacity="0.95" />
+        <line x1="4" y1="52" x2="556" y2="52" stroke="#24170d" strokeWidth="1.4" />
+        <line x1="4" y1="61.5" x2="556" y2="61.5" stroke="#24170d" strokeWidth="1.0" />
 
         {/* 标志性的 18- 18- 16- 16- 折景刻度印花与缝针刻线 */}
         {topTabs.map((tab, idx) => {
-          const tabX = 18 + idx * 34;
+          const tabX = 20 + idx * 33;
           return (
             <g key={idx} opacity="0.85">
               <line x1={tabX} y1="52" x2={tabX} y2="61.5" stroke="#24170d" strokeWidth="0.8" />
               <text
-                x={tabX + 7}
+                x={tabX + 6.5}
                 y="59"
                 fontSize="6.2"
                 fontFamily="sans-serif"
@@ -212,7 +223,7 @@ export const TableclothFrontValance: React.FC<{
       {/* ── 4. 垂帷纵向拼接布幅与自然缝痕 (彻底消灭塑料瓦楞硬反光，还原真织物悬垂) ── */}
       <g id="verticalClothPanels">
         {topTabs.map((_, idx) => {
-          const seamX = 18 + idx * 34;
+          const seamX = 20 + idx * 33;
           return (
             <g key={idx}>
               {/* 布幅车缝接缝线 (亚光微凹暗缝) */}
@@ -224,7 +235,7 @@ export const TableclothFrontValance: React.FC<{
                 stroke="rgba(40, 20, 5, 0.28)"
                 strokeWidth="0.9"
               />
-              {/* 细微丝线侧向缝痕 (柔和漫反射，非塑料白反光) */}
+              {/* 细微丝线侧向缝痕 (柔和漫反射) */}
               <line
                 x1={seamX + 0.8}
                 y1="61.5"
@@ -233,11 +244,11 @@ export const TableclothFrontValance: React.FC<{
                 stroke="rgba(255, 245, 200, 0.18)"
                 strokeWidth="0.7"
               />
-              {/* 纵向布幅自然微悬垂柔光 (让布幔呈现自然的微微起伏柔软感) */}
+              {/* 纵向布幅自然微悬垂柔光 */}
               <rect
                 x={seamX + 3}
                 y="61.5"
-                width="28"
+                width="26"
                 height={theme.ribbonY - 61.5}
                 fill="rgba(255, 255, 255, 0.03)"
               />
@@ -246,21 +257,21 @@ export const TableclothFrontValance: React.FC<{
         })}
       </g>
 
-      {/* ── 5. 中央标志性黑金宝相三叶云纹徽章 (刺绣镶嵌于布幔中央) ── */}
+      {/* ── 5. 中央标志性黑金宝相三叶云纹徽章 ── */}
       <CenterpieceComponent theme={theme} />
 
-      {/* ── 6. 经典中式万字回纹带 (连续贯通横幅下摆锦带) ── */}
+      {/* ── 6. 经典中式万字回纹带 (连续贯通横幅下摆锦带，宽度 4..556) ── */}
       <g id="bottomMeanderRibbon">
-        <rect x="0" y={theme.ribbonY} width="560" height={theme.ribbonH} fill={`url(#${theme.borderPatternId})`} />
-        {/* 上下两道工整深黑与金黄压边线 */}
-        <line x1="0" y1={theme.ribbonY} x2="560" y2={theme.ribbonY} stroke="#24170d" strokeWidth="1.4" />
-        <line x1="0" y1={theme.ribbonY + theme.ribbonH} x2="560" y2={theme.ribbonY + theme.ribbonH} stroke="#24170d" strokeWidth="1.4" />
+        <rect x="4" y={theme.ribbonY} width="552" height={theme.ribbonH} fill={`url(#${theme.borderPatternId})`} />
+        {/* 上下两道工整深黑压边线 */}
+        <line x1="4" y1={theme.ribbonY} x2="556" y2={theme.ribbonY} stroke="#24170d" strokeWidth="1.4" />
+        <line x1="4" y1={theme.ribbonY + theme.ribbonH} x2="556" y2={theme.ribbonY + theme.ribbonH} stroke="#24170d" strokeWidth="1.4" />
       </g>
 
       {/* ── 7. 密排垂金丝流苏 (参考图下方整齐排列的温润亚光真丝排穗) ── */}
       <g id="hangingTasselFringe">
         {Array.from({ length: tasselCount }).map((_, i) => {
-          const tx = 16 + i * tasselStep;
+          const tx = 20 + i * tasselStep;
           const tY = theme.tasselY;
           const tLen = theme.tasselLength;
           const tW = theme.tasselWidth;
