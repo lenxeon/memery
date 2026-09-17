@@ -330,7 +330,7 @@ export const FruitPickerModal: React.FC<FruitPickerModalProps> = ({
         {/* TAB 1: 敬献新果盘到案台 */}
         {activeTab === 'offer' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[58vh] overflow-y-auto pr-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[58vh] overflow-y-auto custom-scrollbar pr-1">
               {FRUIT_OPTIONS.map((opt) => {
                 const isSelected = selectedFruit === opt.id;
                 return (

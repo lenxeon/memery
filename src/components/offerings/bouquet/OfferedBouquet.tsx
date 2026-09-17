@@ -207,8 +207,9 @@ export const OfferedBouquet: React.FC<OfferedBouquetProps> = ({
       )}
 
       {/* SVG Bouquet Art */}
-      <svg 
-        viewBox="0 0 130 72" 
+      <svg
+        viewBox="0 0 130 72"
+        xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
       >
         <defs>

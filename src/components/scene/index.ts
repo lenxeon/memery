@@ -6,3 +6,4 @@ export * from './AltarTable';
 export * from './FloorPlanks';
 export * from './MemorialPortrait';
 export * from './walls';
+export * from '../../pixi/components/AltarPixiViewport';

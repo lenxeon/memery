@@ -610,22 +610,25 @@
   animation: swayDaisyNodBud 3.0s ease-in-out infinite 0.3s;
 }
 
-/* Custom subtle scrollbar for modals */
+/* Custom subtle scrollbar for modals with dark oriental aesthetic */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(217, 119, 6, 0.35) rgba(245, 245, 244, 0.6);
+  scrollbar-color: rgba(217, 119, 6, 0.45) rgba(0, 0, 0, 0.2);
 }
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(245, 245, 244, 0.6);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 9999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(217, 119, 6, 0.35);
+  background: rgba(217, 119, 6, 0.4);
   border-radius: 9999px;
+  border: 1px solid rgba(245, 158, 11, 0.15);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(180, 83, 9, 0.55);
+  background: rgba(245, 158, 11, 0.65);
 }
+

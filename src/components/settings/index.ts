@@ -8,3 +8,5 @@ export * from './FlowerPickerModal';
 export * from './FruitPickerModal';
 export * from './MemorialEditModal';
 export * from './UserAgreementModal';
+export * from './AuthModal';
+

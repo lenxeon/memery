@@ -24,10 +24,13 @@ import {
   Pause,
   Music,
   ShieldCheck,
-  Eye
+  Eye,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw
 } from 'lucide-react';
 import { sound, BGM_TRACKS } from '../../utils/audio';
-import { BgmTrackId, FloorStyle } from '../../types';
+import { BgmTrackId, FloorStyle, AuditCategory, AuditGroup } from '../../types';
 import { FLOOR_STYLE_OPTIONS } from '../scene/FloorPlanks';
 import { ChineseCornerOrnaments, ChineseCloudDivider, CinnabarSealBadge } from '../common/ChineseDecorations';
 
@@ -54,6 +57,15 @@ export interface EnvironmentDrawerProps {
   onUpdateTimeScale?: (scale: number) => void;
   isAuditMode?: boolean;
   onToggleAuditMode?: () => void;
+  auditCategory?: AuditCategory;
+  onSwitchAuditCategory?: (cat: AuditCategory) => void;
+  auditGroup?: AuditGroup;
+  onSwitchAuditGroup?: (grp: AuditGroup) => void;
+  auditWithFlowers?: boolean;
+  onToggleAuditFlowers?: () => void;
+  flowerDecayHealth?: number;
+  onSelectFlowerDecayHealth?: (health: number) => void;
+  onTriggerAuditPetals?: () => void;
 }
 
 export const WALL_STYLE_OPTIONS: {
@@ -113,7 +125,24 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
   onUpdateTimeScale,
   isAuditMode = false,
   onToggleAuditMode,
+  auditCategory = 'flowers',
+  onSwitchAuditCategory,
+  auditGroup = 'flowers_tier1_all',
+  onSwitchAuditGroup,
+  auditWithFlowers = true,
+  onToggleAuditFlowers,
+  flowerDecayHealth = 1.0,
+  onSelectFlowerDecayHealth,
+  onTriggerAuditPetals,
 }) => {
+  const [isAuditExpanded, setIsAuditExpanded] = useState(isAuditMode);
+
+  React.useEffect(() => {
+    if (isAuditMode) {
+      setIsAuditExpanded(true);
+    }
+  }, [isAuditMode]);
+
   const [bgmState, setBgmState] = useState({
     isPlaying: sound.bgmPlaying,
     trackId: sound.currentTrackId,
@@ -319,7 +348,7 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               <button
                 type="button"
                 onClick={() => onUpdateLighting({ godRaysEnabled: !lighting.godRaysEnabled })}
-                className={`text-xs px-2.5 py-0.5 rounded-full transition-colors cursor-pointer ${
+                className={`text-xs px-2.5 py-0.5 rounded-full transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                   lighting.godRaysEnabled ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-medium' : 'bg-stone-800 text-stone-500'
                 }`}
               >
@@ -370,7 +399,7 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               <button
                 type="button"
                 onClick={onToggleAllCandles}
-                className="text-xs text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer"
+                className="text-xs text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer shrink-0 whitespace-nowrap"
               >
                 一键全点 / 全熄
               </button>
@@ -402,12 +431,12 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               <Sparkles size={14} className="text-amber-400" />
               <span className="font-serif font-semibold">案台雅致装点</span>
             </div>
-            <div className="flex items-center justify-between text-stone-300 pt-1">
-              <span>提花织锦大桌布（整案铺设 · 金丝流苏）</span>
+            <div className="flex items-center justify-between text-stone-300 pt-1 gap-2">
+              <span className="truncate">提花织锦大桌布（整案铺设 · 金丝流苏）</span>
               <button
                 type="button"
                 onClick={onToggleTableRunner}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 whitespace-nowrap ${
                   showTableRunner ? 'bg-amber-600 border-amber-400/60 text-amber-950 font-bold' : 'bg-stone-800 border-stone-700 text-stone-400'
                 }`}
               >
@@ -471,12 +500,12 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               </div>
             )}
 
-            <div className="flex items-center justify-between text-stone-300 pt-1 border-t border-stone-800">
-              <span>案头散落花瓣（随风零落意境）</span>
+            <div className="flex items-center justify-between text-stone-300 pt-1 border-t border-stone-800 gap-2">
+              <span className="truncate">案头散落花瓣（随风零落意境）</span>
               <button
                 type="button"
                 onClick={onTogglePetals}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 whitespace-nowrap ${
                   showPetals ? 'bg-amber-600 border-amber-400/60 text-amber-950 font-bold' : 'bg-stone-800 border-stone-700 text-stone-400'
                 }`}
               >
@@ -562,7 +591,7 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
                   key={opt.scale}
                   type="button"
                   onClick={() => onUpdateTimeScale?.(opt.scale)}
-                  className={`py-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer border ${
+                  className={`py-1.5 px-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer border whitespace-nowrap text-center ${
                     timeScale === opt.scale
                       ? 'bg-amber-600/80 border-amber-400/70 text-amber-100 shadow-xs'
                       : 'bg-stone-950/60 hover:bg-stone-800/60 border-stone-800 text-stone-400'
@@ -587,7 +616,7 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               <button
                 type="button"
                 onClick={() => sound.toggleBgm()}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1 border ${
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1 border shrink-0 whitespace-nowrap ${
                   bgmState.isPlaying 
                     ? 'bg-amber-600 border-amber-400/60 text-amber-950 font-bold shadow-xs' 
                     : 'bg-stone-800 border-stone-700 text-stone-300 hover:bg-stone-700'
@@ -642,19 +671,19 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
           </div>
 
           {/* ── 9. 摆件交互音效开关 ── */}
-          <div className="flex items-center justify-between p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               {soundEnabled ? (
-                <Volume2 size={16} className="text-amber-400" />
+                <Volume2 size={16} className="text-amber-400 shrink-0" />
               ) : (
-                <VolumeX size={16} className="text-stone-500" />
+                <VolumeX size={16} className="text-stone-500 shrink-0" />
               )}
-              <span className="text-stone-300 font-medium text-xs">祭祀与供奉触碰音效 (敲磬/点烛/置杯)</span>
+              <span className="text-stone-300 font-medium text-xs truncate">祭祀与供奉触碰音效 (敲磬/点烛/置杯)</span>
             </div>
             <button
               type="button"
               onClick={onToggleSound}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 whitespace-nowrap ${
                 soundEnabled ? 'bg-amber-600 border-amber-400/60 text-amber-950 font-bold' : 'bg-stone-800 border-stone-700 text-stone-400'
               }`}
             >
@@ -662,32 +691,325 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
             </button>
           </div>
 
-          {/* ── 10. 专项展台审计开关 ── */}
+          {/* ── 10. 专项展台审计开关与深度配置 (支持展开折叠) ── */}
           {onToggleAuditMode && (
-            <div className="flex items-center justify-between p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
-                  <Eye size={16} />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-stone-200 font-medium text-xs">专项展台审计（名花与花器全景品鉴）</span>
-                  <span className="text-[10px] text-stone-400">开启后在案台呈现可自由拖拽的全景名花与名瓷品鉴展台</span>
-                </div>
-              </div>
-              <button
-                type="button"
+            <div className="space-y-3 p-3.5 bg-stone-900/80 rounded-2xl border border-amber-500/30 transition-all">
+              {/* 头部开关与展开折叠控制 */}
+              <div 
+                className="flex items-center justify-between cursor-pointer select-none gap-2.5"
                 onClick={() => {
                   sound.playWoodPlacement();
-                  onToggleAuditMode();
+                  setIsAuditExpanded((prev) => !prev);
                 }}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
-                  isAuditMode
-                    ? 'bg-gradient-to-r from-rose-600 to-amber-600 border-amber-400/60 text-stone-950 font-bold'
-                    : 'bg-stone-800 border-stone-700 text-stone-400 hover:text-stone-200'
-                }`}
               >
-                {isAuditMode ? '已开启' : '开启'}
-              </button>
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-all ${
+                    isAuditMode 
+                      ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]' 
+                      : 'bg-stone-800 border-stone-700 text-stone-500'
+                  }`}>
+                    <Eye size={16} />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-stone-200 font-medium text-xs">专项展台审计（名花与花器全景品鉴）</span>
+                      <span className="text-[10px] text-amber-400/90 font-mono flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 whitespace-nowrap shrink-0">
+                        {isAuditExpanded ? '收起配置' : '展开配置'}
+                        {isAuditExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-stone-400 mt-0.5">
+                      {isAuditMode ? '展台已激活 · 点击可折叠或微调审计大类、分组与枯荣度' : '开启后在案台呈现可自由拖拽的全景名花与名瓷品鉴展台'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 ml-1" onClick={(e) => e.stopPropagation()}>
+                  {/* 开关按钮 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playWoodPlacement();
+                      onToggleAuditMode();
+                      if (!isAuditMode) {
+                        setIsAuditExpanded(true);
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer border shrink-0 whitespace-nowrap ${
+                      isAuditMode
+                        ? 'bg-gradient-to-r from-rose-600 to-amber-600 border-amber-400/60 text-stone-950 font-bold shadow-xs'
+                        : 'bg-stone-800 border-stone-700 text-stone-400 hover:text-stone-200'
+                    }`}
+                  >
+                    {isAuditMode ? '已开启' : '开启'}
+                  </button>
+                </div>
+              </div>
+
+              {/* 展开后的详细配置面板 */}
+              {isAuditExpanded && (
+                <div className="pt-3 border-t border-amber-500/20 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {/* 1. 品鉴大类切换 (名花 vs 花器) */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-medium text-amber-200/90 flex items-center justify-between font-serif">
+                      <span>品鉴大类</span>
+                      <span className="text-[10px] text-stone-400 font-sans font-normal">
+                        {auditCategory === 'flowers' ? '当前：15款名卉形神品鉴' : '当前：12款雅瓷花器形制'}
+                      </span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isAuditMode) onToggleAuditMode?.();
+                          onSwitchAuditCategory?.('flowers');
+                        }}
+                        className={`py-1.5 px-2.5 rounded-xl border text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                          auditCategory === 'flowers'
+                            ? 'bg-amber-500 text-stone-950 font-bold border-amber-400 shadow-sm'
+                            : 'bg-stone-950/70 border-stone-800 text-stone-300 hover:bg-stone-800/80 hover:text-stone-100'
+                        }`}
+                      >
+                        <span>🌸</span>
+                        <span>名花形神专项 (15款)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isAuditMode) onToggleAuditMode?.();
+                          onSwitchAuditCategory?.('vases');
+                        }}
+                        className={`py-1.5 px-2.5 rounded-xl border text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                          auditCategory === 'vases'
+                            ? 'bg-amber-500 text-stone-950 font-bold border-amber-400 shadow-sm'
+                            : 'bg-stone-950/70 border-stone-800 text-stone-300 hover:bg-stone-800/80 hover:text-stone-100'
+                        }`}
+                      >
+                        <span>🏺</span>
+                        <span>花器形制专项 (12款)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 2. 展台阵列分组 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-medium text-amber-200/90 font-serif">
+                      {auditCategory === 'flowers' ? '名花陈列分组' : '雅瓷花器分组'}
+                    </label>
+                    {auditCategory === 'flowers' ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('flowers_tier1_all');
+                          }}
+                          className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
+                            auditGroup === 'flowers_tier1_all'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          🌟 10花齐放同台
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('flowers_tier1_a');
+                          }}
+                          className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
+                            auditGroup === 'flowers_tier1_a'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          🌺 梯队A (前5)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('flowers_tier1_b');
+                          }}
+                          className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
+                            auditGroup === 'flowers_tier1_b'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          🪷 梯队B (后5)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('flowers_classic');
+                          }}
+                          className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
+                            auditGroup === 'flowers_classic'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          💮 经典5供名花
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('flowers_bouquets');
+                          }}
+                          className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all col-span-2 sm:col-span-1 ${
+                            auditGroup === 'flowers_bouquets'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          💐 案前敬献花束
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('new_unique');
+                          }}
+                          className={`py-1.5 px-2.5 rounded-lg border text-xs text-center cursor-pointer transition-all ${
+                            auditGroup === 'new_unique'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          ✨ 4款异形肌理瓶
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAuditMode) onToggleAuditMode?.();
+                            onSwitchAuditGroup?.('designer_twist');
+                          }}
+                          className={`py-1.5 px-2.5 rounded-lg border text-xs text-center cursor-pointer transition-all ${
+                            auditGroup === 'designer_twist'
+                              ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
+                              : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                          }`}
+                        >
+                          🎨 8款现代折痕瓶
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. 详细调节项：名花生命枯荣度 & 裸检模式 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                    {/* 名花生命枯荣调节 */}
+                    {auditCategory === 'flowers' && (
+                      <div className="space-y-1.5 p-2 bg-stone-950/60 rounded-xl border border-stone-800">
+                        <label className="text-[10px] text-amber-200/80 font-medium flex items-center justify-between">
+                          <span>枯荣生命阶段</span>
+                          <span className="text-rose-400 font-mono text-[10px]">
+                            {Math.round((flowerDecayHealth ?? 1) * 100)}%
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-3 gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!isAuditMode) onToggleAuditMode?.();
+                              onSelectFlowerDecayHealth?.(1.0);
+                            }}
+                            className={`py-1 px-1 rounded text-[10px] text-center cursor-pointer transition-all border ${
+                              (flowerDecayHealth ?? 1) >= 0.9
+                                ? 'bg-rose-950/60 border-rose-400 text-rose-200 font-bold'
+                                : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
+                            }`}
+                          >
+                            🌸 满盛
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!isAuditMode) onToggleAuditMode?.();
+                              onSelectFlowerDecayHealth?.(0.55);
+                            }}
+                            className={`py-1 px-1 rounded text-[10px] text-center cursor-pointer transition-all border ${
+                              (flowerDecayHealth ?? 1) > 0.3 && (flowerDecayHealth ?? 1) < 0.9
+                                ? 'bg-amber-950/60 border-amber-400 text-amber-200 font-bold'
+                                : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
+                            }`}
+                          >
+                            🍂 微枯
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!isAuditMode) onToggleAuditMode?.();
+                              onSelectFlowerDecayHealth?.(0.15);
+                            }}
+                            className={`py-1 px-1 rounded text-[10px] text-center cursor-pointer transition-all border ${
+                              (flowerDecayHealth ?? 1) <= 0.3
+                                ? 'bg-stone-800 border-stone-600 text-stone-300 font-bold'
+                                : 'bg-stone-900 border-stone-800 text-stone-400 hover:text-stone-200'
+                            }`}
+                          >
+                            🥀 岁暮
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 插花景深 vs 裸检切换 */}
+                    <div className={`space-y-1.5 p-2 bg-stone-950/60 rounded-xl border border-stone-800 ${
+                      auditCategory === 'flowers' ? '' : 'sm:col-span-2'
+                    }`}>
+                      <label className="text-[10px] text-amber-200/80 font-medium">
+                        瓶口景深与微观肌理
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isAuditMode) onToggleAuditMode?.();
+                          onToggleAuditFlowers?.();
+                        }}
+                        className="w-full py-1.5 px-2 rounded-lg bg-amber-950/30 hover:bg-amber-900/40 text-amber-200 border border-amber-500/40 cursor-pointer text-xs font-medium flex items-center justify-center gap-1.5 transition-all"
+                      >
+                        <span>{auditWithFlowers ? '🌸 切换为净瓶裸检（看肌理）' : '🌸 恢复插花入瓶（看咬合）'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 快捷操作条：触发落英 / 恢复常规五供 */}
+                  <div className="flex items-center justify-between pt-1 text-[11px]">
+                    {auditCategory === 'flowers' && onTriggerAuditPetals && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onTriggerAuditPetals();
+                        }}
+                        className="text-amber-300 hover:text-amber-200 flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <span>🍃 触发漫天落瓣动效</span>
+                      </button>
+                    )}
+                    {isAuditMode && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onToggleAuditMode?.();
+                        }}
+                        className="text-stone-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer ml-auto transition-colors"
+                      >
+                        <RotateCcw size={12} />
+                        <span>一键退出审计 · 恢复常规五供</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

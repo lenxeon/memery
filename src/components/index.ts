@@ -18,3 +18,5 @@ export * from './offerings';
 export * from './effects';
 export * from './settings';
 export * from './controls';
+export * from './auth';
+export * from './memorial';

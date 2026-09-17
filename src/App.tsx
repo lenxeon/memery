@@ -20,11 +20,20 @@ import {
   EntityTypeId,
   TableclothStyle,
   WallBackgroundStyle,
-  FloorStyle
+  FloorStyle,
+  AuditCategory,
+  AuditGroup,
+  UserProfile,
+  MemorialHallItem
 } from './types';
 import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait, FLOOR_STYLE_OPTIONS } from './components/scene';
 import { VolumetricRays, DustMotes, PetalShower } from './components/effects';
+import { AltarPixiViewport } from './pixi/components/AltarPixiViewport';
+
 import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerModal, BlessingModal, UserAgreementModal } from './components/settings';
+import { AuthPage } from './components/auth';
+import { MemorialListModal, CreateMemorialModal } from './components/memorial';
+
 import { BottomDock } from './components/controls';
 import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
 import { VaseStyle, getVaseStyleMeta } from './components/offerings/flowers/vases';
@@ -43,7 +52,12 @@ import {
   SlidersHorizontal,
   Heart,
   GripVertical,
-  X
+  X,
+  ChevronDown,
+  ChevronUp,
+  User,
+  LogOut,
+  Compass
 } from 'lucide-react';
 
 // ── 供案常规陈设 (五供齐备) ──
@@ -60,16 +74,7 @@ export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
 });
 
 // ── 🔍 专项审计展台 (台面清空其它所有物品，并列陈列供逐一审计花器形制、微观肌理与名花形神) ──
-export type AuditCategory = 'flowers' | 'vases';
-export type VaseAuditGroup = 'new_unique' | 'designer_twist';
-export type FlowerAuditGroup =
-  | 'flowers_tier1_all'   // 🌟 第一梯队 10 花齐放同台
-  | 'flowers_tier1_a'     // 🌺 第一梯队 A 组 (前5名卉：梅花/向日葵/康乃馨/马蹄莲/郁金香)
-  | 'flowers_tier1_b'     // 🪷 第一梯队 B 组 (后5名卉：水仙/铃兰/蝴蝶兰/绣球/雏菊)
-  | 'flowers_classic'     // 💮 经典传承 5 供 (牡丹/百合/清莲/白菊/玫瑰)
-  | 'flowers_bouquets';   // 💐 案前敬献花束平铺对比
-
-export type AuditGroup = VaseAuditGroup | FlowerAuditGroup;
+export type { AuditCategory, VaseAuditGroup, FlowerAuditGroup, AuditGroup } from './types';
 
 // 1. 雅瓷花器形制专项审计
 export const buildAuditVaseItems = (
@@ -392,16 +397,88 @@ const INITIAL_LIGHTING: LightingSettings = {
   windForce: 0.15,
 };
 
+const DEFAULT_MEMORIAL_HALLS: MemorialHallItem[] = [
+  {
+    id: 'hall_grandma',
+    name: '王秀英',
+    title: '慈颜常驻 · 永沐春风',
+    relationship: '祖母',
+    birthDate: '1936 - 2021',
+    photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
+    guardianDays: 186,
+    blessingCount: 38,
+    isOwner: true,
+    createdAt: Date.now() - 186 * 86400000,
+  },
+  {
+    id: 'hall_father',
+    name: '林建国',
+    title: '父爱如山 · 德泽流芳',
+    relationship: '慈父',
+    birthDate: '1948 - 2023',
+    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    guardianDays: 92,
+    blessingCount: 24,
+    isOwner: true,
+    createdAt: Date.now() - 92 * 86400000,
+  },
+  {
+    id: 'hall_uncle',
+    name: '张明德',
+    title: '松柏长青 · 德馨永存',
+    relationship: '叔公',
+    birthDate: '1942 - 2022',
+    photoUrl: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=400&q=80',
+    guardianDays: 45,
+    blessingCount: 16,
+    isOwner: false,
+    creatorName: '由堂兄 张伟 筹建',
+    lastVisitedAt: Date.now() - 3 * 86400000,
+    createdAt: Date.now() - 45 * 86400000,
+  },
+];
+
 const INITIAL_MEMORIAL: MemorialInfo = {
-  title: '暖念墙',
-  subtitle: 'Warmth & Blessing',
-  photoUrl: 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&w=400&q=80',
+  title: DEFAULT_MEMORIAL_HALLS[0].title,
+  subtitle: `${DEFAULT_MEMORIAL_HALLS[0].relationship} ${DEFAULT_MEMORIAL_HALLS[0].name} (${DEFAULT_MEMORIAL_HALLS[0].birthDate})`,
+  photoUrl: DEFAULT_MEMORIAL_HALLS[0].photoUrl,
 };
 
 export default function App() {
   const [items, setItems] = useState<Record<SceneItemId, SceneItem>>(INITIAL_ITEMS);
   const [lighting, setLighting] = useState<LightingSettings>(INITIAL_LIGHTING);
   const [memorial, setMemorial] = useState<MemorialInfo>(INITIAL_MEMORIAL);
+
+  // 堂轩名录与纪念堂管理状态
+  const [memorialHalls, setMemorialHalls] = useState<MemorialHallItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('memery_memorial_halls');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return DEFAULT_MEMORIAL_HALLS;
+  });
+
+  const [currentHallId, setCurrentHallId] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedId = localStorage.getItem('memery_current_hall_id');
+        if (savedId) return savedId;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return DEFAULT_MEMORIAL_HALLS[0]?.id || '';
+  });
+
+  const [isMemorialListOpen, setIsMemorialListOpen] = useState(false);
+  const [isCreateMemorialOpen, setIsCreateMemorialOpen] = useState(false);
+
+  // 当前主奉堂轩
+  const currentHall = memorialHalls.find((h) => h.id === currentHallId) || memorialHalls[0];
 
   // Modals state
   const [isLightingOpen, setIsLightingOpen] = useState(false);
@@ -421,6 +498,55 @@ export default function App() {
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
   const [currentFlower, setCurrentFlower] = useState<FlowerType>('peonies');
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'altar' | 'auth'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash;
+      if (params.has('login') || params.has('auth') || params.get('page') === 'login' || hash === '#/login' || hash === '#login') {
+        return 'auth';
+      }
+    }
+    return 'altar';
+  });
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      if (hash === '#/login' || hash === '#login' || params.get('page') === 'login' || params.has('login')) {
+        setCurrentView('auth');
+      } else {
+        setCurrentView('altar');
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    window.addEventListener('popstate', handleHash);
+    return () => {
+      window.removeEventListener('hashchange', handleHash);
+      window.removeEventListener('popstate', handleHash);
+    };
+  }, []);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('memery_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleLogout = () => {
+    sound.playWoodPlacement();
+    setCurrentUser(null);
+    setIsUserMenuOpen(false);
+    try {
+      localStorage.removeItem('memery_current_user');
+    } catch (err) {
+      console.error(err);
+    }
+    showToast('已安全退出登录');
+  };
 
   // Background space aesthetics (默认晴岚映曜 · 宏伟木构殿堂长廊)
   const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('heritage_wood');
@@ -450,6 +576,37 @@ export default function App() {
     setTimeout(() => {
       setToastMessage((prev) => (prev === msg ? null : prev));
     }, 4500);
+  };
+
+  // 堂轩选择与切换
+  const handleSelectHall = (hall: MemorialHallItem) => {
+    setCurrentHallId(hall.id);
+    try {
+      localStorage.setItem('memery_current_hall_id', hall.id);
+    } catch (e) {
+      console.error(e);
+    }
+    setMemorial({
+      title: hall.title,
+      subtitle: `${hall.relationship} ${hall.name} ${hall.birthDate ? `(${hall.birthDate})` : ''}`,
+      photoUrl: hall.photoUrl,
+    });
+    showToast(`已步入《${hall.title}》· 守护 ${hall.name}`);
+  };
+
+  // 筹建新堂轩并设为当前案台
+  const handleCreateHall = (newHall: MemorialHallItem) => {
+    setMemorialHalls((prev) => {
+      const next = [newHall, ...prev];
+      try {
+        localStorage.setItem('memery_memorial_halls', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+    handleSelectHall(newHall);
+    showToast(`新堂轩《${newHall.title}》已筹建落成`);
   };
 
   // 2.5D 深度视差微动交互
@@ -587,6 +744,7 @@ export default function App() {
   const [auditGroup, setAuditGroup] = useState<AuditGroup>('flowers_tier1_all');
   const [auditWithFlowers, setAuditWithFlowers] = useState(true);
   const [flowerDecayHealth, setFlowerDecayHealth] = useState<number>(1.0);
+  const [isAuditCapsuleExpanded, setIsAuditCapsuleExpanded] = useState<boolean>(true);
 
   // 审计胶囊拖拽改变位置 (支持桌面端鼠标与移动端触摸)
   const handleAuditPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -652,6 +810,19 @@ export default function App() {
       nextHealth === 1.0
         ? '🌸 满盛怒放（生机 100%）'
         : nextHealth === 0.55
+        ? '🍂 微枯初衰（生机 55%）'
+        : '🥀 岁暮深凋（生机 15%）';
+    showToast(`名花枯荣生命审计：${stageDesc}`);
+  };
+
+  const selectFlowerDecayHealth = (health: number) => {
+    setFlowerDecayHealth(health);
+    sound.playBell(720, 1.5);
+    setItems(buildAuditItems(auditCategory, auditGroup, auditWithFlowers, health));
+    const stageDesc =
+      health >= 0.9
+        ? '🌸 满盛怒放（生机 100%）'
+        : health >= 0.4
         ? '🍂 微枯初衰（生机 55%）'
         : '🥀 岁暮深凋（生机 15%）';
     showToast(`名花枯荣生命审计：${stageDesc}`);
@@ -1067,6 +1238,35 @@ export default function App() {
     }
   };
 
+  if (currentView === 'auth') {
+    return (
+      <div className="relative w-full min-h-screen bg-[#0c0a09]">
+        <AuthPage
+          onBack={() => {
+            setCurrentView('altar');
+            if (window.location.hash === '#/login' || window.location.hash === '#login') {
+              window.history.pushState('', document.title, window.location.pathname + window.location.search);
+            }
+          }}
+          onSuccess={(user) => {
+            setCurrentUser(user);
+            setCurrentView('altar');
+            if (window.location.hash === '#/login' || window.location.hash === '#login') {
+              window.history.pushState('', document.title, window.location.pathname + window.location.search);
+            }
+            showToast(`已登录：${user.name}，暖念心灯已长伴`);
+          }}
+          onOpenAgreement={() => setIsAgreementOpen(true)}
+        />
+        {/* 《暖念》立意初心、社会价值与用户使用协议声明弹窗 */}
+        <UserAgreementModal
+          isOpen={isAgreementOpen}
+          onClose={() => setIsAgreementOpen(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <main
       className={`relative w-full h-screen overflow-hidden flex flex-col items-center justify-between select-none transition-colors duration-700 font-sans ${getSceneBackgroundClass()}`}
@@ -1081,7 +1281,7 @@ export default function App() {
 
       {/* Top Header & Quick Environment Bar */}
       <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
-        {/* Left: App Brand & Quick Agreement Link */}
+        {/* Left: App Brand, Quick Agreement Link & User Login/Profile */}
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -1093,6 +1293,117 @@ export default function App() {
             <span className="w-1 h-1 rounded-full bg-amber-400/60" />
             <span className="text-[10px] text-amber-400/80 group-hover:text-amber-300 font-normal">公约与立意</span>
           </button>
+
+          {/* 堂轩名录（纪念馆列表）入口 */}
+          <button
+            type="button"
+            onClick={() => {
+              sound.playWoodPlacement();
+              setIsMemorialListOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[#1c1917]/90 backdrop-blur-md hover:bg-stone-900 border border-amber-500/40 hover:border-amber-400/70 text-amber-200 text-xs shadow-xs transition-all cursor-pointer group select-none"
+            title="点击打开堂轩名录，切换或创建纪念堂"
+          >
+            <Compass size={13} className="text-amber-400 group-hover:rotate-45 transition-transform duration-300 shrink-0" />
+            <span className="font-serif max-w-[80px] sm:max-w-[120px] truncate text-[11px] sm:text-xs text-amber-100 font-medium">
+              {currentHall ? currentHall.title.split('·')[0].trim() : '堂轩名录'}
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">
+              {memorialHalls.length}
+            </span>
+            <ChevronDown size={11} className="text-amber-400/70 group-hover:translate-y-0.5 transition-transform shrink-0" />
+          </button>
+
+          {/* 用户账户与登录卡片入口 */}
+          <div className="relative">
+            {currentUser ? (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playWoodPlacement();
+                    setIsUserMenuOpen(!isUserMenuOpen);
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[#1c1917]/90 backdrop-blur-md hover:bg-stone-900 border border-amber-500/40 text-amber-200 text-xs shadow-xs transition-all cursor-pointer"
+                  title="点击查看个人暖念档案与守护记录"
+                >
+                  <span className="text-xs select-none">{currentUser.avatar || (currentUser.loginType === 'wechat' ? '💬' : currentUser.loginType === 'apple' ? '🍎' : '👤')}</span>
+                  <span className="font-serif max-w-[70px] sm:max-w-[100px] truncate text-[11px] sm:text-xs text-amber-100">{currentUser.name}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" title="心灯已长伴" />
+                </button>
+
+                {/* 用户档案气泡卡片 */}
+                {isUserMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-[#1c1917]/95 backdrop-blur-xl border border-amber-500/50 shadow-2xl p-3.5 z-50 text-xs text-stone-200 animate-in fade-in zoom-in-95 ring-1 ring-amber-400/20">
+                    <div className="flex items-center gap-2.5 pb-2.5 border-b border-amber-500/20">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-lg shrink-0">
+                        {currentUser.avatar || (currentUser.loginType === 'wechat' ? '💬' : currentUser.loginType === 'apple' ? '🍎' : '👤')}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-serif font-bold text-amber-100 truncate text-xs">{currentUser.name}</div>
+                        <div className="text-[10px] text-amber-400/80 flex items-center gap-1 mt-0.5">
+                          <span>{currentUser.loginType === 'wechat' ? '微信授权登录' : currentUser.loginType === 'apple' ? 'Apple 隐私登录' : '手机账号登录'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="py-2.5 space-y-1.5 text-[11px] text-stone-300">
+                      <div className="flex justify-between items-center">
+                        <span className="text-stone-400">已守护天数</span>
+                        <span className="font-mono text-amber-300 font-semibold">{currentUser.guardianDays} 天</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-stone-400">案前寄思祈愿</span>
+                        <span className="font-mono text-amber-300 font-semibold">{currentUser.blessingCount} 次</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-stone-400">暖念长青状态</span>
+                        <span className="text-emerald-400 text-[10px] flex items-center gap-1 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          <span>心灯守护中</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2.5 border-t border-amber-500/20 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsAgreementOpen(true);
+                        }}
+                        className="text-[10px] text-stone-400 hover:text-amber-200 cursor-pointer transition-colors"
+                      >
+                        服务公约
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex items-center gap-1 text-[11px] text-red-400 hover:text-red-300 cursor-pointer transition-colors"
+                      >
+                        <LogOut size={12} />
+                        <span>退出登录</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playWoodPlacement();
+                  setCurrentView('auth');
+                  window.location.hash = '#/login';
+                }}
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 border border-amber-400/60 shadow-xs text-xs text-stone-950 font-bold transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+                title="开启暖念心灯档案 · 登录与注册"
+              >
+                <User size={12} className="stroke-[2.5]" />
+                <span>登录 / 注册</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Quick controls on right */}
@@ -1192,47 +1503,23 @@ export default function App() {
         onMouseMove={handleStageMouseMove}
         onMouseLeave={handleStageMouseLeave}
       >
-        {/* Layer 1: Cathedral Window / Architectural Heritage Wood Wall (晴岚映曜宏伟殿宇木构长廊) */}
-        <div 
-          className="absolute inset-0 transition-transform duration-300 ease-out pointer-events-none"
-          style={{
-            transform: `translate3d(${parallax.x * 0.25}px, ${parallax.y * 0.25}px, 0)`,
-          }}
-        >
-          <AltarWall
-            masterOn={lighting.masterOn}
-            sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.05}
-            timeOfDay={lighting.timeOfDay}
-            sunAngle={lighting.sunAngle}
-            wallStyle={wallStyle}
-          />
-        </div>
-
-        {/* Layer 2: Volumetric Rays (Tyndall Light Beams / God Rays) */}
-        <VolumetricRays
-          enabled={lighting.masterOn && lighting.godRaysEnabled}
-          intensity={lighting.godRaysIntensity}
-          sunAngle={lighting.sunAngle}
-          timeOfDay={lighting.timeOfDay}
+        {/* 2.5D Pure Canvas WebGL Game Scene Viewport (全量接管背景、地坪、光影、供案与供品) */}
+        <AltarPixiViewport
+          items={items}
+          lighting={lighting}
+          wallStyle={wallStyle}
+          floorStyle={floorStyle}
+          tableclothStyle={tableclothStyle}
+          showTableRunner={showTableRunner}
+          petalTrigger={petalTrigger}
+          lastOfferedFlower={lastOfferedFlower}
+          onToggleItemLit={toggleItemLit}
+          onToggleFruit={handleToggleFruit}
+          onVaseClick={handleToggleVaseStyle}
+          onBowlHit={() => sound.playSingingBowl()}
+          onUpdateItemPosition={updateItemPosition}
+          className="absolute inset-0 z-10"
         />
-
-        {/* Layer 3: Floating Dust Motes caught in the sunlight */}
-        <DustMotes
-          density={lighting.dustDensity}
-          sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.15}
-          windForce={lighting.windForce}
-          timeOfDay={lighting.timeOfDay}
-        />
-
-        {/* Layer 4: Perspective Flooring with Marble Tile & Hardwood Planks (2D 插画写实人字拼与汉白玉大理石) */}
-        <div 
-          className="absolute inset-x-0 bottom-0 transition-transform duration-300 ease-out pointer-events-none"
-          style={{
-            transform: `translate3d(${parallax.x * 0.45}px, ${parallax.y * 0.45}px, 0)`,
-          }}
-        >
-          <FloorPlanks lighting={lighting} floorStyle={floorStyle} />
-        </div>
 
         {/* Layer 5: Sacred Memorial Portrait Frame (居中安放于木构长廊正前) */}
         <div 
@@ -1276,177 +1563,195 @@ export default function App() {
                 <CinnabarSealBadge text="审计" />
               </div>
 
-              <span className="text-stone-600 hidden sm:inline">|</span>
-
-              {/* 类别切换：名花 vs 花器 */}
-              <div className="flex items-center bg-stone-950/90 p-0.5 rounded-full border border-amber-500/40">
-                <button
-                  type="button"
-                  onClick={() => switchAuditCategory('flowers')}
-                  className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
-                    auditCategory === 'flowers'
-                      ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-stone-950 font-bold shadow-xs'
-                      : 'text-amber-200/70 hover:text-amber-100'
-                  }`}
-                >
-                  <span>🌸</span>
-                  <span>名花 (15款)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => switchAuditCategory('vases')}
-                  className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
-                    auditCategory === 'vases'
-                      ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
-                      : 'text-amber-200/70 hover:text-amber-100'
-                  }`}
-                >
-                  <span>🏺</span>
-                  <span>花器 (12款)</span>
-                </button>
-              </div>
-
-              <span className="text-stone-600 hidden sm:inline">|</span>
-
-              {/* 名花专属分组切换 */}
-              {auditCategory === 'flowers' ? (
-                <div className="flex items-center flex-wrap gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('flowers_tier1_all')}
-                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'flowers_tier1_all'
-                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                    title="第一梯队 10 款新名花双排错落同台大展"
-                  >
-                    🌟 10花齐放
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('flowers_tier1_a')}
-                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'flowers_tier1_a'
-                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                    title="梅花、向日葵、康乃馨、马蹄莲、郁金香"
-                  >
-                    🌺 梯队A (前5)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('flowers_tier1_b')}
-                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'flowers_tier1_b'
-                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                    title="水仙、铃兰、蝴蝶兰、绣球、雏菊"
-                  >
-                    🪷 梯队B (后5)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('flowers_classic')}
-                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'flowers_classic'
-                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                    title="牡丹、百合、清莲、白菊、玫瑰"
-                  >
-                    💮 经典5供
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('flowers_bouquets')}
-                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'flowers_bouquets'
-                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                    title="桌面平铺丝带花束敬献形态比对"
-                  >
-                    💐 案前花束
-                  </button>
-                </div>
-              ) : (
-                /* 花器专属分组切换 */
-                <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('new_unique')}
-                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'new_unique'
-                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                  >
-                    ✨ 4款异形瓶
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchAuditGroup('designer_twist')}
-                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      auditGroup === 'designer_twist'
-                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                  >
-                    🎨 8款折痕瓶
-                  </button>
-                </div>
-              )}
-
-              <span className="text-stone-600 hidden sm:inline">|</span>
-
-              {/* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */}
-              {auditCategory === 'flowers' ? (
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={cycleFlowerDecay}
-                    className="px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border border-rose-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                    title="切换名花生命周期：满盛(100%) -> 微枯(55%) -> 岁暮深凋(15%)"
-                  >
-                    <span>
-                      {flowerDecayHealth === 1.0 ? '🌸 满盛' : flowerDecayHealth === 0.55 ? '🍂 微枯' : '🥀 岁暮'}
-                    </span>
-                    <span className="text-[10px] text-rose-300/80 font-mono">
-                      {Math.round(flowerDecayHealth * 100)}%
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={triggerAuditPetals}
-                    className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                    title="模拟落英缤纷漫天落瓣动效"
-                  >
-                    <span>🍃 花雨</span>
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={toggleAuditFlowers}
-                  className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                  title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
-                >
-                  <span>{auditWithFlowers ? '🌸 切换裸检' : '🌸 显示插花'}</span>
-                </button>
-              )}
-
-              {/* 恢复常规五供快捷按钮 */}
+              {/* 胶囊展开/收起切换按钮 */}
               <button
                 type="button"
-                onClick={toggleAuditMode}
-                className="px-2.5 py-1 rounded-full bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                title="恢复常规五供陈设"
+                onClick={() => {
+                  sound.playWoodPlacement();
+                  setIsAuditCapsuleExpanded((prev) => !prev);
+                }}
+                className="px-2 py-0.5 rounded-full bg-stone-900/90 border border-amber-500/40 hover:border-amber-400 text-[11px] text-amber-200/90 flex items-center gap-0.5 cursor-pointer transition-all active:scale-95"
+                title={isAuditCapsuleExpanded ? '收起配置选项' : '展开详细配置选项'}
               >
-                <span>🔄 恢复常规五供</span>
+                <span>{isAuditCapsuleExpanded ? '收起' : '展开配置'}</span>
+                {isAuditCapsuleExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
               </button>
+
+              {isAuditCapsuleExpanded && (
+                <>
+                  <span className="text-stone-600 hidden sm:inline">|</span>
+
+                  {/* 类别切换：名花 vs 花器 */}
+                  <div className="flex items-center bg-stone-950/90 p-0.5 rounded-full border border-amber-500/40">
+                    <button
+                      type="button"
+                      onClick={() => switchAuditCategory('flowers')}
+                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                        auditCategory === 'flowers'
+                          ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                    >
+                      <span>🌸</span>
+                      <span>名花 (15款)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditCategory('vases')}
+                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                        auditCategory === 'vases'
+                          ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                    >
+                      <span>🏺</span>
+                      <span>花器 (12款)</span>
+                    </button>
+                  </div>
+
+                  <span className="text-stone-600 hidden sm:inline">|</span>
+
+                  {/* 名花专属分组切换 */}
+                  {auditCategory === 'flowers' ? (
+                    <div className="flex items-center flex-wrap gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('flowers_tier1_all')}
+                        className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'flowers_tier1_all'
+                            ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                        title="第一梯队 10 款新名花双排错落同台大展"
+                      >
+                        🌟 10花齐放
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('flowers_tier1_a')}
+                        className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'flowers_tier1_a'
+                            ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                        title="梅花、向日葵、康乃馨、马蹄莲、郁金香"
+                      >
+                        🌺 梯队A (前5)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('flowers_tier1_b')}
+                        className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'flowers_tier1_b'
+                            ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                        title="水仙、铃兰、蝴蝶兰、绣球、雏菊"
+                      >
+                        🪷 梯队B (后5)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('flowers_classic')}
+                        className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'flowers_classic'
+                            ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                        title="牡丹、百合、清莲、白菊、玫瑰"
+                      >
+                        💮 经典5供
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('flowers_bouquets')}
+                        className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'flowers_bouquets'
+                            ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                        title="桌面平铺丝带花束敬献形态比对"
+                      >
+                        💐 案前花束
+                      </button>
+                    </div>
+                  ) : (
+                    /* 花器专属分组切换 */
+                    <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('new_unique')}
+                        className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'new_unique'
+                            ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                      >
+                        ✨ 4款异形瓶
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => switchAuditGroup('designer_twist')}
+                        className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                          auditGroup === 'designer_twist'
+                            ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                            : 'text-amber-200/70 hover:text-amber-100'
+                        }`}
+                      >
+                        🎨 8款折痕瓶
+                      </button>
+                    </div>
+                  )}
+
+                  <span className="text-stone-600 hidden sm:inline">|</span>
+
+                  {/* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */}
+                  {auditCategory === 'flowers' ? (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={cycleFlowerDecay}
+                        className="px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border border-rose-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                        title="切换名花生命周期：满盛(100%) -> 微枯(55%) -> 岁暮深凋(15%)"
+                      >
+                        <span>
+                          {flowerDecayHealth === 1.0 ? '🌸 满盛' : flowerDecayHealth === 0.55 ? '🍂 微枯' : '🥀 岁暮'}
+                        </span>
+                        <span className="text-[10px] text-rose-300/80 font-mono">
+                          {Math.round(flowerDecayHealth * 100)}%
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={triggerAuditPetals}
+                        className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                        title="模拟落英缤纷漫天落瓣动效"
+                      >
+                        <span>🍃 花雨</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={toggleAuditFlowers}
+                      className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                      title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
+                    >
+                      <span>{auditWithFlowers ? '🌸 切换裸检' : '🌸 显示插花'}</span>
+                    </button>
+                  )}
+
+                  {/* 恢复常规五供快捷按钮 */}
+                  <button
+                    type="button"
+                    onClick={toggleAuditMode}
+                    className="px-2.5 py-1 rounded-full bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                    title="恢复常规五供陈设"
+                  >
+                    <span>🔄 恢复常规五供</span>
+                  </button>
+                </>
+              )}
 
               {/* 关闭审计展台 X 按钮 */}
               <button
@@ -1461,34 +1766,8 @@ export default function App() {
           </div>
         )}
 
-        {/* Layer 6: Altar Table with all draggable items (往背墙位置适度移入，紧贴墙体立面，更具厅堂进深感) */}
-        <div 
-          className="absolute bottom-22 sm:bottom-28 z-25 w-full flex justify-center px-4 transition-transform duration-300 ease-out pointer-events-none"
-          style={{
-            transform: `translate3d(${parallax.x * 0.85}px, ${parallax.y * 0.85}px, 0) scale(1.0)`,
-            transformOrigin: '50% 90%',
-          }}
-        >
-          <div className="pointer-events-auto w-full flex justify-center">
-            <AltarTable
-              items={items}
-              onUpdateItemPosition={updateItemPosition}
-              onToggleItemLit={toggleItemLit}
-              onResetLayout={resetTableLayout}
-              onRemoveItem={handleRemoveItem}
-              onToggleFruit={handleToggleFruit}
-              onToggleVase={handleToggleVaseStyle}
-              showTableRunner={showTableRunner}
-              tableclothStyle={tableclothStyle}
-              showPetals={showPetals}
-              lighting={lighting}
-              isArrangeMode={isArrangeMode}
-            />
-          </div>
-        </div>
 
-        {/* Layer 7: Gentle Petal Shower upon flower offering */}
-        <PetalShower activeTrigger={petalTrigger} flowerType={lastOfferedFlower} />
+
       </div>
 
       {/* Bottom Navigation Dock (reproducing user's bottom buttons: 献花 / 供果 / 点烛 / 置台 / 氛围 / 祈愿) */}
@@ -1539,6 +1818,15 @@ export default function App() {
         onUpdateTimeScale={setTimeScale}
         isAuditMode={isAuditMode}
         onToggleAuditMode={toggleAuditMode}
+        auditCategory={auditCategory}
+        onSwitchAuditCategory={switchAuditCategory}
+        auditGroup={auditGroup}
+        onSwitchAuditGroup={switchAuditGroup}
+        auditWithFlowers={auditWithFlowers}
+        onToggleAuditFlowers={toggleAuditFlowers}
+        flowerDecayHealth={flowerDecayHealth}
+        onSelectFlowerDecayHealth={selectFlowerDecayHealth}
+        onTriggerAuditPetals={triggerAuditPetals}
       />
 
       {/* 献花控制弹窗 (献花上案 · 更换花瓶) */}
@@ -1581,6 +1869,49 @@ export default function App() {
       <UserAgreementModal
         isOpen={isAgreementOpen}
         onClose={() => setIsAgreementOpen(false)}
+      />
+
+      {/* 堂轩名录（纪念馆列表弹窗：支持我创建的 / 我瞻仰过的 / 空状态引导） */}
+      <MemorialListModal
+        isOpen={isMemorialListOpen}
+        onClose={() => setIsMemorialListOpen(false)}
+        halls={memorialHalls}
+        currentHallId={currentHallId}
+        onSelectHall={handleSelectHall}
+        onOpenCreate={() => {
+          setIsMemorialListOpen(false);
+          setIsCreateMemorialOpen(true);
+        }}
+        onClearHalls={() => {
+          setMemorialHalls([]);
+          try {
+            localStorage.setItem('memery_memorial_halls', JSON.stringify([]));
+          } catch (e) {
+            console.error(e);
+          }
+          showToast('已清空当前堂轩列表（供体验空状态引导创建流程）');
+        }}
+        onLoadSampleHalls={() => {
+          setMemorialHalls(DEFAULT_MEMORIAL_HALLS);
+          setCurrentHallId(DEFAULT_MEMORIAL_HALLS[0].id);
+          try {
+            localStorage.setItem('memery_memorial_halls', JSON.stringify(DEFAULT_MEMORIAL_HALLS));
+            localStorage.setItem('memery_current_hall_id', DEFAULT_MEMORIAL_HALLS[0].id);
+          } catch (e) {
+            console.error(e);
+          }
+          showToast('已恢复预置示例纪念堂');
+        }}
+      />
+
+      {/* 筹建新堂轩弹窗 */}
+      <CreateMemorialModal
+        isOpen={isCreateMemorialOpen}
+        onClose={() => setIsCreateMemorialOpen(false)}
+        onCreate={(newHall) => {
+          handleCreateHall(newHall);
+          setIsCreateMemorialOpen(false);
+        }}
       />
     </main>
   );

@@ -42,7 +42,7 @@ export const BaseFruitDish: React.FC<BaseFruitDishProps> = ({
         height: 92 * scale,
       }}
     >
-      <svg viewBox="0 0 108 92" className="w-full h-full overflow-visible">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 92" className="w-full h-full overflow-visible">
         <defs>
           {/* 1. 羊脂白玉玉质渐变 (温润通透带暖奶白与微阴) */}
           <linearGradient id="jadePorcelainGrad" x1="0%" y1="0%" x2="100%" y2="0%">

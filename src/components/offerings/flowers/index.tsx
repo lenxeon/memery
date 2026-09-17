@@ -6,11 +6,13 @@ import React from 'react';
 import { VaseFlowerProps, getVaseMouthAperture, getVaseSpreadFactor } from './types';
 import { BaseVase } from './BaseVase';
 import { getFlowerModule } from './registry';
+import { ProtectedCanvasFlora } from './ProtectedCanvasFlora';
 
 export * from './types';
 export * from './BaseVase';
 export * from './registry';
 export * from './FlowerPreview';
+export * from './ProtectedCanvasFlora';
 export * from './utils/lifecycle';
 export * from './items/PeoniesFlower';
 export * from './items/LiliesFlower';
@@ -31,17 +33,19 @@ export const FlowerVase: React.FC<VaseFlowerProps> = ({
   const hasFlower = flowerType && flowerType !== 'none';
   const flowerModule = hasFlower ? getFlowerModule(flowerType) : null;
   const FlowerComponent = flowerModule?.Component;
-  const health = lifecycle?.health ?? 1.0;
-  const dryFactor = Math.max(0, Math.min(1.0, (0.75 - health) / 0.7));
-  const isFaded = health <= 0.05;
+  const rawHealth = lifecycle?.health ?? 1.0;
+  // 将连续微小健康度量化为 2% 步进（50阶），兼顾肉眼极其平滑的色彩衰老演进，同时杜绝每秒高频刷屏
+  const steppedHealth = Math.round(rawHealth * 50) / 50;
+  const steppedDry = Math.round(Math.max(0, Math.min(1.0, (0.75 - steppedHealth) / 0.7)) * 50) / 50;
+  const isFaded = steppedHealth <= 0.05;
 
   // 掉落花瓣轨迹渲染
   const fallingPetalsSlot = flowerModule ? (
     <g id="fallingPetalsGroup">
       {flowerModule.fallingPetals.map((petal) => {
-        if (health > petal.detachHealth) return null;
+        if (steppedHealth > petal.detachHealth) return null;
 
-        const progress = Math.min(1.0, (petal.detachHealth - health) / petal.fallSpan);
+        const progress = Math.min(1.0, (petal.detachHealth - steppedHealth) / petal.fallSpan);
         const currX = petal.startX + (petal.landX - petal.startX) * progress + Math.sin(progress * Math.PI * petal.swayFreq) * petal.swayAmp * (1 - progress);
         const currY = petal.startY + (petal.landY - petal.startY) * progress;
         const currRot = progress * petal.landRot;
@@ -53,7 +57,7 @@ export const FlowerVase: React.FC<VaseFlowerProps> = ({
             cy={currY}
             rx={petal.rx}
             ry={petal.ry}
-            fill={dryFactor > 0.4 ? '#a88e6a' : '#fbcfe8'}
+            fill={steppedDry > 0.4 ? '#a88e6a' : '#fbcfe8'}
             opacity={0.85}
             transform={`rotate(${currRot}, ${currX}, ${currY})`}
           />
@@ -77,14 +81,21 @@ export const FlowerVase: React.FC<VaseFlowerProps> = ({
       fallingPetalsSlot={fallingPetalsSlot}
     >
       {FlowerComponent && (
-        <FlowerComponent
-          health={health}
-          dryFactor={dryFactor}
-          isFaded={isFaded}
-          vaseStyle={vaseStyle}
-          mouthAperture={mouthAperture}
-          spreadFactor={spreadFactor}
-        />
+        <ProtectedCanvasFlora
+          boundX={-60}
+          boundY={-80}
+          boundWidth={270}
+          boundHeight={290}
+        >
+          <FlowerComponent
+            health={steppedHealth}
+            dryFactor={steppedDry}
+            isFaded={isFaded}
+            vaseStyle={vaseStyle}
+            mouthAperture={mouthAperture}
+            spreadFactor={spreadFactor}
+          />
+        </ProtectedCanvasFlora>
       )}
     </BaseVase>
   );

@@ -116,3 +116,43 @@ export interface BgmTrackInfo {
   desc: string;
   icon: string;
 }
+
+export type AuditCategory = 'flowers' | 'vases';
+export type VaseAuditGroup = 'new_unique' | 'designer_twist';
+export type FlowerAuditGroup =
+  | 'flowers_tier1_all'   // 🌟 第一梯队 10 花齐放同台
+  | 'flowers_tier1_a'     // 🌺 第一梯队 A 组 (前5名卉：梅花/向日葵/康乃馨/马蹄莲/郁金香)
+  | 'flowers_tier1_b'     // 🪷 第一梯队 B 组 (后5名卉：水仙/铃兰/蝴蝶兰/绣球/雏菊)
+  | 'flowers_classic'     // 💮 经典传承 5 供 (牡丹/百合/清莲/白菊/玫瑰)
+  | 'flowers_bouquets';   // 💐 案前敬献花束平铺对比
+
+export type AuditGroup = VaseAuditGroup | FlowerAuditGroup;
+
+export type LoginMethod = 'phone' | 'wechat' | 'apple';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  avatar?: string;
+  loginType: LoginMethod;
+  phoneNumber?: string;
+  isSubscribed?: boolean;
+  guardianDays: number;
+  blessingCount: number;
+  createdAt: number;
+}
+
+export interface MemorialHallItem {
+  id: string;
+  name: string;             // 先人姓名，如"王秀英"
+  title: string;            // 堂号，如"慈颜常驻 · 永沐春风"
+  relationship: string;     // 关系，如"祖母" / "慈父" / "爱宠" / "先师"
+  birthDate?: string;       // 生卒日期，如"1936 - 2021"
+  photoUrl: string;         // 肖像相片
+  guardianDays: number;     // 守护天数
+  blessingCount: number;    // 累计祈福/香火次数
+  isOwner: boolean;         // 是否是我创建的
+  creatorName?: string;     // 筹建人（如"由堂哥 张伟 筹建"）
+  lastVisitedAt?: number;   // 上次瞻仰时间
+  createdAt: number;
+}

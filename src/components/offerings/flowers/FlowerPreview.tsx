@@ -5,6 +5,7 @@
 import React from 'react';
 import { FlowerType } from '../../../types';
 import { FLOWER_REGISTRY } from './registry';
+import { ProtectedCanvasFlora } from './ProtectedCanvasFlora';
 
 export interface FlowerPreviewProps {
   flowerType: FlowerType;
@@ -35,7 +36,15 @@ export const FlowerPreview: React.FC<FlowerPreviewProps> = ({
         viewBox="10 5 130 135"
         className="w-full h-full overflow-visible drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
       >
-        <FlowerComp health={1.0} dryFactor={0} isFaded={false} />
+        <ProtectedCanvasFlora
+          boundX={10}
+          boundY={5}
+          boundWidth={130}
+          boundHeight={135}
+          viewBox="10 5 130 135"
+        >
+          <FlowerComp health={1.0} dryFactor={0} isFaded={false} />
+        </ProtectedCanvasFlora>
       </svg>
     </div>
   );
