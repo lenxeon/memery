@@ -16,13 +16,14 @@ interface BaseWallProps {
 
 export const BaseWall: React.FC<BaseWallProps> = ({
   masterOn = true,
-  sunlightIntensity,
+  sunlightIntensity = 0.92,
   ambiance,
   defsSlot,
   environmentSlot,
   children,
 }) => {
-  const effectiveOpacity = masterOn ? Math.max(0.35, sunlightIntensity) : 0.45;
+  const safeIntensity = Number.isFinite(sunlightIntensity) ? sunlightIntensity : 0.92;
+  const effectiveOpacity = masterOn ? Math.max(0.35, safeIntensity) : 0.45;
 
   return (
     <div className="absolute inset-x-0 top-0 bottom-0 flex flex-col items-center pointer-events-none select-none z-0 overflow-hidden">
@@ -55,7 +56,7 @@ export const BaseWall: React.FC<BaseWallProps> = ({
             className="absolute top-12 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full pointer-events-none z-0"
             style={{
               background: ambiance.sunOrb,
-              transform: `scale(${0.9 + sunlightIntensity * 0.4})`,
+              transform: `scale(${0.9 + safeIntensity * 0.4})`,
               mixBlendMode: 'screen',
             }}
           />

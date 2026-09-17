@@ -3,15 +3,16 @@
  * @description 祭坛背景墙控制器，根据当前选中的背景风格动态派发渲染对应的背景墙组件。
  */
 import React from 'react';
-import { WallBackgroundStyle, TimeOfDay } from '../../../types';
+import { WallBackgroundStyle, TimeOfDay, LightingSettings } from '../../../types';
 import { BaseWall } from './BaseWall';
 import { getWallModule, renderWallDefs } from './registry';
 
 export interface AltarWallProps {
+  lighting?: LightingSettings;
   masterOn?: boolean;
-  sunlightIntensity: number;
-  timeOfDay: TimeOfDay;
-  sunAngle: number;
+  sunlightIntensity?: number;
+  timeOfDay?: TimeOfDay;
+  sunAngle?: number;
   wallStyle?: WallBackgroundStyle;
 }
 
@@ -23,10 +24,11 @@ export type WindowArchProps = AltarWallProps;
  * 每种风格独立维护自身专属的 SVG 图形、材质 defs 与环境修饰层。
  */
 export const AltarWall: React.FC<AltarWallProps> = ({
-  masterOn = true,
-  sunlightIntensity,
-  timeOfDay,
-  sunAngle,
+  lighting,
+  masterOn = lighting?.masterOn ?? true,
+  sunlightIntensity = lighting?.sunlightIntensity ?? 0.92,
+  timeOfDay = lighting?.timeOfDay ?? 'day',
+  sunAngle = lighting?.sunAngle ?? 0,
   wallStyle = 'classic_dawn',
 }) => {
   // 1. 获取对应的风格模块定义
