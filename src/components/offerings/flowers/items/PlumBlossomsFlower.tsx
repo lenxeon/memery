@@ -327,30 +327,30 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({
           {renderWaterDropBud(76, 68, 12, 0.75)}
         </g>
 
-        {/* ── 肉：纯白小碟梅花（花体缩小一半，稀疏错落分布在中后段，神态各异：俯仰、侧颜、背杯） ── */}
+        {/* ── 肉：纯白小碟梅花（花体缩小一半，稀疏错落分布在中后段，神态各异：俯仰、侧颜、背杯，微风轻晃） ── */}
         <g id="plumWhiteBlooms">
           {/* 1. 中段主节处：【侧颜向右】微昂（咬在 84,32 节处，尺寸极小 r=5.4，侧颜清冷，向右斜挑金蕊） */}
-          <g className="animate-flower-sway-main" style={{ ...fl1, transformOrigin: '84px 32px' }}>
+          <g className="animate-flower-sway-main-gentle" style={{ ...fl1, transformOrigin: '84px 32px' }}>
             {renderPlumBloom(84, 32, 5.4, -18, 'side_right')}
           </g>
 
           {/* 2. 中高右侧折枝：【三分之四侧俯】微俯（咬在 102,-2 节处，尺寸 r=5.8，向案前微俯视） */}
-          <g className="animate-flower-sway-right" style={{ ...fl2, transformOrigin: '102px -2px' }}>
+          <g className="animate-flower-sway-right-gentle" style={{ ...fl2, transformOrigin: '102px -2px' }}>
             {renderPlumBloom(102, -2, 5.8, 25, 'three_quarter')}
           </g>
 
           {/* 3. 高枝顶端分梢：【侧颜向左】清拔（咬在 108,-25 节处，尺寸 r=5.0，侧身回看主干） */}
-          <g className="animate-flower-sway-bud" style={{ ...fl3, transformOrigin: '108px -25px' }}>
+          <g className="animate-flower-sway-bud-gentle" style={{ ...fl3, transformOrigin: '108px -25px' }}>
             {renderPlumBloom(108, -25, 5.0, 15, 'side_left')}
           </g>
 
           {/* 4. 主长枝中段偏左：【正面微仰】扁碟（咬在 68,2 节处，尺寸 r=5.2，仰望长空，金丝毕现） */}
-          <g className="animate-flower-sway-left" style={{ ...fl4, transformOrigin: '68px 2px' }}>
+          <g className="animate-flower-sway-left-gentle" style={{ ...fl4, transformOrigin: '68px 2px' }}>
             {renderPlumBloom(68, 2, 5.2, -10, 'front_tilt')}
           </g>
 
           {/* 5. 顶梢破空回眸处：【背身含蓄杯状】（咬在 64,-26 节处，尺寸 r=4.8，背立露青绿花萼与白瓣尖，宋画幽玄禅意） */}
-          <g className="animate-flower-sway-crown" style={{ ...fl5, transformOrigin: '64px -26px' }}>
+          <g className="animate-flower-sway-crown-gentle" style={{ ...fl5, transformOrigin: '64px -26px' }}>
             {renderPlumBloom(64, -26, 4.8, 30, 'back_cup')}
           </g>
         </g>

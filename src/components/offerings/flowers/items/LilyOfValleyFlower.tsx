@@ -343,8 +343,8 @@ export const LilyOfValleyFlower: React.FC<FlowerComponentProps> = ({ health, dry
 
       {/* ── 架构 2：倒悬白玉风铃群（花如铃铛倒垂、微风中风铃轻摆、花瓣向外翻卷） ── */}
       <g id="valleyBellsRacemes">
-        {/* ════ 支 1 花群【中央高挑主葶】：随风舒缓沉浮 ════ */}
-        <g id="valleySpike1Bells" className="animate-flower-sway-crown" style={{ ...fl4, transformOrigin: '75px 128px' }}>
+        {/* ════ 支 1 花群【中央高挑主葶】：随风轻柔舒缓沉浮 ════ */}
+        <g id="valleySpike1Bells" className="animate-flower-sway-crown-gentle" style={{ ...fl4, transformOrigin: '75px 128px' }}>
           {/* 梢头顶端与次顶花骨朵 (小珍珠花蕾) */}
           {renderPendantBloom(78, 18, 80, 16, 0.65, 8, 'bud')}
           {renderPendantBloom(77, 24, 73, 22, 0.72, -10, 'bud')}
@@ -358,8 +358,8 @@ export const LilyOfValleyFlower: React.FC<FlowerComponentProps> = ({ health, dry
           {renderPendantBloom(75, 100, 66, 98, 1.18, -4, 'open')}
         </g>
 
-        {/* ════ 支 2 花群【左侧舒展拱葶】：迎风轻扬 ════ */}
-        <g id="valleySpike2Bells" className="animate-flower-sway-left" style={{ ...fl1, transformOrigin: '72px 128px' }}>
+        {/* ════ 支 2 花群【左侧舒展拱葶】：迎风轻柔小幅微扬 ════ */}
+        <g id="valleySpike2Bells" className="animate-flower-sway-left-gentle" style={{ ...fl1, transformOrigin: '72px 128px' }}>
           {/* 梢端花蕾 */}
           {renderPendantBloom(33, 28, 30, 26, 0.62, -15, 'bud')}
           {renderPendantBloom(36, 34, 41, 32, 0.70, 12, 'bud')}
@@ -373,7 +373,7 @@ export const LilyOfValleyFlower: React.FC<FlowerComponentProps> = ({ health, dry
         </g>
 
         {/* ════ 支 3 花群【右侧丰满拱葶】：背风舒缓 ════ */}
-        <g id="valleySpike3Bells" className="animate-flower-sway-right" style={{ ...fl2, transformOrigin: '77px 128px' }}>
+        <g id="valleySpike3Bells" className="animate-flower-sway-right-gentle" style={{ ...fl2, transformOrigin: '77px 128px' }}>
           {/* 梢端花蕾 */}
           {renderPendantBloom(114, 44, 116, 42, 0.62, 14, 'bud')}
           {renderPendantBloom(111, 48, 106, 46, 0.72, -10, 'bud')}

@@ -389,21 +389,21 @@ export const CallaLiliesFlower: React.FC<FlowerComponentProps> = ({
       <g id="callaBlooms">
         {/* 枝1：【粉晕侧仰马蹄莲】左高梢，大而舒展 */}
         <g transform={`translate(${b1x}, ${b1y}) rotate(${b1rot})`} style={fl1}>
-          <g className="animate-flower-sway-left" style={{ transformOrigin: '0px 0px' }}>
+          <g className="animate-flower-sway-left-gentle" style={{ transformOrigin: '0px 0px' }}>
             {renderPinkSideCalla(1.15)}
           </g>
         </g>
 
         {/* 枝2：【象牙白舒展大花】右侧中高位，温润高贵 */}
         <g transform={`translate(${b2x}, ${b2y}) rotate(${b2rot})`} style={fl2}>
-          <g className="animate-flower-sway-right" style={{ transformOrigin: '0px 0px' }}>
+          <g className="animate-flower-sway-right-gentle" style={{ transformOrigin: '0px 0px' }}>
             {renderWhiteCalla(1.12)}
           </g>
         </g>
 
         {/* 枝3：【正面粉晕大马蹄莲】居中偏低焦点花，露出金黄肉穗与鲜活花喉 */}
         <g transform={`translate(${b3x}, ${b3y}) rotate(${b3rot})`} style={fl3}>
-          <g className="animate-flower-sway-main" style={{ transformOrigin: '0px 0px' }}>
+          <g className="animate-flower-sway-main-gentle" style={{ transformOrigin: '0px 0px' }}>
             {renderPinkFrontCalla(1.18)}
           </g>
         </g>

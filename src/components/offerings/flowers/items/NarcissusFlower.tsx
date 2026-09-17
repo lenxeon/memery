@@ -416,30 +416,30 @@ export const NarcissusFlower: React.FC<FlowerComponentProps> = ({ health, dryFac
         />
       </g>
 
-      {/* ── 架构 2：开放程度不同的白玉水仙花朵（主支盛开、六瓣、花丝花粉清晰生动，随风丰姿摇曳） ── */}
+      {/* ── 架构 2：开放程度不同的白玉水仙花朵（主支盛开、六瓣、花丝花粉清晰生动，随风丰姿轻柔摇曳） ── */}
       <g id="narcissusBloomsGroup">
         {/* 【花朵 1·顶峰盛开主花】：位于 94, 22，面向右上方，高挑圣洁随风微仰 */}
-        <g id="bloomTop" className="animate-flower-sway-crown" style={{ ...fl4, transformOrigin: '94px 22px' }}>
+        <g id="bloomTop" className="animate-flower-sway-crown-gentle" style={{ ...fl4, transformOrigin: '94px 22px' }}>
           {renderOpenBloom(94, 22, 13.5, 24, [2, -3, 4, -2, 3, -4])}
         </g>
 
         {/* 【花朵 2·中上部大花】：位于 84, 48，3/4 俯仰盛开，主花沉稳轻晃 */}
-        <g id="bloomMidUpper" className="animate-flower-sway-main" style={{ ...fl1, transformOrigin: '84px 48px' }}>
+        <g id="bloomMidUpper" className="animate-flower-sway-main-gentle" style={{ ...fl1, transformOrigin: '84px 48px' }}>
           {renderOpenBloom(84, 48, 15.0, -12, [-3, 2, -4, 3, -2, 4])}
         </g>
 
         {/* 【花朵 3·右侧侧向立体花】：位于 98, 80，侧面杯状杯口朝右，向外舒展轻摆 */}
-        <g id="bloomRightProfile" className="animate-flower-sway-right" style={{ ...fl2, transformOrigin: '98px 80px' }}>
+        <g id="bloomRightProfile" className="animate-flower-sway-right-gentle" style={{ ...fl2, transformOrigin: '98px 80px' }}>
           {renderProfileBloom(98, 80, 1.12, 110)}
         </g>
 
         {/* 【花朵 4·左侧初绽半开花】：位于 46, 68，迎风轻拂起伏 */}
-        <g id="bloomLeftSemi" className="animate-flower-sway-left" style={{ ...fl3, transformOrigin: '46px 68px' }}>
+        <g id="bloomLeftSemi" className="animate-flower-sway-left-gentle" style={{ ...fl3, transformOrigin: '46px 68px' }}>
           {renderOpenBloom(46, 68, 11.5, -35, [3, -2, 4, -4, 2, -3])}
         </g>
 
         {/* 【花朵 5·左梢初放小星花】：位于 34, 54，灵巧微颤 */}
-        <g id="bloomLeftTip" className="animate-flower-sway-bud" style={{ ...fl5, transformOrigin: '34px 54px' }}>
+        <g id="bloomLeftTip" className="animate-flower-sway-bud-gentle" style={{ ...fl5, transformOrigin: '34px 54px' }}>
           {renderOpenBloom(34, 54, 9.5, 45, [1, -1, 2, -2, 1, -1])}
         </g>
       </g>
@@ -447,12 +447,12 @@ export const NarcissusFlower: React.FC<FlowerComponentProps> = ({ health, dryFac
       {/* ── 架构 3：饱满青白珍珠花骨朵群（侧支花骨朵轻快随风摇曳） ── */}
       <g id="narcissusBudsGroup">
         {/* 骨朵 1：右上梢头伴生花蕾 */}
-        <g className="animate-flower-sway-bud" style={{ ...fl1, transformOrigin: '108px 32px' }}>
+        <g className="animate-flower-sway-bud-gentle" style={{ ...fl1, transformOrigin: '108px 32px' }}>
           {renderFlowerBud(108, 32, 2.8, 45, true)}
         </g>
 
         {/* 骨朵 2：右侧中上挺拔长梗花蕾 */}
-        <g className="animate-flower-sway-bud" style={{ ...fl2, transformOrigin: '102px 54px' }}>
+        <g className="animate-flower-sway-bud-gentle" style={{ ...fl2, transformOrigin: '102px 54px' }}>
           {renderFlowerBud(102, 54, 3.2, 30, true)}
         </g>
 
@@ -468,7 +468,7 @@ export const NarcissusFlower: React.FC<FlowerComponentProps> = ({ health, dryFac
         <g style={fl4}>{renderFlowerBud(54, 84, 2.8, 135, false)}</g>
 
         {/* 骨朵 6：左侧探出小蕾 */}
-        <g className="animate-flower-sway-bud" style={{ ...fl5, transformOrigin: '38px 76px' }}>
+        <g className="animate-flower-sway-bud-gentle" style={{ ...fl5, transformOrigin: '38px 76px' }}>
           {renderFlowerBud(38, 76, 2.9, -45, true)}
         </g>
       </g>

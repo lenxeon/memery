@@ -386,16 +386,16 @@ export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
       {/* ── 架构 3：扁平宽卵形绿叶（严格出现在花朵下方，承托花头） ── */}
       <g id="hydrangeaFlatLeaves">
         {/* 【主花下方·左托叶】：紧贴主花下部，向左下自然平展承托 */}
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '52px 42px' }}>
+        <g className="animate-leaf-sway-1-gentle" style={{ transformOrigin: '52px 42px' }}>
           {renderFlatLeaf(52, 42, 25, 16, 130)}
         </g>
         {/* 【主花下方·右托叶】：紧贴主花下部，向右下微展 */}
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '62px 42px' }}>
+        <g className="animate-leaf-sway-2-gentle" style={{ transformOrigin: '62px 42px' }}>
           {renderFlatLeaf(62, 42, 23, 15, -140)}
         </g>
 
         {/* 【次花下方·右侧托叶】：紧贴次花下部，向右下方舒展 */}
-        <g className="animate-leaf-sway-3" style={{ transformOrigin: '88px 82px' }}>
+        <g className="animate-leaf-sway-3-gentle" style={{ transformOrigin: '88px 82px' }}>
           {renderFlatLeaf(88, 82, 22, 15, -115)}
         </g>
       </g>

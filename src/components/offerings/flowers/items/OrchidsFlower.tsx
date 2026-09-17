@@ -253,39 +253,39 @@ export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
           <path d="M 18 22 Q 16 21.5 14 21" stroke="url(#orchidHardStemGrad)" strokeWidth="1.0" fill="none" />
         </g>
 
-        {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（附着点轻灵颤动微风） ── */}
+        {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（附着点轻柔微风颤动） ── */}
         <g id="orchidBloomsRaceme">
           {/* 1. 【基部第一朵·最大盛开花】(x:82, y:82)：靠近底部花朵最大（scale: 1.12），饱满盛放俯展 */}
           <g style={fl1} transform="translate(82, 82)">
-            <g className="animate-flower-sway-main" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-main-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBloom(1.12, 15)}
             </g>
           </g>
 
           {/* 2. 【中下部第二朵·盛开大花】(x:67, y:63)：次大朵（scale: 1.00），向左微仰 */}
           <g style={fl2} transform="translate(67, 63)">
-            <g className="animate-flower-sway-left" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-left-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBloom(1.00, -12)}
             </g>
           </g>
 
           {/* 3. 【中高部第三朵·端庄中花】(x:57, y:45)：中型朵（scale: 0.86），翩跹若飞 */}
           <g style={fl3} transform="translate(57, 45)">
-            <g className="animate-flower-sway-crown" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-crown-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBloom(0.86, -20)}
             </g>
           </g>
 
           {/* 4. 【前段第四朵·初绽小花】(x:45, y:28)：逐渐缩小（scale: 0.70），初舒羽翼 */}
           <g style={fl4} transform="translate(45, 28)">
-            <g className="animate-flower-sway-right" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-right-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBloom(0.70, -28)}
             </g>
           </g>
 
           {/* 5. 【前端第五朵·含苞微吐小花】(x:35, y:17)：小巧玲珑（scale: 0.56），半开掩映 */}
           <g transform="translate(35, 17)">
-            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBloom(0.56, -35)}
             </g>
           </g>
@@ -293,28 +293,28 @@ export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
           {/* ── 前端未开放的花骨朵（依次递减变小） ── */}
           {/* 6. 【前端大蕾】(x:26, y:12)：充实饱满的青紫花骨朵 (scale: 0.47) */}
           <g transform="translate(26, 12)">
-            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBud(0.47, -45)}
             </g>
           </g>
 
           {/* 7. 【前端中蕾】(x:19, y:16)：紧致微翘小蕾 (scale: 0.36) */}
           <g transform="translate(19, 16)">
-            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBud(0.36, -60)}
             </g>
           </g>
 
           {/* 8. 【前端初生嫩蕾】(x:14, y:21)：精巧青绿小蕾 (scale: 0.27) */}
           <g transform="translate(14, 21)">
-            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBud(0.27, -78)}
             </g>
           </g>
 
           {/* 9. 【极梢微型苞尖】(x:11, y:29)：梢头初生细蕾 (scale: 0.20) */}
           <g transform="translate(11, 29)">
-            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            <g className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '0px 0px' }}>
               {renderOrchidBud(0.20, -95)}
             </g>
           </g>

@@ -243,11 +243,11 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
         {/* 直挺修长花径 */}
         <path d="M 75 125 L 75 68 L 75 22" stroke="url(#tulipJuicyStemGrad)" strokeWidth="4.0" fill="none" strokeLinecap="round" />
         {/* 一花一叶：靠近花苞位置（从 y=82 起包裹至 y=32），微风轻抚 */}
-        <g className="animate-leaf-sway-1" style={{ transformOrigin: '74px 82px' }}>
+        <g className="animate-leaf-sway-1-gentle" style={{ transformOrigin: '74px 82px' }}>
           {renderRigidCuppedLeaf(74, 82, 68, 56, 68, 30, 9.5, -1, 0.46)}
         </g>
-        {/* 居中高位大花苞 (纯雅奶白，体量最大，姿态端正高拔，微风拂动) */}
-        <g className="animate-flower-sway-crown" style={{ ...fl1, transformOrigin: '75px 22px' }}>
+        {/* 居中高位大花苞 (纯雅奶白，体量最大，姿态端正高拔，轻柔微拂) */}
+        <g className="animate-flower-sway-crown-gentle" style={{ ...fl1, transformOrigin: '75px 22px' }}>
           {renderTulipBud(75, 14, 'white', 1.16, 0)}
         </g>
       </g>
@@ -260,11 +260,11 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
         {/* 向左微倾挺立花径 */}
         <path d="M 73 125 Q 67 85 48 40" stroke="url(#tulipJuicyStemGrad)" strokeWidth="3.8" fill="none" strokeLinecap="round" />
         {/* 一花一叶：靠近花苞中上部（从 y=86 起至 y=44），微风轻抚 */}
-        <g className="animate-leaf-sway-2" style={{ transformOrigin: '68px 86px' }}>
+        <g className="animate-leaf-sway-2-gentle" style={{ transformOrigin: '68px 86px' }}>
           {renderRigidCuppedLeaf(68, 86, 52, 64, 40, 42, 10, -1, 0.48)}
         </g>
         {/* 左侧中位花苞 (娇粉，中等体量，微向左倾斜-7度) */}
-        <g className="animate-flower-sway-left" style={{ ...fl2, transformOrigin: '48px 40px' }}>
+        <g className="animate-flower-sway-left-gentle" style={{ ...fl2, transformOrigin: '48px 40px' }}>
           {renderTulipBud(47, 30, 'pink', 1.05, -7)}
         </g>
       </g>
@@ -277,11 +277,11 @@ export const TulipsFlower: React.FC<FlowerComponentProps> = ({ health, dryFactor
         {/* 向右挺立短花径 */}
         <path d="M 77 125 Q 85 92 102 55" stroke="url(#tulipJuicyStemGrad)" strokeWidth="3.6" fill="none" strokeLinecap="round" />
         {/* 一花一叶：靠近低位花苞（从 y=92 起至 y=58），紧贴茎干（宽9px） */}
-        <g className="animate-leaf-sway-3" style={{ transformOrigin: '82px 92px' }}>
+        <g className="animate-leaf-sway-3-gentle" style={{ transformOrigin: '82px 92px' }}>
           {renderRigidCuppedLeaf(82, 92, 94, 74, 108, 56, 9.0, 1, 0.48)}
         </g>
         {/* 右侧前低位小巧花苞 (玫红，紧致小巧，微向右倾斜9度) */}
-        <g className="animate-flower-sway-right" style={{ ...fl3, transformOrigin: '102px 55px' }}>
+        <g className="animate-flower-sway-right-gentle" style={{ ...fl3, transformOrigin: '102px 55px' }}>
           {renderTulipBud(103, 44, 'rose', 0.92, 9)}
         </g>
       </g>

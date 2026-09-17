@@ -383,21 +383,21 @@ export const SunflowersFlower: React.FC<FlowerComponentProps> = ({
       <g id="sunflowerBlooms">
         {/* 枝3：【侧背向日葵·特大花托】左侧低位，突出展示多层反卷大总苞 */}
         <g transform={`translate(${b3x}, ${b3y}) rotate(${b3rot})`} style={fl3}>
-          <g className="animate-flower-sway-left" style={{ transformOrigin: '0px 0px' }}>
+          <g className="animate-flower-sway-left-gentle" style={{ transformOrigin: '0px 0px' }}>
             {renderLeftCalyxSunflower(1.1)}
           </g>
         </g>
 
         {/* 枝2：【3/4 侧面向右向日葵】右侧中位，花托花瓣紧密浑然一体 */}
         <g transform={`translate(${b2x}, ${b2y}) rotate(${b2rot})`} style={fl2}>
-          <g className="animate-flower-sway-right" style={{ transformOrigin: '0px 0px' }}>
+          <g className="animate-flower-sway-right-gentle" style={{ transformOrigin: '0px 0px' }}>
             {renderRightTiltSunflower(1.14)}
           </g>
         </g>
 
         {/* 枝1：【正视盛放向日葵】中上主花，金黄璀璨，压在最上层 */}
         <g transform={`translate(${b1x}, ${b1y}) rotate(${b1rot})`} style={fl1}>
-          <g className="animate-flower-sway-main" style={{ transformOrigin: '0px 0px' }}>
+          <g className="animate-flower-sway-main-gentle" style={{ transformOrigin: '0px 0px' }}>
             {renderCenterSunflower(1.18)}
           </g>
         </g>
