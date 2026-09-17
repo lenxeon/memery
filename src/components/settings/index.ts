@@ -7,3 +7,4 @@ export * from './BlessingModal';
 export * from './FlowerPickerModal';
 export * from './FruitPickerModal';
 export * from './MemorialEditModal';
+export * from './UserAgreementModal';

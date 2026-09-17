@@ -24,7 +24,7 @@ import {
 } from './types';
 import { AltarWall, AltarTable, FloorPlanks, MemorialPortrait, FLOOR_STYLE_OPTIONS } from './components/scene';
 import { VolumetricRays, DustMotes, PetalShower } from './components/effects';
-import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerModal, BlessingModal } from './components/settings';
+import { EnvironmentDrawer, WALL_STYLE_OPTIONS, FlowerPickerModal, FruitPickerModal, BlessingModal, UserAgreementModal } from './components/settings';
 import { BottomDock, FpsMonitor } from './components/controls';
 import { FloraFactory, RitualFactory, VesselFactory, itemRegistry } from './game/factories/AbstractItemFactory';
 import { VaseStyle, getVaseStyleMeta } from './components/offerings/flowers/vases';
@@ -418,6 +418,7 @@ export default function App() {
   const [petalTrigger, setPetalTrigger] = useState(0);
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
   const [currentFlower, setCurrentFlower] = useState<FlowerType>('peonies');
+  const [isAgreementOpen, setIsAgreementOpen] = useState(false);
 
   // Background space aesthetics (默认晴岚映曜 · 宏伟木构殿堂长廊)
   const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('heritage_wood');
@@ -1047,8 +1048,18 @@ export default function App() {
 
       {/* Top Header & Quick Environment Bar */}
       <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
-        {/* Left: FPS Monitor in dev mode (页面不显示主题胶囊，保持画面庄重素净) */}
+        {/* Left: App Brand & Quick Agreement Link */}
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsAgreementOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1c1917]/90 backdrop-blur-md border border-amber-500/40 shadow-xs text-xs text-amber-200 hover:bg-stone-900 transition-all cursor-pointer group select-none"
+            title="查看《暖念》立意初心、社会价值与服务声明"
+          >
+            <span className="font-serif font-bold tracking-widest text-amber-100 group-hover:text-amber-200 text-xs sm:text-sm">暖念</span>
+            <span className="w-1 h-1 rounded-full bg-amber-400/60" />
+            <span className="text-[10px] text-amber-400/80 group-hover:text-amber-300 font-normal">公约与立意</span>
+          </button>
           {import.meta.env.DEV && <FpsMonitor />}
         </div>
 
@@ -1439,6 +1450,7 @@ export default function App() {
       <EnvironmentDrawer
         isOpen={isLightingOpen}
         onClose={() => setIsLightingOpen(false)}
+        onOpenAgreement={() => setIsAgreementOpen(true)}
         lighting={lighting}
         onUpdateLighting={(up) => setLighting((prev) => ({ ...prev, ...up }))}
         onToggleAllCandles={toggleAllCandles}
@@ -1502,6 +1514,12 @@ export default function App() {
         isOpen={isBlessingOpen}
         onClose={() => setIsBlessingOpen(false)}
         onSubmitBlessing={handleBlessingSubmit}
+      />
+
+      {/* 《暖念》立意初心、社会价值与用户使用协议声明弹窗 */}
+      <UserAgreementModal
+        isOpen={isAgreementOpen}
+        onClose={() => setIsAgreementOpen(false)}
       />
     </main>
   );

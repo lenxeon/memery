@@ -22,7 +22,8 @@ import {
   Disc3,
   Play,
   Pause,
-  Music
+  Music,
+  ShieldCheck
 } from 'lucide-react';
 import { sound, BGM_TRACKS } from '../../utils/audio';
 import { BgmTrackId, FloorStyle } from '../../types';
@@ -32,6 +33,7 @@ import { ChineseCornerOrnaments, ChineseCloudDivider, CinnabarSealBadge } from '
 export interface EnvironmentDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenAgreement?: () => void;
   lighting: LightingSettings;
   onUpdateLighting: (updated: Partial<LightingSettings>) => void;
   onToggleAllCandles: () => void;
@@ -88,6 +90,7 @@ export type LightingPanelProps = EnvironmentDrawerProps;
 export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
   isOpen,
   onClose,
+  onOpenAgreement,
   lighting,
   onUpdateLighting,
   onToggleAllCandles,
@@ -652,6 +655,22 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
             >
               {soundEnabled ? '开' : '关'}
             </button>
+          </div>
+
+          {/* 协议与立意公约说明入口 */}
+          <div className="pt-2 flex items-center justify-between text-xs text-stone-400 border-t border-amber-500/20">
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onOpenAgreement?.();
+              }}
+              className="flex items-center gap-1.5 text-amber-300/80 hover:text-amber-200 cursor-pointer transition-colors"
+            >
+              <ShieldCheck size={14} className="text-amber-400" />
+              <span>《暖念服务协议、立意与收费声明》</span>
+            </button>
+            <span className="text-[10px] text-stone-500">v1.0.0 官方公约</span>
           </div>
         </div>
 
