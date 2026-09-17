@@ -23,7 +23,8 @@ import {
   Play,
   Pause,
   Music,
-  ShieldCheck
+  ShieldCheck,
+  Eye
 } from 'lucide-react';
 import { sound, BGM_TRACKS } from '../../utils/audio';
 import { BgmTrackId, FloorStyle } from '../../types';
@@ -51,6 +52,8 @@ export interface EnvironmentDrawerProps {
   onTogglePetals?: () => void;
   timeScale?: number;
   onUpdateTimeScale?: (scale: number) => void;
+  isAuditMode?: boolean;
+  onToggleAuditMode?: () => void;
 }
 
 export const WALL_STYLE_OPTIONS: {
@@ -108,6 +111,8 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
   onTogglePetals,
   timeScale = 1,
   onUpdateTimeScale,
+  isAuditMode = false,
+  onToggleAuditMode,
 }) => {
   const [bgmState, setBgmState] = useState({
     isPlaying: sound.bgmPlaying,
@@ -656,6 +661,35 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               {soundEnabled ? '开' : '关'}
             </button>
           </div>
+
+          {/* ── 10. 专项展台审计开关 ── */}
+          {onToggleAuditMode && (
+            <div className="flex items-center justify-between p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Eye size={16} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-stone-200 font-medium text-xs">专项展台审计（名花与花器全景品鉴）</span>
+                  <span className="text-[10px] text-stone-400">开启后在案台呈现可自由拖拽的全景名花与名瓷品鉴展台</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playWoodPlacement();
+                  onToggleAuditMode();
+                }}
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
+                  isAuditMode
+                    ? 'bg-gradient-to-r from-rose-600 to-amber-600 border-amber-400/60 text-stone-950 font-bold'
+                    : 'bg-stone-800 border-stone-700 text-stone-400 hover:text-stone-200'
+                }`}
+              >
+                {isAuditMode ? '已开启' : '开启'}
+              </button>
+            </div>
+          )}
 
           {/* 协议与立意公约说明入口 */}
           <div className="pt-2 flex items-center justify-between text-xs text-stone-400 border-t border-amber-500/20">

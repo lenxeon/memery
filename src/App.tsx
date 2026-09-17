@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   SceneItem,
   SceneItemId,
@@ -41,7 +41,9 @@ import {
   VolumeX,
   Sparkles,
   SlidersHorizontal,
-  Heart
+  Heart,
+  GripVertical,
+  X
 } from 'lucide-react';
 
 // ── 供案常规陈设 (五供齐备) ──
@@ -374,7 +376,7 @@ export const buildAuditItems = (
 };
 
 export const buildInitialItems = (): Record<SceneItemId, SceneItem> =>
-  buildAuditItems('flowers', 'flowers_tier1_all', true, 1.0);
+  buildStandardItems();
 
 const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = buildInitialItems();
 
@@ -577,12 +579,43 @@ export default function App() {
     },
   });
 
-  // ── 专项审计模式状态 ──
-  const [isAuditMode, setIsAuditMode] = useState(true);
+  // ── 专项审计模式状态 (默认不开启，支持拖拽改变位置与配置项开启) ──
+  const [isAuditMode, setIsAuditMode] = useState(false);
+  const [auditPos, setAuditPos] = useState<{ x: number; y: number } | null>(null);
+  const auditPanelRef = useRef<HTMLDivElement>(null);
   const [auditCategory, setAuditCategory] = useState<AuditCategory>('flowers');
   const [auditGroup, setAuditGroup] = useState<AuditGroup>('flowers_tier1_all');
   const [auditWithFlowers, setAuditWithFlowers] = useState(true);
   const [flowerDecayHealth, setFlowerDecayHealth] = useState<number>(1.0);
+
+  // 审计胶囊拖拽改变位置 (支持桌面端鼠标与移动端触摸)
+  const handleAuditPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // 若点击在按钮等交互元素上，不触发面板拖拽
+    if ((e.target as HTMLElement).closest('button, input, select, a')) return;
+
+    const panel = auditPanelRef.current;
+    if (!panel) return;
+
+    const rect = panel.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+
+    const onPointerMove = (moveEv: PointerEvent) => {
+      const panelW = rect.width;
+      const panelH = rect.height;
+      const newX = Math.max(8, Math.min(window.innerWidth - panelW - 8, moveEv.clientX - offsetX));
+      const newY = Math.max(50, Math.min(window.innerHeight - panelH - 20, moveEv.clientY - offsetY));
+      setAuditPos({ x: newX, y: newY });
+    };
+
+    const onPointerUp = () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+  };
 
   const switchAuditCategory = (category: AuditCategory) => {
     setAuditCategory(category);
@@ -1216,190 +1249,217 @@ export default function App() {
           />
         </div>
 
-        {/* Layer 5.5: 🔍 专项审计模式控制胶囊 (居于案台上方，一键全景审计) */}
-        <div className="absolute top-[26%] sm:top-[28%] z-30 flex justify-center w-full px-4 pointer-events-none">
-          <div className="pointer-events-auto flex items-center flex-wrap justify-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1c1917]/95 backdrop-blur-xl border border-amber-500/60 shadow-[0_10px_30px_rgba(0,0,0,0.8)] text-xs text-amber-100 ring-1 ring-amber-400/20 animate-in fade-in slide-in-from-top-4 max-w-[98vw]">
-            <div className="flex items-center gap-1.5 font-semibold text-amber-300 font-serif mr-1">
-              <span>{auditCategory === 'flowers' ? '🌸' : '🏺'}</span>
-              <span>{isAuditMode ? (auditCategory === 'flowers' ? '名花专项审计' : '花器专项审计') : '常规五供陈设'}</span>
-              <CinnabarSealBadge text="审计" />
-            </div>
+        {/* Layer 5.5: 🔍 专项审计模式控制胶囊 (默认不开启，支持拖拽改变位置，支持关闭) */}
+        {isAuditMode && (
+          <div 
+            ref={auditPanelRef}
+            onPointerDown={handleAuditPointerDown}
+            className="fixed z-40 select-none touch-none cursor-move transition-shadow"
+            style={{
+              left: auditPos ? `${auditPos.x}px` : '50%',
+              top: auditPos ? `${auditPos.y}px` : '88px',
+              transform: auditPos ? 'none' : 'translateX(-50%)',
+              maxWidth: '96vw',
+            }}
+          >
+            <div className="pointer-events-auto flex items-center flex-wrap justify-center gap-1.5 sm:gap-2 px-3.5 py-1.5 rounded-full bg-[#1c1917]/95 backdrop-blur-xl border border-amber-500/60 shadow-[0_12px_36px_rgba(0,0,0,0.85)] text-xs text-amber-100 ring-1 ring-amber-400/20 animate-in fade-in zoom-in-95">
+              {/* 拖动手柄与标题 */}
+              <div className="flex items-center gap-1 font-semibold text-amber-300 font-serif mr-1">
+                <div 
+                  className="text-amber-400/60 hover:text-amber-300 p-0.5 cursor-grab active:cursor-grabbing" 
+                  title="按住拖动位置"
+                >
+                  <GripVertical size={15} />
+                </div>
+                <span>{auditCategory === 'flowers' ? '🌸' : '🏺'}</span>
+                <span>{auditCategory === 'flowers' ? '名花专项审计' : '花器专项审计'}</span>
+                <CinnabarSealBadge text="审计" />
+              </div>
 
-            {isAuditMode && (
-              <>
-                <span className="text-stone-600 hidden sm:inline">|</span>
-                {/* 类别切换：名花 vs 花器 */}
-                <div className="flex items-center bg-stone-950/90 p-0.5 rounded-full border border-amber-500/40">
+              <span className="text-stone-600 hidden sm:inline">|</span>
+
+              {/* 类别切换：名花 vs 花器 */}
+              <div className="flex items-center bg-stone-950/90 p-0.5 rounded-full border border-amber-500/40">
+                <button
+                  type="button"
+                  onClick={() => switchAuditCategory('flowers')}
+                  className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                    auditCategory === 'flowers'
+                      ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-stone-950 font-bold shadow-xs'
+                      : 'text-amber-200/70 hover:text-amber-100'
+                  }`}
+                >
+                  <span>🌸</span>
+                  <span>名花 (15款)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchAuditCategory('vases')}
+                  className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                    auditCategory === 'vases'
+                      ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                      : 'text-amber-200/70 hover:text-amber-100'
+                  }`}
+                >
+                  <span>🏺</span>
+                  <span>花器 (12款)</span>
+                </button>
+              </div>
+
+              <span className="text-stone-600 hidden sm:inline">|</span>
+
+              {/* 名花专属分组切换 */}
+              {auditCategory === 'flowers' ? (
+                <div className="flex items-center flex-wrap gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
                   <button
                     type="button"
-                    onClick={() => switchAuditCategory('flowers')}
-                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
-                      auditCategory === 'flowers'
-                        ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-stone-950 font-bold shadow-xs'
+                    onClick={() => switchAuditGroup('flowers_tier1_all')}
+                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'flowers_tier1_all'
+                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
                         : 'text-amber-200/70 hover:text-amber-100'
                     }`}
+                    title="第一梯队 10 款新名花双排错落同台大展"
                   >
-                    <span>🌸</span>
-                    <span>名花 (15款)</span>
+                    🌟 10花齐放
                   </button>
                   <button
                     type="button"
-                    onClick={() => switchAuditCategory('vases')}
-                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
-                      auditCategory === 'vases'
+                    onClick={() => switchAuditGroup('flowers_tier1_a')}
+                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'flowers_tier1_a'
+                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
+                    title="梅花、向日葵、康乃馨、马蹄莲、郁金香"
+                  >
+                    🌺 梯队A (前5)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchAuditGroup('flowers_tier1_b')}
+                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'flowers_tier1_b'
+                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
+                    title="水仙、铃兰、蝴蝶兰、绣球、雏菊"
+                  >
+                    🪷 梯队B (后5)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchAuditGroup('flowers_classic')}
+                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'flowers_classic'
+                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
+                    title="牡丹、百合、清莲、白菊、玫瑰"
+                  >
+                    💮 经典5供
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchAuditGroup('flowers_bouquets')}
+                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'flowers_bouquets'
+                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
+                    title="桌面平铺丝带花束敬献形态比对"
+                  >
+                    💐 案前花束
+                  </button>
+                </div>
+              ) : (
+                /* 花器专属分组切换 */
+                <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                  <button
+                    type="button"
+                    onClick={() => switchAuditGroup('new_unique')}
+                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'new_unique'
                         ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
                         : 'text-amber-200/70 hover:text-amber-100'
                     }`}
                   >
-                    <span>🏺</span>
-                    <span>花器 (12款)</span>
+                    ✨ 4款异形瓶
                   </button>
-                </div>
-
-                <span className="text-stone-600 hidden sm:inline">|</span>
-
-                {/* 名花专属分组切换 */}
-                {auditCategory === 'flowers' ? (
-                  <div className="flex items-center flex-wrap gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('flowers_tier1_all')}
-                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'flowers_tier1_all'
-                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                      title="第一梯队 10 款新名花双排错落同台大展"
-                    >
-                      🌟 10花齐放
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('flowers_tier1_a')}
-                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'flowers_tier1_a'
-                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                      title="梅花、向日葵、康乃馨、马蹄莲、郁金香"
-                    >
-                      🌺 梯队A (前5)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('flowers_tier1_b')}
-                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'flowers_tier1_b'
-                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                      title="水仙、铃兰、蝴蝶兰、绣球、雏菊"
-                    >
-                      🪷 梯队B (后5)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('flowers_classic')}
-                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'flowers_classic'
-                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                      title="牡丹、百合、清莲、白菊、玫瑰"
-                    >
-                      💮 经典5供
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('flowers_bouquets')}
-                      className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'flowers_bouquets'
-                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                      title="桌面平铺丝带花束敬献形态比对"
-                    >
-                      💐 案前花束
-                    </button>
-                  </div>
-                ) : (
-                  /* 花器专属分组切换 */
-                  <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('new_unique')}
-                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'new_unique'
-                          ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                    >
-                      ✨ 4款异形瓶
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => switchAuditGroup('designer_twist')}
-                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                        auditGroup === 'designer_twist'
-                          ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
-                          : 'text-amber-200/70 hover:text-amber-100'
-                      }`}
-                    >
-                      🎨 8款折痕瓶
-                    </button>
-                  </div>
-                )}
-
-                <span className="text-stone-600 hidden sm:inline">|</span>
-
-                {/* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */}
-                {auditCategory === 'flowers' ? (
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={cycleFlowerDecay}
-                      className="px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border border-rose-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                      title="切换名花生命周期：满盛(100%) -> 微枯(55%) -> 岁暮深凋(15%)"
-                    >
-                      <span>
-                        {flowerDecayHealth === 1.0 ? '🌸 满盛' : flowerDecayHealth === 0.55 ? '🍂 微枯' : '🥀 岁暮'}
-                      </span>
-                      <span className="text-[10px] text-rose-300/80 font-mono">
-                        {Math.round(flowerDecayHealth * 100)}%
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={triggerAuditPetals}
-                      className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                      title="模拟落英缤纷漫天落瓣动效"
-                    >
-                      <span>🍃 花雨</span>
-                    </button>
-                  </div>
-                ) : (
                   <button
                     type="button"
-                    onClick={toggleAuditFlowers}
-                    className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-                    title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
+                    onClick={() => switchAuditGroup('designer_twist')}
+                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
+                      auditGroup === 'designer_twist'
+                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                        : 'text-amber-200/70 hover:text-amber-100'
+                    }`}
                   >
-                    <span>{auditWithFlowers ? '🌸 切换裸检' : '🌸 显示插花'}</span>
+                    🎨 8款折痕瓶
                   </button>
-                )}
-              </>
-            )}
+                </div>
+              )}
 
-            <button
-              type="button"
-              onClick={toggleAuditMode}
-              className="px-3 py-1 rounded-full bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
-              title="切换展台模式与常规五供模式"
-            >
-              <span>{isAuditMode ? '🔄 恢复常规五供' : '🔍 进入专项展台'}</span>
-            </button>
+              <span className="text-stone-600 hidden sm:inline">|</span>
+
+              {/* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */}
+              {auditCategory === 'flowers' ? (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={cycleFlowerDecay}
+                    className="px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/50 text-rose-200 border border-rose-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                    title="切换名花生命周期：满盛(100%) -> 微枯(55%) -> 岁暮深凋(15%)"
+                  >
+                    <span>
+                      {flowerDecayHealth === 1.0 ? '🌸 满盛' : flowerDecayHealth === 0.55 ? '🍂 微枯' : '🥀 岁暮'}
+                    </span>
+                    <span className="text-[10px] text-rose-300/80 font-mono">
+                      {Math.round(flowerDecayHealth * 100)}%
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={triggerAuditPetals}
+                    className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                    title="模拟落英缤纷漫天落瓣动效"
+                  >
+                    <span>🍃 花雨</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={toggleAuditFlowers}
+                  className="px-2.5 py-1 rounded-full bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border border-amber-400/40 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                  title="切换插花查看瓶口咬合深度，或看净瓶裸瓶"
+                >
+                  <span>{auditWithFlowers ? '🌸 切换裸检' : '🌸 显示插花'}</span>
+                </button>
+              )}
+
+              {/* 恢复常规五供快捷按钮 */}
+              <button
+                type="button"
+                onClick={toggleAuditMode}
+                className="px-2.5 py-1 rounded-full bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium"
+                title="恢复常规五供陈设"
+              >
+                <span>🔄 恢复常规五供</span>
+              </button>
+
+              {/* 关闭审计展台 X 按钮 */}
+              <button
+                type="button"
+                onClick={toggleAuditMode}
+                className="w-6 h-6 rounded-full bg-stone-900/90 hover:bg-rose-950/80 text-stone-400 hover:text-rose-300 flex items-center justify-center cursor-pointer border border-amber-500/40 hover:border-rose-400/60 transition-all shrink-0 ml-0.5 active:scale-90"
+                title="关闭专项审计展台"
+              >
+                <X size={14} />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Layer 6: Altar Table with all draggable items (往背墙位置适度移入，紧贴墙体立面，更具厅堂进深感) */}
         <div 
@@ -1477,6 +1537,8 @@ export default function App() {
         onChangeWallStyle={handleWallStyleChange}
         timeScale={timeScale}
         onUpdateTimeScale={setTimeScale}
+        isAuditMode={isAuditMode}
+        onToggleAuditMode={toggleAuditMode}
       />
 
       {/* 献花控制弹窗 (献花上案 · 更换花瓶) */}
