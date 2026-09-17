@@ -178,19 +178,26 @@ export class TexturePipeline {
   }
 
   public getVaseTexture(
-    flowerType: FlowerType = 'peonies',
+    flowerType: FlowerType | 'none' = 'peonies',
     isRight: boolean = false,
-    vaseStyle: VaseStyle = isRight ? 'painted_iris' : 'warm_white_plain'
+    vaseStyle: VaseStyle = isRight ? 'painted_iris' : 'warm_white_plain',
+    health: number = 1.0
   ): Promise<Texture> {
-    const key = `vase_${flowerType}_${vaseStyle}_${isRight ? 'R' : 'L'}`;
+    const rawHealth = Math.round(health * 50) / 50;
+    const key = `vase_${flowerType}_${vaseStyle}_${isRight ? 'R' : 'L'}_h${rawHealth}`;
     const cached = getCachedTexture(key);
     if (cached) return Promise.resolve(cached);
 
     try {
-      const flowerModule = FLOWER_REGISTRY[flowerType] || FLOWER_REGISTRY.peonies;
-      const FlowerComp = flowerModule.Component;
+      const hasFlower = flowerType && flowerType !== 'none';
+      const flowerModule = hasFlower ? (FLOWER_REGISTRY[flowerType as FlowerType] || FLOWER_REGISTRY.peonies) : null;
+      const FlowerComp = flowerModule?.Component;
       const mouthAperture = getVaseMouthAperture(vaseStyle);
       const spreadFactor = getVaseSpreadFactor(vaseStyle);
+
+      const steppedHealth = rawHealth;
+      const steppedDry = Math.round(Math.max(0, Math.min(1.0, (0.75 - steppedHealth) / 0.7)) * 50) / 50;
+      const isFaded = steppedHealth <= 0.05;
 
       const element = React.createElement(
         'svg',
@@ -217,18 +224,18 @@ export class TexturePipeline {
           'g',
           { transform: isRight ? 'translate(150, 0) scale(-1, 1)' : undefined },
           React.createElement('g', { id: 'vaseMouthBack' }, renderVaseMouthBack(vaseStyle)),
-          React.createElement(
+          FlowerComp ? React.createElement(
             'g',
             { id: 'flowerMain' },
             React.createElement(FlowerComp, {
-              health: 1.0,
-              dryFactor: 0,
-              isFaded: false,
+              health: steppedHealth,
+              dryFactor: steppedDry,
+              isFaded,
               vaseStyle,
               mouthAperture,
               spreadFactor,
             })
-          ),
+          ) : null,
           React.createElement('g', { id: 'vaseBody' }, renderVaseBody(vaseStyle))
         )
       );
@@ -237,7 +244,7 @@ export class TexturePipeline {
       return rasterizeSvgToTexture(key, svg, 250, 280, 2.5);
     } catch (e) {
       console.warn('Failed to render real flower vase, falling back to template:', e);
-      const svg = getVaseWithFlowerSvg(flowerType, isRight);
+      const svg = getVaseWithFlowerSvg(flowerType as FlowerType, isRight);
       return rasterizeSvgToTexture(key, svg, 150, 200, 2.5);
     }
   }

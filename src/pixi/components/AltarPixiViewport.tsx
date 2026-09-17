@@ -35,7 +35,7 @@ export interface AltarPixiViewportProps {
   lastOfferedFlower?: FlowerType;
   onToggleItemLit?: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
-  onVaseClick?: (side: 'left' | 'right') => void;
+  onVaseClick?: (id: SceneItemId) => void;
   onBowlHit?: () => void;
   onUpdateItemPosition?: (id: SceneItemId, pos: { x: number; y: number }) => void;
   className?: string;
@@ -166,7 +166,7 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
           sound.playSingingBowl();
           callbacksRef.current.onBowlHit?.();
         },
-        onVaseClick: (side) => callbacksRef.current.onVaseClick?.(side),
+        onVaseClick: (id) => callbacksRef.current.onVaseClick?.(id),
         onUpdatePosition: (id, pos) => callbacksRef.current.onUpdateItemPosition?.(id, pos),
       });
 

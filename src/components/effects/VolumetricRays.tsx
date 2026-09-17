@@ -60,7 +60,7 @@ export const VolumetricRays: React.FC<VolumetricRaysProps> = ({
     <div 
       className="absolute inset-0 pointer-events-none overflow-hidden select-none z-10 transition-opacity duration-700"
       style={{ 
-        opacity: Math.min(1, intensity * 0.95),
+        opacity: Math.min(1, (Number(intensity) || 0) * 0.95),
         mixBlendMode: 'screen', // 模拟光学加色混合（光束与背景平滑叠加，绝不产生硬边发暗色块）
       }}
     >

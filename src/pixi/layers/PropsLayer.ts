@@ -16,7 +16,7 @@ export interface PropsLayerCallbacks {
   onToggleLit?: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
   onBowlHit?: () => void;
-  onVaseClick?: (side: 'left' | 'right') => void;
+  onVaseClick?: (id: SceneItemId) => void;
   onItemPointerDown?: (id: SceneItemId, event: FederatedPointerEvent) => void;
   onUpdatePosition?: (id: SceneItemId, pos: { x: number; y: number }) => void;
 }
@@ -195,15 +195,9 @@ export class PropsLayer {
             } else if (id.startsWith('fruit_')) {
               sound.playWoodPlacement();
               this.callbacks.onToggleFruit?.(id as SceneItemId);
-            } else if (id === 'singing_bowl') {
-              sound.playSingingBowl();
-              this.callbacks.onBowlHit?.();
-            } else if (id === 'vase_left') {
+            } else if (id.startsWith('vase')) {
               sound.playBell(720, 2);
-              this.callbacks.onVaseClick?.('left');
-            } else if (id === 'vase_right') {
-              sound.playBell(720, 2);
-              this.callbacks.onVaseClick?.('right');
+              this.callbacks.onVaseClick?.(id as SceneItemId);
             } else if (id === 'tea_cups') {
               sound.playPorcelainClink();
             } else if (id === 'censer') {
@@ -248,16 +242,18 @@ export class PropsLayer {
 
       if (id.startsWith('vase_')) {
         const isRight = id.includes('right');
-        const flower = (item.flowerType || (isRight ? 'lilies' : 'peonies')) as FlowerType;
+        const flower = (item.flowerType !== undefined ? item.flowerType : (isRight ? 'lilies' : 'peonies')) as FlowerType | 'none';
         const vaseStyle = (item.vaseStyle || (isRight ? 'painted_iris' : 'warm_white_plain')) as VaseStyle;
-        targetKey = `vase_${flower}_${vaseStyle}_${isRight ? 'R' : 'L'}`;
+        const health = item.lifecycle?.health ?? 1.0;
+        const qHealth = Math.round(health * 50) / 50;
+        targetKey = `vase_${flower}_${vaseStyle}_${isRight ? 'R' : 'L'}_h${qHealth}`;
         // 花瓶+盛开花束：高挑修长，远超蜡烛高度 (265px 挺拔优雅，对齐参考图1)
         targetW = 210;
         targetH = 265;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getVaseTexture(flower, isRight, vaseStyle).then((tex) => {
+          this.pipeline.getVaseTexture(flower, isRight, vaseStyle, qHealth).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.94);
@@ -433,20 +429,13 @@ export class PropsLayer {
   public update(delta: number = 1): void {
     this.animTime += delta;
 
-    // 清风拂动花枝微摇 (自然多频正弦波复合风力物理)
-    const leftVase = this.propContainers.get('vase_left');
-    if (leftVase) {
-      const windSway = Math.sin(this.animTime * 0.018) * 0.018 + Math.cos(this.animTime * 0.038) * 0.008;
-      leftVase.rotation = windSway;
-    }
-    const rightVase = this.propContainers.get('vase_right');
-    if (rightVase) {
-      const windSway = Math.sin(this.animTime * 0.018 + 1.6) * 0.018 + Math.cos(this.animTime * 0.038 + 0.8) * 0.008;
-      rightVase.rotation = windSway;
-    }
-    // 供花花束微风呼吸感
+    // 清风拂动花枝微摇 (自然多频正弦波复合风力物理，覆盖全部常规与审计名花名瓷)
     for (const [id, cont] of this.propContainers.entries()) {
-      if (id.startsWith('offered_flower_')) {
+      if (id.startsWith('vase')) {
+        const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+        const windSway = Math.sin(this.animTime * 0.018 + seed * 0.4) * 0.018 + Math.cos(this.animTime * 0.038 + seed * 0.7) * 0.008;
+        cont.rotation = windSway;
+      } else if (id.startsWith('offered_flower_')) {
         cont.rotation = Math.sin(this.animTime * 0.015 + id.charCodeAt(id.length - 1)) * 0.006;
       }
     }

@@ -73,7 +73,7 @@ export const MemorialPortrait: React.FC<MemorialPortraitProps> = ({
             background: timeOfDay === 'night'
               ? 'radial-gradient(circle, rgba(240, 200, 120, 0.25) 0%, rgba(200, 150, 50, 0.1) 45%, transparent 70%)'
               : 'radial-gradient(circle, rgba(255, 230, 150, 0.45) 0%, rgba(255, 190, 80, 0.18) 45%, rgba(255, 180, 50, 0.05) 65%, transparent 80%)',
-            opacity: 0.6 + sunlightIntensity * 0.4,
+            opacity: 0.6 + (Number(sunlightIntensity) || 0) * 0.4,
           }}
         />
 
