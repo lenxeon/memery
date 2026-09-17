@@ -135,7 +135,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             }`}
           >
             <Lock size={12} />
-            <span>四、私密与安全防线</span>
+            <span>四、无公祭·纯私人空间</span>
           </button>
           <button
             type="button"
@@ -173,30 +173,29 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             </section>
           )}
 
-          {/* 二、社会价值与绿色倡议 */}
+          {/* 二、社会价值与倡议 */}
           {(activeSection === 'all' || activeSection === 'social') && (
             <section className="space-y-3">
               <h4 className="text-base font-serif font-bold text-amber-200 flex items-center gap-2 border-l-2 border-amber-400 pl-2.5">
-                二、社会价值与绿色文明祭扫倡议
+                二、社会价值与绿色倡议：践行文明祭扫，赋能现代殡葬文明
               </h4>
-              <ul className="space-y-2.5 pl-4 list-disc text-stone-300">
-                <li>
-                  <strong className="text-amber-100">响应国家绿色殡葬国策，彻底消除火患与烟尘污染：</strong>
-                  传统祭扫中的焚纸鸣炮常带来严重的大气污染与巨量资源消耗，更频发山林特大火灾。《暖念》大力倡导以“云端清供、虚拟燃烛、心灯常驻、鲜花寄情”代替明火纸烛，以数字化手段践行国家绿色环保低碳文明祭祀要求。
-                </li>
-                <li>
-                  <strong className="text-amber-100">现代人生者哀伤疗愈与心理健康抚慰：</strong>
-                  亲人或爱宠告别往往带来持久的隐秘创伤与抑郁情绪。《暖念》通过每日点燃一盏烛火、拂动花草、敲击磬音的微仪式，为失亲者提供持久、温润的情感安放空间，陪伴人们健康度过哀伤周期。
-                </li>
-                <li>
-                  <strong className="text-amber-100">中华优秀传统美学与生命哲学之数字化传承：</strong>
-                  将宋明古典文人插花形制、名窑传世瓷器（宋汝窑、青花、羊脂玉）、二十四节气时令清供及大木构东方建筑美学数字化重现，让年轻一代在交互中体悟传统造物之美与生命敬畏心。
-                </li>
-                <li>
-                  <strong className="text-amber-100">跨越海峡与重洋的情感纽带：</strong>
-                  让异地打拼的务工游子、海外求学的华人同胞，无论身处万里之外，亦可在手机端随时随地给故人奉上一捧鲜花。
-                </li>
-              </ul>
+              <p>
+                作为一项兼具人文温情与社会效益的数字化公益探索，《暖念》深度契合国家所倡导的“绿色低碳、文明殡葬、生态祭扫”新风尚，具有深远的社会价值：
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="p-3 rounded-xl bg-stone-900/80 border border-amber-500/20 space-y-1">
+                  <span className="font-bold text-amber-300 flex items-center gap-1">
+                    <Leaf size={13} /> 绿色环保·杜绝火灾隐患
+                  </span>
+                  <p className="text-stone-400">彻底告别纸钱冥币燃烧带来的空气污染与山林火灾隐患，以数字长明灯与高保真动态鲜花还原追思内核。</p>
+                </div>
+                <div className="p-3 rounded-xl bg-stone-900/80 border border-amber-500/20 space-y-1">
+                  <span className="font-bold text-amber-300 flex items-center gap-1">
+                    <Heart size={13} /> 跨越重洋·解游子万里乡愁
+                  </span>
+                  <p className="text-stone-400">常年异地奔波的游子、求学的海外学子，即使身在万里之外，亦可在手机端随时随地给长眠故里的长辈敬奉一捧鲜花。</p>
+                </div>
+              </div>
             </section>
           )}
 
@@ -272,21 +271,21 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
           {(activeSection === 'all' || activeSection === 'safety') && (
             <section className="space-y-3">
               <h4 className="text-base font-serif font-bold text-amber-200 flex items-center gap-2 border-l-2 border-amber-400 pl-2.5">
-                四、空间私密属性与社会安全守卫公约：恪守纯私人服务边界，筑牢清朗防线
+                四、空间私密属性与安全守卫公约：无公祭，全是面向私人的情感寄托空间
               </h4>
               <p>
-                《暖念》严格定位为<strong>纯私人性质的数字化家庭与亲友悼念服务平台</strong>。为恪守服务边界、保障用户私密情感、防止任何形式的公众炒作或不良社会舆情，平台确立以下核心守则：
+                《暖念》严格恪守<strong>“无公祭、非公开、全私域”</strong>的纯私人情感寄托定位。平台不设任何公祭功能，<strong>所有空间 100% 均为面向个人与家庭的私密纪念空间</strong>。为彻底阻断任何形式的公众炒作、群体聚集或不良社会影响，平台确立以下核心守则：
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                {/* 1. 纯私人空间定位 */}
+                {/* 1. 坚决杜绝公祭 */}
                 <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
                   <div className="font-bold text-amber-300 flex items-center gap-1.5">
                     <Lock size={14} className="text-amber-400 shrink-0" />
-                    <span>1. 纯私人空间服务（不设公众纪念空间）</span>
+                    <span>1. 坚决杜绝公祭（不设公众纪念空间）</span>
                   </div>
                   <p className="text-stone-300 leading-relaxed text-[11px]">
-                    本平台<strong>专一提供私人空间服务，明确不提供革命英烈与国家楷模类似公众纪念空间</strong>。英烈模范悼念属法定公共机构范畴，平台不设公共广场通道，严禁私自建立公众性质档案或借此炒作。
+                    本平台<strong>坚决不提供任何公祭服务，不设立公祭大厅，不开展群体公祭活动</strong>。革命英烈与国家楷模追思属官方严肃公共事业范畴，平台严禁设立公众性质纪念空间，严禁借公祭名义进行网络炒作或集资。
                   </p>
                 </div>
 
@@ -294,10 +293,10 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
                 <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
                   <div className="font-bold text-amber-300 flex items-center gap-1.5">
                     <Users size={14} className="text-amber-400 shrink-0" />
-                    <span>2. 纯受邀私有访问（严格上限 ≤100 人）</span>
+                    <span>2. 纯受邀私有访问（严格封顶 ≤100 人）</span>
                   </div>
                   <p className="text-stone-300 leading-relaxed text-[11px]">
-                    所有空间均为私有空间，<strong>只有接到创建人定向邀请后方可访问</strong>。每个私有空间的累计受邀可见人数<strong>严格受限于 ≤100 人的绝对上限</strong>，物理阻断公网传播与不良社会影响。
+                    每一个空间均是面向私人的纯私密情感寄托空间，完全不对外公开。<strong>只有接到创建人定向专属邀请方可访问</strong>；受邀可见人数<strong>严格锁定在 ≤100 人绝对上限</strong>，物理阻断公网传播，严防不良社会影响。
                   </p>
                 </div>
 
