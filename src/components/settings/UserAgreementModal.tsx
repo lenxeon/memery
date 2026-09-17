@@ -8,7 +8,7 @@
  * 4. 99元/年与19元/月的长青守护订阅细则（符合 Apple 3.1.2 规范）。
  */
 import React, { useState } from 'react';
-import { ShieldCheck, Heart, Sparkles, X, BookOpen, ExternalLink, Leaf, Scale } from 'lucide-react';
+import { ShieldCheck, Heart, Sparkles, X, BookOpen, ExternalLink, Leaf, Scale, Lock, Users, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { ChineseCornerOrnaments, ChineseCloudDivider, CinnabarSealBadge } from '../common/ChineseDecorations';
 import { sound } from '../../utils/audio';
 
@@ -21,7 +21,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [activeSection, setActiveSection] = useState<'all' | 'intent' | 'social' | 'commercial' | 'rules'>('all');
+  const [activeSection, setActiveSection] = useState<'all' | 'intent' | 'social' | 'commercial' | 'safety' | 'rules'>('all');
 
   if (!isOpen) return null;
 
@@ -99,7 +99,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             }`}
           >
             <Heart size={12} />
-            <span>一、产品立意与初心</span>
+            <span>一、立意与初心</span>
           </button>
           <button
             type="button"
@@ -111,7 +111,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             }`}
           >
             <Leaf size={12} />
-            <span>二、社会价值与绿色倡议</span>
+            <span>二、社会价值</span>
           </button>
           <button
             type="button"
@@ -123,7 +123,19 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             }`}
           >
             <Scale size={12} />
-            <span>三、商业思想与收费公约</span>
+            <span>三、收费公约</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('safety')}
+            className={`px-3 py-1 rounded-full cursor-pointer transition-all shrink-0 flex items-center gap-1 ${
+              activeSection === 'safety'
+                ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                : 'text-stone-400 hover:text-stone-200'
+            }`}
+          >
+            <Lock size={12} />
+            <span>四、私密与安全防线</span>
           </button>
           <button
             type="button"
@@ -135,7 +147,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             }`}
           >
             <BookOpen size={12} />
-            <span>四、合规行为守则</span>
+            <span>五、合规守则</span>
           </button>
         </div>
 
@@ -210,7 +222,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
 
               <div className="space-y-2">
                 <p>
-                  <strong className="text-amber-100">核心原则 2：永久保障基础体验免费权（客至常心，心诚则灵）</strong><br />
+                  <strong className="text-amber-100">核心原则 2：永久保障基础体验免费权（素简存念，真情长在）</strong><br />
                   所有用户<strong>无需支付任何费用</strong>，即可永久免费拥有完整的纪念案台。我们开放经典陶木香炉、双对素白烛台、经典传统供花（素菊、百合、牡丹）及平安红富士苹果。<br />
                   免费供品遵循大自然“万物生灭自然流转”之规律：香柱按时长燃尽化为轻烟；蜡烛流尽烛泪后自然熄灭；鲜花随时间经历盛开到凋枯，数日后自然融入尘土消失。免费功能虽素简，但仪式尊严绝不打折，平台绝不在祭奠界面插入破坏宁静的商业弹窗广告。
                 </p>
@@ -256,11 +268,84 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
             </section>
           )}
 
-          {/* 四、合规守则与隐私安全 */}
+          {/* 四、空间私密保护与安全守卫公约 */}
+          {(activeSection === 'all' || activeSection === 'safety') && (
+            <section className="space-y-3">
+              <h4 className="text-base font-serif font-bold text-amber-200 flex items-center gap-2 border-l-2 border-amber-400 pl-2.5">
+                四、空间私密保护与社会安全守卫公约：源头杜绝恶意建档，筑牢清朗良俗防线
+              </h4>
+              <p>
+                纪念逝者是一件极其庄重、神圣且私密的情感托付。为既充分保障用户缅怀至亲的尊严与私密，又坚决防止别有用心之人利用数字祭奠进行恶意炒作、网络暴力或引发不良社会舆情，《暖念》构建了以下严格的安全守卫与风控机制：
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                {/* 1. 空间高度私密 */}
+                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <Lock size={14} className="text-amber-400 shrink-0" />
+                    <span>1. 空间私密无感保障（无侵入式窥探）</span>
+                  </div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    所有纪念空间<strong>默认处于完全私密封闭状态</strong>，不设公开大厅与公共排行广场。平台坚决不作侵入式前置机器窥视，给家属与故人间最真挚的追思保留一片不受打扰的净土。
+                  </p>
+                </div>
+
+                {/* 2. 全员实名制底线 */}
+                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-amber-400 shrink-0" />
+                    <span>2. 全员实名制认证（源头消弭匿名恶意）</span>
+                  </div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    所有注册与建档用户<strong>必须完成法定权威实名身份认证与手机核验</strong>。坚决封杀匿名小号与网络水军，落实“身份可溯、行为有责”，从源头根除恶意造谣诽谤的土壤。
+                  </p>
+                </div>
+
+                {/* 3. 空间建档配额 */}
+                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-amber-400 shrink-0" />
+                    <span>3. 建档配额管控（每人限创 ≤5 个空间）</span>
+                  </div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    为防范黑产抢注或恶意批量建档，<strong>每个实名账户限创不超过 5 个纪念空间</strong>。若因多代直系长辈合规需要申请增创，必须提交直系亲属证明并经<strong>人工双人多维严格审核</strong>。
+                  </p>
+                </div>
+
+                {/* 4. 严密分享受控 */}
+                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <Users size={14} className="text-amber-400 shrink-0" />
+                    <span>4. 私域受控分享（单空间限 ≤100 人可见）</span>
+                  </div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    单空间受邀分享人数<strong>严格限制不超过 100 人可见</strong>，物理切断公网病毒式裂变传播，防止产生不良社会影响。行业先辈公祭等特殊扩容必须经平台风控部门人工严格审批。
+                  </p>
+                </div>
+              </div>
+
+              {/* 红线与应急机制 */}
+              <div className="p-3.5 rounded-2xl bg-red-950/20 border border-red-500/30 text-xs space-y-2">
+                <div className="font-bold text-red-300 flex items-center gap-1.5 text-sm">
+                  <ShieldAlert size={14} className="text-red-400 shrink-0" />
+                  <span>5. 多重安全红线主动防御（触线即刻熔断并移交司法）</span>
+                </div>
+                <div className="text-stone-300 space-y-1 text-[11px] leading-relaxed">
+                  <p>• <strong>英烈与伟人专项保护禁区</strong>：内置国家英烈名录，严禁非官方授权擅立英烈牌位或进行戏谑调侃；</p>
+                  <p>• <strong>健在人士恶意立碑“零容忍”</strong>：严惩为在世人员设立虚假灵堂等网络暴力行径，一经核实立即永久封号并报案处理；</p>
+                  <p>• <strong>反封建迷信与非法集资</strong>：严禁出现算命看相、阴阳风水诈骗、超度敛财或诱导集资打赏；</p>
+                  <p>• <strong>亲友一键侵权举报与 7×24 小时应急冻结</strong>：每个空间均设有极简举报通道，收到有效投诉第一时间先行冻结空间并介入处置。
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* 五、合规守则与隐私安全 */}
           {(activeSection === 'all' || activeSection === 'rules') && (
             <section className="space-y-3">
               <h4 className="text-base font-serif font-bold text-amber-200 flex items-center gap-2 border-l-2 border-amber-400 pl-2.5">
-                四、用户行为规范、隐私安全与免责守则
+                五、用户行为规范、隐私安全与免责守则
               </h4>
               <ul className="space-y-2 pl-4 list-disc text-stone-300 text-xs leading-relaxed">
                 <li>

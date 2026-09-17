@@ -677,7 +677,7 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
         {/* Pinned Bottom Confirm Bar */}
         <div className="flex items-center justify-between border-t border-amber-500/30 px-5 py-3 shrink-0 bg-[#1c1917]/95 relative z-10 backdrop-blur-xs">
           <span className="text-[11px] text-stone-400 font-serif">
-            全部调节已实时生效 · 心诚则灵
+            全部调节已实时生效 · 素心寄思
           </span>
           <button
             type="button"
