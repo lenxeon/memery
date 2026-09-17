@@ -105,22 +105,8 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     if (!isReadyRef.current) return;
     const { width, height } = getViewportDimensions();
     viewportSizeRef.current = { width, height };
-    const pipeline = TexturePipeline.getInstance();
 
-    // 1. 远景层
-    bgLayerRef.current?.render(width, height, lighting, wallStyle);
-
-    // 2. 地面层
-    floorLayerRef.current?.render(
-      width,
-      height,
-      floorStyle,
-      pipeline.woodPlankTexture,
-      pipeline.marbleTileTexture,
-      lighting
-    );
-
-    // 3. 供案几何与桌布 (对标原版 560x160 黄金比例与底部边距)
+    // 1. 供案几何与桌布 (对标原版 560x160 黄金比例与底部边距)
     const centerX = width * 0.5;
     const tableWidth = Math.min(width - 32, 560);
     const tableHeight = tableWidth * (160 / 560);
@@ -128,16 +114,9 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     const tableTopY = height - tableBottomOffset - tableHeight * 0.71;
     tableLayerRef.current?.render(centerX, tableTopY, tableWidth, tableHeight, tableclothStyle, showTableRunner);
 
-    // 4. 丁达尔神圣光柱
-    if (lighting.masterOn && lighting.godRaysEnabled) {
-      pixiEffectsRef.current?.updateGodRays(width, height, lighting.godRaysIntensity);
-    } else {
-      pixiEffectsRef.current?.updateGodRays(width, height, 0);
-    }
-
-    // 5. 供品与道具
+    // 2. 供品与道具 (1:1 视觉真理源比例：鲜花高挑雅致 265px，烛身纤巧 28x72px，烛火灵动 24px)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items, lighting, wallStyle, floorStyle, tableclothStyle, showTableRunner, getViewportDimensions]);
+  }, [items, tableclothStyle, showTableRunner, getViewportDimensions]);
 
   // 1. 初始化 PixiJS 舞台
   useEffect(() => {

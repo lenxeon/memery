@@ -1497,13 +1497,62 @@ export default function App() {
         </div>
       )}
 
-      {/* Core Simulation Stage (图 2 绝美宏伟建筑背景 + 2.5D 深度视差微动 + 写实地坪 + 极致精美供台花卉) */}
+      {/* Core Simulation Stage (古典建筑壁构 + 2.5D 深度视差微动 + 写实 3D 透视地坪 + 极致精美纯 Canvas 供台) */}
       <div 
         className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden"
         onMouseMove={handleStageMouseMove}
         onMouseLeave={handleStageMouseLeave}
       >
-        {/* 2.5D Pure Canvas WebGL Game Scene Viewport (全量接管背景、地坪、光影、供案与供品) */}
+        {/* Layer 1: Sacred Altar Back Wall (宏伟古典建筑壁构) */}
+        <div className="absolute inset-0 pointer-events-none">
+          <AltarWall
+            lighting={lighting}
+            wallStyle={wallStyle}
+          />
+        </div>
+
+        {/* Layer 2: Volumetric Rays (Tyndall Light Beams / 晨曦丁达尔柔和金芒) */}
+        <VolumetricRays
+          enabled={lighting.masterOn && lighting.godRaysEnabled}
+          intensity={lighting.godRaysIntensity}
+          sunAngle={lighting.sunAngle}
+          timeOfDay={lighting.timeOfDay}
+        />
+
+        {/* Layer 3: Floating Dust Motes caught in the sunlight */}
+        <DustMotes
+          density={lighting.dustDensity}
+          sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.15}
+          windForce={lighting.windForce}
+          timeOfDay={lighting.timeOfDay}
+        />
+
+        {/* Layer 4: Perspective Flooring with Marble Tile & Hardwood Planks (2.5D 真·CSS 3D 纵深透视地坪，近大远小视锥收敛) */}
+        <div 
+          className="absolute inset-x-0 bottom-0 transition-transform duration-300 ease-out pointer-events-none"
+          style={{
+            transform: `translate3d(${parallax.x * 0.45}px, ${parallax.y * 0.45}px, 0)`,
+          }}
+        >
+          <FloorPlanks lighting={lighting} floorStyle={floorStyle} />
+        </div>
+
+        {/* Layer 5: Sacred Memorial Portrait Frame (居中安放于木构长廊正前) */}
+        <div 
+          className="absolute top-[18%] sm:top-[20%] z-30 pointer-events-auto transition-transform duration-300 ease-out"
+          style={{
+            transform: `translate3d(${parallax.x * 0.45}px, ${parallax.y * 0.45}px, 0)`,
+          }}
+        >
+          <MemorialPortrait
+            info={memorial}
+            onUpdateInfo={(up) => setMemorial((prev) => ({ ...prev, ...up }))}
+            sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.2}
+            timeOfDay={lighting.timeOfDay}
+          />
+        </div>
+
+        {/* Layer 6: 2.5D Pure Canvas WebGL Game Scene Viewport (全面接管红木供案、金丝桌布与全部供品摆件的 Canvas 光栅化与动效渲染) */}
         <AltarPixiViewport
           items={items}
           lighting={lighting}
@@ -1518,23 +1567,8 @@ export default function App() {
           onVaseClick={handleToggleVaseStyle}
           onBowlHit={() => sound.playSingingBowl()}
           onUpdateItemPosition={updateItemPosition}
-          className="absolute inset-0 z-10"
+          className="absolute inset-0 z-25 pointer-events-auto"
         />
-
-        {/* Layer 5: Sacred Memorial Portrait Frame (居中安放于木构长廊正前) */}
-        <div 
-          className="absolute top-[18%] sm:top-[20%] z-20 pointer-events-auto transition-transform duration-300 ease-out"
-          style={{
-            transform: `translate3d(${parallax.x * 0.45}px, ${parallax.y * 0.45}px, 0)`,
-          }}
-        >
-          <MemorialPortrait
-            info={memorial}
-            onUpdateInfo={(up) => setMemorial((prev) => ({ ...prev, ...up }))}
-            sunlightIntensity={lighting.masterOn ? lighting.sunlightIntensity : 0.2}
-            timeOfDay={lighting.timeOfDay}
-          />
-        </div>
 
         {/* Layer 5.5: 🔍 专项审计模式控制胶囊 (默认不开启，支持拖拽改变位置，支持关闭) */}
         {isAuditMode && (

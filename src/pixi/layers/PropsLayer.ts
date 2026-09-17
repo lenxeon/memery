@@ -68,7 +68,7 @@ export class PropsLayer {
     this.currentAltarCenterX = altarCenterX;
     this.currentAltarTopY = altarTopY;
     this.currentAltarWidth = altarWidth;
-    const scaleFactor = Math.min(1.0, Math.max(0.65, altarWidth / 820));
+    const scaleFactor = Math.min(1.0, Math.max(0.65, altarWidth / 560));
     this.currentScaleFactor = scaleFactor;
 
     const defaultLayouts: Record<string, { xOffset: number; yOffset: number }> = {
@@ -130,13 +130,14 @@ export class PropsLayer {
         let hasMoved = false;
 
         cont.on('pointerdown', (e: FederatedPointerEvent) => {
+          e.stopPropagation();
+          this.draggingId = id;
           isItemDragging = true;
           hasMoved = false;
           startPointerX = e.global.x;
           startPointerY = e.global.y;
           startContX = cont!.x;
           startContY = cont!.y;
-          this.draggingId = id;
           cont!.cursor = 'grabbing';
           if (cont!.parent) {
             cont!.parent.setChildIndex(cont!, cont!.parent.children.length - 1);
@@ -152,12 +153,22 @@ export class PropsLayer {
             hasMoved = true;
           }
           if (hasMoved) {
-            cont!.x = startContX + dx;
-            cont!.y = startContY + dy;
+            const boundsX = 220 * (this.currentAltarWidth / 560);
+            const newX = Math.max(
+              this.currentAltarCenterX - boundsX,
+              Math.min(this.currentAltarCenterX + boundsX, startContX + dx)
+            );
+            const newY = Math.max(
+              this.currentAltarTopY - 24,
+              Math.min(this.currentAltarTopY + 36, startContY + dy)
+            );
+
+            cont!.x = newX;
+            cont!.y = newY;
           }
         });
 
-        const handlePointerUp = () => {
+        const handlePointerEnd = () => {
           if (!isItemDragging) return;
           isItemDragging = false;
           this.draggingId = null;
@@ -165,32 +176,47 @@ export class PropsLayer {
           cont!.scale.set(this.currentScaleFactor);
 
           if (hasMoved) {
-            const tableSpreadX = this.currentAltarWidth / 560;
-            const safeSpread = Math.max(0.1, tableSpreadX * this.currentScaleFactor);
-            const newRelX = (cont!.x - this.currentAltarCenterX) / safeSpread;
-            const newRelY = (cont!.y - this.currentAltarTopY) / this.currentScaleFactor;
+            sound.playWoodPlacement();
+            const spread = this.currentAltarWidth / 560;
+            const relX = (cont!.x - this.currentAltarCenterX) / spread / this.currentScaleFactor;
+            const relY = (cont!.y - this.currentAltarTopY) / this.currentScaleFactor;
+            this.callbacks.onUpdateItemPosition?.(id as SceneItemId, { x: relX, y: relY });
             this.callbacks.onUpdatePosition?.(id as SceneItemId, {
-              x: Math.round(newRelX),
-              y: Math.round(newRelY),
+              x: Math.round(relX),
+              y: Math.round(relY),
             });
           } else {
             // 点击交互逻辑
-            if (id === 'censer' || id.startsWith('candle_')) {
+            if (id.startsWith('candle_')) {
+              if (item.isLit) sound.playExtinguish();
+              else sound.playMatchStrike();
+              this.callbacks.onToggleItemLit?.(id as SceneItemId);
               this.callbacks.onToggleLit?.(id as SceneItemId);
             } else if (id.startsWith('fruit_')) {
+              sound.playWoodPlacement();
               this.callbacks.onToggleFruit?.(id as SceneItemId);
             } else if (id === 'singing_bowl') {
+              sound.playSingingBowl();
               this.callbacks.onBowlHit?.();
             } else if (id === 'vase_left') {
+              sound.playBell(720, 2);
               this.callbacks.onVaseClick?.('left');
             } else if (id === 'vase_right') {
+              sound.playBell(720, 2);
               this.callbacks.onVaseClick?.('right');
+            } else if (id === 'tea_cups') {
+              sound.playPorcelainClink();
+            } else if (id === 'censer') {
+              if (item.isLit) sound.playExtinguish();
+              else sound.playMatchStrike();
+              this.callbacks.onToggleItemLit?.(id as SceneItemId);
+              this.callbacks.onToggleLit?.(id as SceneItemId);
             }
           }
         };
 
-        cont.on('pointerup', handlePointerUp);
-        cont.on('pointerupoutside', handlePointerUp);
+        cont.on('pointerup', handlePointerEnd);
+        cont.on('pointerupoutside', handlePointerEnd);
 
         this.propContainers.set(id, cont);
         this.propSprites.set(id, sprite);
@@ -225,8 +251,9 @@ export class PropsLayer {
         const flower = (item.flowerType || (isRight ? 'lilies' : 'peonies')) as FlowerType;
         const vaseStyle = (item.vaseStyle || (isRight ? 'painted_iris' : 'warm_white_plain')) as VaseStyle;
         targetKey = `vase_${flower}_${vaseStyle}_${isRight ? 'R' : 'L'}`;
-        targetW = 180;
-        targetH = 202;
+        // 花瓶+盛开花束：高挑修长，远超蜡烛高度 (265px 挺拔优雅，对齐参考图1)
+        targetW = 210;
+        targetH = 265;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
@@ -242,15 +269,15 @@ export class PropsLayer {
       } else if (id === 'censer') {
         const isLit = !!item.isLit;
         targetKey = `censer_${isLit ? 'lit' : 'unlit'}`;
-        targetW = 100;
-        targetH = 52;
+        targetW = 86;
+        targetH = 46;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
           this.pipeline.getCenserTexture(isLit).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
-              sprite.anchor.set(0.5, 0.94);
+              sprite.anchor.set(0.5, 0.92);
               sprite.width = targetW;
               sprite.height = targetH;
             }
@@ -265,16 +292,17 @@ export class PropsLayer {
           cont.addChild(this.incenseSmoke.sprite);
         }
         this.incenseSmoke.sprite.x = 0;
-        this.incenseSmoke.sprite.y = -38.5;
+        this.incenseSmoke.sprite.y = -34;
       } else if (id.startsWith('candle_')) {
         const health = item.waxHeight ?? (item.lifecycle?.health ?? 1.0);
         const isLit = !!item.isLit;
         const qHealth = Math.round(health * 10) / 10;
         const currentWaxFactor = Math.max(0.08, Math.min(1.0, qHealth));
-        const candleH = Math.round(22 + 76 * currentWaxFactor);
+        // 蜡烛主体纤巧秀美 (高度 18~72px，宽度 28px，严禁大红柱或巨烛)
+        const candleH = Math.round(18 + 54 * currentWaxFactor);
 
         targetKey = `candle_w_${qHealth}_${isLit ? '1' : '0'}`;
-        targetW = 42;
+        targetW = 28;
         targetH = candleH;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
@@ -289,7 +317,7 @@ export class PropsLayer {
           });
         }
 
-        // 绑定 60FPS 动态真实烛火到蜡烛凹槽
+        // 绑定 60FPS 动态真实烛火到蜡烛凹槽 (火苗高度~24px，纤巧灵动)
         let flame = this.candleFlames.get(id);
         if (!flame || flame.sprite.destroyed) {
           flame = new CandleFlameRenderer();
@@ -299,20 +327,20 @@ export class PropsLayer {
           cont.addChild(flame.sprite);
         }
         flame.sprite.x = 0;
-        flame.sprite.y = -candleH + 8;
+        flame.sprite.y = -candleH + 5;
         flame.sprite.visible = isLit;
       } else if (id.startsWith('fruit_')) {
         const fruitType = (item.fruitType || 'apples') as FruitType;
         targetKey = `fruit_${fruitType}`;
-        targetW = 108;
-        targetH = 92;
+        targetW = 98;
+        targetH = 80;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
           this.pipeline.getFruitTexture(fruitType).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
-              sprite.anchor.set(0.5, 0.85);
+              sprite.anchor.set(0.5, 0.88);
               sprite.width = targetW;
               sprite.height = targetH;
             }
@@ -320,8 +348,8 @@ export class PropsLayer {
         }
       } else if (id === 'tea_cups') {
         targetKey = 'tea_cups_trio';
-        targetW = 108;
-        targetH = 48;
+        targetW = 86;
+        targetH = 38;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
@@ -336,8 +364,8 @@ export class PropsLayer {
         }
       } else if (id === 'singing_bowl') {
         targetKey = 'singing_bowl_brass';
-        targetW = 82;
-        targetH = 68;
+        targetW = 66;
+        targetH = 54;
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);

@@ -36,6 +36,9 @@ export class CandleFlameRenderer {
 
     this.texture = Texture.from(this.canvas);
     this.sprite = new Sprite(this.texture);
+    // 限制精灵尺寸为高精缩小版，防止 220px 巨火失真
+    this.sprite.width = 38;
+    this.sprite.height = 52;
     // 锚点精确对齐火苗底座 (centerX=40, baseY=94)
     this.sprite.anchor.set(40 / this.logicalWidth, 94 / this.logicalHeight);
   }
