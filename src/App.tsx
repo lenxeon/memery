@@ -417,6 +417,7 @@ export default function App() {
   // Petal shower animation trigger
   const [petalTrigger, setPetalTrigger] = useState(0);
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
+  const [currentFlower, setCurrentFlower] = useState<FlowerType>('peonies');
 
   // Background space aesthetics (默认晴岚映曜 · 宏伟木构殿堂长廊)
   const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('heritage_wood');
@@ -743,6 +744,7 @@ export default function App() {
       [newId]: newBouquet,
     }));
 
+    setCurrentFlower(flowerType);
     setLastOfferedFlower(flowerType);
     setPetalTrigger(Date.now());
     sound.playBell(560, 2);
@@ -1422,6 +1424,7 @@ export default function App() {
       {/* Bottom Navigation Dock (reproducing user's bottom buttons: 献花 / 供果 / 点烛 / 置台 / 氛围 / 祈愿) */}
       <BottomDock
         onOpenFlowers={() => setIsFlowerOpen(true)}
+        currentFlower={currentFlower}
         onOpenFruits={() => setIsFruitOpen(true)}
         onToggleCandles={toggleAllCandles}
         candlesLit={Boolean(items.candle_left?.isLit || items.candle_right?.isLit)}
@@ -1469,6 +1472,8 @@ export default function App() {
       <FlowerPickerModal
         isOpen={isFlowerOpen}
         onClose={() => setIsFlowerOpen(false)}
+        currentFlower={currentFlower}
+        onSelectFlower={setCurrentFlower}
         onAddOfferedFlower={handleAddOfferedFlower}
         onChangeVaseFlower={handleChangeVaseFlower}
         onChangeVaseStyle={handleChangeVaseStyle}

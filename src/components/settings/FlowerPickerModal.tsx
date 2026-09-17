@@ -13,10 +13,13 @@ import { FlowerType } from '../../types';
 import { Sparkles, Heart, Flower2, Trash2, Check, Sparkle } from 'lucide-react';
 import { VaseStyle, VASE_STYLES, getVaseStyleMeta } from '../offerings/flowers/vases';
 import { ChineseCornerOrnaments, ChineseCloudDivider, CinnabarSealBadge } from '../common/ChineseDecorations';
+import { FlowerPreview, FLOWER_REGISTRY } from '../offerings/flowers';
 
 export interface FlowerPickerModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentFlower?: FlowerType;
+  onSelectFlower?: (flowerType: FlowerType) => void;
   onAddOfferedFlower?: (flowerType: FlowerType) => void;
   onChangeVaseFlower?: (side: 'left' | 'right', flowerType: FlowerType) => void;
   onChangeVaseStyle?: (side: 'left' | 'right', vaseStyle: VaseStyle) => void;
@@ -32,6 +35,8 @@ export interface FlowerPickerModalProps {
 export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
   isOpen,
   onClose,
+  currentFlower = 'peonies',
+  onSelectFlower,
   onAddOfferedFlower,
   onChangeVaseFlower,
   onChangeVaseStyle,
@@ -44,10 +49,17 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
   onFillTenFlowers,
 }) => {
   const [activeTab, setActiveTab] = useState<'offer' | 'vases'>('offer');
+  const [selectedOfferFlower, setSelectedOfferFlower] = useState<FlowerType>(currentFlower);
   const [selectedVaseSide, setSelectedVaseSide] = useState<'left' | 'right'>('left');
   const [selectedVaseStyle, setSelectedVaseStyle] = useState<VaseStyle>(leftVaseStyle);
   const [selectedFlowerType, setSelectedFlowerType] = useState<FlowerType>(leftVaseFlower);
   const [vaseSubTab, setVaseSubTab] = useState<'vases' | 'flowers'>('vases');
+
+  React.useEffect(() => {
+    if (currentFlower) {
+      setSelectedOfferFlower(currentFlower);
+    }
+  }, [currentFlower, isOpen]);
 
   if (!isOpen) return null;
 
@@ -257,10 +269,49 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
 
         {/* TAB 1: 献花到供案桌面 */}
         {activeTab === 'offer' && (
-          <div className="relative z-10">
-            <div className="flex items-center justify-between gap-2 mb-2 px-1 text-xs">
+          <div className="relative z-10 space-y-3">
+            {/* ── 当前即将敬献供花实物预览大卡 (Live Showcase for Currently Selected Flower) ── */}
+            {(() => {
+              const currentOpt = flowerOptions.find((f) => f.id === selectedOfferFlower) || flowerOptions[0];
+              return (
+                <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-stone-950/95 via-stone-900/90 to-amber-950/40 border border-amber-400/50 ring-1 ring-amber-400/20 shadow-[0_8px_24px_rgba(0,0,0,0.6)] flex items-center justify-between gap-3 relative overflow-hidden">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-b from-stone-900 to-stone-950 border border-amber-400/50 shadow-[0_0_16px_rgba(245,158,11,0.25)] flex items-center justify-center shrink-0 overflow-hidden relative group">
+                      <FlowerPreview flowerType={selectedOfferFlower} size={62} />
+                      <div className="absolute inset-0 bg-radial from-transparent to-black/30 pointer-events-none" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[11px] text-amber-300 font-serif tracking-wider">即将敬奉</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 font-normal">
+                          {currentOpt.tag}
+                        </span>
+                      </div>
+                      <div className="font-serif font-bold text-amber-100 text-sm sm:text-base mt-0.5 truncate">
+                        {currentOpt.name}
+                      </div>
+                      <div className="text-[11px] text-stone-400 mt-0.5 line-clamp-1 leading-relaxed">
+                        {currentOpt.desc}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOfferBouquet(selectedOfferFlower)}
+                    className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold text-xs sm:text-sm cursor-pointer transition-all active:scale-95 shadow-[0_4px_16px_rgba(245,158,11,0.35)] flex items-center gap-1.5 shrink-0 whitespace-nowrap border border-amber-300"
+                    title="立即将当前所选供花敬奉于供案前"
+                  >
+                    <Heart size={14} className="fill-stone-950" />
+                    <span>奉于案前</span>
+                  </button>
+                </div>
+              );
+            })()}
+
+            <div className="flex items-center justify-between gap-2 px-1 text-xs">
               <span className="text-amber-200/80 font-medium">
-                点击花束即可敬献案台：
+                挑选花品（点击查看实景小样）：
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 {onFillTenFlowers && (
@@ -293,32 +344,56 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
               </div>
             </div>
 
-            <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-              {flowerOptions.map((opt) => (
-                <div
-                  key={opt.id}
-                  onClick={() => handleOfferBouquet(opt.id)}
-                  className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl border border-amber-500/25 bg-stone-950/60 hover:bg-stone-900/80 hover:border-amber-400/60 cursor-pointer transition-all active:scale-[0.98] group shadow-xs gap-2"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl drop-shadow-xs shrink-0">{opt.emoji}</span>
-                    <div className="min-w-0">
-                      <div className="font-medium text-amber-100 flex items-center gap-2 text-sm leading-snug">
-                        <span className="truncate">{opt.name}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 font-normal shrink-0 whitespace-nowrap">
-                          {opt.tag}
-                        </span>
+            <div className="space-y-2 max-h-[260px] overflow-y-auto custom-scrollbar pr-1">
+              {flowerOptions.map((opt) => {
+                const isSelected = selectedOfferFlower === opt.id;
+                return (
+                  <div
+                    key={opt.id}
+                    onClick={() => {
+                      setSelectedOfferFlower(opt.id);
+                      onSelectFlower?.(opt.id);
+                      sound.playBell(580, 1.5);
+                    }}
+                    className={`flex items-center justify-between p-2.5 sm:p-3 rounded-2xl border cursor-pointer transition-all active:scale-[0.98] group shadow-xs gap-2 ${
+                      isSelected
+                        ? 'border-amber-400 bg-amber-950/40 ring-1 ring-amber-400/60 shadow-[0_0_15px_rgba(245,158,11,0.15)] text-amber-100'
+                        : 'border-amber-500/25 bg-stone-950/60 hover:bg-stone-900/80 hover:border-amber-400/60 text-stone-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-stone-900/90 border border-amber-400/30 flex items-center justify-center shrink-0 overflow-hidden shadow-xs group-hover:border-amber-400/60 transition-all">
+                        <FlowerPreview flowerType={opt.id} size={36} />
                       </div>
-                      <div className="text-[11px] text-stone-400 mt-0.5 truncate">{opt.desc}</div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-amber-100 flex items-center gap-2 text-sm leading-snug">
+                          <span className="truncate">{opt.name}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 font-normal shrink-0 whitespace-nowrap">
+                            {opt.tag}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-stone-400 mt-0.5 truncate">{opt.desc}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {isSelected && <Check size={16} className="text-amber-400 mr-0.5" />}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOfferBouquet(opt.id);
+                        }}
+                        className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-amber-600/30 text-amber-300 border border-amber-500/40 font-medium group-hover:bg-amber-500 group-hover:text-stone-950 transition-all shadow-xs whitespace-nowrap active:scale-95"
+                        title="直接敬献此花"
+                      >
+                        <Heart size={13} className="group-hover:fill-stone-950" />
+                        <span>敬献</span>
+                      </button>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-amber-600/30 text-amber-300 border border-amber-500/40 font-medium group-hover:bg-amber-500 group-hover:text-stone-950 transition-all shadow-xs shrink-0 whitespace-nowrap">
-                    <Heart size={13} className="group-hover:fill-stone-950" />
-                    <span>敬献</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -461,7 +536,9 @@ export const FlowerPickerModal: React.FC<FlowerPickerModalProps> = ({
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="text-2xl shrink-0">{opt.emoji}</span>
+                          <div className="w-9 h-9 rounded-xl bg-stone-900/90 border border-amber-400/30 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                            <FlowerPreview flowerType={opt.id} size={34} />
+                          </div>
                           <div className="min-w-0">
                             <div className="text-xs font-semibold text-amber-200 truncate">{opt.name}</div>
                             <div className="text-[10px] text-stone-400 truncate">{opt.desc}</div>

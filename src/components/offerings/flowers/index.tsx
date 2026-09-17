@@ -10,6 +10,7 @@ import { getFlowerModule } from './registry';
 export * from './types';
 export * from './BaseVase';
 export * from './registry';
+export * from './FlowerPreview';
 export * from './utils/lifecycle';
 export * from './items/PeoniesFlower';
 export * from './items/LiliesFlower';

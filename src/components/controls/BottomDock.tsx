@@ -15,9 +15,12 @@ import {
   Sparkles 
 } from 'lucide-react';
 import { sound } from '../../utils/audio';
+import { FlowerType } from '../../types';
+import { FlowerPreview, FLOWER_REGISTRY } from '../offerings/flowers';
 
 interface BottomDockProps {
   onOpenFlowers: () => void;
+  currentFlower?: FlowerType;
   onOpenFruits: () => void;
   onToggleCandles: () => void;
   candlesLit: boolean;
@@ -30,6 +33,7 @@ interface BottomDockProps {
 
 export const BottomDock: React.FC<BottomDockProps> = ({
   onOpenFlowers,
+  currentFlower = 'peonies',
   onOpenFruits,
   onToggleCandles,
   candlesLit,
@@ -45,6 +49,8 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     sound.playWoodPlacement();
     setIsExpanded((prev) => !prev);
   };
+
+  const currentFlowerMeta = FLOWER_REGISTRY[currentFlower] || FLOWER_REGISTRY.peonies;
 
   return (
     <div className="fixed bottom-2 sm:bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
@@ -69,17 +75,20 @@ export const BottomDock: React.FC<BottomDockProps> = ({
 
             {/* 6 个核心功能按钮 (花、果、烛、台、影、愿) */}
             <div className="w-full flex items-center justify-between gap-1 sm:gap-2">
-              {/* 1. 献花 */}
+              {/* 1. 献花：展示当前选定供花实景微缩图 */}
               <button
                 type="button"
                 onClick={() => {
                   sound.playBell(580, 2);
                   onOpenFlowers();
                 }}
-                className="flex flex-col items-center justify-center gap-1 min-h-[44px] py-1 px-2 rounded-2xl hover:bg-amber-950/40 text-stone-300 hover:text-amber-200 transition-all active:scale-95 cursor-pointer group"
+                className="flex flex-col items-center justify-center gap-1 min-h-[44px] py-1 px-2 rounded-2xl hover:bg-amber-950/40 text-stone-300 hover:text-amber-200 transition-all active:scale-95 cursor-pointer group relative"
+                title={`献花 · 当前选定「${currentFlowerMeta.name}」，点击即可挑选或敬献`}
               >
-                <Flower2 size={20} className="text-amber-400/80 group-hover:text-amber-300 group-hover:scale-110 transition-all" />
-                <span className="text-[11px] font-normal tracking-wider">献花</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-stone-800 to-stone-900 border border-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.25)] flex items-center justify-center overflow-hidden group-hover:border-amber-300 group-hover:scale-110 transition-all">
+                  <FlowerPreview flowerType={currentFlower} size={26} />
+                </div>
+                <span className="text-[11px] font-normal tracking-wider text-stone-300 group-hover:text-amber-200">献花</span>
               </button>
 
               {/* 2. 供果 */}
