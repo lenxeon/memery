@@ -520,6 +520,96 @@
   animation: leafSway4Gentle 3.9s ease-in-out infinite 1.1s;
 }
 
+/* ── 12. 雏菊整体花束迎风摇曳 (以瓶口 75px 125px 为根基旋转，枝叶花一体，永不分家) ── */
+@keyframes swayDaisyWhole {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(1.8deg);
+  }
+  65% {
+    transform: rotate(-1.5deg);
+  }
+  84% {
+    transform: rotate(0.8deg);
+  }
+}
+
+.animate-sway-daisy-whole {
+  will-change: transform;
+  animation: swayDaisyWhole 3.8s ease-in-out infinite;
+}
+
+/* ── 雏菊花朵在枝头的纯角度点头轻晃 (纯 rotate，绝对无平移，花枝 100% 严丝合缝) ── */
+@keyframes swayDaisyNodCrown {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  28% {
+    transform: rotate(2.0deg);
+  }
+  60% {
+    transform: rotate(-1.6deg);
+  }
+}
+
+@keyframes swayDaisyNodRight {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  34% {
+    transform: rotate(-2.2deg);
+  }
+  68% {
+    transform: rotate(1.8deg);
+  }
+}
+
+@keyframes swayDaisyNodLeft {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  26% {
+    transform: rotate(2.2deg);
+  }
+  62% {
+    transform: rotate(-1.8deg);
+  }
+}
+
+@keyframes swayDaisyNodBud {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  24% {
+    transform: rotate(2.8deg);
+  }
+  58% {
+    transform: rotate(-2.4deg);
+  }
+}
+
+.animate-sway-daisy-nod-crown {
+  will-change: transform;
+  animation: swayDaisyNodCrown 3.6s ease-in-out infinite;
+}
+
+.animate-sway-daisy-nod-right {
+  will-change: transform;
+  animation: swayDaisyNodRight 4.0s ease-in-out infinite 0.4s;
+}
+
+.animate-sway-daisy-nod-left {
+  will-change: transform;
+  animation: swayDaisyNodLeft 3.4s ease-in-out infinite 0.2s;
+}
+
+.animate-sway-daisy-nod-bud {
+  will-change: transform;
+  animation: swayDaisyNodBud 3.0s ease-in-out infinite 0.3s;
+}
+
 /* Custom subtle scrollbar for modals */
 .custom-scrollbar {
   scrollbar-width: thin;

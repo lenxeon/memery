@@ -207,34 +207,25 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
   /**
    * 突出、舒展且微卷的雏菊特有小叶 (Prominent Lobed & Curled Daisy Leaves)
    */
-  const renderDaisyLeaf = (
-    x: number,
-    y: number,
-    length: number,
-    rot: number,
-    curlSign: number = 1,
-    animClass: string = 'animate-leaf-sway-1-gentle'
-  ) => {
+  const renderDaisyLeaf = (x: number, y: number, length: number, rot: number, curlSign: number = 1) => {
     const w = length * 0.25;
     return (
-      <g transform={`translate(${x}, ${y})`}>
-        <g className={animClass} style={{ transformOrigin: '0px 0px' }} transform={`rotate(${rot})`}>
-          {/* 突出舒展的波缘雏菊绿叶轮廓 */}
-          <path
-            d={`M 0 0 C ${w * 0.9} -${length * 0.25}, ${w * 1.5 * curlSign} -${length * 0.55}, ${w * 2.2 * curlSign} -${length} C ${w * 0.8 * curlSign} -${length * 0.75}, -${w * 0.3} -${length * 0.35}, 0 0 Z`}
-            fill="url(#daisyLeafGrad)"
-            stroke={leafDark}
-            strokeWidth="0.35"
-          />
-          {/* 明晰主叶脉与侧微脉 */}
-          <path
-            d={`M 0 0 Q ${w * 0.8 * curlSign} -${length * 0.55} ${w * 1.8 * curlSign} -${length * 0.95}`}
-            stroke={leafLight}
-            strokeWidth="0.5"
-            fill="none"
-            opacity="0.9"
-          />
-        </g>
+      <g transform={`translate(${x}, ${y}) rotate(${rot})`}>
+        {/* 突出舒展的波缘雏菊绿叶轮廓 */}
+        <path
+          d={`M 0 0 C ${w * 0.9} -${length * 0.25}, ${w * 1.5 * curlSign} -${length * 0.55}, ${w * 2.2 * curlSign} -${length} C ${w * 0.8 * curlSign} -${length * 0.75}, -${w * 0.3} -${length * 0.35}, 0 0 Z`}
+          fill="url(#daisyLeafGrad)"
+          stroke={leafDark}
+          strokeWidth="0.35"
+        />
+        {/* 明晰主叶脉与侧微脉 */}
+        <path
+          d={`M 0 0 Q ${w * 0.8 * curlSign} -${length * 0.55} ${w * 1.8 * curlSign} -${length * 0.95}`}
+          stroke={leafLight}
+          strokeWidth="0.5"
+          fill="none"
+          opacity="0.9"
+        />
       </g>
     );
   };
@@ -280,144 +271,165 @@ export const DaisiesFlower: React.FC<FlowerComponentProps> = ({
         </linearGradient>
       </defs>
 
-      {/* ── 架构 1：最底层背景叶片群（图层置于最底，绝不遮挡任何花朵，随风轻柔荡漾） ── */}
-      <g id="daisySlenderLeaves">
-        {/* 高位顶花与侧花之间的衬托小叶 */}
-        {renderDaisyLeaf(84, 24, 16, 26, 1, 'animate-leaf-sway-1-gentle')}
-        {renderDaisyLeaf(66, 25, 16, -24, -1, 'animate-leaf-sway-2-gentle')}
+      {/* ── 雏菊整体花束在风中摇曳生姿（以瓶口 75px 125px 为根基旋转，枝叶花一体，绝不分家） ── */}
+      <g className="animate-sway-daisy-whole" style={{ transformOrigin: '75px 125px' }}>
+        {/* ── 架构 1：最底层背景叶片群（图层置于最底，绝不遮挡任何花朵，仅在花与花间探出青翠生机） ── */}
+        <g id="daisySlenderLeaves">
+          {/* 高位顶花与侧花之间的衬托小叶 */}
+          {renderDaisyLeaf(84, 24, 16, 26, 1)}
+          {renderDaisyLeaf(66, 25, 16, -24, -1)}
 
-        {/* 高位侧花外缘与空隙小叶 */}
-        {renderDaisyLeaf(50, 42, 17, -40, -1, 'animate-leaf-sway-3-gentle')}
-        {renderDaisyLeaf(98, 40, 17, 36, 1, 'animate-leaf-sway-4-gentle')}
+          {/* 高位侧花外缘与空隙小叶 */}
+          {renderDaisyLeaf(50, 42, 17, -40, -1)}
+          {renderDaisyLeaf(98, 40, 17, 36, 1)}
 
-        {/* 中高层花朵之间掩映的小叶 */}
-        {renderDaisyLeaf(62, 52, 18, -32, -1, 'animate-leaf-sway-2-gentle')}
-        {renderDaisyLeaf(88, 50, 18, 30, 1, 'animate-leaf-sway-1-gentle')}
+          {/* 中高层花朵之间掩映的小叶 */}
+          {renderDaisyLeaf(62, 52, 18, -32, -1)}
+          {renderDaisyLeaf(88, 50, 18, 30, 1)}
 
-        {/* 中层花朵与下层花朵之间空隙小叶 */}
-        {renderDaisyLeaf(48, 54, 18, -48, -1, 'animate-leaf-sway-4-gentle')}
-        {renderDaisyLeaf(100, 52, 18, 46, 1, 'animate-leaf-sway-3-gentle')}
-        {renderDaisyLeaf(60, 72, 19, -35, -1, 'animate-leaf-sway-1-gentle')}
-        {renderDaisyLeaf(89, 68, 19, 32, 1, 'animate-leaf-sway-2-gentle')}
+          {/* 中层花朵与下层花朵之间空隙小叶 */}
+          {renderDaisyLeaf(48, 54, 18, -48, -1)}
+          {renderDaisyLeaf(100, 52, 18, 46, 1)}
+          {renderDaisyLeaf(60, 72, 19, -35, -1)}
+          {renderDaisyLeaf(89, 68, 19, 32, 1)}
 
-        {/* 中下层枝干间微卷小叶（绝不在瓶口横向飞出） */}
-        {renderDaisyLeaf(66, 82, 18, -28, 1, 'animate-leaf-sway-3-gentle')}
-        {renderDaisyLeaf(84, 78, 18, 25, -1, 'animate-leaf-sway-4-gentle')}
-        {renderDaisyLeaf(71, 92, 16, -18, -1, 'animate-leaf-sway-1-gentle')}
-        {renderDaisyLeaf(79, 90, 16, 20, 1, 'animate-leaf-sway-2-gentle')}
-      </g>
-
-      {/* ── 架构 2：自然舒展的分枝花茎骨架 ── */}
-      <g id="daisyBranchedStems">
-        {/* A. 中央主茎：自瓶口 (75,125) 挺立直上至顶花 (75,16) */}
-        <path
-          d="M 75 125 C 75 95, 74 62, 75 38 C 75 28, 75 22, 75 16"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="2.4"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* B. 右上高位小径：自 (75,60) 优雅斜逸至 (96,32) */}
-        <path
-          d="M 75 60 C 82 48, 89 40, 96 32"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="1.8"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* C. 左上高位小径：自 (75,65) 斜逸至 (52,34) */}
-        <path
-          d="M 75 65 C 68 54, 60 44, 52 34"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="1.8"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* D. 左梢花蕾分枝：自 (62,46) 向上抽出至 (62,22) */}
-        <path
-          d="M 62 46 C 62 36, 62 28, 62 22"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="1.3"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* E. 右中侧分枝：自 (75,88) 向右下舒展至 (98,60) */}
-        <path
-          d="M 75 88 C 84 78, 92 70, 98 60"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="1.9"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* F. 左中侧分枝：自 (75,92) 向左下舒展至 (46,64) */}
-        <path
-          d="M 75 92 C 64 82, 54 74, 46 64"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="1.9"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* G. 右下小花分枝：自 (75,102) 斜挑至 (82,80) */}
-        <path
-          d="M 75 102 C 78 94, 80 87, 82 80"
-          stroke="url(#daisyRealStemGrad)"
-          strokeWidth="1.4"
-          fill="none"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* ── 架构 3：多花高低有致、侧向与正视生动呼应（细长韧茎在微风中轻柔减半摇曳） ── */}
-      <g id="daisyMultiBlooms">
-        {/* 1. 【极顶挺秀·饱满盛放正视】(x:75, y:16)：高标挺秀，全束冠顶 */}
-        <g transform="translate(75, 16)" className="animate-flower-sway-crown-gentle" style={{ transformOrigin: '75px 16px' }}>
-          {renderFrontBloom(16.0, 5.2)}
+          {/* 中下层枝干间微卷小叶（绝不在瓶口横向飞出） */}
+          {renderDaisyLeaf(66, 82, 18, -28, 1)}
+          {renderDaisyLeaf(84, 78, 18, 25, -1)}
+          {renderDaisyLeaf(71, 92, 16, -18, -1)}
+          {renderDaisyLeaf(79, 90, 16, 20, 1)}
         </g>
 
-        {/* 2. 【高位右上·侧向舒展】(x:96, y:32)：优雅侧仰，白瓣向右上方轻灵展开，金蕊微倾透视 */}
-        <g transform="translate(96, 32)" className="animate-flower-sway-right-gentle" style={{ transformOrigin: '96px 32px' }}>
-          {renderSideBloom(14.5, 22, false, 0.55)}
+        {/* ── 架构 2：自然舒展的分枝花茎骨架 ── */}
+        <g id="daisyBranchedStems">
+          {/* A. 中央主茎：自瓶口 (75,125) 挺立直上至顶花 (75,16) */}
+          <path
+            d="M 75 125 C 75 95, 74 62, 75 38 C 75 28, 75 22, 75 16"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="2.4"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* B. 右上高位小径：自 (75,60) 优雅斜逸至 (96,32) */}
+          <path
+            d="M 75 60 C 82 48, 89 40, 96 32"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="1.8"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* C. 左上高位小径：自 (75,65) 斜逸至 (52,34) */}
+          <path
+            d="M 75 65 C 68 54, 60 44, 52 34"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="1.8"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* D. 左梢花蕾分枝：自 (62,46) 向上抽出至 (62,22) */}
+          <path
+            d="M 62 46 C 62 36, 62 28, 62 22"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="1.3"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* E. 右中侧分枝：自 (75,88) 向右下舒展至 (98,60) */}
+          <path
+            d="M 75 88 C 84 78, 92 70, 98 60"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="1.9"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* F. 左中侧分枝：自 (75,92) 向左下舒展至 (46,64) */}
+          <path
+            d="M 75 92 C 64 82, 54 74, 46 64"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="1.9"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* G. 右下小花分枝：自 (75,102) 斜挑至 (82,80) */}
+          <path
+            d="M 75 102 C 78 94, 80 87, 82 80"
+            stroke="url(#daisyRealStemGrad)"
+            strokeWidth="1.4"
+            fill="none"
+            strokeLinecap="round"
+          />
         </g>
 
-        {/* 3. 【高位左上·侧向舒展】(x:52, y:34)：优雅侧仰，白瓣向左上方轻灵展开，金蕊微倾透视 */}
-        <g transform="translate(52, 34)" className="animate-flower-sway-left-gentle" style={{ transformOrigin: '52px 34px' }}>
-          {renderSideBloom(14.5, -20, true, 0.55)}
-        </g>
+        {/* ── 架构 3：多花高低有致、侧向与正视生动呼应（纯角度点颤，花枝 100% 严丝合缝） ── */}
+        <g id="daisyMultiBlooms">
+          {/* 1. 【极顶挺秀·饱满盛放正视】(x:75, y:16)：高标挺秀，全束冠顶 */}
+          <g transform="translate(75, 16)">
+            <g className="animate-sway-daisy-nod-crown" style={{ transformOrigin: '0px 0px' }}>
+              {renderFrontBloom(16.0, 5.2)}
+            </g>
+          </g>
 
-        {/* 4. 【左梢高位·娇嫩小花骨朵】(x:62, y:22)：挺立于高梢分枝，青绿细萼紧裹纯白尖 */}
-        <g transform="translate(62, 22)" className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '62px 22px' }}>
-          {renderFlowerBud(-12, 0.9)}
-        </g>
+          {/* 2. 【高位右上·侧向舒展】(x:96, y:32)：优雅侧仰，白瓣向右上方轻灵展开，金蕊微倾透视 */}
+          <g transform="translate(96, 32)">
+            <g className="animate-sway-daisy-nod-right" style={{ transformOrigin: '0px 0px' }}>
+              {renderSideBloom(14.5, 22, false, 0.55)}
+            </g>
+          </g>
 
-        {/* 5. 【中央主花·饱满盛放正视】(x:74, y:46)：全束视觉中心（r=16.5，密集金黄花丝绒毛花蕊） */}
-        <g transform="translate(74, 46)" className="animate-flower-sway-main-gentle" style={{ transformOrigin: '74px 46px' }}>
-          {renderFrontBloom(16.5, 5.4)}
-        </g>
+          {/* 3. 【高位左上·侧向舒展】(x:52, y:34)：优雅侧仰，白瓣向左上方轻灵展开，金蕊微倾透视 */}
+          <g transform="translate(52, 34)">
+            <g className="animate-sway-daisy-nod-left" style={{ transformOrigin: '0px 0px' }}>
+              {renderSideBloom(14.5, -20, true, 0.55)}
+            </g>
+          </g>
 
-        {/* 6. 【中层右侧·侧向微俯】(x:98, y:60)：向右微俯，透视白瓣层次生动，金蕊若隐若现 */}
-        <g transform="translate(98, 60)" className="animate-flower-sway-right-gentle" style={{ transformOrigin: '98px 60px' }}>
-          {renderSideBloom(14.0, 32, false, 0.52)}
-        </g>
+          {/* 4. 【左梢高位·娇嫩小花骨朵】(x:62, y:22)：挺立于高梢分枝，青绿细萼紧裹纯白尖 */}
+          <g transform="translate(62, 22)">
+            <g className="animate-sway-daisy-nod-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderFlowerBud(-12, 0.9)}
+            </g>
+          </g>
 
-        {/* 7. 【中层左侧·侧向微俯】(x:46, y:64)：向左微俯，白瓣侧发展开，轻灵生动 */}
-        <g transform="translate(46, 64)" className="animate-flower-sway-left-gentle" style={{ transformOrigin: '46px 64px' }}>
-          {renderSideBloom(14.0, -30, true, 0.52)}
-        </g>
+          {/* 5. 【中央主花·饱满盛放正视】(x:74, y:46)：全束视觉中心（r=16.5，密集金黄花丝绒毛花蕊） */}
+          <g transform="translate(74, 46)">
+            <g className="animate-sway-daisy-nod-crown" style={{ transformOrigin: '0px 0px' }}>
+              {renderFrontBloom(16.5, 5.4)}
+            </g>
+          </g>
 
-        {/* 8. 【下层右侧·侧向初放雏菊】(x:82, y:80)：贴近瓶口高低错落，纯白小花微侧舒展 */}
-        <g transform="translate(82, 80)" className="animate-flower-sway-main-gentle" style={{ transformOrigin: '82px 80px' }}>
-          {renderSideBloom(12.5, 26, false, 0.62)}
-        </g>
+          {/* 6. 【中层右侧·侧向微俯】(x:98, y:60)：向右微俯，透视白瓣层次生动，金蕊若隐若现 */}
+          <g transform="translate(98, 60)">
+            <g className="animate-sway-daisy-nod-right" style={{ transformOrigin: '0px 0px' }}>
+              {renderSideBloom(14.0, 32, false, 0.52)}
+            </g>
+          </g>
 
-        {/* 9. 【瓶口左侧·鲜嫩小花骨朵】(x:68, y:88)：近瓶口抽出的小青蕾，含蓄初露白尖 */}
-        <g transform="translate(68, 88)" className="animate-flower-sway-bud-gentle" style={{ transformOrigin: '68px 88px' }}>
-          {renderFlowerBud(12, 0.85)}
+          {/* 7. 【中层左侧·侧向微俯】(x:46, y:64)：向左微俯，白瓣侧发展开，轻灵生动 */}
+          <g transform="translate(46, 64)">
+            <g className="animate-sway-daisy-nod-left" style={{ transformOrigin: '0px 0px' }}>
+              {renderSideBloom(14.0, -30, true, 0.52)}
+            </g>
+          </g>
+
+          {/* 8. 【下层右侧·侧向初放雏菊】(x:82, y:80)：贴近瓶口高低错落，纯白小花微侧舒展 */}
+          <g transform="translate(82, 80)">
+            <g className="animate-sway-daisy-nod-right" style={{ transformOrigin: '0px 0px' }}>
+              {renderSideBloom(12.5, 26, false, 0.62)}
+            </g>
+          </g>
+
+          {/* 9. 【瓶口左侧·鲜嫩小花骨朵】(x:68, y:88)：近瓶口抽出的小青蕾，含蓄初露白尖 */}
+          <g transform="translate(68, 88)">
+            <g className="animate-sway-daisy-nod-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderFlowerBud(12, 0.85)}
+            </g>
+          </g>
         </g>
       </g>
     </g>
