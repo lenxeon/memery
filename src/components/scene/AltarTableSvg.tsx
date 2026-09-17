@@ -120,12 +120,30 @@ export const AltarTableSvg: React.FC<AltarTableSvgProps> = ({
           <stop offset="100%" stopColor="#92400e" />
         </linearGradient>
 
-        {/* 材质微纹理贴图库 */}
+        {/* 材质微纹理贴图库 (真实织物经纬线与暗提花机理，绝无塑料反光) */}
+        {/* 1. 御制金绫织锦专用布纹 (纵横交织纱线与暗八宝菱花) */}
+        <pattern id="weaveGoldBrocade" width="16" height="16" patternUnits="userSpaceOnUse">
+          <rect width="16" height="16" fill="none" />
+          <line x1="0" y1="2" x2="16" y2="2" stroke="rgba(255,245,210,0.18)" strokeWidth="0.8" />
+          <line x1="0" y1="6" x2="16" y2="6" stroke="rgba(40,20,5,0.12)" strokeWidth="0.8" />
+          <line x1="0" y1="10" x2="16" y2="10" stroke="rgba(255,245,210,0.18)" strokeWidth="0.8" />
+          <line x1="0" y1="14" x2="16" y2="14" stroke="rgba(40,20,5,0.12)" strokeWidth="0.8" />
+          <line x1="2" y1="0" x2="2" y2="16" stroke="rgba(255,245,210,0.15)" strokeWidth="0.8" />
+          <line x1="6" y1="0" x2="6" y2="16" stroke="rgba(40,20,5,0.10)" strokeWidth="0.8" />
+          <line x1="10" y1="0" x2="10" y2="16" stroke="rgba(255,245,210,0.15)" strokeWidth="0.8" />
+          <line x1="14" y1="0" x2="14" y2="16" stroke="rgba(40,20,5,0.10)" strokeWidth="0.8" />
+          <polygon points="8,3 13,8 8,13 3,8" fill="none" stroke="rgba(255,240,180,0.22)" strokeWidth="0.8" />
+          <polygon points="8,5 11,8 8,11 5,8" fill="rgba(80,45,10,0.06)" />
+        </pattern>
+
         <pattern id="weaveSatinSilk" width="16" height="16" patternUnits="userSpaceOnUse">
           <rect width="16" height="16" fill="none" />
           <path d="M 0 0 L 16 16 M 0 8 L 8 16 M 8 0 L 16 8" stroke="rgba(255,255,255,0.28)" strokeWidth="1.2" />
           <line x1="0" y1="4" x2="16" y2="4" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8" />
           <line x1="0" y1="12" x2="16" y2="12" stroke="rgba(255,255,255,0.22)" strokeWidth="0.8" />
+        </pattern>
+        <pattern id="weaveSilkRaw" width="16" height="16" patternUnits="userSpaceOnUse">
+          <use href="#weaveSatinSilk" />
         </pattern>
 
         <pattern id="weaveCoarseLinen" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -140,6 +158,9 @@ export const AltarTableSvg: React.FC<AltarTableSvgProps> = ({
           <line x1="0" y1="13" x2="20" y2="13" stroke="rgba(255,255,255,0.42)" strokeWidth="1.4" />
           <line x1="3" y1="0" x2="3" y2="20" stroke="rgba(255,255,255,0.42)" strokeWidth="1.4" />
           <line x1="13" y1="0" x2="13" y2="20" stroke="rgba(0,0,0,0.3)" strokeWidth="1.4" />
+        </pattern>
+        <pattern id="weaveRoughLinen" width="20" height="20" patternUnits="userSpaceOnUse">
+          <use href="#weaveCoarseLinen" />
         </pattern>
 
         <pattern id="weaveVelvetWool" width="16" height="16" patternUnits="userSpaceOnUse">
@@ -182,8 +203,10 @@ export const AltarTableSvg: React.FC<AltarTableSvgProps> = ({
 
         {/* 边饰锦带贴图库 */}
         <pattern id="borderMeanderGold" width="24" height="14" patternUnits="userSpaceOnUse">
-          <rect width="24" height="14" fill="#26170d" />
-          <path d="M 0 2 L 21 2 L 21 12 L 3 12 L 3 5.5 L 17 5.5 L 17 9 L 7 9" fill="none" stroke="#f3cf7a" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" />
+          <rect width="24" height="14" fill="#24160c" />
+          <line x1="0" y1="0.8" x2="24" y2="0.8" stroke="#caa34e" strokeWidth="1.2" />
+          <line x1="0" y1="13.2" x2="24" y2="13.2" stroke="#caa34e" strokeWidth="1.2" />
+          <path d="M 0 2.5 L 22 2.5 L 22 11.5 L 2 11.5 L 2 5.5 L 18 5.5 L 18 8.5 L 6 8.5" fill="none" stroke="#d5b060" strokeWidth="1.4" strokeLinecap="square" strokeLinejoin="miter" />
         </pattern>
 
         <pattern id="borderIndigoHemstitch" width="20" height="14" patternUnits="userSpaceOnUse">
@@ -235,6 +258,22 @@ export const AltarTableSvg: React.FC<AltarTableSvgProps> = ({
           <stop offset="100%" stopColor={theme.drapeGrad[4]} />
         </linearGradient>
 
+        {/* 木质案唇投在布面上的柔和漫反射环境落影 (展现真实布料从桌面垂挂的空间关系) */}
+        <linearGradient id="clothLipShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#1a0f06" stopOpacity="0.52" />
+          <stop offset="30%" stopColor="#251609" stopOpacity="0.28" />
+          <stop offset="75%" stopColor="#2e1a0b" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="#2e1a0b" stopOpacity="0" />
+        </linearGradient>
+
+        {/* 柔和亚光布面漫反射 (取代刺眼的塑料白光反射) */}
+        <linearGradient id="fabricSoftDiffuse" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#000000" stopOpacity="0.08" />
+          <stop offset="35%" stopColor="#ffffff" stopOpacity="0.10" />
+          <stop offset="75%" stopColor="#ffffff" stopOpacity="0.06" />
+          <stop offset="100%" stopColor="#000000" stopOpacity="0.15" />
+        </linearGradient>
+
         <linearGradient id="cornerDropShadowLeft" x1="100%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor={theme.cornerShadow[0]} />
           <stop offset="70%" stopColor={theme.cornerShadow[1]} />
@@ -257,13 +296,6 @@ export const AltarTableSvg: React.FC<AltarTableSvgProps> = ({
           <stop offset="0%" stopColor={theme.fringeGrad[0]} />
           <stop offset="60%" stopColor={theme.fringeGrad[1]} />
           <stop offset="100%" stopColor={theme.fringeGrad[2]} />
-        </linearGradient>
-
-        <linearGradient id="tableclothSheenWave" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-          <stop offset="35%" stopColor="#ffffff" stopOpacity="0.4" />
-          <stop offset="65%" stopColor="#ffffff" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
       </defs>
 

@@ -136,7 +136,7 @@ export class IncenseSmokeRenderer {
     const gustPulse = Math.pow(Math.max(0, Math.sin(this.time * 0.35)), 2.6) * 1.4;
     const organicWind = (windForce * 1.2) + (breathCycle * 0.45) + (gustPulse * (breathCycle >= 0 ? 0.7 : -0.7));
 
-    // ── 2. 真实物理发射与向上流动模拟 ──
+    // ── 2. 真实热对流缓缓升腾与自然扩散模拟 ──
     const trails = this.trails;
 
     // 每 2 帧发射一个新烟气质点
@@ -144,19 +144,21 @@ export class IncenseSmokeRenderer {
       for (let s = 0; s < dynamicEmbers.length; s++) {
         const emb = dynamicEmbers[s];
         trails[s].unshift({
-          x: emb.x + (Math.random() - 0.5) * 0.2,
+          x: emb.x,
           y: emb.y - 0.5,
           vx: 0,
-          vy: -(0.85 + Math.random() * 0.12) * lateFactor,
+          // 缓缓上升：静谧平缓的对流速度 (-0.52 ~ -0.62 px/frame)
+          vy: -(0.54 + Math.random() * 0.06) * lateFactor,
           age: 0,
-          maxAge: 85 + Math.random() * 15,
-          width: 0.9,
+          // 高度克制在 55~65px 范围之内，自然散入虚空
+          maxAge: 70 + Math.random() * 10,
+          width: 1.0,
           alpha: 0,
         });
       }
     }
 
-    // 更新烟气粒子生命周期
+    // 更新烟气粒子生命周期 (三缕同向谐和升腾，各安其道，绝不交叉缠绕)
     for (let s = 0; s < trails.length; s++) {
       const trail = trails[s];
       const emb = dynamicEmbers[s];
@@ -170,41 +172,53 @@ export class IncenseSmokeRenderer {
           continue;
         }
 
-        // 垂直升腾
+        // 垂直平缓升腾
         node.y += node.vy * delta;
 
-        // 垂直高度与归一化比例
+        // 距离各自香头的垂直升腾高度
         const distFromEmber = Math.max(0, emb.y - node.y);
-        const p = Math.min(1.0, distFromEmber / 88);
+        const p = Math.min(1.0, distFromEmber / 60);
 
-        // 三缕同心步调一致的微风行波
-        const windShift = organicWind * (9.2 * Math.pow(p, 1.35));
-        const waveShift = Math.sin(p * 3.6 - this.time * 1.5) * (4.2 * Math.pow(p, 1.25));
+        // 1. 三缕共享同一热气流上升波纹（同向微拂，波峰向上徐徐传递，最大摆幅仅 1.1px，彻底杜绝交缠与大角度摆动）
+        const upwardCurl = Math.sin(node.y * 0.058 + this.time * 0.72) * (1.1 * Math.pow(p, 1.15));
 
-        const targetX = emb.x + windShift + waveShift;
-        node.x += (targetX - node.x) * 0.18;
+        // 2. 自下而上的自然微向外舒展扩散趋势（左向左微展 1.2px，右向右微展 1.2px，中立端正）
+        // 严格确保三缕烟各自独立：左居左（~73px）、中居中（~80px）、右居右（~87px），永不相交
+        const lateralSpread = (s - 1) * (1.2 * Math.pow(p, 1.1));
 
-        // 烟体生命周期尺寸演变 (最宽仅约 3.3px)
+        // 3. 极微弱的室内微风一致平移
+        const windDrift = (windForce * 0.18) * (2.2 * Math.pow(p, 1.2));
+
+        // 目标横向位置
+        const targetX = emb.x + upwardCurl + lateralSpread + windDrift;
+
+        // 平滑向目标位置过渡
+        node.x += (targetX - node.x) * 0.16;
+
+        // 烟体生命周期尺寸演变与自然扩散（从香尖 1.0px，逐渐舒展扩散至 6~7px）
         const prog = node.age / node.maxAge;
         if (prog < 0.18) {
+          // 根部凝聚段：纤秀、聚拢
           const t = prog / 0.18;
-          node.width = 0.9 + t * 1.2;
-          node.alpha = t * 0.32;
-        } else if (prog < 0.65) {
-          const t = (prog - 0.18) / 0.47;
-          node.width = 2.1 + t * 1.2;
-          node.alpha = 0.32 * (1.0 - t * 0.25);
+          node.width = 1.0 + t * 0.9;
+          node.alpha = t * 0.42;
+        } else if (prog < 0.58) {
+          // 中段升腾段：温润成缕，平缓上升
+          const t = (prog - 0.18) / 0.40;
+          node.width = 1.9 + t * 1.8;
+          node.alpha = 0.42 * (1.0 - t * 0.28);
         } else {
-          const t = (prog - 0.65) / 0.35;
-          node.width = 3.3 + t * 2.2;
-          node.alpha = 0.24 * (1.0 - t);
+          // 高空自然扩散弥散段：散化为轻柔烟雾
+          const t = (prog - 0.58) / 0.42;
+          node.width = 3.7 + t * 3.0; // 扩散至 6.7px
+          node.alpha = 0.30 * Math.pow(1.0 - t, 1.5);
         }
       }
     }
 
-    // ── 3. 绘制平滑流线缕烟 ──
+    // ── 3. 绘制缓缓上升、扩散舒展的柔光工笔缕烟 ──
     if (this.litTransition > 0.02) {
-      const baseAlpha = Math.min(0.9, density * 0.75) * lateFactor * this.litTransition;
+      const baseAlpha = Math.min(0.9, density * 0.8) * lateFactor * this.litTransition;
 
       for (let s = 0; s < trails.length; s++) {
         const trail = trails[s];
@@ -215,12 +229,12 @@ export class IncenseSmokeRenderer {
 
         for (let i = 0; i < trail.length; i++) {
           const node = trail[i];
-          const halfW = (node.width * 0.5) * (0.6 + 0.4 * lateFactor);
+          const halfW = (node.width * 0.5) * (0.65 + 0.35 * lateFactor);
           leftPoints.push({ x: node.x - halfW, y: node.y });
           rightPoints.push({ x: node.x + halfW, y: node.y });
         }
 
-        // Pass 1: 纤巧柔光缕烟多边形
+        // Pass 1: 纤巧柔光缕烟多边形（柔和向外扩散）
         ctx.beginPath();
         ctx.moveTo(leftPoints[0].x, leftPoints[0].y);
         for (let i = 0; i < leftPoints.length - 1; i++) {
@@ -241,26 +255,27 @@ export class IncenseSmokeRenderer {
         const streamGrad = ctx.createLinearGradient(0, bottomY, 0, topY);
 
         if (isNightMode) {
-          streamGrad.addColorStop(0, `rgba(250, 245, 235, 0)`);
-          streamGrad.addColorStop(0.12, `rgba(248, 242, 230, ${0.18 * baseAlpha})`);
-          streamGrad.addColorStop(0.40, `rgba(242, 236, 224, ${0.28 * baseAlpha})`);
-          streamGrad.addColorStop(0.75, `rgba(235, 228, 216, ${0.16 * baseAlpha})`);
+          streamGrad.addColorStop(0, `rgba(252, 246, 236, 0)`);
+          streamGrad.addColorStop(0.12, `rgba(250, 244, 232, ${0.28 * baseAlpha})`);
+          streamGrad.addColorStop(0.42, `rgba(244, 238, 226, ${0.36 * baseAlpha})`);
+          streamGrad.addColorStop(0.72, `rgba(235, 228, 216, ${0.20 * baseAlpha})`);
           streamGrad.addColorStop(1.0, `rgba(220, 212, 200, 0)`);
         } else {
-          streamGrad.addColorStop(0, `rgba(255, 252, 246, 0)`);
-          streamGrad.addColorStop(0.12, `rgba(252, 248, 240, ${0.20 * baseAlpha})`);
-          streamGrad.addColorStop(0.40, `rgba(246, 242, 234, ${0.30 * baseAlpha})`);
-          streamGrad.addColorStop(0.75, `rgba(238, 234, 226, ${0.16 * baseAlpha})`);
+          streamGrad.addColorStop(0, `rgba(255, 253, 248, 0)`);
+          streamGrad.addColorStop(0.12, `rgba(254, 250, 242, ${0.30 * baseAlpha})`);
+          streamGrad.addColorStop(0.42, `rgba(248, 244, 236, ${0.38 * baseAlpha})`);
+          streamGrad.addColorStop(0.72, `rgba(238, 234, 226, ${0.20 * baseAlpha})`);
           streamGrad.addColorStop(1.0, `rgba(220, 215, 205, 0)`);
         }
 
         ctx.fillStyle = streamGrad;
         ctx.fill();
 
-        // Pass 2: 细若游丝的工笔高光中流线
+        // Pass 2: 细若游丝的工笔高光中脊线（随升腾而隐入弥散）
         ctx.beginPath();
         ctx.moveTo(trail[0].x, trail[0].y);
-        for (let i = 0; i < trail.length - 1; i++) {
+        const spineLimit = Math.max(3, Math.floor(trail.length * 0.75));
+        for (let i = 0; i < spineLimit - 1; i++) {
           const xc = (trail[i].x + trail[i + 1].x) / 2;
           const yc = (trail[i].y + trail[i + 1].y) / 2;
           ctx.quadraticCurveTo(trail[i].x, trail[i].y, xc, yc);
@@ -268,10 +283,9 @@ export class IncenseSmokeRenderer {
 
         const coreGrad = ctx.createLinearGradient(0, bottomY, 0, topY);
         coreGrad.addColorStop(0, `rgba(255, 255, 255, 0)`);
-        coreGrad.addColorStop(0.15, `rgba(255, 255, 255, ${0.28 * baseAlpha})`);
-        coreGrad.addColorStop(0.45, `rgba(252, 250, 246, ${0.24 * baseAlpha})`);
-        coreGrad.addColorStop(0.80, `rgba(245, 240, 232, ${0.08 * baseAlpha})`);
-        coreGrad.addColorStop(1.0, `rgba(235, 230, 222, 0)`);
+        coreGrad.addColorStop(0.14, `rgba(255, 255, 255, ${0.32 * baseAlpha})`);
+        coreGrad.addColorStop(0.45, `rgba(254, 252, 248, ${0.24 * baseAlpha})`);
+        coreGrad.addColorStop(0.75, `rgba(245, 240, 232, 0)`);
 
         ctx.strokeStyle = coreGrad;
         ctx.lineWidth = 0.7;
