@@ -240,107 +240,120 @@ export const PlumBlossomsFlower: React.FC<FlowerComponentProps> = ({
         </linearGradient>
       </defs>
 
-      {/* ── 骨：枝干形态“瘦、硬、折” ──
-          枝干加高一半（从原本瓶口 125 一路破空耸立至 -75，高挑清朗，中后段错落折枝，通体绝不生叶） */}
-      <g id="plumThinStems">
-        {/* 1. 下部木质老主干（自瓶口 75,125 挺拔直上，极度清瘦 2.0px，至中段 74,48 破空顿挫） */}
-        <path
-          d="M 75 125 L 75 106 L 73 88 L 76 70 L 74 48"
-          stroke="url(#thinBarkGrad)"
-          strokeWidth="2.1"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
+      {/* ── 整个冷香素白梅花枝在风中苍劲微晃（以瓶口 75px 125px 为旋转锚点，木质高挺） ── */}
+      <g className="animate-sway-woody-stem" style={{ transformOrigin: '75px 125px' }}>
+        {/* ── 骨：枝干形态“瘦、硬、折” ──
+            枝干加高一半（从原本瓶口 125 一路破空耸立至 -75，高挑清朗，中后段错落折枝，通体绝不生叶） */}
+        <g id="plumThinStems">
+          {/* 1. 下部木质老主干（自瓶口 75,125 挺拔直上，极度清瘦 2.0px，至中段 74,48 破空顿挫） */}
+          <path
+            d="M 75 125 L 75 106 L 73 88 L 76 70 L 74 48"
+            stroke="url(#thinBarkGrad)"
+            strokeWidth="2.1"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="bevel"
+          />
 
-        {/* 2. 中后段向右上方舒展的折枝（硬朗折角，高远瘦硬） */}
-        <path
-          d="M 74 48 L 84 32 L 95 18 L 102 -2 L 108 -25 L 114 -42"
-          stroke="url(#thinBarkGrad)"
-          strokeWidth="1.6"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
+          {/* 2. 中后段向右上方舒展的折枝（硬朗折角，高远瘦硬） */}
+          <path
+            d="M 74 48 L 84 32 L 95 18 L 102 -2 L 108 -25 L 114 -42"
+            stroke="url(#thinBarkGrad)"
+            strokeWidth="1.6"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="bevel"
+          />
 
-        {/* 右后段分叉梢细枝 */}
-        <path d="M 108 -25 L 115 -18 L 122 -14" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
-        <path d="M 95 18 L 89 12 L 85 8" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
-        <path d="M 102 -2 L 110 -6" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          {/* 右后段分叉梢细枝 */}
+          <path d="M 108 -25 L 115 -18 L 122 -14" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          <path d="M 95 18 L 89 12 L 85 8" stroke="url(#thinBarkGrad)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+          <path d="M 102 -2 L 110 -6" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
 
-        {/* 3. 破空拔高之孤高绝顶主枝（加高至 y=-75，峭拔清峻，一枝独秀） */}
-        <path
-          d="M 74 48 L 72 26 L 68 2 L 64 -26 L 67 -54 L 62 -75"
-          stroke="url(#thinBarkGrad)"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
+          {/* 3. 破空拔高之孤高绝顶主枝（加高至 y=-75，峭拔清峻，一枝独秀） */}
+          <path
+            d="M 74 48 L 72 26 L 68 2 L 64 -26 L 67 -54 L 62 -75"
+            stroke="url(#thinBarkGrad)"
+            strokeWidth="1.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="bevel"
+          />
 
-        {/* 梢头微有清瘦小分叉 */}
-        <path d="M 64 -26 L 56 -36 L 48 -42" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
-        <path d="M 67 -54 L 72 -64" stroke="url(#thinBarkGrad)" strokeWidth="0.9" fill="none" strokeLinecap="round" />
-        <path d="M 62 -75 L 58 -82" stroke="url(#thinBarkGrad)" strokeWidth="0.8" fill="none" strokeLinecap="round" />
+          {/* 梢头微有清瘦小分叉 */}
+          <path d="M 64 -26 L 56 -36 L 48 -42" stroke="url(#thinBarkGrad)" strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          <path d="M 67 -54 L 72 -64" stroke="url(#thinBarkGrad)" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+          <path d="M 62 -75 L 58 -82" stroke="url(#thinBarkGrad)" strokeWidth="0.8" fill="none" strokeLinecap="round" />
 
-        {/* 4. 中下部向左探出的小折枝（极为克制，仅作骨气呼应） */}
-        <path
-          d="M 73 88 L 62 82 L 54 78"
-          stroke="url(#thinBarkGrad)"
-          strokeWidth="1.3"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="bevel"
-        />
-        <path d="M 62 82 L 58 88" stroke="url(#thinBarkGrad)" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+          {/* 4. 中下部向左探出的小折枝（极为克制，仅作骨气呼应） */}
+          <path
+            d="M 73 88 L 62 82 L 54 78"
+            stroke="url(#thinBarkGrad)"
+            strokeWidth="1.3"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="bevel"
+          />
+          <path d="M 62 82 L 58 88" stroke="url(#thinBarkGrad)" strokeWidth="0.9" fill="none" strokeLinecap="round" />
 
-        {/* 5. 枝条折变处的硬朗骨节（Knobby Node） */}
-        <ellipse cx="75" cy="106" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
-        <ellipse cx="76" cy="70" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
-        <ellipse cx="74" cy="48" rx="1.8" ry="1.2" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
-        <ellipse cx="95" cy="18" rx="1.4" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
-        <ellipse cx="108" cy="-25" rx="1.3" ry="0.9" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
-        <ellipse cx="68" cy="2" rx="1.4" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
-        <ellipse cx="64" cy="-26" rx="1.3" ry="0.9" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+          {/* 5. 枝条折变处的硬朗骨节（Knobby Node） */}
+          <ellipse cx="75" cy="106" rx="1.6" ry="1.1" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+          <ellipse cx="76" cy="70" rx="1.5" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+          <ellipse cx="74" cy="48" rx="1.8" ry="1.2" fill={barkDark} stroke={barkLight} strokeWidth="0.5" />
+          <ellipse cx="95" cy="18" rx="1.4" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+          <ellipse cx="108" cy="-25" rx="1.3" ry="0.9" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+          <ellipse cx="68" cy="2" rx="1.4" ry="1.0" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
+          <ellipse cx="64" cy="-26" rx="1.3" ry="0.9" fill={barkDark} stroke={barkLight} strokeWidth="0.4" />
 
-        {/* 树皮皴纹细笔 */}
-        <path d="M 74.8 115 L 74.2 98" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
-        <path d="M 74.5 65 L 75.2 55" stroke={barkLight} strokeWidth="0.4" opacity="0.6" />
-        <path d="M 86 30 L 93 20" stroke={barkLight} strokeWidth="0.4" opacity="0.6" />
-      </g>
+          {/* 树皮皴纹细笔 */}
+          <path d="M 74.8 115 L 74.2 98" stroke={barkLight} strokeWidth="0.5" opacity="0.6" />
+          <path d="M 74.5 65 L 75.2 55" stroke={barkLight} strokeWidth="0.4" opacity="0.6" />
+          <path d="M 86 30 L 93 20" stroke={barkLight} strokeWidth="0.4" opacity="0.6" />
+        </g>
 
-      {/* ── 神：水滴形直立嫩青绿色小花苞（仅稀疏点缀在中后高段枝节与梢头） ── */}
-      <g id="plumGreenBuds">
-        {/* 极顶高梢直立水滴嫩蕾 */}
-        {renderWaterDropBud(58, -82, -18, 0.85)}
-        {renderWaterDropBud(72, -64, 22, 0.8)}
-        {renderWaterDropBud(48, -42, -35, 0.8)}
-        {/* 右上高梢直立嫩蕾 */}
-        {renderWaterDropBud(114, -42, 28, 0.85)}
-        {renderWaterDropBud(122, -14, 45, 0.75)}
-        {renderWaterDropBud(110, -6, 15, 0.75)}
-        {renderWaterDropBud(85, 8, -25, 0.75)}
-        {/* 中下部极少一两枚幼蕾 */}
-        {renderWaterDropBud(54, 78, -35, 0.8)}
-        {renderWaterDropBud(76, 68, 12, 0.75)}
-      </g>
+        {/* ── 神：水滴形直立嫩青绿色小花苞（仅稀疏点缀在中后高段枝节与梢头） ── */}
+        <g id="plumGreenBuds">
+          {/* 极顶高梢直立水滴嫩蕾 */}
+          {renderWaterDropBud(58, -82, -18, 0.85)}
+          {renderWaterDropBud(72, -64, 22, 0.8)}
+          {renderWaterDropBud(48, -42, -35, 0.8)}
+          {/* 右上高梢直立嫩蕾 */}
+          {renderWaterDropBud(114, -42, 28, 0.85)}
+          {renderWaterDropBud(122, -14, 45, 0.75)}
+          {renderWaterDropBud(110, -6, 15, 0.75)}
+          {renderWaterDropBud(85, 8, -25, 0.75)}
+          {/* 中下部极少一两枚幼蕾 */}
+          {renderWaterDropBud(54, 78, -35, 0.8)}
+          {renderWaterDropBud(76, 68, 12, 0.75)}
+        </g>
 
-      {/* ── 肉：纯白小碟梅花（花体缩小一半，稀疏错落分布在中后段，神态各异：俯仰、侧颜、背杯） ── */}
-      <g id="plumWhiteBlooms">
-        {/* 1. 中段主节处：【侧颜向右】微昂（咬在 84,32 节处，尺寸极小 r=5.4，侧颜清冷，向右斜挑金蕊） */}
-        <g style={fl1}>{renderPlumBloom(84, 32, 5.4, -18, 'side_right')}</g>
+        {/* ── 肉：纯白小碟梅花（花体缩小一半，稀疏错落分布在中后段，神态各异：俯仰、侧颜、背杯） ── */}
+        <g id="plumWhiteBlooms">
+          {/* 1. 中段主节处：【侧颜向右】微昂（咬在 84,32 节处，尺寸极小 r=5.4，侧颜清冷，向右斜挑金蕊） */}
+          <g className="animate-flower-sway-main" style={{ ...fl1, transformOrigin: '84px 32px' }}>
+            {renderPlumBloom(84, 32, 5.4, -18, 'side_right')}
+          </g>
 
-        {/* 2. 中高右侧折枝：【三分之四侧俯】微俯（咬在 102,-2 节处，尺寸 r=5.8，向案前微俯视） */}
-        <g style={fl2}>{renderPlumBloom(102, -2, 5.8, 25, 'three_quarter')}</g>
+          {/* 2. 中高右侧折枝：【三分之四侧俯】微俯（咬在 102,-2 节处，尺寸 r=5.8，向案前微俯视） */}
+          <g className="animate-flower-sway-right" style={{ ...fl2, transformOrigin: '102px -2px' }}>
+            {renderPlumBloom(102, -2, 5.8, 25, 'three_quarter')}
+          </g>
 
-        {/* 3. 高枝顶端分梢：【侧颜向左】清拔（咬在 108,-25 节处，尺寸 r=5.0，侧身回看主干） */}
-        <g style={fl3}>{renderPlumBloom(108, -25, 5.0, 15, 'side_left')}</g>
+          {/* 3. 高枝顶端分梢：【侧颜向左】清拔（咬在 108,-25 节处，尺寸 r=5.0，侧身回看主干） */}
+          <g className="animate-flower-sway-bud" style={{ ...fl3, transformOrigin: '108px -25px' }}>
+            {renderPlumBloom(108, -25, 5.0, 15, 'side_left')}
+          </g>
 
-        {/* 4. 主长枝中段偏左：【正面微仰】扁碟（咬在 68,2 节处，尺寸 r=5.2，仰望长空，金丝毕现） */}
-        <g style={fl4}>{renderPlumBloom(68, 2, 5.2, -10, 'front_tilt')}</g>
+          {/* 4. 主长枝中段偏左：【正面微仰】扁碟（咬在 68,2 节处，尺寸 r=5.2，仰望长空，金丝毕现） */}
+          <g className="animate-flower-sway-left" style={{ ...fl4, transformOrigin: '68px 2px' }}>
+            {renderPlumBloom(68, 2, 5.2, -10, 'front_tilt')}
+          </g>
 
-        {/* 5. 顶梢破空回眸处：【背身含蓄杯状】（咬在 64,-26 节处，尺寸 r=4.8，背立露青绿花萼与白瓣尖，宋画幽玄禅意） */}
-        <g style={fl5}>{renderPlumBloom(64, -26, 4.8, 30, 'back_cup')}</g>
+          {/* 5. 顶梢破空回眸处：【背身含蓄杯状】（咬在 64,-26 节处，尺寸 r=4.8，背立露青绿花萼与白瓣尖，宋画幽玄禅意） */}
+          <g className="animate-flower-sway-crown" style={{ ...fl5, transformOrigin: '64px -26px' }}>
+            {renderPlumBloom(64, -26, 4.8, 30, 'back_cup')}
+          </g>
+        </g>
       </g>
     </g>
   );

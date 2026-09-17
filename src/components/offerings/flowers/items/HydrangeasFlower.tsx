@@ -304,33 +304,36 @@ export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
         </filter>
       </defs>
 
-      {/* ── 架构 1：细长的小草装饰（高耸直立与飘逸垂落） ── */}
+      {/* ── 架构 1：细长的小草装饰（高耸直立与飘逸垂落，随风自然摇曳） ── */}
       <g id="hydrangeaDecorativeGrass">
-        {/* 草 1【右侧最高冲天直草】：穿过花间，直冲上方天际（Y: 6） */}
-        <path
-          d="M 76 100 C 80 75, 92 38, 102 6"
-          stroke="url(#hydrangeaGrassGrad)"
-          strokeWidth="1.2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        {/* 草 2【右侧伴生直草】：伴随高挺直立（Y: 18） */}
-        <path
-          d="M 78 100 C 82 72, 96 44, 108 18"
-          stroke="url(#hydrangeaGrassGrad)"
-          strokeWidth="1.0"
-          fill="none"
-          strokeLinecap="round"
-        />
+        {/* 草 1 & 2【右侧冲天直草】：小风阻高柔韧，微风中轻盈摆动 */}
+        <g className="animate-sway-grass-tall" style={{ transformOrigin: '76px 126px' }}>
+          <path
+            d="M 76 100 C 80 75, 92 38, 102 6"
+            stroke="url(#hydrangeaGrassGrad)"
+            strokeWidth="1.2"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <path
+            d="M 78 100 C 82 72, 96 44, 108 18"
+            stroke="url(#hydrangeaGrassGrad)"
+            strokeWidth="1.0"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </g>
 
-        {/* 草 3【左侧优雅长草】：大跨度弧形向左弯垂，柔和下摆至 Y: 108 */}
-        <path
-          d="M 73 98 C 66 82, 52 68, 36 68 C 22 68, 13 86, 11 108"
-          stroke="url(#hydrangeaGrassGrad)"
-          strokeWidth="1.3"
-          fill="none"
-          strokeLinecap="round"
-        />
+        {/* 草 3【左侧优雅长草】：大跨度弧形向左弯垂，柔韧波浪轻摆 */}
+        <g className="animate-sway-grass-weeping" style={{ transformOrigin: '73px 98px' }}>
+          <path
+            d="M 73 98 C 66 82, 52 68, 36 68 C 22 68, 13 86, 11 108"
+            stroke="url(#hydrangeaGrassGrad)"
+            strokeWidth="1.3"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </g>
       </g>
 
       {/* ── 架构 2：主要花茎（带明显造节、呈段生长、下纯净整洁） ── */}
@@ -383,23 +386,29 @@ export const HydrangeasFlower: React.FC<FlowerComponentProps> = ({ health, dryFa
       {/* ── 架构 3：扁平宽卵形绿叶（严格出现在花朵下方，承托花头） ── */}
       <g id="hydrangeaFlatLeaves">
         {/* 【主花下方·左托叶】：紧贴主花下部，向左下自然平展承托 */}
-        {renderFlatLeaf(52, 42, 25, 16, 130)}
+        <g className="animate-leaf-sway-1" style={{ transformOrigin: '52px 42px' }}>
+          {renderFlatLeaf(52, 42, 25, 16, 130)}
+        </g>
         {/* 【主花下方·右托叶】：紧贴主花下部，向右下微展 */}
-        {renderFlatLeaf(62, 42, 23, 15, -140)}
+        <g className="animate-leaf-sway-2" style={{ transformOrigin: '62px 42px' }}>
+          {renderFlatLeaf(62, 42, 23, 15, -140)}
+        </g>
 
         {/* 【次花下方·右侧托叶】：紧贴次花下部，向右下方舒展 */}
-        {renderFlatLeaf(88, 82, 22, 15, -115)}
+        <g className="animate-leaf-sway-3" style={{ transformOrigin: '88px 82px' }}>
+          {renderFlatLeaf(88, 82, 22, 15, -115)}
+        </g>
       </g>
 
-      {/* ── 架构 4：高低搭配的两朵饱满圆球形绣球花球 ── */}
+      {/* ── 架构 4：高低搭配的两朵饱满圆球形绣球花球（大风阻，沉稳厚重起伏） ── */}
       <g id="hydrangeaSphericalBlooms">
-        {/* 【高挑主花球】：高挑拔升至 Y: 32（X: 56），硕大丰满圆球（直径约 54px） */}
-        <g id="hydrangeaMainSphere" style={fl1}>
+        {/* 【高挑主花球】：大球体微风中深沉起伏 */}
+        <g id="hydrangeaMainSphere" className="animate-sway-hydrangea-main" style={{ ...fl1, transformOrigin: '56px 40px' }}>
           {renderHydrangeaHead(56, 32, 27, 24, 1.05)}
         </g>
 
-        {/* 【收拢次花球】：向主茎紧凑收拢至 Y: 74（X: 86），紧密依偎（直径约 44px） */}
-        <g id="hydrangeaSecondarySphere" style={fl2}>
+        {/* 【收拢次花球】：次花球温润依偎晃动 */}
+        <g id="hydrangeaSecondarySphere" className="animate-sway-hydrangea-sub" style={{ ...fl2, transformOrigin: '84px 82px' }}>
           {renderHydrangeaHead(86, 74, 22, 19, 0.95)}
         </g>
       </g>

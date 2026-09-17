@@ -209,94 +209,115 @@ export const OrchidsFlower: React.FC<FlowerComponentProps> = ({ health, dryFacto
         </linearGradient>
       </defs>
 
-      {/* ── 架构 1：深褐青色硬挺花葶与小花梗（硬径遒劲、一径贯通、带竹节小苞） ── */}
-      <g id="orchidHardStemSpike">
-        {/* A. 主硬径：自瓶口 (75,125) 挺韧拔起，向左上方优雅拱折延伸至前端 (15,28) */}
-        <path
-          d="M 75 125 C 75 106, 76 92, 75 78 C 74 65, 71 52, 63 38 C 55 24, 42 16, 28 18 C 22 19, 18 22, 14 28"
-          stroke="url(#orchidHardStemGrad)"
-          strokeWidth="2.7"
-          fill="none"
-          strokeLinecap="round"
-        />
+      {/* ── 整个素兰花序与挺韧花茎在风中起伏摇曳（以瓶口 75px 125px 为旋转锚点） ── */}
+      <g className="animate-sway-woody-stem" style={{ transformOrigin: '75px 125px' }}>
+        {/* ── 架构 1：深褐青色硬挺花葶与小花梗（硬径遒劲、一径贯通、带竹节小苞） ── */}
+        <g id="orchidHardStemSpike">
+          {/* A. 主硬径：自瓶口 (75,125) 挺韧拔起，向左上方优雅拱折延伸至前端 (15,28) */}
+          <path
+            d="M 75 125 C 75 106, 76 92, 75 78 C 74 65, 71 52, 63 38 C 55 24, 42 16, 28 18 C 22 19, 18 22, 14 28"
+            stroke="url(#orchidHardStemGrad)"
+            strokeWidth="2.7"
+            fill="none"
+            strokeLinecap="round"
+          />
 
-        {/* B. 各朵花的小着生柄 (Pedicels) 与花茎节点 */}
-        {/* 节点 1：主茎 (75,80) 连向花 1 (82,82) */}
-        <path d="M 75 80 Q 78 81 82 82" stroke="url(#orchidHardStemGrad)" strokeWidth="1.6" fill="none" />
-        <ellipse cx="75" cy="80" rx="1.6" ry="1.0" fill={nodeBract} />
+          {/* B. 各朵花的小着生柄 (Pedicels) 与花茎节点 */}
+          {/* 节点 1：主茎 (75,80) 连向花 1 (82,82) */}
+          <path d="M 75 80 Q 78 81 82 82" stroke="url(#orchidHardStemGrad)" strokeWidth="1.6" fill="none" />
+          <ellipse cx="75" cy="80" rx="1.6" ry="1.0" fill={nodeBract} />
 
-        {/* 节点 2：主茎 (74,62) 连向花 2 (67,63) */}
-        <path d="M 74 62 Q 71 62.5 67 63" stroke="url(#orchidHardStemGrad)" strokeWidth="1.6" fill="none" />
-        <ellipse cx="74" cy="62" rx="1.5" ry="1.0" fill={nodeBract} />
+          {/* 节点 2：主茎 (74,62) 连向花 2 (67,63) */}
+          <path d="M 74 62 Q 71 62.5 67 63" stroke="url(#orchidHardStemGrad)" strokeWidth="1.6" fill="none" />
+          <ellipse cx="74" cy="62" rx="1.5" ry="1.0" fill={nodeBract} />
 
-        {/* 节点 3：主茎 (67,46) 连向花 3 (57,45) */}
-        <path d="M 67 46 Q 62 45.5 57 45" stroke="url(#orchidHardStemGrad)" strokeWidth="1.5" fill="none" />
-        <ellipse cx="67" cy="46" rx="1.5" ry="0.9" fill={nodeBract} />
+          {/* 节点 3：主茎 (67,46) 连向花 3 (57,45) */}
+          <path d="M 67 46 Q 62 45.5 57 45" stroke="url(#orchidHardStemGrad)" strokeWidth="1.5" fill="none" />
+          <ellipse cx="67" cy="46" rx="1.5" ry="0.9" fill={nodeBract} />
 
-        {/* 节点 4：主茎 (55,30) 连向花 4 (45,28) */}
-        <path d="M 55 30 Q 50 29 45 28" stroke="url(#orchidHardStemGrad)" strokeWidth="1.4" fill="none" />
-        <ellipse cx="55" cy="30" rx="1.4" ry="0.8" fill={nodeBract} />
+          {/* 节点 4：主茎 (55,30) 连向花 4 (45,28) */}
+          <path d="M 55 30 Q 50 29 45 28" stroke="url(#orchidHardStemGrad)" strokeWidth="1.4" fill="none" />
+          <ellipse cx="55" cy="30" rx="1.4" ry="0.8" fill={nodeBract} />
 
-        {/* 节点 5：主茎 (44,20) 连向花 5 (35,17) */}
-        <path d="M 44 20 Q 39 18.5 35 17" stroke="url(#orchidHardStemGrad)" strokeWidth="1.3" fill="none" />
-        <ellipse cx="44" cy="20" rx="1.3" ry="0.8" fill={nodeBract} />
+          {/* 节点 5：主茎 (44,20) 连向花 5 (35,17) */}
+          <path d="M 44 20 Q 39 18.5 35 17" stroke="url(#orchidHardStemGrad)" strokeWidth="1.3" fill="none" />
+          <ellipse cx="44" cy="20" rx="1.3" ry="0.8" fill={nodeBract} />
 
-        {/* 节点 6：花骨朵 1 小花梗 (32,17) -> (26,12) */}
-        <path d="M 32 17 Q 29 14 26 12" stroke="url(#orchidHardStemGrad)" strokeWidth="1.2" fill="none" />
+          {/* 节点 6：花骨朵 1 小花梗 (32,17) -> (26,12) */}
+          <path d="M 32 17 Q 29 14 26 12" stroke="url(#orchidHardStemGrad)" strokeWidth="1.2" fill="none" />
 
-        {/* 节点 7：花骨朵 2 小花梗 (24,19) -> (19,16) */}
-        <path d="M 24 19 Q 21 17 19 16" stroke="url(#orchidHardStemGrad)" strokeWidth="1.1" fill="none" />
+          {/* 节点 7：花骨朵 2 小花梗 (24,19) -> (19,16) */}
+          <path d="M 24 19 Q 21 17 19 16" stroke="url(#orchidHardStemGrad)" strokeWidth="1.1" fill="none" />
 
-        {/* 节点 8：花骨朵 3 小花梗 (18,22) -> (14,21) */}
-        <path d="M 18 22 Q 16 21.5 14 21" stroke="url(#orchidHardStemGrad)" strokeWidth="1.0" fill="none" />
-      </g>
-
-      {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（花朵整体缩小 10%） ── */}
-      <g id="orchidBloomsRaceme">
-        {/* 1. 【基部第一朵·最大盛开花】(x:82, y:82)：靠近底部花朵最大（scale: 1.12），饱满盛放俯展 */}
-        <g style={fl1} transform="translate(82, 82)">
-          {renderOrchidBloom(1.12, 15)}
+          {/* 节点 8：花骨朵 3 小花梗 (18,22) -> (14,21) */}
+          <path d="M 18 22 Q 16 21.5 14 21" stroke="url(#orchidHardStemGrad)" strokeWidth="1.0" fill="none" />
         </g>
 
-        {/* 2. 【中下部第二朵·盛开大花】(x:67, y:63)：次大朵（scale: 1.00），向左微仰 */}
-        <g style={fl2} transform="translate(67, 63)">
-          {renderOrchidBloom(1.00, -12)}
-        </g>
+        {/* ── 架构 2：一径多花成串，自基部向前端由大渐小（附着点轻灵颤动微风） ── */}
+        <g id="orchidBloomsRaceme">
+          {/* 1. 【基部第一朵·最大盛开花】(x:82, y:82)：靠近底部花朵最大（scale: 1.12），饱满盛放俯展 */}
+          <g style={fl1} transform="translate(82, 82)">
+            <g className="animate-flower-sway-main" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBloom(1.12, 15)}
+            </g>
+          </g>
 
-        {/* 3. 【中高部第三朵·端庄中花】(x:57, y:45)：中型朵（scale: 0.86），翩跹若飞 */}
-        <g style={fl3} transform="translate(57, 45)">
-          {renderOrchidBloom(0.86, -20)}
-        </g>
+          {/* 2. 【中下部第二朵·盛开大花】(x:67, y:63)：次大朵（scale: 1.00），向左微仰 */}
+          <g style={fl2} transform="translate(67, 63)">
+            <g className="animate-flower-sway-left" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBloom(1.00, -12)}
+            </g>
+          </g>
 
-        {/* 4. 【前段第四朵·初绽小花】(x:45, y:28)：逐渐缩小（scale: 0.70），初舒羽翼 */}
-        <g style={fl4} transform="translate(45, 28)">
-          {renderOrchidBloom(0.70, -28)}
-        </g>
+          {/* 3. 【中高部第三朵·端庄中花】(x:57, y:45)：中型朵（scale: 0.86），翩跹若飞 */}
+          <g style={fl3} transform="translate(57, 45)">
+            <g className="animate-flower-sway-crown" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBloom(0.86, -20)}
+            </g>
+          </g>
 
-        {/* 5. 【前端第五朵·含苞微吐小花】(x:35, y:17)：小巧玲珑（scale: 0.56），半开掩映 */}
-        <g transform="translate(35, 17)">
-          {renderOrchidBloom(0.56, -35)}
-        </g>
+          {/* 4. 【前段第四朵·初绽小花】(x:45, y:28)：逐渐缩小（scale: 0.70），初舒羽翼 */}
+          <g style={fl4} transform="translate(45, 28)">
+            <g className="animate-flower-sway-right" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBloom(0.70, -28)}
+            </g>
+          </g>
 
-        {/* ── 前端未开放的花骨朵（依次递减变小） ── */}
-        {/* 6. 【前端大蕾】(x:26, y:12)：充实饱满的青紫花骨朵 (scale: 0.47) */}
-        <g transform="translate(26, 12)">
-          {renderOrchidBud(0.47, -45)}
-        </g>
+          {/* 5. 【前端第五朵·含苞微吐小花】(x:35, y:17)：小巧玲珑（scale: 0.56），半开掩映 */}
+          <g transform="translate(35, 17)">
+            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBloom(0.56, -35)}
+            </g>
+          </g>
 
-        {/* 7. 【前端中蕾】(x:19, y:16)：紧致微翘小蕾 (scale: 0.36) */}
-        <g transform="translate(19, 16)">
-          {renderOrchidBud(0.36, -60)}
-        </g>
+          {/* ── 前端未开放的花骨朵（依次递减变小） ── */}
+          {/* 6. 【前端大蕾】(x:26, y:12)：充实饱满的青紫花骨朵 (scale: 0.47) */}
+          <g transform="translate(26, 12)">
+            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBud(0.47, -45)}
+            </g>
+          </g>
 
-        {/* 8. 【前端初生嫩蕾】(x:14, y:21)：精巧青绿小蕾 (scale: 0.27) */}
-        <g transform="translate(14, 21)">
-          {renderOrchidBud(0.27, -78)}
-        </g>
+          {/* 7. 【前端中蕾】(x:19, y:16)：紧致微翘小蕾 (scale: 0.36) */}
+          <g transform="translate(19, 16)">
+            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBud(0.36, -60)}
+            </g>
+          </g>
 
-        {/* 9. 【极梢微型苞尖】(x:11, y:29)：梢头初生细蕾 (scale: 0.20) */}
-        <g transform="translate(11, 29)">
-          {renderOrchidBud(0.20, -95)}
+          {/* 8. 【前端初生嫩蕾】(x:14, y:21)：精巧青绿小蕾 (scale: 0.27) */}
+          <g transform="translate(14, 21)">
+            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBud(0.27, -78)}
+            </g>
+          </g>
+
+          {/* 9. 【极梢微型苞尖】(x:11, y:29)：梢头初生细蕾 (scale: 0.20) */}
+          <g transform="translate(11, 29)">
+            <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+              {renderOrchidBud(0.20, -95)}
+            </g>
+          </g>
         </g>
       </g>
     </g>

@@ -360,32 +360,42 @@ export const CarnationsFlower: React.FC<FlowerComponentProps> = ({
       </g>
 
       {/* ─────────────────────────────────────────────────────────────
-          五朵粉嫩高低有致花朵（1旺花 + 2小花 + 2花骨朵）
+          五朵粉嫩高低有致花朵（1旺花 + 2小花 + 2花骨朵，微风中轻盈摇曳）
       ───────────────────────────────────────────────────────────── */}
       <g id="carnationFlowers">
         {/* 枝1：【小花骨朵】左侧高梢 */}
         <g transform={`translate(${b1x}, ${b1y}) rotate(${b1rot})`} style={fl1}>
-          {renderTinyBud(0.95)}
+          <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            {renderTinyBud(0.95)}
+          </g>
         </g>
 
         {/* 枝2：【小初绽花】左中位 */}
         <g transform={`translate(${b2x}, ${b2y}) rotate(${b2rot})`} style={fl2}>
-          {renderSmallBloom(0.98)}
+          <g className="animate-flower-sway-left" style={{ transformOrigin: '0px 0px' }}>
+            {renderSmallBloom(0.98)}
+          </g>
         </g>
 
         {/* 枝3：【饱满主花（旺一点）】居中焦点大花 */}
         <g transform={`translate(${b3x}, ${b3y}) rotate(${b3rot})`} style={fl3}>
-          {renderLushBloom(1.08)}
+          <g className="animate-flower-sway-main" style={{ transformOrigin: '0px 0px' }}>
+            {renderLushBloom(1.08)}
+          </g>
         </g>
 
         {/* 枝4：【小初绽花】右中位 */}
         <g transform={`translate(${b4x}, ${b4y}) rotate(${b4rot})`} style={fl4}>
-          {renderSmallBloom(1.0)}
+          <g className="animate-flower-sway-right" style={{ transformOrigin: '0px 0px' }}>
+            {renderSmallBloom(1.0)}
+          </g>
         </g>
 
         {/* 枝5：【小花骨朵】右侧高梢 */}
         <g transform={`translate(${b5x}, ${b5y}) rotate(${b5rot})`} style={fl5}>
-          {renderTinyBud(0.92)}
+          <g className="animate-flower-sway-bud" style={{ transformOrigin: '0px 0px' }}>
+            {renderTinyBud(0.92)}
+          </g>
         </g>
       </g>
     </g>
