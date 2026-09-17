@@ -272,54 +272,54 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
           {(activeSection === 'all' || activeSection === 'safety') && (
             <section className="space-y-3">
               <h4 className="text-base font-serif font-bold text-amber-200 flex items-center gap-2 border-l-2 border-amber-400 pl-2.5">
-                四、空间私密保护与社会安全守卫公约：源头杜绝恶意建档，筑牢清朗良俗防线
+                四、空间私密属性与社会安全守卫公约：恪守纯私人服务边界，筑牢清朗防线
               </h4>
               <p>
-                纪念逝者是一件极其庄重、神圣且私密的情感托付。为既充分保障用户缅怀至亲的尊严与私密，又坚决防止别有用心之人利用数字祭奠进行恶意炒作、网络暴力或引发不良社会舆情，《暖念》构建了以下严格的安全守卫与风控机制：
+                《暖念》严格定位为<strong>纯私人性质的数字化家庭与亲友悼念服务平台</strong>。为恪守服务边界、保障用户私密情感、防止任何形式的公众炒作或不良社会舆情，平台确立以下核心守则：
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                {/* 1. 空间高度私密 */}
+                {/* 1. 纯私人空间定位 */}
                 <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
                   <div className="font-bold text-amber-300 flex items-center gap-1.5">
                     <Lock size={14} className="text-amber-400 shrink-0" />
-                    <span>1. 空间私密无感保障（无侵入式窥探）</span>
+                    <span>1. 纯私人空间服务（不设公众纪念空间）</span>
                   </div>
                   <p className="text-stone-300 leading-relaxed text-[11px]">
-                    所有纪念空间<strong>默认处于完全私密封闭状态</strong>，不设公开大厅与公共排行广场。平台坚决不作侵入式前置机器窥视，给家属与故人间最真挚的追思保留一片不受打扰的净土。
+                    本平台<strong>专一提供私人空间服务，明确不提供革命英烈与国家楷模类似公众纪念空间</strong>。英烈模范悼念属法定公共机构范畴，平台不设公共广场通道，严禁私自建立公众性质档案或借此炒作。
                   </p>
                 </div>
 
-                {/* 2. 全员实名制底线 */}
-                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
-                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
-                    <ShieldCheck size={14} className="text-amber-400 shrink-0" />
-                    <span>2. 全员实名制认证（源头消弭匿名恶意）</span>
-                  </div>
-                  <p className="text-stone-300 leading-relaxed text-[11px]">
-                    所有注册与建档用户<strong>必须完成法定权威实名身份认证与手机核验</strong>。坚决封杀匿名小号与网络水军，落实“身份可溯、行为有责”，从源头根除恶意造谣诽谤的土壤。
-                  </p>
-                </div>
-
-                {/* 3. 空间建档配额 */}
-                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
-                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
-                    <CheckCircle2 size={14} className="text-amber-400 shrink-0" />
-                    <span>3. 建档配额管控（每人限创 ≤5 个空间）</span>
-                  </div>
-                  <p className="text-stone-300 leading-relaxed text-[11px]">
-                    为防范黑产抢注或恶意批量建档，<strong>每个实名账户限创不超过 5 个纪念空间</strong>。若因多代直系长辈合规需要申请增创，必须提交直系亲属证明并经<strong>人工双人多维严格审核</strong>。
-                  </p>
-                </div>
-
-                {/* 4. 严密分享受控 */}
+                {/* 2. 纯受邀私有访问机制 */}
                 <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
                   <div className="font-bold text-amber-300 flex items-center gap-1.5">
                     <Users size={14} className="text-amber-400 shrink-0" />
-                    <span>4. 私域受控分享（单空间限 ≤100 人可见）</span>
+                    <span>2. 纯受邀私有访问（严格上限 ≤100 人）</span>
                   </div>
                   <p className="text-stone-300 leading-relaxed text-[11px]">
-                    单空间受邀分享人数<strong>严格限制不超过 100 人可见</strong>，物理切断公网病毒式裂变传播，防止产生不良社会影响。行业先辈公祭等特殊扩容必须经平台风控部门人工严格审批。
+                    所有空间均为私有空间，<strong>只有接到创建人定向邀请后方可访问</strong>。每个私有空间的累计受邀可见人数<strong>严格受限于 ≤100 人的绝对上限</strong>，物理阻断公网传播与不良社会影响。
+                  </p>
+                </div>
+
+                {/* 3. 空间私密无感保障 */}
+                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-amber-400 shrink-0" />
+                    <span>3. 亲属隐私保障（不作侵入式机器审查）</span>
+                  </div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    在受邀闭环与人数硬性封顶机制下，平台高度尊重家属与逝者间的真实私人哀思，<strong>不对私人空间进行侵入式前置机器窥视</strong>，为每位用户保留最神圣安宁的心灵寄托空间。
+                  </p>
+                </div>
+
+                {/* 4. 全员实名制与配额管控 */}
+                <div className="p-3.5 rounded-2xl bg-stone-900/90 border border-amber-500/25 space-y-1.5">
+                  <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-amber-400 shrink-0" />
+                    <span>4. 实名制与配额（每人限创 ≤5 个空间）</span>
+                  </div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    全员实名认证，可溯源有担当。每位实名用户<strong>默认限创不超过 5 个私有空间</strong>，防范恶意批量建档；若因家族直系长辈合规需要申请增创，须提交证明材料并经<strong>人工双人严格审核</strong>。
                   </p>
                 </div>
               </div>
@@ -331,9 +331,8 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
                   <span>5. 多重安全红线主动防御（触线即刻熔断并移交司法）</span>
                 </div>
                 <div className="text-stone-300 space-y-1 text-[11px] leading-relaxed">
-                  <p>• <strong>英烈与伟人专项保护禁区</strong>：内置国家英烈名录，严禁非官方授权擅立英烈牌位或进行戏谑调侃；</p>
-                  <p>• <strong>健在人士恶意立碑“零容忍”</strong>：严惩为在世人员设立虚假灵堂等网络暴力行径，一经核实立即永久封号并报案处理；</p>
-                  <p>• <strong>反封建迷信与非法集资</strong>：严禁出现算命看相、阴阳风水诈骗、超度敛财或诱导集资打赏；</p>
+                  <p>• <strong>健在人士恶意立碑“零容忍”</strong>：严惩为在世人员设立虚假灵堂等网络暴力与名誉侵权行径，一经核实立即永久封号并依法报案；</p>
+                  <p>• <strong>坚决剔除一切封建迷信与非法集资</strong>：严禁出现算命看相、阴阳风水诈骗、超度敛财或诱导集资打赏；</p>
                   <p>• <strong>亲友一键侵权举报与 7×24 小时应急冻结</strong>：每个空间均设有极简举报通道，收到有效投诉第一时间先行冻结空间并介入处置。
                   </p>
                 </div>
@@ -350,7 +349,7 @@ export const UserAgreementModal: React.FC<UserAgreementModalProps> = ({
               <ul className="space-y-2 pl-4 list-disc text-stone-300 text-xs leading-relaxed">
                 <li>
                   <strong className="text-amber-100">严禁恶意侵权与虚假牌位：</strong>
-                  严禁为未经当事人家属许可的健在人士建立悼念档案，严禁对英烈模范进行任何诋毁侮辱，平台对违规档案一经核实直接永久封存。
+                  严禁为未经当事人家属许可的健在人士建立悼念档案，严禁假借公众人物、历史名人或英烈楷模之名恶意立碑或戏谑调侃，平台对违规档案一经核实直接永久封存。
                 </li>
                 <li>
                   <strong className="text-amber-100">严密保护逝者与生者隐私：</strong>
