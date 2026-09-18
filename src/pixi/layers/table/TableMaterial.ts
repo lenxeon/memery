@@ -124,7 +124,9 @@ export class TableMaterial {
    */
   public calculateTint(lighting?: LightingSettings | null): number {
     if (!lighting || !lighting.masterOn) {
-      return 0x241810; // 关灯：深邃红木暗部
+      // 关灯：仅调色温（中性暖褐），明暗交给光照层按光源位置计算，
+      // 避免整体统一压暗导致案面在烛照场景下失真
+      return 0x8a7264;
     }
     if (lighting.timeOfDay === 'sunset') {
       return 0xffe2cc; // 夕阳：暖金琥珀微泛红

@@ -299,9 +299,9 @@ export class TexturePipeline {
 
     const center = size / 2;
     const grad = ctx.createRadialGradient(center, center, 2, center, center, center);
-    grad.addColorStop(0, 'rgba(255, 180, 45, 0.35)');    // 柔和暖金透光，绝不过曝洗白火苗
-    grad.addColorStop(0.25, 'rgba(255, 140, 30, 0.22)'); // 温暖琥珀橙
-    grad.addColorStop(0.60, 'rgba(230, 85, 15, 0.08)');  // 幽微余韵
+    grad.addColorStop(0, 'rgba(255, 185, 55, 0.58)');    // 饱满暖金透光，烛照氛围明亮
+    grad.addColorStop(0.25, 'rgba(255, 148, 35, 0.38)'); // 温暖琥珀橙
+    grad.addColorStop(0.60, 'rgba(235, 92, 18, 0.15)');  // 幽微余韵
     grad.addColorStop(1.0, 'rgba(200, 50, 0, 0)');        // 渐隐消散
 
     ctx.fillStyle = grad;

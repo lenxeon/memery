@@ -3,13 +3,14 @@
  * @description PixiJS 道具图层管理器。
  * 具备 Dirty-Flag 脏标记与同步纹理缓存，避免重复赋图，保证 60FPS 丝滑流畅。
  */
-import { Container, Sprite, FederatedPointerEvent } from 'pixi.js';
+import { Container, Sprite, FederatedPointerEvent, Polygon } from 'pixi.js';
 import { TexturePipeline } from '../assets/TexturePipeline';
 import { SmokeParticleEmitter } from '../effects/SmokeParticleEmitter';
 import { PixiEffects } from '../effects/PixiEffects';
 import { CandleFlameRenderer } from '../effects/CandleFlameRenderer';
 import { IncenseSmokeRenderer } from '../effects/IncenseSmokeRenderer';
 import { SceneItem, SceneItemId, FlowerType, FruitType } from '../../types';
+import { AltarLightSource } from './AltarTableLayer';
 import { VaseStyle } from '../assets/templates/flowers/vases';
 import { sound } from '../../utils/audio';
 
@@ -107,6 +108,9 @@ export class PropsLayer {
 
     // 2. 更新或新建道具
     for (const [id, item] of Object.entries(items)) {
+      // 空位（键存在但值为 undefined，例如撤下后又被批量操作写回）直接跳过
+      if (!item) continue;
+
       let cont = this.propContainers.get(id);
       let sprite = this.propSprites.get(id);
 
@@ -118,6 +122,21 @@ export class PropsLayer {
 
         cont.eventMode = 'static';
         cont.cursor = 'grab';
+
+        // 香炉：用多边形精确约束命中区域（香炉主体 + 三炷立香的纤细立柱）。
+        // 缕烟精灵画布宽达 160px 且纵向高 280px，若不约束会令远离香体的区域也能触发拖放。
+        if (id === 'censer') {
+          cont.hitArea = new Polygon([
+            -44, 8,     // 香炉左下
+            44, 8,      // 香炉右下
+            44, -52,    // 香炉右上
+            11, -52,    // 立香柱右下（收窄至香体实际宽度）
+            9, -128,    // 立香柱右上
+            -9, -128,   // 立香柱左上
+            -11, -52,   // 立香柱左下
+            -44, -52,   // 香炉左上
+          ]);
+        }
 
         cont.on('pointerover', () => {
           if (!this.draggingId) cont!.scale.set(this.currentScaleFactor * 1.04);
@@ -401,6 +420,42 @@ export class PropsLayer {
 
     // 3. 将蜡烛实时三维位置与光晕传递给光影层
     this.syncCandlesToEffects();
+  }
+
+  /**
+   * 导出当前烛火点光源（火苗核心位置 + 明灭强度），供案体按光源位置计算照明。
+   */
+  public getCandleLightSources(): AltarLightSource[] {
+    const leftCandleCont = this.propContainers.get('candle_left');
+    const rightCandleCont = this.propContainers.get('candle_right');
+    const leftCandle = this.latestItems.candle_left;
+    const rightCandle = this.latestItems.candle_right;
+
+    const build = (cont: Container | undefined, item: SceneItem | undefined, fallbackX: number) => {
+      const isLit = !!item?.isLit;
+      const health = Number(item?.waxHeight ?? (item?.lifecycle?.health ?? 1.0));
+      const wax = Math.max(0.08, Math.min(1.0, Math.round(health * 10) / 10));
+      const candleH = Math.round(18 + 54 * wax);
+      const flameY = cont
+        ? cont.y - (candleH + 5) * this.currentScaleFactor
+        : this.currentAltarTopY - (candleH + 5) * this.currentScaleFactor;
+      // 转换为舞台全局坐标：道具层与案体层视差系数不同，不可直接复用局部坐标
+      const global = this.container.toGlobal({
+        x: cont ? cont.x : fallbackX,
+        y: flameY,
+      });
+      return {
+        x: global.x,
+        y: global.y,
+        // 烛光强度随蜡体余量递减，熄灭为 0
+        intensity: isLit ? Math.max(0.35, 0.55 + 0.45 * wax) : 0,
+      };
+    };
+
+    return [
+      build(leftCandleCont, leftCandle, this.currentAltarCenterX - 74 * this.currentScaleFactor),
+      build(rightCandleCont, rightCandle, this.currentAltarCenterX + 74 * this.currentScaleFactor),
+    ];
   }
 
   private syncCandlesToEffects(): void {

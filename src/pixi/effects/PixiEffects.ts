@@ -161,9 +161,9 @@ export class PixiEffects {
       if (leftLit) {
         this.leftCandleGlow.x = leftX;
         this.leftCandleGlow.y = leftY;
-        const glowScale = (0.42 + breathe * 0.03) * scale;
+        const glowScale = (0.52 + breathe * 0.03) * scale;
         this.leftCandleGlow.scale.set(glowScale);
-        this.leftCandleGlow.alpha = 0.45 + breathe * 0.08;
+        this.leftCandleGlow.alpha = 0.6 + breathe * 0.07;
       }
       this.leftCandleFlame.clear();
     }
@@ -173,9 +173,9 @@ export class PixiEffects {
       if (rightLit) {
         this.rightCandleGlow.x = rightX;
         this.rightCandleGlow.y = rightY;
-        const glowScale = (0.42 - breathe * 0.03) * scale;
+        const glowScale = (0.52 - breathe * 0.03) * scale;
         this.rightCandleGlow.scale.set(glowScale);
-        this.rightCandleGlow.alpha = 0.45 - breathe * 0.08;
+        this.rightCandleGlow.alpha = 0.6 - breathe * 0.07;
       }
       this.rightCandleFlame.clear();
     }

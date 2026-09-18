@@ -32,6 +32,10 @@ export interface AltarPixiViewportProps {
   floorStyle: FloorStyle;
   tableclothStyle: TableclothStyle;
   tableWoodStyle?: TableWoodStyle;
+  /** 腿足构架独立材质（桌腿/牙板/横枨） */
+  tableLegWoodStyle?: TableWoodStyle;
+  /** 桌子前后位置：-1 最靠后（远），0 标准，1 最靠前（近） */
+  tableForward?: number;
   showTableRunner?: boolean;
   petalTrigger?: number;
   lastOfferedFlower?: FlowerType;
@@ -40,6 +44,8 @@ export interface AltarPixiViewportProps {
   onVaseClick?: (id: SceneItemId) => void;
   onBowlHit?: () => void;
   onUpdateItemPosition?: (id: SceneItemId, pos: { x: number; y: number }) => void;
+  /** 场景内直接拖放供案调整前后进深后提交 (范围 -1 ~ 1) */
+  onUpdateTableForward?: (value: number) => void;
   className?: string;
 }
 
@@ -50,6 +56,8 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   floorStyle,
   tableclothStyle,
   tableWoodStyle = 'walnut',
+  tableLegWoodStyle = 'walnut',
+  tableForward = 0,
   showTableRunner = true,
   petalTrigger = 0,
   lastOfferedFlower = 'peonies',
@@ -58,11 +66,17 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   onVaseClick,
   onBowlHit,
   onUpdateItemPosition,
+  onUpdateTableForward,
   className = '',
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<PixiStage | null>(null);
   const isReadyRef = useRef<boolean>(false);
+
+  // 供案前后进深：拖动过程中本地即时生效，松手后提交给外部状态
+  const activeForwardRef = useRef<number>(tableForward);
+  const isDraggingTableRef = useRef<boolean>(false);
+  const dragStartForwardRef = useRef<number>(tableForward);
 
   // 场景图层实例
   const bgLayerRef = useRef<SceneBackgroundLayer | null>(null);
@@ -81,6 +95,7 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     onVaseClick,
     onBowlHit,
     onUpdateItemPosition,
+    onUpdateTableForward,
   });
 
   useEffect(() => {
@@ -90,6 +105,7 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
       onVaseClick,
       onBowlHit,
       onUpdateItemPosition,
+      onUpdateTableForward,
     };
   });
 
@@ -104,15 +120,18 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   }, []);
 
   // 供案透视布局几何（宽厚沉稳，台面前沿精准定位，桌裙离地悬空，绝不拖地）
-  const getTableLayout = useCallback((width: number, height: number) => {
+  // forward ∈ [-1, 1]：前后移动伴随近大远小，前移时贴近镜头、后移时退向纵深
+  const getTableLayout = useCallback((width: number, height: number, forward: number = 0) => {
     const centerX = width * 0.5;
-    // 供案横向长度（对标经典设计稿，适度舒展且两侧通透留白）
-    const tableWidth = Math.min(width - 32, width < 640 ? 540 : 620);
+    // 供案横向长度（对标经典设计稿，适度舒展且两侧通透留白）+ 前后进深缩放
+    const depthScale = 1 + forward * 0.07;
+    let tableWidth = Math.min(width - 32, width < 640 ? 540 : 620) * depthScale;
+    tableWidth = Math.min(tableWidth, width - 20);
     const tableHeight = tableWidth * (166 / 560);
     // 台面前沿到桌脚底部的垂挂高度（在 560:166 视口中为 96 单位）
     const tableHangingHeight = tableWidth * (96 / 560);
-    // 底部留出开阔地板透视余量，消除拖地，确保桌腿悬空端庄
-    const tableBottomOffset = width < 640 ? 44 : 58;
+    // 底部留出开阔地板透视余量：前移收窄（贴近镜头），后移加宽（退向纵深）
+    const tableBottomOffset = (width < 640 ? 44 : 58) - forward * 24;
     const tableTopY = height - tableBottomOffset - tableHangingHeight;
     return { centerX, tableTopY, tableWidth, tableHeight };
   }, []);
@@ -124,24 +143,39 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     viewportSizeRef.current = { width, height };
 
     // 1. 供案几何与桌布 (置于用户近前前景，开阔背景纵深)
-    const { centerX, tableTopY, tableWidth, tableHeight } = getTableLayout(width, height);
-    tableLayerRef.current?.render(
+    const forward = activeForwardRef.current;
+    const { centerX, tableTopY, tableWidth } = getTableLayout(width, height, forward);
+    tableLayerRef.current?.render({
       centerX,
       tableTopY,
       tableWidth,
-      tableHeight,
       tableclothStyle,
       showTableRunner,
-      false,
-      tableWoodStyle
-    );
+      showPetals: false,
+      topWoodStyle: tableWoodStyle,
+      legWoodStyle: tableLegWoodStyle,
+      // 地坪水平灭点基线与 FloorLayer 保持一致 (视口下 38%)
+      horizonY: height * 0.62,
+    });
 
     // 1b. 同步供案台面灯光暗化
     if (tableLayerRef.current) tableLayerRef.current.setLighting(lighting);
 
     // 2. 供品与道具 (1:1 同步置于供案台面)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items, tableclothStyle, tableWoodStyle, showTableRunner, lighting, getViewportDimensions, getTableLayout]);
+    }, [items, tableclothStyle, tableWoodStyle, tableLegWoodStyle, showTableRunner, lighting, getViewportDimensions, getTableLayout]);
+
+  // 始终持有最新重绘函数（供案拖放时按最新状态即时重绘）
+  const renderAllRef = useRef(renderAll);
+  useEffect(() => {
+    renderAllRef.current = renderAll;
+  });
+
+  // 外部进深状态变化（非拖动中）同步至本地渲染值
+  useEffect(() => {
+    if (isDraggingTableRef.current) return;
+    activeForwardRef.current = tableForward;
+  }, [tableForward]);
 
   // 1. 初始化 PixiJS 舞台
   useEffect(() => {
@@ -178,6 +212,8 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
       stage.backgroundLayer.addChild(bgLayer.container);
       stage.floorLayer.addChild(floorLayer.container);
       stage.tableLayer.addChild(tableLayer.container);
+      // 案体照明层：叠在案体之上、道具之下
+      stage.tableLayer.addChild(tableLayer.lightContainer);
       stage.propsLayer.addChild(propsLayer.container);
       stage.lightsLayer.addChild(pixiEffects.lightsContainer);
       stage.lightsLayer.addChild(pixiEffects.petalsContainer);
@@ -195,6 +231,26 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
         onUpdatePosition: (id, pos) => callbacksRef.current.onUpdateItemPosition?.(id, pos),
       });
 
+      // 供案本体拖放：直接在场景中上下拖动调整前后进深（近大远小）
+      tableLayer.setDragCallbacks({
+        onDragStart: () => {
+          isDraggingTableRef.current = true;
+          dragStartForwardRef.current = activeForwardRef.current;
+        },
+        onDrag: (dy) => {
+          const { height } = viewportSizeRef.current;
+          const span = Math.max(160, height * 0.4);
+          const next = Math.max(-1, Math.min(1, dragStartForwardRef.current + dy / span));
+          if (Math.abs(next - activeForwardRef.current) < 0.004) return;
+          activeForwardRef.current = next;
+          renderAllRef.current();
+        },
+        onDragEnd: () => {
+          isDraggingTableRef.current = false;
+          callbacksRef.current.onUpdateTableForward?.(activeForwardRef.current);
+        },
+      });
+
       bgLayerRef.current = bgLayer;
       floorLayerRef.current = floorLayer;
       tableLayerRef.current = tableLayer;
@@ -206,6 +262,8 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
         const delta = ticker.deltaTime;
         propsLayer.update(delta);
         pixiEffects.update(delta);
+        // 案体光照随烛火真实位置与明灭状态实时衰减照亮
+        tableLayerRef.current?.setCandleLights(propsLayer.getCandleLightSources());
       });
 
       isReadyRef.current = true;
@@ -240,15 +298,15 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   useEffect(() => {
     if (!isReadyRef.current) return;
     renderAll();
-  }, [wallStyle, floorStyle, tableclothStyle, tableWoodStyle, showTableRunner, lighting.masterOn, lighting.timeOfDay, lighting.sunlightIntensity]);
+  }, [wallStyle, floorStyle, tableclothStyle, tableWoodStyle, tableLegWoodStyle, tableForward, showTableRunner, lighting.masterOn, lighting.timeOfDay, lighting.sunlightIntensity]);
 
   // 3. 道具状态轻量同步 (只更新道具，绝不重绘背景和地面)
   useEffect(() => {
     if (!isReadyRef.current) return;
     const { width, height } = viewportSizeRef.current;
-    const { centerX, tableTopY, tableWidth } = getTableLayout(width, height);
+    const { centerX, tableTopY, tableWidth } = getTableLayout(width, height, tableForward);
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items, getTableLayout]);
+  }, [items, tableForward, getTableLayout]);
 
   // 4. 落花飘落动效触发
   useEffect(() => {
@@ -273,12 +331,22 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     stageRef.current.setParallaxInput(0, 0);
   };
 
+  // 禁用场景内浏览器原生右键/长按菜单，避免拖放供品时误弹出
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+  const handleDragStart = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <div
       ref={containerRef}
       className={`relative w-full h-full overflow-hidden select-none ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onContextMenu={handleContextMenu}
+      onDragStart={handleDragStart}
     />
   );
 };

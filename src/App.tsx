@@ -522,6 +522,14 @@ const INITIAL_MEMORIAL: MemorialInfo = {
   photoUrl: DEFAULT_MEMORIAL_HALLS[0].photoUrl,
 };
 
+// 供案 4 款原木材质选项（台面与腿足构架共用）
+const TABLE_WOOD_OPTIONS = [
+  { id: 'walnut', name: '暖栗胡桃', color: '#452618', border: '#7c3f25' },
+  { id: 'huanghuali', name: '明式黄花梨', color: '#7a421b', border: '#b4602a' },
+  { id: 'cherry', name: '典雅樱桃', color: '#6a2f20', border: '#9a4731' },
+  { id: 'white_oak', name: '素雅白橡', color: '#8c6e54', border: '#b8997a' },
+] as const;
+
 export default function App() {
   const [items, setItems] = useState<Record<SceneItemId, SceneItem>>(INITIAL_ITEMS);
   const [lighting, setLighting] = useState<LightingSettings>(INITIAL_LIGHTING);
@@ -570,6 +578,9 @@ export default function App() {
   const [showTableRunner, setShowTableRunner] = useState(false);
   const [tableclothStyle, setTableclothStyle] = useState<TableclothStyle>('autumn_gold');
   const [tableWoodStyle, setTableWoodStyle] = useState<TableWoodStyle>('walnut');
+  const [tableLegWoodStyle, setTableLegWoodStyle] = useState<TableWoodStyle>('walnut');
+  // 桌子前后位置：-1 最靠后（远），0 标准，1 最靠前（近）
+  const [tableForward, setTableForward] = useState(0);
   const [showPetals, setShowPetals] = useState(false);
 
   // Petal shower animation trigger
@@ -987,12 +998,15 @@ export default function App() {
           return { ...item, isLit: true };
         };
 
-        return {
-          ...prev,
-          candle_left: renewOrLight(prev.candle_left, 'candle'),
-          candle_right: renewOrLight(prev.candle_right, 'candle'),
-          censer: renewOrLight(prev.censer, 'censer'),
-        } as Record<SceneItemId, SceneItem>;
+        // 已撤下的摆件不应被写回 undefined 空位（会让下游渲染层读到空对象）
+        const next: Record<SceneItemId, SceneItem> = { ...prev };
+        const nextLeft = renewOrLight(prev.candle_left, 'candle');
+        const nextRight = renewOrLight(prev.candle_right, 'candle');
+        const nextCenser = renewOrLight(prev.censer, 'censer');
+        if (nextLeft) next.candle_left = nextLeft;
+        if (nextRight) next.candle_right = nextRight;
+        if (nextCenser) next.censer = nextCenser;
+        return next;
       });
       showToast('已重新奉上并点燃长明红烛与清香');
     }
@@ -1673,6 +1687,8 @@ export default function App() {
           floorStyle={floorStyle}
           tableclothStyle={tableclothStyle}
           tableWoodStyle={tableWoodStyle}
+          tableLegWoodStyle={tableLegWoodStyle}
+          tableForward={tableForward}
           showTableRunner={showTableRunner}
           petalTrigger={petalTrigger}
           lastOfferedFlower={lastOfferedFlower}
@@ -1681,6 +1697,7 @@ export default function App() {
           onVaseClick={handleToggleVaseStyle}
           onBowlHit={() => sound.playSingingBowl()}
           onUpdateItemPosition={updateItemPosition}
+          onUpdateTableForward={(v) => setTableForward(Math.max(-1, Math.min(1, v)))}
           className="absolute inset-0 z-25 pointer-events-auto"
         />
 
@@ -1865,16 +1882,15 @@ export default function App() {
 
                   <span className="text-stone-600 hidden sm:inline">|</span>
 
-                  {/* 案台专属控制：4 款原木材质切换 & 桌布开关 */}
+                  {/* 案台专属控制：台面/腿足独立原木材质、前后位置与桌布开关 */}
                   {auditCategory === 'table' ? (
                     <div className="flex items-center flex-wrap gap-1.5">
                       <div className="flex items-center gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                        {[
-                          { id: 'walnut', name: '暖栗胡桃', color: '#452618', border: '#7c3f25' },
-                          { id: 'huanghuali', name: '明式黄花梨', color: '#7a421b', border: '#b4602a' },
-                          { id: 'cherry', name: '典雅樱桃', color: '#6a2f20', border: '#9a4731' },
-                          { id: 'white_oak', name: '素雅白橡', color: '#8c6e54', border: '#b8997a' },
-                        ].map((w) => {
+
+
+
+
+                        {TABLE_WOOD_OPTIONS.map((w) => {
                           const isSel = tableWoodStyle === w.id;
                           return (
                             <button
@@ -1899,6 +1915,45 @@ export default function App() {
                             </button>
                           );
                         })}
+                      </div>
+
+                      <select
+                        value={tableLegWoodStyle}
+                        onChange={(e) => {
+                          sound.playWoodPlacement();
+                          const v = e.target.value as TableWoodStyle;
+                          setTableLegWoodStyle(v);
+                          showToast(`腿足材质已切换为「${TABLE_WOOD_OPTIONS.find((o) => o.id === v)?.name}」`);
+                        }}
+                        className="px-2 py-1 rounded-full bg-stone-950/80 border border-amber-500/30 text-amber-200 text-xs cursor-pointer outline-none"
+                        title="切换腿足构架（桌腿/牙板/横枨）材质"
+                      >
+                        {TABLE_WOOD_OPTIONS.map((w) => (
+                          <option key={w.id} value={w.id}>
+                            腿足·{w.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="flex items-center gap-1.5 bg-stone-950/80 px-2 py-1 rounded-full border border-amber-500/30">
+                        <span className="text-[10px] text-amber-300/70 whitespace-nowrap">
+                          ✥ 场景中拖动供案调前后
+                        </span>
+                        <span className="text-[10px] font-mono text-amber-200/80 w-8 text-right">
+                          {Math.round(tableForward * 100)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sound.playWoodPlacement();
+                            setTableForward(0);
+                            showToast('供案前后位置已复位');
+                          }}
+                          className="px-1.5 py-0.5 rounded-full bg-stone-900/80 border border-stone-700 text-stone-400 hover:text-amber-200 hover:border-amber-500/50 cursor-pointer transition-all active:scale-95 text-[10px]"
+                          title="复位供案至标准前后位置"
+                        >
+                          复位
+                        </button>
                       </div>
 
                       <button

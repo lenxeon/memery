@@ -66,36 +66,68 @@ export const renderDefs = (): string => `
       </radialGradient>
 `.trim();
 
+/** 坐标收敛到两位小数，避免模板字符串产生过长浮点 */
+const n2 = (v: number): number => Math.round(v * 100) / 100;
+
+/**
+ * 单颗阳光玫瑰青提：翡翠果身 + 极薄天然果霜 + 内敛水润微光。
+ * 以纯字符串返回（模板为纯 SVG 数据，不可保留 JSX 调用）。
+ */
+const renderMuscat = (
+  cx: number,
+  cy: number,
+  r: number,
+  grad: string = 'url(#muscatBodyGrad)',
+  highlight: boolean = true
+): string => {
+  const hx = n2(cx - r * 0.28);
+  const hy = n2(cy - r * 0.32);
+  const arc = `M ${n2(cx - r * 0.45)} ${n2(cy - r * 0.35)} C ${n2(cx - r * 0.55)} ${n2(
+    cy + r * 0.1
+  )}, ${n2(cx - r * 0.15)} ${n2(cy + r * 0.55)}, ${n2(cx + r * 0.35)} ${n2(cy + r * 0.45)}`;
+  const gloss = highlight
+    ? `
+      <path d="${arc}" stroke="#ffffff" stroke-width="${n2(Math.max(0.4, r * 0.09))}" fill="none" opacity="0.18" stroke-linecap="round" />
+      <ellipse cx="${hx}" cy="${hy}" rx="${n2(r * 0.14)}" ry="${n2(
+        r * 0.09
+      )}" fill="#ffffff" opacity="0.36" transform="rotate(-25 ${hx} ${hy})" />`
+    : '';
+  return `<g>
+      <circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(r)}" fill="${grad}" />
+      <circle cx="${n2(cx)}" cy="${n2(cy)}" r="${n2(r)}" fill="url(#muscatFrostBloom)" />${gloss}
+    </g>`;
+};
+
 export const renderContent = (): string => `
 <g id="muscatClusterGroup">
         {/* ── 0. 青提串整体接地柔影 ── */}
         <ellipse cx="51" cy="55" rx="30" ry="7" fill="url(#muscatClusterShadow)" />
 
         {/* ── 1. 底层与后排深色青提 (Back Shadow Grapes - 无强高光，浓郁翡翠深色) ── */}
-        {renderMuscat(38, 44, 7.5, 'url(#muscatShadowGrad)', false)}
-        {renderMuscat(50, 41, 7.8, 'url(#muscatShadowGrad)', false)}
-        {renderMuscat(63, 44, 7.5, 'url(#muscatShadowGrad)', false)}
-        {renderMuscat(44, 34, 7.2, 'url(#muscatShadowGrad)', false)}
-        {renderMuscat(58, 34, 7.2, 'url(#muscatShadowGrad)', false)}
-        {renderMuscat(32, 51, 6.8, 'url(#muscatShadowGrad)', false)}
-        {renderMuscat(70, 51, 6.8, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(38, 44, 7.5, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(50, 41, 7.8, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(63, 44, 7.5, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(44, 34, 7.2, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(58, 34, 7.2, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(32, 51, 6.8, 'url(#muscatShadowGrad)', false)}
+        ${renderMuscat(70, 51, 6.8, 'url(#muscatShadowGrad)', false)}
 
         {/* ── 2. 中层主青提群 (Middle Plump Grapes - 饱满青绿) ── */}
-        {renderMuscat(28, 45, 7.2, 'url(#muscatBodyGrad)', true)}
-        {renderMuscat(42, 48, 8.2, 'url(#muscatBodyGrad)', true)}
-        {renderMuscat(60, 48, 8.2, 'url(#muscatBodyGrad)', true)}
-        {renderMuscat(74, 45, 7.2, 'url(#muscatBodyGrad)', true)}
-        {renderMuscat(51, 28, 7.5, 'url(#muscatBodyGrad)', true)}
-        {renderMuscat(37, 39, 7.8, 'url(#muscatBodyGrad)', true)}
-        {renderMuscat(65, 39, 7.8, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(28, 45, 7.2, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(42, 48, 8.2, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(60, 48, 8.2, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(74, 45, 7.2, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(51, 28, 7.5, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(37, 39, 7.8, 'url(#muscatBodyGrad)', true)}
+        ${renderMuscat(65, 39, 7.8, 'url(#muscatBodyGrad)', true)}
 
         {/* ── 3. 前排受光晶莹青提群 (Front Light Grapes - 珠圆玉润，青翠欲滴) ── */}
-        {renderMuscat(51, 44, 8.8, 'url(#muscatFrontLightGrad)', true)}
-        {renderMuscat(35, 53, 7.5, 'url(#muscatFrontLightGrad)', true)}
-        {renderMuscat(67, 53, 7.5, 'url(#muscatFrontLightGrad)', true)}
-        {renderMuscat(51, 54, 7.8, 'url(#muscatFrontLightGrad)', true)}
-        {renderMuscat(44, 57, 6.5, 'url(#muscatFrontLightGrad)', true)}
-        {renderMuscat(58, 57, 6.5, 'url(#muscatFrontLightGrad)', true)}
+        ${renderMuscat(51, 44, 8.8, 'url(#muscatFrontLightGrad)', true)}
+        ${renderMuscat(35, 53, 7.5, 'url(#muscatFrontLightGrad)', true)}
+        ${renderMuscat(67, 53, 7.5, 'url(#muscatFrontLightGrad)', true)}
+        ${renderMuscat(51, 54, 7.8, 'url(#muscatFrontLightGrad)', true)}
+        ${renderMuscat(44, 57, 6.5, 'url(#muscatFrontLightGrad)', true)}
+        ${renderMuscat(58, 57, 6.5, 'url(#muscatFrontLightGrad)', true)}
 
         {/* ── 4. 鲜活老藤枝蔓与嫩绿卷须 (Fresh Green Vine & Tendrils) ── */}
         <g id="muscatWoodVine">

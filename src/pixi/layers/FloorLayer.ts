@@ -74,7 +74,8 @@ export class FloorLayer {
         this.floorSprite.tileScale.set(tileScale);
 
         if (!lighting.masterOn) {
-          this.floorSprite.tint = 0x241a12;
+          // 关灯：留一层烛照余晖，地面仍比案体更沉，维持纵深层次
+          this.floorSprite.tint = 0x453122;
         } else if (lighting.timeOfDay === 'sunset') {
           this.floorSprite.tint = 0xffe2cc;
         } else if (lighting.timeOfDay === 'night') {

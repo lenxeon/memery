@@ -77,6 +77,15 @@ export async function rasterizeSvgToTexture(
       .replace(/clipRule=/g, 'clip-rule=')
       .replace(/className="[^"]*"/g, '');
 
+    // 剥离模板由 TSX 迁移时残留的 JSX 注释块 {/* ... */}：
+    // 它们在 XML 中既可能被当作可见文本渲染，也可能因注释内含 & 直接导致解析失败
+    sanitizedSvg = sanitizedSvg.replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '');
+    // 转义未成实体的裸 &（XML 实体引用必须是 &name; 形式，否则解析直接报错）
+    sanitizedSvg = sanitizedSvg.replace(
+      /&(?!(?:#\d+|#x[0-9a-fA-F]+|amp|lt|gt|quot|apos);)/g,
+      '&amp;'
+    );
+
     const blob = new Blob([sanitizedSvg], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const img = new Image();
@@ -115,6 +124,9 @@ export async function rasterizeSvgToTexture(
       clearTimeout(timer);
       URL.revokeObjectURL(url);
       console.error(`Failed to rasterize SVG for key: ${cacheKey}`, err);
+      if (import.meta.env?.DEV) {
+        console.error('Offending SVG head:', sanitizedSvg.slice(0, 400));
+      }
       const fallback = createFallbackTexture(width, height);
       resolve(fallback);
     };

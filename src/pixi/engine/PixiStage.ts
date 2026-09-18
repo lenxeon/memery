@@ -62,6 +62,9 @@ export class PixiStage {
     app.canvas.style.height = '100%';
     app.canvas.style.display = 'block';
     app.canvas.style.touchAction = 'none';
+    // 禁用移动端长按弹出的图片操作菜单与系统选择
+    (app.canvas.style as CSSStyleDeclaration & { WebkitTouchCallout: string }).WebkitTouchCallout = 'none';
+    (app.canvas.style as CSSStyleDeclaration & { WebkitUserSelect: string }).WebkitUserSelect = 'none';
     options.container.replaceChildren(app.canvas);
 
     this.stageContainer = new Container();
