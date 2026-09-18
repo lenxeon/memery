@@ -16,7 +16,7 @@ import {
   getSingingBowlSvg,
   getSingleBouquetSvg,
 } from './PropSvgTemplates';
-import { FlowerType, FruitType, FloorStyle, WallBackgroundStyle, TableclothStyle, TimeOfDay } from '../../types';
+import { FlowerType, FruitType, FloorStyle, WallBackgroundStyle, TableclothStyle, TimeOfDay, TableWoodStyle } from '../../types';
 import { VaseStyle } from './templates/flowers/vases';
 import { getVaseFlowerSvg } from './templates/FlowerTemplate';
 import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
@@ -24,7 +24,7 @@ import { getAltarTableSvg } from './templates/AltarTableTemplate';
 import { getWallModule, renderWallDefs } from '../environment/walls/registry';
 
 export class TexturePipeline {
-  private static instance: TexturePipeline;
+  private static instance: TexturePipeline | null = null;
   public isLoaded: boolean = false;
 
   // 地板真实材质贴图 (5大古典禅意地板)

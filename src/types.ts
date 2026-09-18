@@ -106,6 +106,19 @@ export interface FloorStyleInfo {
   iconText: string;
 }
 
+export type TableWoodStyle = 
+  | 'white_oak'   // 白橡木 (清素淡雅 · 自然直纹)
+  | 'huanghuali'  // 黄花梨 (明式名木 · 行云流水鬼脸纹)
+  | 'cherry'      // 樱桃木 (温润暖红 · 致密丝质)
+  | 'walnut';     // 胡桃木 (沉稳深邃 · 经典山纹)
+
+export interface TableWoodStyleInfo {
+  id: TableWoodStyle;
+  name: string;
+  poeticTitle: string;
+  desc: string;
+}
+
 export type BgmTrackId = 'singing_bowl' | 'bamboo_wind' | 'temple_bell' | 'pentatonic_zither';
 
 export interface BgmTrackInfo {
@@ -117,8 +130,9 @@ export interface BgmTrackInfo {
   icon: string;
 }
 
-export type AuditCategory = 'flowers' | 'vases';
+export type AuditCategory = 'flowers' | 'vases' | 'table';
 export type VaseAuditGroup = 'new_unique' | 'designer_twist';
+export type TableAuditGroup = 'all_woods';
 export type FlowerAuditGroup =
   | 'flowers_tier1_all'   // 🌟 第一梯队 10 花齐放同台
   | 'flowers_tier1_a'     // 🌺 第一梯队 A 组 (前5名卉：梅花/向日葵/康乃馨/马蹄莲/郁金香)
@@ -126,7 +140,7 @@ export type FlowerAuditGroup =
   | 'flowers_classic'     // 💮 经典传承 5 供 (牡丹/百合/清莲/白菊/玫瑰)
   | 'flowers_bouquets';   // 💐 案前敬献花束平铺对比
 
-export type AuditGroup = VaseAuditGroup | FlowerAuditGroup;
+export type AuditGroup = FlowerAuditGroup | VaseAuditGroup | TableAuditGroup;
 
 export type LoginMethod = 'phone' | 'wechat' | 'apple';
 

@@ -14,45 +14,45 @@ export const renderTableclothRoundel = (theme: TableclothTheme): string => `
 
 export const renderTableclothTopSurface = (theme: TableclothTheme, motifSvg: string): string => `
   <g id="imperialTablecloth">
-    <polygon points="14,16 546,16 556,52 4,52" fill="url(#brocadeGoldTop)" />
-    <polygon points="14,16 546,16 556,52 4,52" fill="url(#${theme.weavePatternId})" opacity="${theme.weaveOpacity}" />
-    <polygon points="14,16 546,16 556,52 4,52" fill="url(#fabricSoftDiffuse)" opacity="0.35" />
-    <polygon points="14,16 546,16 556,52 4,52" fill="none" stroke="${theme.pipingStroke}" stroke-width="1.0" opacity="0.85" />
-    <polygon points="16,18 544,18 553,50 7,50" fill="none" stroke="${theme.pipingStroke}" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.35" />
+    <polygon points="14,16 546,16 556,70 4,70" fill="url(#brocadeGoldTop)" />
+    <polygon points="14,16 546,16 556,70 4,70" fill="url(#${theme.weavePatternId})" opacity="${theme.weaveOpacity}" />
+    <polygon points="14,16 546,16 556,70 4,70" fill="url(#fabricSoftDiffuse)" opacity="0.35" />
+    <polygon points="14,16 546,16 556,70 4,70" fill="none" stroke="${theme.pipingStroke}" stroke-width="1.0" opacity="0.85" />
+    <polygon points="16,18 544,18 553,68 7,68" fill="none" stroke="${theme.pipingStroke}" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.35" />
     ${motifSvg}
     ${renderTableclothRoundel(theme)}
     <g id="leftSideDrape">
-      <polygon points="14,16 4,52 4,118 14,110" fill="url(#cornerDropShadowLeft)" stroke="${theme.hemStroke}" stroke-width="0.8" />
-      <polygon points="14,16 4,52 4,118 14,110" fill="url(#${theme.weavePatternId})" opacity="${(theme.weaveOpacity * 0.7).toFixed(2)}" />
-      <polygon points="14,97 4,104 4,118 14,110" fill="url(#${theme.borderPatternId})" opacity="0.88" />
-      <line x1="14" y1="97" x2="4" y2="104" stroke="#24170d" stroke-width="1.2" />
-      <line x1="14" y1="110" x2="4" y2="118" stroke="#24170d" stroke-width="1.2" />
-      <line x1="4" y1="52" x2="4" y2="118" stroke="${theme.pipingStroke}" stroke-width="1.2" opacity="0.9" />
-      <line x1="4" y1="52" x2="4" y2="118" stroke="#24170d" stroke-width="0.5" />
+      <polygon points="14,16 4,70 4,136 14,128" fill="url(#cornerDropShadowLeft)" stroke="${theme.hemStroke}" stroke-width="0.8" />
+      <polygon points="14,16 4,70 4,136 14,128" fill="url(#${theme.weavePatternId})" opacity="${(theme.weaveOpacity * 0.7).toFixed(2)}" />
+      <polygon points="14,115 4,122 4,136 14,128" fill="url(#${theme.borderPatternId})" opacity="0.88" />
+      <line x1="14" y1="115" x2="4" y2="122" stroke="#24170d" stroke-width="1.2" />
+      <line x1="14" y1="128" x2="4" y2="136" stroke="#24170d" stroke-width="1.2" />
+      <line x1="4" y1="70" x2="4" y2="136" stroke="${theme.pipingStroke}" stroke-width="1.2" opacity="0.9" />
+      <line x1="4" y1="70" x2="4" y2="136" stroke="#24170d" stroke-width="0.5" />
       <g opacity="0.8">
-        <line x1="10" y1="112" x2="10" y2="120" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
-        <circle cx="10" cy="114" r="1.4" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
-        <polygon points="9,115 11,115 11.4,121 8.6,121" fill="url(#goldFringeFull)" />
-        <line x1="6.5" y1="115" x2="6.5" y2="124" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
-        <circle cx="6.5" cy="117" r="1.5" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
-        <polygon points="5.4,118 7.6,118 8,125 5,125" fill="url(#goldFringeFull)" />
+        <line x1="10" y1="130" x2="10" y2="138" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
+        <circle cx="10" cy="132" r="1.4" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
+        <polygon points="9,133 11,133 11.4,139 8.6,139" fill="url(#goldFringeFull)" />
+        <line x1="6.5" y1="133" x2="6.5" y2="142" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
+        <circle cx="6.5" cy="135" r="1.5" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
+        <polygon points="5.4,136 7.6,136 8,143 5,143" fill="url(#goldFringeFull)" />
       </g>
     </g>
     <g id="rightSideDrape">
-      <polygon points="546,16 556,52 556,118 546,110" fill="url(#cornerDropShadowRight)" stroke="${theme.hemStroke}" stroke-width="0.8" />
-      <polygon points="546,16 556,52 556,118 546,110" fill="url(#${theme.weavePatternId})" opacity="${(theme.weaveOpacity * 0.7).toFixed(2)}" />
-      <polygon points="556,104 546,97 546,110 556,118" fill="url(#${theme.borderPatternId})" opacity="0.88" />
-      <line x1="556" y1="104" x2="546" y2="97" stroke="#24170d" stroke-width="1.2" />
-      <line x1="556" y1="118" x2="546" y2="110" stroke="#24170d" stroke-width="1.2" />
-      <line x1="556" y1="52" x2="556" y2="118" stroke="${theme.pipingStroke}" stroke-width="1.2" opacity="0.9" />
-      <line x1="556" y1="52" x2="556" y2="118" stroke="#24170d" stroke-width="0.5" />
+      <polygon points="546,16 556,70 556,136 546,128" fill="url(#cornerDropShadowRight)" stroke="${theme.hemStroke}" stroke-width="0.8" />
+      <polygon points="546,16 556,70 556,136 546,128" fill="url(#${theme.weavePatternId})" opacity="${(theme.weaveOpacity * 0.7).toFixed(2)}" />
+      <polygon points="556,122 546,115 546,128 556,136" fill="url(#${theme.borderPatternId})" opacity="0.88" />
+      <line x1="556" y1="122" x2="546" y2="115" stroke="#24170d" stroke-width="1.2" />
+      <line x1="556" y1="136" x2="546" y2="128" stroke="#24170d" stroke-width="1.2" />
+      <line x1="556" y1="70" x2="556" y2="136" stroke="${theme.pipingStroke}" stroke-width="1.2" opacity="0.9" />
+      <line x1="556" y1="70" x2="556" y2="136" stroke="#24170d" stroke-width="0.5" />
       <g opacity="0.8">
-        <line x1="550" y1="112" x2="550" y2="120" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
-        <circle cx="550" cy="114" r="1.4" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
-        <polygon points="549,115 551,115 551.4,121 548.6,121" fill="url(#goldFringeFull)" />
-        <line x1="553.5" y1="115" x2="553.5" y2="124" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
-        <circle cx="553.5" cy="117" r="1.5" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
-        <polygon points="552.4,118 554.6,118 555,125 552,125" fill="url(#goldFringeFull)" />
+        <line x1="550" y1="130" x2="550" y2="138" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
+        <circle cx="550" cy="132" r="1.4" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
+        <polygon points="549,133 551,133 551.4,139 548.6,139" fill="url(#goldFringeFull)" />
+        <line x1="553.5" y1="133" x2="553.5" y2="142" stroke="${theme.tasselColor.cord}" stroke-width="1.0" />
+        <circle cx="553.5" cy="135" r="1.5" fill="${theme.tasselColor.bead}" stroke="#24170d" stroke-width="0.5" />
+        <polygon points="552.4,136 554.6,136 555,143 552,143" fill="url(#goldFringeFull)" />
       </g>
     </g>
   </g>
@@ -64,7 +64,7 @@ export const renderTableclothFrontValance = (
   _drapePath: string,
   centerpieceSvg: string
 ): string => {
-  const tasselCount = 32;
+  const tasselCount = 48;
   const tasselStep = 520 / (tasselCount - 1);
   const topTabs = ['8-', '18-', '18-', '18-', '18-', '18-', '16-', '16-', '16-', '18-', '18-', '18-', '18-', '18-', '18-', '18-'];
 
@@ -72,8 +72,8 @@ export const renderTableclothFrontValance = (
     const tabX = 20 + idx * 33;
     return `
       <g opacity="0.85">
-        <line x1="${tabX}" y1="52" x2="${tabX}" y2="61.5" stroke="#24170d" stroke-width="0.8" />
-        <text x="${tabX + 6.5}" y="59" font-size="6.2" font-family="sans-serif" font-weight="bold" fill="#24170d" letter-spacing="-0.5">${tab}</text>
+        <line x1="${tabX}" y1="70" x2="${tabX}" y2="78" stroke="#24170d" stroke-width="0.8" />
+        <text x="${tabX + 6.5}" y="76.2" font-size="5.5" font-family="sans-serif" font-weight="bold" fill="#24170d" letter-spacing="-0.5">${tab}</text>
       </g>
     `;
   }).join('');
@@ -82,9 +82,9 @@ export const renderTableclothFrontValance = (
     const seamX = 20 + idx * 33;
     return `
       <g>
-        <line x1="${seamX}" y1="61.5" x2="${seamX}" y2="${theme.ribbonY}" stroke="rgba(40, 20, 5, 0.28)" stroke-width="0.9" />
-        <line x1="${seamX + 0.8}" y1="61.5" x2="${seamX + 0.8}" y2="${theme.ribbonY}" stroke="rgba(255, 245, 200, 0.18)" stroke-width="0.7" />
-        <rect x="${seamX + 3}" y="61.5" width="26" height="${theme.ribbonY - 61.5}" fill="rgba(255, 255, 255, 0.03)" />
+        <line x1="${seamX}" y1="78" x2="${seamX}" y2="${theme.ribbonY}" stroke="rgba(40, 20, 5, 0.28)" stroke-width="0.9" />
+        <line x1="${seamX + 0.8}" y1="78" x2="${seamX + 0.8}" y2="${theme.ribbonY}" stroke="rgba(255, 245, 200, 0.18)" stroke-width="0.7" />
+        <rect x="${seamX + 3}" y="78" width="26" height="${theme.ribbonY - 78}" fill="rgba(255, 255, 255, 0.03)" />
       </g>
     `;
   }).join('');
@@ -109,18 +109,18 @@ export const renderTableclothFrontValance = (
   return `
     <g id="tableclothFrontValance">
       <g id="valanceTableFeet">
-        <polygon points="30,122 56,122 54,136 28,136" fill="#24170d" stroke="#160e07" stroke-width="1.2" />
-        <line x1="28" y1="136" x2="54" y2="136" stroke="#0a0502" stroke-width="1.8" />
-        <polygon points="504,122 530,122 532,136 506,136" fill="#24170d" stroke="#160e07" stroke-width="1.2" />
-        <line x1="506" y1="136" x2="532" y2="136" stroke="#0a0502" stroke-width="1.8" />
+        <polygon points="30,136 56,136 54,148 28,148" fill="#24170d" stroke="#160e07" stroke-width="1.2" />
+        <line x1="28" y1="148" x2="54" y2="148" stroke="#0a0502" stroke-width="1.8" />
+        <polygon points="504,136 530,136 532,148 506,148" fill="#24170d" stroke="#160e07" stroke-width="1.2" />
+        <line x1="506" y1="148" x2="532" y2="148" stroke="#0a0502" stroke-width="1.8" />
       </g>
-      <polygon points="4,52 556,52 556,118 4,118" fill="url(#brocadeGoldDrape)" stroke="${theme.hemStroke}" stroke-width="1.0" />
-      <polygon points="4,52 556,52 556,118 4,118" fill="url(#${theme.weavePatternId})" opacity="${theme.weaveOpacity}" />
-      <polygon points="4,52 556,52 556,66 4,66" fill="url(#clothLipShadow)" />
+      <polygon points="4,70 556,70 556,136 4,136" fill="url(#brocadeGoldDrape)" stroke="${theme.hemStroke}" stroke-width="1.0" />
+      <polygon points="4,70 556,70 556,136 4,136" fill="url(#${theme.weavePatternId})" opacity="${theme.weaveOpacity}" />
+      <polygon points="4,70 556,70 556,82 4,82" fill="url(#clothLipShadow)" />
       <g id="topPleatRulerRibbon">
-        <rect x="4" y="52" width="552" height="9.5" fill="#caa44e" opacity="0.95" />
-        <line x1="4" y1="52" x2="556" y2="52" stroke="#24170d" stroke-width="1.4" />
-        <line x1="4" y1="61.5" x2="556" y2="61.5" stroke="#24170d" stroke-width="1.0" />
+        <rect x="4" y="70" width="552" height="8" fill="#caa44e" opacity="0.95" />
+        <line x1="4" y1="70" x2="556" y2="70" stroke="#24170d" stroke-width="1.4" />
+        <line x1="4" y1="78" x2="556" y2="78" stroke="#24170d" stroke-width="1.0" />
         ${rulerRibbonContent}
       </g>
       <g id="verticalClothPanels">
@@ -135,7 +135,7 @@ export const renderTableclothFrontValance = (
       <g id="hangingTasselFringe">
         ${tasselsContent}
       </g>
-      <rect x="0" y="132" width="560" height="8" fill="#140b04" opacity="0.5" filter="blur(2px)" />
+      <rect x="0" y="148" width="560" height="6" fill="#140b04" opacity="0.45" filter="blur(2px)" />
     </g>
   `;
 };

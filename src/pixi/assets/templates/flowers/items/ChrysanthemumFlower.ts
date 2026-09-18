@@ -101,7 +101,7 @@ export const renderChrysanthemumFlower = (props: FlowerRenderProps): string => {
                 ${Array.from({ length: 16 }).map((_, i) => {
                   const angle = (i * 360) / 16;
                   return `
-                    <
+                    <path
                       d="M -3 0 C -6 -18 -4 -34 0 -44 C 4 -34 6 -18 3 0 Z"
                       fill="url(#chrysOuterPetalGrad)"
                       stroke="#fef08a"
@@ -117,7 +117,7 @@ export const renderChrysanthemumFlower = (props: FlowerRenderProps): string => {
                 ${Array.from({ length: 14 }).map((_, i) => {
                   const angle = (i * 360) / 14 + 12;
                   return `
-                    <
+                    <path
                       d="M -2.5 0 C -5 -14 -3 -26 0 -34 C 3 -26 5 -14 2.5 0 Z"
                       fill="url(#chrysPetalGrad)"
                       stroke="#fde047"
@@ -133,7 +133,7 @@ export const renderChrysanthemumFlower = (props: FlowerRenderProps): string => {
                 ${Array.from({ length: 12 }).map((_, i) => {
                   const angle = (i * 360) / 12 + 6;
                   return `
-                    <
+                    <path
                       d="M -2 0 C -4 -10 -2 -18 0 -22 C 2 -18 4 -10 2 0 Z"
                       fill="url(#chrysPetalGrad)"
                       transform="rotate(${angle})"
@@ -160,7 +160,7 @@ export const renderChrysanthemumFlower = (props: FlowerRenderProps): string => {
               ${Array.from({ length: 14 }).map((_, i) => {
                 const angle = (i * 360) / 14;
                 return `
-                  <
+                  <path
                     d="M -2.5 0 C -5 -14 -3 -26 0 -32 C 3 -26 5 -14 2.5 0 Z"
                     fill="url(#chrysPetalGrad)"
                     stroke="#fef08a"
@@ -172,7 +172,7 @@ export const renderChrysanthemumFlower = (props: FlowerRenderProps): string => {
               ${Array.from({ length: 10 }).map((_, i) => {
                 const angle = (i * 360) / 10 + 15;
                 return `
-                  <
+                  <path
                     d="M -2 0 C -3 -9 -2 -16 0 -20 C 2 -16 3 -9 2 0 Z"
                     fill="url(#chrysPetalGrad)"
                     transform="rotate(${angle})"
@@ -191,7 +191,7 @@ export const renderChrysanthemumFlower = (props: FlowerRenderProps): string => {
               ${Array.from({ length: 12 }).map((_, i) => {
                 const angle = (i * 360) / 12;
                 return `
-                  <
+                  <path
                     d="M -2 0 C -4 -12 -2 -22 0 -26 C 2 -22 4 -12 2 0 Z"
                     fill="url(#chrysPetalGrad)"
                     stroke="#fef08a"

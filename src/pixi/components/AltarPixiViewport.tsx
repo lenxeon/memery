@@ -20,6 +20,7 @@ import {
   WallBackgroundStyle,
   FloorStyle,
   TableclothStyle,
+  TableWoodStyle,
   FlowerType,
 } from '../../types';
 import { sound } from '../../utils/audio';
@@ -30,6 +31,7 @@ export interface AltarPixiViewportProps {
   wallStyle: WallBackgroundStyle;
   floorStyle: FloorStyle;
   tableclothStyle: TableclothStyle;
+  tableWoodStyle?: TableWoodStyle;
   showTableRunner?: boolean;
   petalTrigger?: number;
   lastOfferedFlower?: FlowerType;
@@ -47,6 +49,7 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   wallStyle,
   floorStyle,
   tableclothStyle,
+  tableWoodStyle = 'walnut',
   showTableRunner = true,
   petalTrigger = 0,
   lastOfferedFlower = 'peonies',
@@ -100,15 +103,17 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
     return { width: Math.round(w), height: Math.round(h) };
   }, []);
 
-  // 供案透视布局几何（后移 30px，同时桌面显著加宽，呈现端庄沉浸的大厅视野）
+  // 供案透视布局几何（宽厚沉稳，台面前沿精准定位，桌裙离地悬空，绝不拖地）
   const getTableLayout = useCallback((width: number, height: number) => {
     const centerX = width * 0.5;
-    // 桌面加宽（由 580 加宽至 640，移动端由 530 加宽至 560，更加端庄沉稳）
-    const tableWidth = Math.min(width - 16, width < 640 ? 560 : 640);
-    const tableHeight = tableWidth * (160 / 560);
-    // 供案后移 30px（由原本 36px 增加 30px 至 66px，移动端由 26px 增至 56px）
-    const tableBottomOffset = width < 640 ? 56 : 66;
-    const tableTopY = height - tableBottomOffset - tableHeight * 0.71;
+    // 供案横向长度（对标经典设计稿，适度舒展且两侧通透留白）
+    const tableWidth = Math.min(width - 32, width < 640 ? 540 : 620);
+    const tableHeight = tableWidth * (166 / 560);
+    // 台面前沿到桌脚底部的垂挂高度（在 560:166 视口中为 96 单位）
+    const tableHangingHeight = tableWidth * (96 / 560);
+    // 底部留出开阔地板透视余量，消除拖地，确保桌腿悬空端庄
+    const tableBottomOffset = width < 640 ? 44 : 58;
+    const tableTopY = height - tableBottomOffset - tableHangingHeight;
     return { centerX, tableTopY, tableWidth, tableHeight };
   }, []);
 
@@ -120,14 +125,23 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
 
     // 1. 供案几何与桌布 (置于用户近前前景，开阔背景纵深)
     const { centerX, tableTopY, tableWidth, tableHeight } = getTableLayout(width, height);
-    tableLayerRef.current?.render(centerX, tableTopY, tableWidth, tableHeight, tableclothStyle, showTableRunner);
+    tableLayerRef.current?.render(
+      centerX,
+      tableTopY,
+      tableWidth,
+      tableHeight,
+      tableclothStyle,
+      showTableRunner,
+      false,
+      tableWoodStyle
+    );
 
     // 1b. 同步供案台面灯光暗化
     if (tableLayerRef.current) tableLayerRef.current.setLighting(lighting);
 
     // 2. 供品与道具 (1:1 同步置于供案台面)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-  }, [items, tableclothStyle, showTableRunner, lighting, getViewportDimensions, getTableLayout]);
+  }, [items, tableclothStyle, tableWoodStyle, showTableRunner, lighting, getViewportDimensions, getTableLayout]);
 
   // 1. 初始化 PixiJS 舞台
   useEffect(() => {
@@ -226,7 +240,7 @@ export const AltarPixiViewport: React.FC<AltarPixiViewportProps> = ({
   useEffect(() => {
     if (!isReadyRef.current) return;
     renderAll();
-  }, [wallStyle, floorStyle, tableclothStyle, showTableRunner, lighting.masterOn, lighting.timeOfDay, lighting.sunlightIntensity]);
+  }, [wallStyle, floorStyle, tableclothStyle, tableWoodStyle, showTableRunner, lighting.masterOn, lighting.timeOfDay, lighting.sunlightIntensity]);
 
   // 3. 道具状态轻量同步 (只更新道具，绝不重绘背景和地面)
   useEffect(() => {

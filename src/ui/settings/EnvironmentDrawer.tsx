@@ -3,7 +3,7 @@
  * @description 环境与场景样式抽屉面板，支持时间、背景墙、桌布、音量等实时调节。
  */
 import React, { useState } from 'react';
-import { LightingSettings, TimeOfDay, TableclothStyle, WallBackgroundStyle } from '../../types';
+import { LightingSettings, TimeOfDay, TableclothStyle, TableWoodStyle, WallBackgroundStyle } from '../../types';
 import { 
   Sun, 
   Moon, 
@@ -47,6 +47,8 @@ export interface EnvironmentDrawerProps {
   onToggleTableRunner?: () => void;
   tableclothStyle?: TableclothStyle;
   onChangeTableclothStyle?: (style: TableclothStyle) => void;
+  tableWoodStyle?: TableWoodStyle;
+  onChangeTableWoodStyle?: (style: TableWoodStyle) => void;
   floorStyle?: FloorStyle;
   onChangeFloorStyle?: (style: FloorStyle) => void;
   wallStyle?: WallBackgroundStyle;
@@ -100,6 +102,21 @@ const TABLECLOTH_OPTIONS: {
   { id: 'sandalwood_purple', name: '紫檀金', material: '盘金缂丝', texture: '连珠卷草纹 · 金莲曼荼罗', color: '#593a52', borderColor: '#581c87' },
 ];
 
+export const TABLE_WOOD_OPTIONS: {
+  id: TableWoodStyle;
+  name: string;
+  poeticTitle: string;
+  texture: string;
+  color: string;
+  borderColor: string;
+  tag: string;
+}[] = [
+  { id: 'walnut', name: '暖栗胡桃', poeticTitle: '檀影温润', texture: '经典山纹 · 沉稳内敛', color: '#452618', borderColor: '#7c3f25', tag: '经典传承' },
+  { id: 'huanghuali', name: '明式黄花梨', poeticTitle: '流水华彩', texture: '波浪鬼脸 · 琥珀温润', color: '#7a421b', borderColor: '#b4602a', tag: '宫廷名木' },
+  { id: 'cherry', name: '典雅樱桃木', poeticTitle: '暖红映辉', texture: '丝质细润 · 微泛朱霞', color: '#6a2f20', borderColor: '#9a4731', tag: '端庄古朴' },
+  { id: 'white_oak', name: '素雅白橡木', poeticTitle: '素心净植', texture: '自然直纹 · 通透淡雅', color: '#8c6e54', borderColor: '#b8997a', tag: '禅意素净' },
+];
+
 export type LightingPanelProps = EnvironmentDrawerProps;
 
 export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
@@ -115,6 +132,8 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
   onToggleTableRunner,
   tableclothStyle = 'autumn_gold',
   onChangeTableclothStyle,
+  tableWoodStyle = 'walnut',
+  onChangeTableWoodStyle,
   floorStyle = 'marble_tile',
   onChangeFloorStyle,
   wallStyle = 'classic_dawn',
@@ -431,7 +450,62 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               <Sparkles size={14} className="text-amber-400" />
               <span className="font-serif font-semibold">案台雅致装点</span>
             </div>
-            <div className="flex items-center justify-between text-stone-300 pt-1 gap-2">
+
+            {/* 4 款供案实木材质选择 */}
+            <div className="space-y-2 pt-0.5">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="flex items-center gap-1 font-medium text-amber-200">
+                  <Palette size={12} className="text-amber-400" />
+                  <span className="font-serif">供案原木材质 (4 款可选)</span>
+                </span>
+                <span className="text-amber-300 font-medium">
+                  {TABLE_WOOD_OPTIONS.find((o) => o.id === tableWoodStyle)?.name}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-1.5">
+                {TABLE_WOOD_OPTIONS.map((opt) => {
+                  const isSelected = tableWoodStyle === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        sound.playWoodPlacement();
+                        onChangeTableWoodStyle?.(opt.id);
+                      }}
+                      className={`flex items-center gap-2 p-1.5 rounded-lg border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-amber-950/50 border-amber-400/80 ring-1 ring-amber-400/40 text-amber-100 shadow-xs'
+                          : 'bg-stone-950/60 hover:bg-stone-800/60 border-stone-800 text-stone-400'
+                      }`}
+                    >
+                      <div
+                        className="w-5 h-5 rounded-full border shadow-xs flex items-center justify-center shrink-0"
+                        style={{ background: opt.color, borderColor: opt.borderColor }}
+                      >
+                        {isSelected && <Check size={11} className="text-white drop-shadow-xs stroke-[3]" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <span className={`text-[11px] truncate font-serif ${isSelected ? 'text-amber-200 font-semibold' : 'text-stone-300 font-medium'}`}>
+                            {opt.name}
+                          </span>
+                          <span className="text-[9px] px-1 py-0.2 rounded bg-stone-800 text-stone-400 shrink-0 font-normal">
+                            {opt.tag}
+                          </span>
+                        </div>
+                        <div className="text-[9px] text-stone-500 truncate mt-0.5">
+                          {opt.texture}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-stone-300 pt-2 border-t border-stone-800 gap-2">
               <span className="truncate">提花织锦大桌布（整案铺设 · 金丝流苏）</span>
               <button
                 type="button"
@@ -749,7 +823,7 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
               {/* 展开后的详细配置面板 */}
               {isAuditExpanded && (
                 <div className="pt-3 border-t border-amber-500/20 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                  {/* 1. 品鉴大类切换 (名花 vs 花器) */}
+                  {/* 1. 品鉴大类切换 (名花 vs 花器 vs 供案) */}
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-medium text-amber-200/90 flex items-center justify-between font-serif">
                       <span>品鉴大类</span>
@@ -788,6 +862,22 @@ export const EnvironmentDrawer: React.FC<EnvironmentDrawerProps> = ({
                       >
                         <span>🏺</span>
                         <span>花器形制专项 (12款)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isAuditMode) onToggleAuditMode?.();
+                          onSwitchAuditCategory?.('table');
+                        }}
+                        className={`py-1.5 px-2.5 rounded-xl border text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                          auditCategory === 'table'
+                            ? 'bg-amber-500 text-stone-950 font-bold border-amber-400 shadow-sm'
+                            : 'bg-stone-950/70 border-stone-800 text-stone-300 hover:bg-stone-800/80 hover:text-stone-100'
+                        }`}
+                      >
+                        <span>🪵</span>
+                        <span>供案原木材质 (4款)</span>
                       </button>
                     </div>
                   </div>

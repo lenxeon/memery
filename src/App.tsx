@@ -19,6 +19,7 @@ import {
   WorldContext,
   EntityTypeId,
   TableclothStyle,
+  TableWoodStyle,
   WallBackgroundStyle,
   FloorStyle,
   AuditCategory,
@@ -458,8 +459,7 @@ export const buildAuditItems = (
   return buildAuditVaseItems(vaseGroup, withFlowers);
 };
 
-export const buildInitialItems = (): Record<SceneItemId, SceneItem> =>
-  buildStandardItems();
+export const buildInitialItems = (): Record<SceneItemId, SceneItem> => ({});
 
 const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = buildInitialItems();
 
@@ -566,10 +566,11 @@ export default function App() {
   const [isArrangeMode, setIsArrangeMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  // Table adornments (桌旗/大桌布与落花瓣)
-  const [showTableRunner, setShowTableRunner] = useState(true);
+  // Table adornments (桌旗/大桌布与落花瓣：响应用户指令默认去除桌布)
+  const [showTableRunner, setShowTableRunner] = useState(false);
   const [tableclothStyle, setTableclothStyle] = useState<TableclothStyle>('autumn_gold');
-  const [showPetals, setShowPetals] = useState(true);
+  const [tableWoodStyle, setTableWoodStyle] = useState<TableWoodStyle>('walnut');
+  const [showPetals, setShowPetals] = useState(false);
 
   // Petal shower animation trigger
   const [petalTrigger, setPetalTrigger] = useState(0);
@@ -857,6 +858,11 @@ export default function App() {
 
   const switchAuditCategory = (category: AuditCategory) => {
     setAuditCategory(category);
+    if (category === 'table') {
+      sound.playWoodPlacement();
+      showToast('已进入「供案材质专项审计」');
+      return;
+    }
     const defaultGroup: AuditGroup = category === 'flowers' ? 'flowers_tier1_all' : 'new_unique';
     setAuditGroup(defaultGroup);
     sound.playPorcelainClink();
@@ -876,6 +882,7 @@ export default function App() {
       flowers_bouquets: '已展示案前敬献花束平铺形态对比',
       new_unique: '已展示 4 款异形与微观肌理瓶',
       designer_twist: '已展示 8 款现代几何折痕瓶',
+      all_woods: '已展示 4 款名木实木板式材质',
     };
     showToast(labelMap[group] || '展台已更新');
   };
@@ -1558,6 +1565,30 @@ export default function App() {
             {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} className="text-stone-400" />}
           </button>
 
+          {/* Table wood quick audit launcher */}
+          <button
+            type="button"
+            onClick={() => {
+              sound.playWoodPlacement();
+              if (isAuditMode && auditCategory === 'table') {
+                setIsAuditMode(false);
+              } else {
+                setIsAuditMode(true);
+                setAuditCategory('table');
+                setIsAuditCapsuleExpanded(true);
+              }
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all shadow-xs cursor-pointer whitespace-nowrap ${
+              isAuditMode && auditCategory === 'table'
+                ? 'bg-amber-500 text-stone-950 font-bold border border-amber-400 ring-2 ring-amber-400/40 shadow-sm'
+                : 'bg-white/90 border border-amber-200/60 text-stone-700 hover:bg-white'
+            }`}
+            title="快捷切换供案实木材质与桌布"
+          >
+            <span>🪵</span>
+            <span className="font-serif font-medium">案台材质</span>
+          </button>
+
           {/* Detailed Ambiance & Music panel button */}
           <button
             type="button"
@@ -1641,6 +1672,7 @@ export default function App() {
           wallStyle={wallStyle}
           floorStyle={floorStyle}
           tableclothStyle={tableclothStyle}
+          tableWoodStyle={tableWoodStyle}
           showTableRunner={showTableRunner}
           petalTrigger={petalTrigger}
           lastOfferedFlower={lastOfferedFlower}
@@ -1674,8 +1706,8 @@ export default function App() {
                 >
                   <GripVertical size={15} />
                 </div>
-                <span>{auditCategory === 'flowers' ? '🌸' : '🏺'}</span>
-                <span>{auditCategory === 'flowers' ? '名花专项审计' : '花器专项审计'}</span>
+                <span>{auditCategory === 'flowers' ? '🌸' : auditCategory === 'vases' ? '🏺' : '🪵'}</span>
+                <span>{auditCategory === 'flowers' ? '名花专项审计' : auditCategory === 'vases' ? '花器专项审计' : '案台木质审计'}</span>
                 <CinnabarSealBadge text="审计" />
               </div>
 
@@ -1697,7 +1729,7 @@ export default function App() {
                 <>
                   <span className="text-stone-600 hidden sm:inline">|</span>
 
-                  {/* 类别切换：名花 vs 花器 */}
+                  {/* 类别切换：名花 vs 花器 vs 案台 */}
                   <div className="flex items-center bg-stone-950/90 p-0.5 rounded-full border border-amber-500/40">
                     <button
                       type="button"
@@ -1722,6 +1754,18 @@ export default function App() {
                     >
                       <span>🏺</span>
                       <span>花器 (12款)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchAuditCategory('table')}
+                      className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium flex items-center gap-1 ${
+                        auditCategory === 'table'
+                          ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
+                          : 'text-amber-200/70 hover:text-amber-100'
+                      }`}
+                    >
+                      <span>🪵</span>
+                      <span>案台 (4款)</span>
                     </button>
                   </div>
 
@@ -1821,8 +1865,65 @@ export default function App() {
 
                   <span className="text-stone-600 hidden sm:inline">|</span>
 
-                  {/* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */}
-                  {auditCategory === 'flowers' ? (
+                  {/* 案台专属控制：4 款原木材质切换 & 桌布开关 */}
+                  {auditCategory === 'table' ? (
+                    <div className="flex items-center flex-wrap gap-1.5">
+                      <div className="flex items-center gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
+                        {[
+                          { id: 'walnut', name: '暖栗胡桃', color: '#452618', border: '#7c3f25' },
+                          { id: 'huanghuali', name: '明式黄花梨', color: '#7a421b', border: '#b4602a' },
+                          { id: 'cherry', name: '典雅樱桃', color: '#6a2f20', border: '#9a4731' },
+                          { id: 'white_oak', name: '素雅白橡', color: '#8c6e54', border: '#b8997a' },
+                        ].map((w) => {
+                          const isSel = tableWoodStyle === w.id;
+                          return (
+                            <button
+                              key={w.id}
+                              type="button"
+                              onClick={() => {
+                                sound.playWoodPlacement();
+                                setTableWoodStyle(w.id as TableWoodStyle);
+                                showToast(`供案材质已切换为「${w.name}」`);
+                              }}
+                              className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 text-xs font-medium flex items-center gap-1.5 ${
+                                isSel
+                                  ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
+                                  : 'text-amber-200/80 hover:text-amber-100 hover:bg-stone-900/60'
+                              }`}
+                            >
+                              <span
+                                className="w-2.5 h-2.5 rounded-full inline-block border shrink-0"
+                                style={{ background: w.color, borderColor: w.border }}
+                              />
+                              <span>{w.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sound.playWoodPlacement();
+                          setShowTableRunner((v) => {
+                            const next = !v;
+                            showToast(next ? '已铺设提花大桌布' : '已收起桌布，呈现纯实木板式案台');
+                            return next;
+                          });
+                        }}
+                        className={`px-2.5 py-1 rounded-full border cursor-pointer transition-all active:scale-95 flex items-center gap-1 font-medium text-xs ${
+                          showTableRunner
+                            ? 'bg-amber-600/50 border-amber-400 text-amber-200 font-bold'
+                            : 'bg-stone-900/80 border-stone-700 text-stone-400 hover:text-stone-200'
+                        }`}
+                        title="切换铺设大桌布或纯实木板式案台"
+                      >
+                        <span>🧺</span>
+                        <span>{showTableRunner ? '已铺大桌布' : '素雅纯实木'}</span>
+                      </button>
+                    </div>
+                  ) : auditCategory === 'flowers' ? (
+                    /* 名花专属控制：枯荣生命周期切换 & 漫天落瓣动效 */
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
@@ -1847,6 +1948,7 @@ export default function App() {
                       </button>
                     </div>
                   ) : (
+                    /* 花器专属控制 */
                     <button
                       type="button"
                       onClick={toggleAuditFlowers}
@@ -1915,6 +2017,11 @@ export default function App() {
         onChangeTableclothStyle={(st) => {
           sound.playWoodPlacement();
           setTableclothStyle(st);
+        }}
+        tableWoodStyle={tableWoodStyle}
+        onChangeTableWoodStyle={(st) => {
+          sound.playWoodPlacement();
+          setTableWoodStyle(st);
         }}
         floorStyle={floorStyle}
         onChangeFloorStyle={handleFloorStyleChange}

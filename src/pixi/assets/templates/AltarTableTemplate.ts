@@ -57,7 +57,7 @@ export function getAltarTableSvg(options: AltarTableOptions = {}): string {
 
   // 纯木前面板线纹（未启用桌布时呈现）
   const bareWoodLines = Array.from({ length: 18 })
-    .map((_, i) => `<line x1="${20 + i * 30}" y1="54" x2="${20 + i * 30}" y2="74" stroke="rgba(75, 45, 20, 0.12)" stroke-width="1.2" />`)
+    .map((_, i) => `<line x1="${20 + i * 30}" y1="72.5" x2="${20 + i * 30}" y2="92.5" stroke="rgba(75, 45, 20, 0.12)" stroke-width="1.2" />`)
     .join('');
 
   // 前垂布幔 / 裸木面
@@ -70,30 +70,30 @@ export function getAltarTableSvg(options: AltarTableOptions = {}): string {
       )
     : `
       <g id="bareWoodFrontSlab">
-        <polygon points="4,52 556,52 556,54.5 4,54.5" fill="url(#bevelSpecularGrad)" />
-        <rect x="4" y="54" width="552" height="20" rx="1.5" fill="url(#frontSlabGrad)" />
+        <polygon points="4,70 556,70 556,72.5 4,72.5" fill="url(#bevelSpecularGrad)" />
+        <rect x="4" y="72.5" width="552" height="20" rx="1.5" fill="url(#frontSlabGrad)" />
         ${bareWoodLines}
-        <line x1="4" y1="74" x2="556" y2="74" stroke="#52361d" stroke-width="1.5" />
-        <polygon points="14,16 4,52 4,74 8,74 16,16" fill="url(#endgrainLeft)" opacity="0.6" />
-        <polygon points="546,16 556,52 556,74 552,74 544,16" fill="url(#endgrainRight)" opacity="0.6" />
+        <line x1="4" y1="92.5" x2="556" y2="92.5" stroke="#52361d" stroke-width="1.5" />
+        <polygon points="14,16 4,70 4,92.5 8,92.5 16,16" fill="url(#endgrainLeft)" opacity="0.6" />
+        <polygon points="546,16 556,70 556,92.5 552,92.5 544,16" fill="url(#endgrainRight)" opacity="0.6" />
       </g>
     `;
 
   return `
-<svg viewBox="0 0 560 160" width="560" height="160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+<svg viewBox="0 0 560 166" width="560" height="166" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
   <defs>
     <linearGradient id="woodTableTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#f3e5d3" />
-      <stop offset="25%" stop-color="#faecd8" />
-      <stop offset="65%" stop-color="#eed7bf" />
-      <stop offset="100%" stop-color="#dfc3a3" />
+      <stop offset="0%" stop-color="#c8ad6a" />
+      <stop offset="25%" stop-color="#d4b96e" />
+      <stop offset="65%" stop-color="#bb9f54" />
+      <stop offset="100%" stop-color="#9a8040" />
     </linearGradient>
     <linearGradient id="bevelSpecularGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#eedcc7" />
-      <stop offset="20%" stop-color="#fff8ee" />
-      <stop offset="50%" stop-color="#ffffff" />
-      <stop offset="80%" stop-color="#fff8ee" />
-      <stop offset="100%" stop-color="#eedcc7" />
+      <stop offset="0%" stop-color="#b89a50" />
+      <stop offset="20%" stop-color="#d9c278" />
+      <stop offset="50%" stop-color="#e8d28a" />
+      <stop offset="80%" stop-color="#d9c278" />
+      <stop offset="100%" stop-color="#b89a50" />
     </linearGradient>
     <linearGradient id="frontSlabGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#d8b997" />
@@ -145,18 +145,16 @@ export function getAltarTableSvg(options: AltarTableOptions = {}): string {
       <stop offset="60%" stop-color="#d97706" />
       <stop offset="100%" stop-color="#92400e" />
     </linearGradient>
-    <pattern id="weaveGoldBrocade" width="16" height="16" patternUnits="userSpaceOnUse">
-      <rect width="16" height="16" fill="none" />
-      <line x1="0" y1="2" x2="16" y2="2" stroke="rgba(255,245,210,0.18)" stroke-width="0.8" />
-      <line x1="0" y1="6" x2="16" y2="6" stroke="rgba(40,20,5,0.12)" stroke-width="0.8" />
-      <line x1="0" y1="10" x2="16" y2="10" stroke="rgba(255,245,210,0.18)" stroke-width="0.8" />
-      <line x1="0" y1="14" x2="16" y2="14" stroke="rgba(40,20,5,0.12)" stroke-width="0.8" />
-      <line x1="2" y1="0" x2="2" y2="16" stroke="rgba(255,245,210,0.15)" stroke-width="0.8" />
-      <line x1="6" y1="0" x2="6" y2="16" stroke="rgba(40,20,5,0.10)" stroke-width="0.8" />
-      <line x1="10" y1="0" x2="10" y2="16" stroke="rgba(255,245,210,0.15)" stroke-width="0.8" />
-      <line x1="14" y1="0" x2="14" y2="16" stroke="rgba(40,20,5,0.10)" stroke-width="0.8" />
-      <polygon points="8,3 13,8 8,13 3,8" fill="none" stroke="rgba(255,240,180,0.22)" stroke-width="0.8" />
-      <polygon points="8,5 11,8 8,11 5,8" fill="rgba(80,45,10,0.06)" />
+    <pattern id="weaveGoldBrocade" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="none" />
+      <rect x="0" y="0" width="4" height="4" fill="rgba(255,248,200,0.07)" />
+      <rect x="4" y="4" width="4" height="4" fill="rgba(255,248,200,0.07)" />
+      <rect x="4" y="0" width="4" height="4" fill="rgba(20,10,0,0.05)" />
+      <rect x="0" y="4" width="4" height="4" fill="rgba(20,10,0,0.05)" />
+      <line x1="0" y1="0" x2="8" y2="0" stroke="rgba(20,10,0,0.10)" stroke-width="0.5" />
+      <line x1="0" y1="4" x2="8" y2="4" stroke="rgba(255,245,180,0.10)" stroke-width="0.4" />
+      <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(20,10,0,0.10)" stroke-width="0.5" />
+      <line x1="4" y1="0" x2="4" y2="8" stroke="rgba(255,245,180,0.10)" stroke-width="0.4" />
     </pattern>
     <pattern id="weaveSatinSilk" width="16" height="16" patternUnits="userSpaceOnUse">
       <rect width="16" height="16" fill="none" />
@@ -302,39 +300,39 @@ export function getAltarTableSvg(options: AltarTableOptions = {}): string {
   ${watermarkSvg}
 
   <g id="tableBaseStructure">
-    <rect x="58" y="55" width="444" height="80" rx="3" fill="url(#apronPanelGrad)" />
-    <rect x="62" y="55" width="140" height="80" fill="rgba(255, 235, 205, 0.05)" />
-    <rect x="210" y="55" width="140" height="80" fill="rgba(255, 235, 205, 0.07)" />
-    <rect x="358" y="55" width="140" height="80" fill="rgba(255, 235, 205, 0.05)" />
-    <line x1="205" y1="55" x2="205" y2="135" stroke="#48301c" stroke-width="3" />
-    <line x1="207" y1="55" x2="207" y2="135" stroke="#dfc09c" stroke-width="1" opacity="0.6" />
-    <line x1="353" y1="55" x2="353" y2="135" stroke="#48301c" stroke-width="3" />
-    <line x1="355" y1="55" x2="355" y2="135" stroke="#dfc09c" stroke-width="1" opacity="0.6" />
-    <rect x="52" y="55" width="48" height="82" rx="2" fill="url(#legBlockGrad)" />
-    <line x1="53" y1="55" x2="53" y2="137" stroke="#edd4b8" stroke-width="1.2" opacity="0.8" />
-    <rect x="96" y="55" width="5" height="82" fill="#4d321c" opacity="0.45" />
-    <rect x="460" y="55" width="48" height="82" rx="2" fill="url(#legBlockGrad)" />
-    <line x1="461" y1="55" x2="461" y2="137" stroke="#edd4b8" stroke-width="1.2" opacity="0.8" />
-    <rect x="460" y="55" width="5" height="82" fill="#4d321c" opacity="0.45" />
-    <rect x="52" y="132" width="456" height="5" rx="1" fill="#6e4c2b" />
-    <rect x="52" y="55" width="456" height="14" fill="#2d1b0d" opacity="0.65" />
+    <rect x="58" y="70" width="444" height="76" rx="3" fill="url(#apronPanelGrad)" />
+    <rect x="62" y="70" width="140" height="76" fill="rgba(255, 235, 205, 0.05)" />
+    <rect x="210" y="70" width="140" height="76" fill="rgba(255, 235, 205, 0.07)" />
+    <rect x="358" y="70" width="140" height="76" fill="rgba(255, 235, 205, 0.05)" />
+    <line x1="205" y1="70" x2="205" y2="146" stroke="#48301c" stroke-width="3" />
+    <line x1="207" y1="70" x2="207" y2="146" stroke="#dfc09c" stroke-width="1" opacity="0.6" />
+    <line x1="353" y1="70" x2="353" y2="146" stroke="#48301c" stroke-width="3" />
+    <line x1="355" y1="70" x2="355" y2="146" stroke="#dfc09c" stroke-width="1" opacity="0.6" />
+    <rect x="52" y="70" width="48" height="78" rx="2" fill="url(#legBlockGrad)" />
+    <line x1="53" y1="70" x2="53" y2="148" stroke="#edd4b8" stroke-width="1.2" opacity="0.8" />
+    <rect x="96" y="70" width="5" height="78" fill="#4d321c" opacity="0.45" />
+    <rect x="460" y="70" width="48" height="78" rx="2" fill="url(#legBlockGrad)" />
+    <line x1="461" y1="70" x2="461" y2="148" stroke="#edd4b8" stroke-width="1.2" opacity="0.8" />
+    <rect x="460" y="70" width="5" height="78" fill="#4d321c" opacity="0.45" />
+    <rect x="52" y="144" width="456" height="5" rx="1" fill="#6e4c2b" />
+    <rect x="52" y="70" width="456" height="12" fill="#2d1b0d" opacity="0.65" />
   </g>
 
   <g id="tableTopSlab">
-    <polygon points="14,16 546,16 556,52 4,52" fill="url(#woodTableTopGrad)" stroke="#cfb290" stroke-width="0.8" />
+    <polygon points="14,16 546,16 556,70 4,70" fill="url(#woodTableTopGrad)" stroke="#cfb290" stroke-width="0.8" />
     <path d="M 25 24 Q 280 23 535 24" stroke="#e0c4a4" stroke-width="0.9" fill="none" opacity="0.75" />
-    <path d="M 18 33 Q 280 32 542 33" stroke="#e0c4a4" stroke-width="1.0" fill="none" opacity="0.7" />
-    <path d="M 12 42 Q 280 41 548 42" stroke="#e0c4a4" stroke-width="1.1" fill="none" opacity="0.65" />
-    <ellipse cx="280" cy="34" rx="210" ry="14" fill="#fff9ef" opacity="0.35" />
+    <path d="M 18 40 Q 280 39 542 40" stroke="#e0c4a4" stroke-width="1.0" fill="none" opacity="0.7" />
+    <path d="M 10 56 Q 280 55 550 56" stroke="#e0c4a4" stroke-width="1.1" fill="none" opacity="0.65" />
+    <ellipse cx="280" cy="45" rx="210" ry="18" fill="#fff9ef" opacity="0.12" />
     ${tableclothTopSvg}
     ${petalsSvg}
     ${valanceOrBareWood}
   </g>
 
-  <ellipse cx="76" cy="139" rx="38" ry="4.5" fill="#201208" opacity="0.85" />
-  <ellipse cx="484" cy="139" rx="38" ry="4.5" fill="#201208" opacity="0.85" />
-  <rect x="74" y="137" width="412" height="4" rx="2" fill="#201208" opacity="0.75" />
-  <ellipse cx="${(280 + shadowTiltX * 1.5).toFixed(1)}" cy="146" rx="270" ry="12" fill="url(#tableFloorShadowGrad)" />
+  <ellipse cx="76" cy="152" rx="38" ry="4.5" fill="#201208" opacity="0.85" />
+  <ellipse cx="484" cy="152" rx="38" ry="4.5" fill="#201208" opacity="0.85" />
+  <rect x="74" y="150" width="412" height="4" rx="2" fill="#201208" opacity="0.75" />
+  <ellipse cx="${(280 + shadowTiltX * 1.5).toFixed(1)}" cy="158" rx="270" ry="10" fill="url(#tableFloorShadowGrad)" />
 </svg>
   `.trim();
 }

@@ -69,19 +69,22 @@ export class PropsLayer {
     this.currentAltarCenterX = altarCenterX;
     this.currentAltarTopY = altarTopY;
     this.currentAltarWidth = altarWidth;
-    const scaleFactor = Math.min(1.0, Math.max(0.65, altarWidth / 560));
+    // scaleFactor 随桌宽线性缩放，不再硬钳到 1.0，让道具跟随桌子宽度铺开
+    const scaleFactor = Math.min(1.5, Math.max(0.65, altarWidth / 560));
     this.currentScaleFactor = scaleFactor;
 
+    // xOffset 以 560 为基准比例尺，随 scaleFactor 同步放大
+    const spread = scaleFactor;
     const defaultLayouts: Record<string, { xOffset: number; yOffset: number }> = {
-      vase_left: { xOffset: -164, yOffset: -4 },
-      vase_right: { xOffset: 164, yOffset: -4 },
-      candle_left: { xOffset: -74, yOffset: 3 },
-      candle_right: { xOffset: 74, yOffset: 3 },
-      fruit_left: { xOffset: -118, yOffset: 16 },
-      fruit_right: { xOffset: 118, yOffset: 16 },
-      censer: { xOffset: 0, yOffset: 6 },
-      tea_cups: { xOffset: 0, yOffset: 22 },
-      singing_bowl: { xOffset: -62, yOffset: 32 },
+      vase_left:    { xOffset: -164 * spread, yOffset: -4 },
+      vase_right:   { xOffset:  164 * spread, yOffset: -4 },
+      candle_left:  { xOffset:  -74 * spread, yOffset:  3 },
+      candle_right: { xOffset:   74 * spread, yOffset:  3 },
+      fruit_left:   { xOffset: -118 * spread, yOffset: 16 },
+      fruit_right:  { xOffset:  118 * spread, yOffset: 16 },
+      censer:       { xOffset:    0,          yOffset:  6 },
+      tea_cups:     { xOffset:    0,          yOffset: 22 },
+      singing_bowl: { xOffset:  -62 * spread, yOffset: 32 },
     };
 
     this.latestItems = items;
