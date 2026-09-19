@@ -9,16 +9,48 @@ import { SmokeParticleEmitter } from '../effects/SmokeParticleEmitter';
 import { PixiEffects } from '../effects/PixiEffects';
 import { CandleFlameRenderer } from '../effects/CandleFlameRenderer';
 import { IncenseSmokeRenderer } from '../effects/IncenseSmokeRenderer';
-import { SceneItem, SceneItemId, FlowerType, FruitType } from '../../types';
+import { SceneItem, SceneItemId, FlowerType, FruitType, VaseHitZone } from '../../types';
 import { AltarLightSource } from './AltarTableLayer';
 import { VaseStyle } from '../assets/templates/flowers/vases';
 import { sound } from '../../utils/audio';
+
+/**
+ * 花瓶命中区（容器局部坐标，单位 px，随容器 scale 缩放）。
+ * 花瓶纹理是 210×265 的整幅画布，瓶身仅占中间约 44px 宽，四角大片透明留白，
+ * 若沿用精灵包围盒，离花瓶很远的空处也会被命中。此处按「瓶身 + 花冠」实际轮廓收紧。
+ * 坐标换算：容器原点对应纹理 viewBox 中的 (75, 193.2)，横向 0.84×、纵向 0.946×。
+ */
+/** 瓶口在容器局部坐标中的高度，同时作为「花冠 / 瓶身」点击分区的分界 */
+const VASE_MOUTH_Y = -84;
+
+const vaseHitArea = (hasFlower: boolean): Polygon => {
+  if (!hasFlower) {
+    // 净瓶裸检：只保留瓶身立柱
+    return new Polygon([-22, 4, 22, 4, 22, VASE_MOUTH_Y, -22, VASE_MOUTH_Y]);
+  }
+  return new Polygon([
+    -22, 4,     // 瓶底左
+    -22, -50,   // 瓶身左
+    -20, VASE_MOUTH_Y,   // 瓶口左
+    -46, -102,  // 花冠左下外展
+    -56, -145,  // 花冠左最宽处
+    -44, -180,  // 花冠左上收
+    -18, -192,  // 花冠顶左
+    18, -192,   // 花冠顶右
+    44, -180,
+    56, -145,
+    46, -102,
+    20, VASE_MOUTH_Y,    // 瓶口右
+    22, -50,
+    22, 4,      // 瓶底右
+  ]);
+};
 
 export interface PropsLayerCallbacks {
   onToggleLit?: (id: SceneItemId) => void;
   onToggleFruit?: (id: SceneItemId) => void;
   onBowlHit?: () => void;
-  onVaseClick?: (id: SceneItemId) => void;
+  onVaseClick?: (id: SceneItemId, zone: VaseHitZone) => void;
   onItemPointerDown?: (id: SceneItemId, event: FederatedPointerEvent) => void;
   onUpdatePosition?: (id: SceneItemId, pos: { x: number; y: number }) => void;
 }
@@ -76,16 +108,21 @@ export class PropsLayer {
 
     // xOffset 以 560 为基准比例尺，随 scaleFactor 同步放大
     const spread = scaleFactor;
+    // 台面进深与 AltarTableLayer 一致（depth = 54u，u = tableWidth / 560）。
+    // yOffset 语义为「相对台面前沿的纵深」：0 = 紧贴前沿，负值向案里（后方）退，
+    // 必须落在 [-depthUnits, 0] 带内，否则道具会浮在台面之外的正立面上。
+    const tableDepth = 54 * (altarWidth / 560);
+    const depthUnits = tableDepth / scaleFactor;
     const defaultLayouts: Record<string, { xOffset: number; yOffset: number }> = {
-      vase_left:    { xOffset: -164 * spread, yOffset: -4 },
-      vase_right:   { xOffset:  164 * spread, yOffset: -4 },
-      candle_left:  { xOffset:  -74 * spread, yOffset:  3 },
-      candle_right: { xOffset:   74 * spread, yOffset:  3 },
-      fruit_left:   { xOffset: -118 * spread, yOffset: 16 },
-      fruit_right:  { xOffset:  118 * spread, yOffset: 16 },
-      censer:       { xOffset:    0,          yOffset:  6 },
-      tea_cups:     { xOffset:    0,          yOffset: 22 },
-      singing_bowl: { xOffset:  -62 * spread, yOffset: 32 },
+      vase_left:    { xOffset: -164 * spread, yOffset: -46 },
+      vase_right:   { xOffset:  164 * spread, yOffset: -46 },
+      candle_left:  { xOffset:  -74 * spread, yOffset: -40 },
+      candle_right: { xOffset:   74 * spread, yOffset: -40 },
+      fruit_left:   { xOffset: -118 * spread, yOffset: -28 },
+      fruit_right:  { xOffset:  118 * spread, yOffset: -28 },
+      censer:       { xOffset:    0,          yOffset: -38 },
+      tea_cups:     { xOffset:    0,          yOffset: -18 },
+      singing_bowl: { xOffset:  -62 * spread, yOffset:  -8 },
     };
 
     this.latestItems = items;
@@ -150,6 +187,7 @@ export class PropsLayer {
         let startPointerY = 0;
         let startContX = 0;
         let startContY = 0;
+        let startLocalY = 0;
         let hasMoved = false;
 
         cont.on('pointerdown', (e: FederatedPointerEvent) => {
@@ -159,6 +197,8 @@ export class PropsLayer {
           hasMoved = false;
           startPointerX = e.global.x;
           startPointerY = e.global.y;
+          // 记录命中点在容器局部坐标中的高度，用于花瓶「花冠 / 瓶身」分区判定
+          startLocalY = cont!.toLocal(e.global).y;
           startContX = cont!.x;
           startContY = cont!.y;
           cont!.cursor = 'grabbing';
@@ -181,9 +221,11 @@ export class PropsLayer {
               this.currentAltarCenterX - boundsX,
               Math.min(this.currentAltarCenterX + boundsX, startContX + dx)
             );
+            // 纵向只允许在台面进深带内移动（后沿 -tableDepth ~ 前沿 0）
+            const dragDepth = 54 * (this.currentAltarWidth / 560);
             const newY = Math.max(
-              this.currentAltarTopY - 24,
-              Math.min(this.currentAltarTopY + 36, startContY + dy)
+              this.currentAltarTopY - dragDepth,
+              Math.min(this.currentAltarTopY, startContY + dy)
             );
 
             cont!.x = newX;
@@ -218,7 +260,9 @@ export class PropsLayer {
               this.callbacks.onToggleFruit?.(id as SceneItemId);
             } else if (id.startsWith('vase')) {
               sound.playBell(720, 2);
-              this.callbacks.onVaseClick?.(id as SceneItemId);
+              // 瓶口以上为花冠（换花材），瓶口以下为瓶身（换器型）
+              const zone: VaseHitZone = startLocalY < VASE_MOUTH_Y ? 'flowers' : 'vase';
+              this.callbacks.onVaseClick?.(id as SceneItemId, zone);
             } else if (id === 'tea_cups') {
               sound.playPorcelainClink();
             } else if (id === 'censer') {
@@ -243,9 +287,11 @@ export class PropsLayer {
       }
 
       // 计算相对于供案中心的绝对坐标
-      const def = defaultLayouts[id] || { xOffset: 0, yOffset: 0 };
+      const def = defaultLayouts[id] || { xOffset: 0, yOffset: -18 };
       const relX = item.position?.x !== undefined ? item.position.x : def.xOffset;
-      const relY = item.position?.y !== undefined ? item.position.y : def.yOffset;
+      // 纵向强制收入台面进深带：兼容历史存档里写在台面前沿之外的正值
+      const relYRaw = item.position?.y !== undefined ? item.position.y : def.yOffset;
+      const relY = Math.max(-depthUnits, Math.min(0, relYRaw));
 
       const tableSpreadX = altarWidth / 560;
       const itemX = altarCenterX + relX * tableSpreadX * scaleFactor;
@@ -270,6 +316,8 @@ export class PropsLayer {
         // 花瓶+盛开花束：高挑修长，远超蜡烛高度 (265px 挺拔优雅，对齐参考图1)
         targetW = 210;
         targetH = 265;
+        // 命中区随花束有无切换：净瓶时不再保留上方花冠的空命中
+        cont.hitArea = vaseHitArea(flower !== 'none');
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);

@@ -63,7 +63,7 @@ export const MemorialEditModal: React.FC<MemorialEditModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-md bg-[#1c1917]/95 backdrop-blur-xl rounded-3xl p-5 sm:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.85)] border border-amber-500/50 ring-1 ring-amber-400/20 text-stone-200 pointer-events-auto"
+        className="w-full max-w-md max-h-[86vh] overflow-y-auto bg-[#1c1917]/95 backdrop-blur-xl rounded-3xl p-5 sm:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.85)] border border-amber-500/50 ring-1 ring-amber-400/20 text-stone-200 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-amber-500/30 pb-3 mb-4">

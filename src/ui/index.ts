@@ -8,3 +8,4 @@ export * from './memorial';
 export * from './controls';
 export * from './common/ChineseDecorations';
 export * from './portrait';
+export * from './dialog';

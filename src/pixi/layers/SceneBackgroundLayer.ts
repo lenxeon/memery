@@ -1,7 +1,7 @@
 /**
  * @file SceneBackgroundLayer.ts
  * @description PixiJS 远景与古典建筑背景墙层。
- * 100% 呈现 6 大传世殿宇壁构 (来自 AltarWall / registry 官方高精矢量 GPU 纹理)，
+ * 100% 呈现 6 大传世殿宇壁构 (来自 WallScene / registry 官方高精矢量 GPU 纹理)，
  * 融合柔和天光光晕与昼夜晨昏环境色谱。
  */
 import { Container, Graphics, Sprite } from 'pixi.js';

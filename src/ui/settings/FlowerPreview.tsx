@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { FlowerType } from '../../types';
-import { getFlowerOnlyPreviewSvg } from '../../pixi/assets/templates/FlowerTemplate';
+import { getFlowerOnlyPreviewSvg } from '../../pixi';
 
 export interface FlowerPreviewProps {
   flowerType: FlowerType;

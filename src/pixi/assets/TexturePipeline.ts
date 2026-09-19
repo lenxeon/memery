@@ -4,8 +4,6 @@
  * 具备一键全量预热与同步获取能力，保证 60FPS 极速渲染。
  */
 import { Texture } from 'pixi.js';
-import React from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { rasterizeSvgToTexture, getCachedTexture } from './SvgToTexture';
 import {
   getVaseWithFlowerSvg,
@@ -21,7 +19,8 @@ import { VaseStyle } from './templates/flowers/vases';
 import { getVaseFlowerSvg } from './templates/FlowerTemplate';
 import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
 import { getAltarTableSvg } from './templates/AltarTableTemplate';
-import { getWallModule, renderWallDefs } from '../environment/walls/registry';
+import { getWallModule, renderWallDefs } from '../scene/walls/registry';
+import { WALL_GOLD_FILLET_DEFS } from '../scene/walls/BaseWall';
 
 export class TexturePipeline {
   private static instance: TexturePipeline | null = null;
@@ -366,39 +365,18 @@ export class TexturePipeline {
       const wallModule = getWallModule(wallStyle);
       const ambiance = wallModule.getAmbiance(timeOfDay, masterOn);
       const defsSlot = renderWallDefs(wallStyle, timeOfDay, masterOn);
-      const StyleComp = wallModule.Component;
+      const content = wallModule.renderContent({
+        masterOn,
+        sunlightIntensity: 1.0,
+        timeOfDay,
+        sunAngle: 0,
+        ambiance,
+      });
 
-      const element = React.createElement(
-        'svg',
-        {
-          xmlns: 'http://www.w3.org/2000/svg',
-          viewBox: '0 0 420 720',
-          width: '420',
-          height: '720',
-        },
-        React.createElement(
-          'defs',
-          null,
-          React.createElement(
-            'linearGradient',
-            { id: 'goldFilletGrad', x1: '0%', y1: '0%', x2: '100%', y2: '100%' },
-            React.createElement('stop', { offset: '0%', stopColor: '#e8cd8a' }),
-            React.createElement('stop', { offset: '35%', stopColor: '#caa262' }),
-            React.createElement('stop', { offset: '70%', stopColor: '#9a7638' }),
-            React.createElement('stop', { offset: '100%', stopColor: '#6e4f1f' })
-          ),
-          defsSlot
-        ),
-        React.createElement(StyleComp, {
-          masterOn,
-          sunlightIntensity: 1.0,
-          timeOfDay,
-          sunAngle: 0,
-          ambiance,
-        })
-      );
-
-      const svg = renderToStaticMarkup(element);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 720" width="420" height="720">
+  <defs>${WALL_GOLD_FILLET_DEFS}${defsSlot}
+  </defs>${content}
+</svg>`;
       return rasterizeSvgToTexture(key, svg, 840, 1440, 2.0);
     } catch (e) {
       console.warn('Failed to rasterize altar wall:', e);

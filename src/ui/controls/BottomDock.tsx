@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { sound } from '../../utils/audio';
 import { FlowerType } from '../../types';
-import { FLOWER_REGISTRY } from '../../pixi/assets/templates/flowers';
+import { FLOWER_REGISTRY } from '../../pixi';
 
 interface BottomDockProps {
   onOpenFlowers: () => void;

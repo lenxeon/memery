@@ -5,36 +5,10 @@
  * 以及最新扩充的【奇特形制与手作肌理】：手作泥捏翻边陶瓶、银曜珠光螺旋涡轮瓶、极简莫兰迪旋转扭扭塔瓶、天青流沙渐变圆锥砂陶瓶。
  */
 
-export type VaseStyle =
-  // ── 基础现代高阶设计感系列 ──
-  | 'ribbed_fluted_white'    // 1. 极细百褶密棱直筒瓶 (参考图1右 / 图4右)
-  | 'organic_twist_cream'    // 2. 流光旋风波浪奶油瓶 (参考图2 奶油白)
-  | 'organic_twist_rose'     // 3. 落樱粉波浪旋风瓶 (参考图5 樱粉色)
-  | 'chiseled_stone_gray'    // 4. 侘寂玄灰砂岩横纹瓶 (参考图3 玄灰粗砂拉坯横纹)
-  | 'fluted_trapezoid_mini'  // 5. 折线圆台百褶短瓶 (参考图1中 梯形圆台百褶)
-  | 'faceted_gem_prism'      // 6. 钻石晶体多面切角瓶 (参考图4之2 晶体多边形折面)
-  | 'melon_lobed_celadon'    // 7. 海棠瓜棱秀颈素瓶 (参考图4之3 纤秀颈瓜棱圆瓣)
-  | 'minimal_drop_swan'      // 8. 现代极简水滴天鹅瓶 (参考图4左1 / 图1左 极简纤颈水滴)
-  // ── 奇特造型与手作肌理系列 (最新用户参考) ──
-  | 'pinched_clay_ruffle'    // 9. 手作泥捏翻边陶瓶 (新图1: 不对称卷边荷叶口、手工梳齿拉坯刮痕粗陶)
-  | 'pearlescent_turbine'    // 10. 银曜珠光螺旋涡轮瓶 (新图3: 撇口垂胆腹、8道旋转刀锋立体螺旋棱)
-  | 'twisted_helix_tower'    // 11. 极简莫兰迪旋转扭扭塔瓶 (新图4: 空间多边形沿竖轴90°旋转扭曲沙漏腰)
-  | 'gradient_sand_volcano'  // 12. 天青流沙渐变圆锥砂陶瓶 (新图5: 极简圆台圆锥体、天青釉渐变粗砂岩底)
-  // 向下兼容历史别名
-  | 'warm_white_plain'
-  | 'painted_iris'
-  | 'fluted_origami'
-  | 'faceted_prism'
-  | 'song_mallet'
-  | 'willow_guanyin'
-  | 'archaic_ears'
-  | 'classic_meiping'
-  | 'painted_peony'
-  | 'painted_plum'
-  | 'qinghua_lotus'
-  | 'royal_blue_gold'
-  | 'mutton_jade_ears'
-  | 'celadon_ru';
+import type { VaseStyle } from '../../../../../types';
+
+// 形制类型由全局协议层定义，此处转出以保持原有导入路径可用
+export type { VaseStyle };
 
 export interface VaseStyleMeta {
   id: VaseStyle;
