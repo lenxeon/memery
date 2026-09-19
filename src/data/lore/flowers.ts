@@ -1,0 +1,237 @@
+/**
+ * @file flowers.ts
+ * @description 供花典故。id 与 FlowerType 一致，可直接按花材 id 查档。
+ */
+import type { RelicLore } from './types';
+
+export const FLOWER_LORE: RelicLore[] = [
+  {
+    id: 'peonies',
+    category: 'flower',
+    name: '牡丹',
+    poeticTitle: '国色天香',
+    dynasty: '唐',
+    origin: '唐·李肇《唐国史补》',
+    allusion:
+      '唐人最尚牡丹，长安春暮花时，士庶车马若狂，一株有直数万钱者。《唐国史补》记：「京城贵游尚牡丹三十余年矣，每春暮车马若狂。」故牡丹为唐世花王，非虚誉。',
+    poem: {
+      text: '唯有牡丹真国色，花开时节动京城。',
+      title: '赏牡丹',
+      author: '唐·刘禹锡',
+    },
+    ritual: '供花以双数为敬，花头朝神位；牡丹用于春祭，取富贵圆满之意。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'lotus',
+    category: 'flower',
+    name: '莲',
+    poeticTitle: '净土清芬',
+    dynasty: '南北朝',
+    origin: '宋·周敦颐《爱莲说》',
+    allusion:
+      '莲随佛教东传而入中土供奉，佛经以莲花出淤泥而不染喻清净法身，造像与藻井皆以莲为座。宋儒周敦颐作《爱莲说》，遂以莲比君子。',
+    poem: {
+      text: '出淤泥而不染，濯清涟而不妖。',
+      title: '爱莲说',
+      author: '宋·周敦颐',
+    },
+    ritual: '佛前供莲最古，宜清水养，忌萎凋不换。',
+    authenticity: 'canon',
+    related: ['pattern_lotus'],
+  },
+  {
+    id: 'chrysanthemum',
+    category: 'flower',
+    name: '菊',
+    poeticTitle: '晚节凌霜',
+    dynasty: '晋',
+    origin: '晋·陶渊明《饮酒》、南朝·吴均《续齐谐记》',
+    allusion:
+      '陶渊明采菊东篱，菊遂为隐逸与晚节之象。重九佩茱萸、饮菊酒之俗，见《续齐谐记》所载桓景登高避灾事。',
+    poem: {
+      text: '采菊东篱下，悠然见南山。',
+      title: '饮酒·其五',
+      author: '晋·陶渊明',
+    },
+    ritual: '菊耐霜不落，喻人之晚节，秋祭与重阳扫墓多用之。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'plum_blossoms',
+    category: 'flower',
+    name: '梅',
+    poeticTitle: '暗香疏影',
+    dynasty: '宋',
+    origin: '《宋史·隐逸传》、宋·林逋《山园小梅》',
+    allusion:
+      '宋人林逋隐居孤山，植梅畜鹤，世谓「梅妻鹤子」，咏梅遂成一代风气。梅开百花之先，凛寒独放，与松、竹并为岁寒三友。',
+    poem: {
+      text: '疏影横斜水清浅，暗香浮动月黄昏。',
+      title: '山园小梅',
+      author: '宋·林逋',
+    },
+    ritual: '冬春之交供梅，取凌寒守志之意，宜疏不宜密。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'orchids',
+    category: 'flower',
+    name: '兰',
+    poeticTitle: '空谷幽香',
+    dynasty: '先秦',
+    origin: '《孔子家语·在厄》、战国·屈原《离骚》',
+    allusion:
+      '孔子厄于陈蔡，谓「芝兰生于深林，不以无人而不芳」，以兰喻君子慎独之德。屈原则「纫秋兰以为佩」，兰为香祖，古人以祓除不祥。',
+    poem: {
+      text: '芝兰生于深林，不以无人而不芳。',
+      title: '孔子家语·在厄',
+      author: '先秦·孔门弟子记',
+    },
+    ritual: '清明插兰、佩兰，古有祓除之礼；供兰宜单株清供，忌浓香夺主。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'narcissus',
+    category: 'flower',
+    name: '水仙',
+    poeticTitle: '凌波仙子',
+    dynasty: '宋',
+    origin: '宋·黄庭坚《王充道送水仙花五十枝》',
+    allusion:
+      '水仙宋时已入文人清供，黄庭坚以洛神拟之，名曰「凌波仙子」。漳州水仙自明清为贡品，岁朝案头必有。',
+    poem: {
+      text: '凌波仙子生尘袜，水上轻盈步微月。',
+      title: '王充道送水仙花五十枝',
+      author: '宋·黄庭坚',
+    },
+    ritual: '岁朝清供首选，清水养、素器盛，取洁净迎新之意。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'roses',
+    category: 'flower',
+    name: '玫瑰',
+    poeticTitle: '浅深两色',
+    dynasty: '宋',
+    origin: '宋·杨万里《红玫瑰》',
+    allusion:
+      '宋人已辨玫瑰非月季、非蔷薇，杨万里诗云「不与蔷薇谱牒通」。古之玫瑰入香、入药、入馔为其要；今以切花成束供奉，乃近世西俗。',
+    poem: {
+      text: '非关月季姓名同，不与蔷薇谱牒通。',
+      title: '红玫瑰',
+      author: '宋·杨万里',
+    },
+    note: '古典玫瑰重香与色，不以束花献祭；今之「献一束玫瑰」通行于近代，属礼俗流变。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'lilies',
+    category: 'flower',
+    name: '百合',
+    poeticTitle: '百年好合',
+    dynasty: '宋',
+    origin: '宋·罗愿《尔雅翼》',
+    allusion:
+      '「百合」之名取其鳞茎众瓣合抱，《尔雅翼》谓其「根以众瓣合成」。民间因「百」「合」二字，转出「百年好合」吉语。',
+    note: '今世以百合寄哀思、表纯洁，源自西方花语；与中国固有「百年好合」的婚嫁吉语并非一源。',
+    ritual: '白百合近世多用于追思场合，宜素器、单数清供。',
+    authenticity: 'folk',
+  },
+  {
+    id: 'hydrangeas',
+    category: 'flower',
+    name: '绣球',
+    poeticTitle: '八仙聚瑞',
+    dynasty: '宋',
+    origin: '宋人「聚八仙」之名',
+    allusion:
+      '木本绣球宋已有之，宋人谓之「聚八仙」，以其花序八朵攒聚如仙侣环坐。明清始通行「绣球」之名。',
+    note: '「聚八仙」与扬州「琼花」古来并称，二者形近而实异，宋人已辨之。',
+    ritual: '花球圆满，取团圆聚会之意，宜置于供案两侧。',
+    authenticity: 'folk',
+  },
+  {
+    id: 'tulips',
+    category: 'flower',
+    name: '郁金香',
+    poeticTitle: '琥珀浮光',
+    dynasty: '清',
+    origin: '唐·李白《客中行》（辨误）',
+    allusion:
+      '今之郁金香为荷兰球根花卉，清代以降渐入中土，二十世纪始大规模引种。古书中「郁金香」另是一物，乃姜黄属香草，用以和酒、染衣。',
+    poem: {
+      text: '兰陵美酒郁金香，玉碗盛来琥珀光。',
+      title: '客中行',
+      author: '唐·李白',
+    },
+    note: '李白诗中「郁金香」指浸了郁金香草的酒香，与今日荷兰郁金香花同名而异物，不可混为一谈。',
+    authenticity: 'modern',
+  },
+  {
+    id: 'sunflowers',
+    category: 'flower',
+    name: '向日葵',
+    poeticTitle: '倾心向阳',
+    dynasty: '明末',
+    origin: '明·王象晋《群芳谱》（一名迎阳花）',
+    allusion:
+      '向日葵原产美洲，明后期经南洋传入，古称「丈菊」「西番菊」「迎阳花」，王象晋《群芳谱》已著录。',
+    note: '古诗文中单言「葵」者多指葵菜，如「惟有葵花向日倾」，与今之向日葵非一物。',
+    ritual: '取倾心向阳之意，民间用以喻子孙心念先人不改。',
+    authenticity: 'modern',
+  },
+  {
+    id: 'carnations',
+    category: 'flower',
+    name: '康乃馨',
+    poeticTitle: '寸草春晖',
+    dynasty: '近现代',
+    origin: '欧美石竹属栽培种',
+    allusion:
+      '康乃馨为石竹属洋花，清末民国随西礼传入，西方以之表母爱与追念，近世遂成祭扫常花。',
+    note: '中国古有石竹、瞿麦，然与今之康乃馨（香石竹）并非一物，古亦无以此献祭之制。',
+    ritual: '近世追思用花，宜素色，与白菊同供。',
+    authenticity: 'modern',
+    related: ['chrysanthemum'],
+  },
+  {
+    id: 'calla_lilies',
+    category: 'flower',
+    name: '马蹄莲',
+    poeticTitle: '素心一瓣',
+    dynasty: '近现代',
+    origin: '南部非洲原产，清末传入',
+    allusion:
+      '马蹄莲原产非洲湿地，清代末期作为观赏花卉引入，因其佛焰苞洁白如绢，近世多用于素净清供。',
+    note: '古无马蹄莲，亦无相关诗咏，其供祭用法出自近世园艺礼俗。',
+    authenticity: 'modern',
+  },
+  {
+    id: 'lily_of_valley',
+    category: 'flower',
+    name: '铃兰',
+    poeticTitle: '五月清铃',
+    dynasty: '近现代',
+    origin: '欧洲温带原产',
+    allusion:
+      '铃兰为欧洲林下小花，西方称「五月铃」，视为归春与纯洁之象，近现代引入中土。',
+    note: '中文「铃兰」之名晚起，古籍所载铃兰多另指他物，与欧洲铃兰传统无涉。',
+    authenticity: 'modern',
+  },
+  {
+    id: 'daisies',
+    category: 'flower',
+    name: '雏菊',
+    poeticTitle: '天真烂漫',
+    dynasty: '近现代',
+    origin: '欧洲原产，近世引入',
+    allusion:
+      '雏菊为欧洲常见野花，近代随园艺传入，花小丛生，取天真、追念之意。',
+    note: '古无雏菊之名，中国古籍中的「菊」皆指菊科菊属，非此西洋小菊。',
+    authenticity: 'modern',
+    related: ['chrysanthemum'],
+  },
+];

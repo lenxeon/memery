@@ -53,6 +53,8 @@ export interface PropsLayerCallbacks {
   onVaseClick?: (id: SceneItemId, zone: VaseHitZone) => void;
   onItemPointerDown?: (id: SceneItemId, event: FederatedPointerEvent) => void;
   onUpdatePosition?: (id: SceneItemId, pos: { x: number; y: number }) => void;
+  /** 长按物件：请求查看该物件的典故出处（供花、供果、礼器） */
+  onInspect?: (id: SceneItemId) => void;
 }
 
 export class PropsLayer {
@@ -189,12 +191,35 @@ export class PropsLayer {
         let startContY = 0;
         let startLocalY = 0;
         let hasMoved = false;
+        // 长按（>520ms 且未移动）视为「查看典故」，与单击的功能操作、拖动的位移操作三分
+        let longPressTimer: number | null = null;
+        let longPressFired = false;
+
+        const clearLongPress = () => {
+          if (longPressTimer !== null) {
+            window.clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+        };
 
         cont.on('pointerdown', (e: FederatedPointerEvent) => {
           e.stopPropagation();
           this.draggingId = id;
           isItemDragging = true;
           hasMoved = false;
+          longPressFired = false;
+          clearLongPress();
+          longPressTimer = window.setTimeout(() => {
+            longPressTimer = null;
+            if (!isItemDragging || hasMoved) return;
+            longPressFired = true;
+            isItemDragging = false;
+            this.draggingId = null;
+            cont!.cursor = 'grab';
+            cont!.scale.set(this.currentScaleFactor);
+            sound.playPorcelainClink();
+            this.callbacks.onInspect?.(id as SceneItemId);
+          }, 520);
           startPointerX = e.global.x;
           startPointerY = e.global.y;
           // 记录命中点在容器局部坐标中的高度，用于花瓶「花冠 / 瓶身」分区判定
@@ -214,6 +239,8 @@ export class PropsLayer {
           const dy = e.global.y - startPointerY;
           if (!hasMoved && Math.hypot(dx, dy) > 4) {
             hasMoved = true;
+            // 进入拖动即取消长按判定
+            clearLongPress();
           }
           if (hasMoved) {
             const boundsX = 220 * (this.currentAltarWidth / 560);
@@ -234,8 +261,13 @@ export class PropsLayer {
         });
 
         const handlePointerEnd = () => {
+          clearLongPress();
           if (!isItemDragging) return;
           isItemDragging = false;
+          if (longPressFired) {
+            longPressFired = false;
+            return;
+          }
           this.draggingId = null;
           cont!.cursor = 'grab';
           cont!.scale.set(this.currentScaleFactor);

@@ -2,14 +2,14 @@
  * @file App.tsx
  * @description 应用外壳（App Shell）：只负责视图路由、登录态持久化与全局弹窗宿主。
  *
- * 具体业务页面（馆空间）位于 src/pages/hall，登录页位于 src/ui/auth，
+ * 具体业务页面（馆空间）位于 src/ui/space，登录页位于 src/ui/auth，
  * 本文件不承载任何场景陈设、摆件或弹窗内容。
  */
 import React, { useEffect, useState } from 'react';
 import { AuthPage } from './ui/auth';
-import { HallSpacePage } from './pages/hall/HallSpacePage';
-import { openAgreement } from './features/agreement';
-import { useViewRouter } from './app/viewRouter';
+import { HallSpacePage } from './ui/space';
+import { openAgreement } from './ui/agreement';
+import { useViewRouter } from './ui/shell/viewRouter';
 import type { UserProfile } from './types';
 
 const USER_STORAGE_KEY = 'memery_current_user';

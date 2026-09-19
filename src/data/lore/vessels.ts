@@ -1,0 +1,252 @@
+/**
+ * @file vessels.ts
+ * @description 礼器典故：香炉、烛台、茶盏、铜磬、供瓶，以及各瓶型的取法谱系。
+ *
+ * 注意：本作器型多为当代设计，档案中「取法」指其形制渊源，不代表出土原物。
+ */
+import type { RelicLore } from './types';
+
+export const VESSEL_LORE: RelicLore[] = [
+  {
+    id: 'censer',
+    category: 'vessel',
+    name: '香炉',
+    poeticTitle: '博山烟直',
+    dynasty: '汉',
+    origin: '旧题汉·刘歆《西京杂记》',
+    allusion:
+      '《西京杂记》记长安巧工丁缓作九层博山香炉，镂以奇禽怪兽，穷诸灵异，皆自然运动。汉人焚香之器至博山炉而大备，后世代有制作。',
+    poem: {
+      text: '博山炉中沉香火，双烟一气凌紫霞。',
+      title: '杨叛儿',
+      author: '唐·李白',
+    },
+    ritual: '民间上香以三炷为常，香火不断为敬；烟直上者有「诚心直达」之说。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'candle',
+    category: 'vessel',
+    name: '烛台',
+    poeticTitle: '双烛长明',
+    dynasty: '汉魏',
+    origin: '战国以来烛具，汉魏成制',
+    allusion:
+      '古人以麻蒸、蜂蜡为烛，战国已有烛具，汉魏渐成台式。祠堂祭案设烛台一对，长明不灭，以照幽冥。',
+    poem: {
+      text: '蜡烛有心还惜别，替人垂泪到天明。',
+      title: '赠别',
+      author: '唐·杜牧',
+    },
+    ritual: '祭案烛台成对，左右各一，取阴阳相配、昼夜长明之意。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'tea_cups',
+    category: 'vessel',
+    name: '茶盏',
+    poeticTitle: '清茶三献',
+    dynasty: '宋',
+    origin: '宋·蔡襄《茶录》',
+    allusion:
+      '宋人点茶尚黑釉盏，蔡襄《茶录》论盏色：「茶色白，宜黑盏」，建安兔毫盏遂为斗茶上品。祭案设茶，则取其清而不取其味。',
+    poem: {
+      text: '一碗喉吻润，两碗破孤闷。',
+      title: '走笔谢孟谏议寄新茶',
+      author: '唐·卢仝',
+    },
+    ritual: '祭案常设清茶三盏，与酒果并陈，谓之「清酌庶羞」之余意。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'singing_bowl',
+    category: 'vessel',
+    name: '铜磬',
+    poeticTitle: '一声清磬',
+    dynasty: '唐',
+    origin: '佛门呗器，历代沿袭',
+    allusion:
+      '磬本为石制乐器，入佛门则为铜钵、铜磬，为呗器之一，击之以集众、以收心。清音既起，万籁俱寂。',
+    poem: {
+      text: '万籁此都寂，但余钟磬音。',
+      title: '题破山寺后禅院',
+      author: '唐·常建',
+    },
+    ritual: '击磬一响，以净心神，多在献香、献茶前后行之。',
+    authenticity: 'canon',
+  },
+  {
+    id: 'vase',
+    category: 'vessel',
+    name: '供瓶',
+    poeticTitle: '一花一器',
+    dynasty: '明',
+    origin: '明·袁宏道《瓶史》',
+    allusion:
+      '袁宏道《瓶史》专论插花之器与法，谓插花不可太繁、亦不可太瘦，多不过二种三种，高低疏密如画苑布置方妙。瓶花清供，至明而成一家之学。',
+    poem: {
+      text: '插花不可太繁，亦不可太瘦，多不过二种三种。',
+      title: '瓶史·宜称',
+      author: '明·袁宏道',
+    },
+    ritual: '供瓶成对称于香炉两侧，花头朝内，取「束香与花以献」之礼。',
+    authenticity: 'canon',
+    related: ['peonies', 'lotus'],
+  },
+  {
+    id: 'melon_lobed_celadon',
+    category: 'vessel',
+    name: '瓜棱青瓷瓶',
+    poeticTitle: '分瓣含翠',
+    dynasty: '宋',
+    origin: '取法宋金瓜棱瓶（龙泉窑、耀州窑一系）',
+    allusion:
+      '瓜棱瓶以竖凹分瓣如瓜，宋金南北窑口皆有烧造，青釉厚处凝翠、薄处见胎，为宋人尚「类玉」之器。',
+    note: '此为今器取法宋式，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'ribbed_fluted_white',
+    category: 'vessel',
+    name: '竖棱白釉瓶',
+    poeticTitle: '甜白出筋',
+    dynasty: '明',
+    origin: '取法元代枢府釉模印出筋与明永乐甜白釉',
+    allusion:
+      '甜白釉明永乐时为极品，釉色莹润如凝脂；出筋之法，则于胎上起棱，釉薄处微见骨色，白中见骨，最耐看。',
+    note: '此为今器取法明清白瓷，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'fluted_trapezoid_mini',
+    category: 'vessel',
+    name: '束腰小尊',
+    poeticTitle: '觚哉小尊',
+    dynasty: '商周',
+    origin: '取法商周青铜觚之束腰外撇',
+    allusion:
+      '觚为商周饮酒之器，喇叭口、细腰、外撇足，孔子有「觚不觚，觚哉觚哉」之叹，惜其失制。后世花器多仿觚形，小者宜案头清供。',
+    note: '此为今器取法青铜觚的基本轮廓，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'chiseled_stone_gray',
+    category: 'vessel',
+    name: '凿石纹瓶',
+    poeticTitle: '凿石留痕',
+    dynasty: '汉',
+    origin: '取法汉代石雕与画像石的凿刻肌理',
+    allusion:
+      '汉画像石以减地平雕见长，凿痕成行如梳，拙而不野。今以凿刻肌理入陶，取其厚重肃穆，宜配松枝、白菊。',
+    note: '此为今器取法汉石作肌理，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'faceted_gem_prism',
+    category: 'vessel',
+    name: '多面琉璃器',
+    poeticTitle: '棱光分色',
+    dynasty: '隋唐',
+    origin: '取法隋唐西亚玻璃器（法门寺地宫所出其一系）',
+    allusion:
+      '隋唐时西域玻璃器入贡，多面磨花、壁薄色清，为内库珍玩。今以多棱折面拟之，光过成彩。',
+    note: '此为今器取法古代玻璃器折光之趣，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'gradient_sand_volcano',
+    category: 'vessel',
+    name: '窑变砂釉器',
+    poeticTitle: '入窑一色',
+    dynasty: '宋',
+    origin: '取法宋钧窑窑变',
+    allusion:
+      '钧窑以铜红釉入窑，火之所在，色之所在，故有「入窑一色，出窑万彩」之说。釉色自上而下流淌，如砂丘、如熔岩。',
+    note: '器型为当代设计，取法在釉色之变，非宋钧原器。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'pinched_clay_ruffle',
+    category: 'vessel',
+    name: '泥捏翻边陶瓶',
+    poeticTitle: '泥痕翻卷',
+    dynasty: '新石器',
+    origin: '取法彩陶泥条盘筑与梳齿纹（马家窑一系）',
+    allusion:
+      '彩陶以泥条盘筑成形，指腹按压处留痕，口沿翻卷如荷叶，梳齿划纹成行。拙手之痕即为纹，最见初民之意。',
+    note: '此为今器取法史前陶艺手法，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'twisted_helix_tower',
+    category: 'vessel',
+    name: '长颈旋纹瓶',
+    poeticTitle: '修颈亭亭',
+    dynasty: '宋元',
+    origin: '取法宋元经瓶（今称梅瓶）之小口修颈',
+    allusion:
+      '小口、丰肩、修颈而下敛者，宋人谓之经瓶，为酒器；后世雅称梅瓶，以其口径小仅容梅枝故。今变其比例作修长塔式。',
+    note: '此为今器取法宋元瓶式比例，非出土原物。',
+    authenticity: 'canon',
+    related: ['vase'],
+  },
+  {
+    id: 'organic_twist_cream',
+    category: 'vessel',
+    name: '卷泥素瓶',
+    poeticTitle: '素手卷泥',
+    dynasty: '当代',
+    origin: '当代手工陶艺',
+    allusion:
+      '当代陶艺借手捏拉坯，令器身微旋成势，素色无纹，重在手痕与釉面的先后对话。',
+    note: '当代设计器型，无古代器式可考。',
+    authenticity: 'modern',
+    related: ['vase'],
+  },
+  {
+    id: 'organic_twist_rose',
+    category: 'vessel',
+    name: '卷泥胭瓶',
+    poeticTitle: '胭色微醺',
+    dynasty: '当代',
+    origin: '当代手工陶艺',
+    allusion:
+      '同上器之制，施胭脂色釉，深浅随釉层厚薄而变，宜配浅色花材。',
+    note: '当代设计器型，无古代器式可考。',
+    authenticity: 'modern',
+    related: ['vase'],
+  },
+  {
+    id: 'minimal_drop_swan',
+    category: 'vessel',
+    name: '水滴素瓶',
+    poeticTitle: '一滴静水',
+    dynasty: '当代',
+    origin: '当代极简设计',
+    allusion:
+      '取水滴将落未落之势，颈细腹圆，不施纹饰，以形取胜，为当代极简一派。',
+    note: '当代设计器型，无古代器式可考。',
+    authenticity: 'modern',
+    related: ['vase'],
+  },
+  {
+    id: 'pearlescent_turbine',
+    category: 'vessel',
+    name: '珠光涡轮瓶',
+    poeticTitle: '珠光流转',
+    dynasty: '当代',
+    origin: '当代设计，取珠光釉面',
+    allusion:
+      '以珠光釉随器身旋起，光行如水涡，属当代陈设器，重光影而不重纹样。',
+    note: '当代设计器型，无古代器式可考。',
+    authenticity: 'modern',
+    related: ['vase'],
+  },
+];

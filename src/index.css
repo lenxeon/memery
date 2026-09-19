@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* 显式声明 Tailwind v4 扫描源：pixi/ 下的类名写在纯 TS 模板字符串里（BaseWall 等），
+   依赖隐式自动检测在 dev 增量场景下可能漏扫（表现为墙尺寸类 w-[380px] 等不生成）。 */
+@source "./pixi";
+@source "./ui";
+@source "./utils";
+
 /* ── 夏日微风风吹律动 (60FPS GPU-Accelerated Botanical Wind Dynamics) ──
    特性：硬件加速合成层 (will-change: transform + translate3d)，完全规避 CPU 重排与重绘；
    动作幅度肉眼清晰可见，花瓣与每片叶子都有专属的风吹律动；

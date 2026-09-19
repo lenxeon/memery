@@ -12,7 +12,8 @@ export class FloorLayer {
   public container: Container = new Container();
 
   private fallbackGraphics: Graphics = new Graphics();
-  private floorSprite: TilingSprite | null = null;
+  /** 真·透视地坪：横向条带池（每条 4px，尺度随距地平线距离线性衰减） */
+  private floorStrips: TilingSprite[] = [];
   private depthShadingGraphics: Graphics = new Graphics();
   private skirtingGraphics: Graphics = new Graphics();
   private shadowGraphics: Graphics = new Graphics();
@@ -46,48 +47,69 @@ export class FloorLayer {
 
     this.fallbackGraphics.rect(0, horizonY, width, floorHeight).fill({ color: baseColor });
 
-    // 2. 获取当前风格贴图 (从 5 风格贴图池中读取)
+    // 2. 真·透视地坪贴图 —— 还原旧 CSS 3D (perspective + rotateX) 的近大远小观感：
+    //    将地面视为水平平面做投影：屏幕尺度 s(y) ∝ (y - horizonY)（线性衰减），
+    //    纵向纹理坐标 v(y) ∝ ln(y - horizonY)（等距世界深度被透视压缩、收敛于地平线）。
+    //    用 4px 横向条带逐条绘制，条带内尺度近似恒定，接缝不可见；
+    //    横向以画面中心为消失点锚定（tilePosition.x = width/2），砖缝向灭点收敛。
     const pipeline = TexturePipeline.getInstance();
     const activeTex = pipeline.floorTextures[floorStyle] || (floorStyle === 'marble_tile' ? marbleTexture : woodTexture);
 
     if (activeTex && activeTex.source && activeTex.source.width > 1) {
       try {
-        if (!this.floorSprite) {
-          this.floorSprite = new TilingSprite({
-            texture: activeTex,
-            width,
-            height: floorHeight,
-          });
-          // 放在 fallbackGraphics 之后、depthShading 之前
-          this.container.addChildAt(this.floorSprite, 1);
-        } else {
-          this.floorSprite.texture = activeTex;
-          this.floorSprite.width = width;
-          this.floorSprite.height = floorHeight;
+        const tsBottom = 0.6; // 近端（画面底缘）基础贴图尺度
+        const rowH = 4; // 条带高度
+        const mLog = floorHeight / tsBottom; // 对数映射系数
+        const vanishX = width / 2;
+        const needed = Math.ceil(floorHeight / rowH);
+
+        while (this.floorStrips.length < needed) {
+          const strip = new TilingSprite({ texture: activeTex, width, height: rowH + 0.6 });
+          // 插在底色之上、景深遮罩之下
+          this.container.addChildAt(strip, 1);
+          this.floorStrips.push(strip);
         }
 
-        this.floorSprite.x = 0;
-        this.floorSprite.y = horizonY;
-        this.floorSprite.visible = true;
-
-        const tileScale = floorStyle === 'marble_tile' ? 0.42 : floorStyle === 'zen_tatami' ? 0.35 : 0.38;
-        this.floorSprite.tileScale.set(tileScale);
-
+        let stripTint = 0xffffff;
         if (!lighting.masterOn) {
           // 关灯：留一层烛照余晖，地面仍比案体更沉，维持纵深层次
-          this.floorSprite.tint = 0x453122;
+          stripTint = 0x453122;
         } else if (lighting.timeOfDay === 'sunset') {
-          this.floorSprite.tint = 0xffe2cc;
+          stripTint = 0xffe2cc;
         } else if (lighting.timeOfDay === 'night') {
-          this.floorSprite.tint = 0x556b82;
-        } else {
-          this.floorSprite.tint = 0xffffff;
+          stripTint = 0x556b82;
+        }
+
+        for (let i = 0; i < this.floorStrips.length; i++) {
+          const strip = this.floorStrips[i];
+          if (i >= needed) {
+            strip.visible = false;
+            continue;
+          }
+          const yTop = horizonY + i * rowH;
+          const yBot = Math.min(yTop + rowH, height);
+          const yMid = (yTop + yBot) / 2;
+          const dist = yMid - horizonY; // 距地平线的屏幕距离
+          const tileScale = (tsBottom * dist) / floorHeight;
+          // 纵向世界坐标：v = mLog · ln(dist)，保证跨条带纹理连续
+          const vWorld = mLog * Math.log(Math.max(dist, 0.001));
+
+          strip.visible = true;
+          strip.texture = activeTex;
+          strip.x = 0;
+          strip.y = yTop;
+          strip.width = width;
+          strip.height = yBot - yTop + 0.6; // 轻微重叠消除条带缝
+          strip.tileScale.set(tileScale);
+          strip.tilePosition.x = vanishX; // 横向以灭点锚定 → 砖缝向灭点收敛
+          strip.tilePosition.y = yMid - yTop - vWorld * tileScale;
+          strip.tint = stripTint;
         }
       } catch (err) {
-        console.warn('FloorLayer tiling error:', err);
+        console.warn('FloorLayer perspective tiling error:', err);
       }
-    } else if (this.floorSprite) {
-      this.floorSprite.visible = false;
+    } else {
+      for (const strip of this.floorStrips) strip.visible = false;
     }
 
     // 3. 景深与漫反射渐变遮罩 (近大远小视锥明暗收敛)
