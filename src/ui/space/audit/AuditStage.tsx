@@ -7,17 +7,37 @@
  * 因此它可被单独渲染与快照测试，也可复用于其它展台场景。
  */
 import React from 'react';
-import { AuditCategory, AuditGroup, TableWoodStyle } from '../../../types';
+import { AuditCategory, TableWoodStyle } from '../../../types';
 import { TABLE_WOOD_OPTIONS } from '../../../data/sceneItems';
+import {
+  AUDIT_FLOWER_CATALOG,
+  AUDIT_VASE_CATALOG,
+  AuditCatalogEntry,
+  formatAuditEntryLabel,
+} from '../../../data/auditCatalog';
 import { CinnabarSealBadge } from '../../common/ChineseDecorations';
 import { sound } from '../../../utils/audio';
-import { GripVertical, ChevronDown, ChevronUp, X } from 'lucide-react';
+import {
+  GripVertical,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from 'lucide-react';
 
 export interface AuditStageProps {
   /** 展台类别：名花 / 花器 / 案台 */
   category: AuditCategory;
-  /** 当前分组（名花梯队、花器系列等） */
-  group: AuditGroup;
+  /** 当前组号（0 起）：名花与花器各按「每组 5 件」翻页 */
+  page: number;
+  /** 总组数 */
+  pageCount: number;
+  /** 本组实际陈出的条目（用于提示与快速跳组） */
+  pageEntries: AuditCatalogEntry[];
+  onPrevPage: () => void;
+  onNextPage: () => void;
+  onSwitchPage: (page: number) => void;
   /** 花器展台是否插花（净瓶裸检为 false） */
   withFlowers: boolean;
   /** 名花枯荣生机 0–1 */
@@ -31,7 +51,6 @@ export interface AuditStageProps {
   onPointerDown?: React.PointerEventHandler<HTMLDivElement>;
   onToggleExpanded: () => void;
   onSwitchCategory: (category: AuditCategory) => void;
-  onSwitchGroup: (group: AuditGroup) => void;
   onToggleFlowers: () => void;
   onCycleDecay: () => void;
   onTriggerPetals: () => void;
@@ -56,24 +75,21 @@ const CATEGORY_META: Record<AuditCategory, { icon: string; title: string }> = {
   table: { icon: '🪵', title: '案台木质审计' },
 };
 
-/** 名花分组按钮 */
-const FLOWER_GROUPS: { id: AuditGroup; icon: string; label: string; title: string }[] = [
-  { id: 'flowers_tier1_all', icon: '🌟', label: '10花齐放', title: '第一梯队 10 款新名花双排错落同台大展' },
-  { id: 'flowers_tier1_a', icon: '🌺', label: '梯队A (前5)', title: '梅花、向日葵、康乃馨、马蹄莲、郁金香' },
-  { id: 'flowers_tier1_b', icon: '🪷', label: '梯队B (后5)', title: '水仙、铃兰、蝴蝶兰、绣球、雏菊' },
-  { id: 'flowers_classic', icon: '💮', label: '经典5供', title: '牡丹、百合、清莲、白菊、玫瑰' },
-  { id: 'flowers_bouquets', icon: '💐', label: '案前花束', title: '桌面平铺丝带花束敬献形态比对' },
-];
-
-/** 花器分组按钮 */
-const VASE_GROUPS: { id: AuditGroup; icon: string; label: string }[] = [
-  { id: 'new_unique', icon: '✨', label: '4款异形瓶' },
-  { id: 'designer_twist', icon: '🎨', label: '8款折痕瓶' },
-];
+/** 类别总件数（随注册表自动增长） */
+const CATEGORY_TOTAL: Record<AuditCategory, number> = {
+  flowers: AUDIT_FLOWER_CATALOG.length,
+  vases: AUDIT_VASE_CATALOG.length,
+  table: TABLE_WOOD_OPTIONS.length,
+};
 
 export const AuditStage: React.FC<AuditStageProps> = ({
   category,
-  group,
+  page,
+  pageCount,
+  pageEntries,
+  onPrevPage,
+  onNextPage,
+  onSwitchPage,
   withFlowers,
   decayHealth,
   expanded,
@@ -82,7 +98,6 @@ export const AuditStage: React.FC<AuditStageProps> = ({
   onPointerDown,
   onToggleExpanded,
   onSwitchCategory,
-  onSwitchGroup,
   onToggleFlowers,
   onCycleDecay,
   onTriggerPetals,
@@ -156,7 +171,7 @@ export const AuditStage: React.FC<AuditStageProps> = ({
                 }`}
               >
                 <span>🌸</span>
-                <span>名花 (15款)</span>
+                <span>名花 ({CATEGORY_TOTAL.flowers}款)</span>
               </button>
               <button
                 type="button"
@@ -168,7 +183,7 @@ export const AuditStage: React.FC<AuditStageProps> = ({
                 }`}
               >
                 <span>🏺</span>
-                <span>花器 (12款)</span>
+                <span>花器 ({CATEGORY_TOTAL.vases}款)</span>
               </button>
               <button
                 type="button"
@@ -180,47 +195,70 @@ export const AuditStage: React.FC<AuditStageProps> = ({
                 }`}
               >
                 <span>🪵</span>
-                <span>案台 (4款)</span>
+                <span>案台 ({CATEGORY_TOTAL.table}款)</span>
               </button>
             </div>
 
             <span className="text-stone-600 hidden sm:inline">|</span>
 
-            {/* 名花 / 花器 分组切换 */}
-            {category === 'flowers' ? (
-              <div className="flex items-center flex-wrap gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                {FLOWER_GROUPS.map((g) => (
-                  <button
-                    key={g.id}
-                    type="button"
-                    onClick={() => onSwitchGroup(g.id)}
-                    className={`px-2 py-0.5 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      group === g.id
-                        ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                    title={g.title}
+            {/* 名花 / 花器：每组 5 件翻页（目录随注册表自动增长） */}
+            {category === 'table' ? null : (
+              <div
+                className="flex items-center gap-1 bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30"
+                title={pageEntries.map(formatAuditEntryLabel).join('\n')}
+              >
+                <button
+                  type="button"
+                  onClick={onPrevPage}
+                  className="w-6 h-6 flex items-center justify-center rounded-full text-amber-200/80 hover:text-amber-100 hover:bg-stone-900/60 cursor-pointer transition-all active:scale-95"
+                  title="上一组 5 件"
+                >
+                  <ChevronLeft size={13} />
+                </button>
+                <span className="px-1 text-[11px] text-amber-200 font-medium whitespace-nowrap font-mono">
+                  第 {page + 1}/{pageCount} 组 · {pageEntries.length}件
+                </span>
+                <button
+                  type="button"
+                  onClick={onNextPage}
+                  className="w-6 h-6 flex items-center justify-center rounded-full text-amber-200/80 hover:text-amber-100 hover:bg-stone-900/60 cursor-pointer transition-all active:scale-95"
+                  title="下一组 5 件"
+                >
+                  <ChevronRight size={13} />
+                </button>
+                {/* 组号直达：超过 12 组时收拢为下拉，避免胶囊过长 */}
+                {pageCount > 12 ? (
+                  <select
+                    value={page}
+                    onChange={(e) => onSwitchPage(Number(e.target.value))}
+                    className="px-1 py-0.5 rounded-full bg-stone-950/90 border border-amber-500/30 text-amber-200 text-[10px] cursor-pointer outline-none"
+                    title="直接跳到某一组"
                   >
-                    {g.icon} {g.label}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center bg-stone-950/80 p-0.5 rounded-full border border-amber-500/30">
-                {VASE_GROUPS.map((g) => (
-                  <button
-                    key={g.id}
-                    type="button"
-                    onClick={() => onSwitchGroup(g.id)}
-                    className={`px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95 font-medium ${
-                      group === g.id
-                        ? 'bg-amber-600/90 text-stone-950 font-bold shadow-xs'
-                        : 'text-amber-200/70 hover:text-amber-100'
-                    }`}
-                  >
-                    {g.icon} {g.label}
-                  </button>
-                ))}
+                    {Array.from({ length: pageCount }, (_, i) => (
+                      <option key={i} value={i}>
+                        第 {i + 1} 组
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: pageCount }, (_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => onSwitchPage(i)}
+                        className={`w-5 h-5 rounded-full text-[10px] cursor-pointer transition-all active:scale-95 ${
+                          i === page
+                            ? 'bg-amber-500 text-stone-950 font-bold'
+                            : 'text-amber-200/70 hover:text-amber-100 hover:bg-stone-900/60'
+                        }`}
+                        title={`第 ${i + 1} 组`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

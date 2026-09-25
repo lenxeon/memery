@@ -4,7 +4,7 @@
  * 具备 Dirty-Flag 脏标记与同步纹理缓存，避免重复赋图，保证 60FPS 丝滑流畅。
  */
 import { Container, Sprite, FederatedPointerEvent, Polygon } from 'pixi.js';
-import { TexturePipeline } from '../assets/TexturePipeline';
+import { TexturePipeline, getVaseTextureCacheKey } from '../assets/TexturePipeline';
 import { SmokeParticleEmitter } from '../effects/SmokeParticleEmitter';
 import { PixiEffects } from '../effects/PixiEffects';
 import { CandleFlameRenderer } from '../effects/CandleFlameRenderer';
@@ -352,7 +352,7 @@ export class PropsLayer {
         const vaseStyle = (item.vaseStyle || (isRight ? 'painted_iris' : 'warm_white_plain')) as VaseStyle;
         const health = item.lifecycle?.health ?? 1.0;
         const qHealth = Math.round(health * 50) / 50;
-        targetKey = `vase_${flower}_${vaseStyle}_${isRight ? 'R' : 'L'}_h${qHealth}`;
+        targetKey = getVaseTextureCacheKey(flower, vaseStyle, isRight, qHealth);
         // 花瓶+盛开花束：高挑修长，远超蜡烛高度 (265px 挺拔优雅，对齐参考图1)
         targetW = 210;
         targetH = 265;

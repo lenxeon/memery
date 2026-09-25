@@ -15,10 +15,27 @@ import {
   getSingleBouquetSvg,
 } from './PropSvgTemplates';
 import { FlowerType, FruitType, FloorStyle, TableclothStyle, TableWoodStyle } from '../../types';
-import { VaseStyle } from './templates/flowers/vases';
+import { VaseStyle, getVaseItem } from './templates/flowers/vases';
 import { getVaseFlowerSvg } from './templates/FlowerTemplate';
 import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
 import { getAltarTableSvg } from './templates/AltarTableTemplate';
+
+/**
+ * 花器纹理缓存修订号。
+ * 新增形制时，Vite 热更新可能先让目录出现、后让注册表生效；旧逻辑会把默认瓶永久缓存到新 ID。
+ * 缓存键使用「修订号 + 已解析的真实模板 ID」，既隔离历史脏缓存，也避免未知 ID 污染目标键。
+ */
+export const VASE_TEXTURE_CACHE_REVISION = 'r2';
+
+export const getVaseTextureCacheKey = (
+  flowerType: FlowerType | 'none',
+  vaseStyle: VaseStyle,
+  isRight: boolean,
+  health: number
+): string => {
+  const resolvedStyle = getVaseItem(vaseStyle).id;
+  return `vase_${VASE_TEXTURE_CACHE_REVISION}_${flowerType}_${resolvedStyle}_${isRight ? 'R' : 'L'}_h${health}`;
+};
 
 export class TexturePipeline {
   private static instance: TexturePipeline | null = null;
@@ -43,7 +60,7 @@ export class TexturePipeline {
   public glowTexture: Texture | null = null;
 
   // 花瓣粒子贴图
-  public petalTextures: Record<FlowerType, Texture | null> = {
+  public petalTextures: Partial<Record<FlowerType, Texture | null>> = {
     peonies: null,
     lilies: null,
     lotus: null,
@@ -96,6 +113,40 @@ export class TexturePipeline {
         orchids: '#f472b6',
         hydrangeas: '#60a5fa',
         daisies: '#ffffff',
+        wintersweet: '#facc15',
+        magnolia: '#fff7ed',
+        peach_blossoms: '#fb7185',
+        apricot_blossoms: '#fff7f5',
+        pear_blossoms: '#ffffff',
+        crabapple_blossoms: '#fb7185',
+        camellias: '#dc2626',
+        azaleas: '#f43f5e',
+        kerria: '#facc15',
+        hibiscus_mutabilis: '#fb7185',
+        irises: '#6366f1',
+        clivia: '#f97316',
+        wisteria: '#8b5cf6',
+        trumpet_creeper: '#f97316',
+        morning_glories: '#3b82f6',
+        honeysuckle: '#facc15',
+        winter_jasmine: '#fde047',
+        osmanthus: '#fbbf24',
+        crape_myrtle: '#d946ef',
+        globe_amaranth: '#db2777',
+        gardenias: '#fffdf5',
+        jasmine: '#ffffff',
+        balloon_flowers: '#6366f1',
+        daylilies: '#f97316',
+        hostas: '#ffffff',
+        impatiens: '#ec4899',
+        hollyhocks: '#e11d48',
+        pomegranate_blossoms: '#ef4444',
+        chinese_hibiscus: '#ef4444',
+        cockscomb: '#be123c',
+        poppies: '#ef4444',
+        epiphyllum: '#ffffff',
+        spider_lilies: '#dc2626',
+        redbuds: '#c026d3',
       };
 
       for (const [key, color] of Object.entries(petalColors)) {
@@ -182,7 +233,7 @@ export class TexturePipeline {
     health: number = 1.0
   ): Promise<Texture> {
     const rawHealth = Math.round(health * 50) / 50;
-    const key = `vase_${flowerType}_${vaseStyle}_${isRight ? 'R' : 'L'}_h${rawHealth}`;
+    const key = getVaseTextureCacheKey(flowerType, vaseStyle, isRight, rawHealth);
     const cached = getCachedTexture(key);
     if (cached) return Promise.resolve(cached);
 
@@ -350,4 +401,3 @@ export class TexturePipeline {
     }
   }
 }
-

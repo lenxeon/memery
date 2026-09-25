@@ -24,7 +24,7 @@ export { WALL_STYLE_OPTIONS } from './scene/walls/options';
 // ── 领域数据：供品图形模板与注册表 ──
 export { FLOWER_REGISTRY } from './assets/templates/flowers';
 export { VASE_STYLES, getVaseStyleMeta } from './assets/templates/flowers/vases';
-export { getFlowerOnlyPreviewSvg } from './assets/templates/FlowerTemplate';
+export { getFlowerOnlyPreviewSvg, getVaseOnlyPreviewSvg } from './assets/templates/FlowerTemplate';
 
 // ── 渲染数据契约：渲染一个馆所需的全部数据定义 ──
 export type {

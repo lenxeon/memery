@@ -37,10 +37,10 @@ export class PixiEffects {
   private poolSize: number = 60;
 
   private glowTexture: Texture;
-  private petalTextures: Record<FlowerType, Texture | null>;
+  private petalTextures: Partial<Record<FlowerType, Texture | null>>;
   private time: number = 0;
 
-  constructor(glowTex: Texture, petalTexes: Record<FlowerType, Texture | null>) {
+  constructor(glowTex: Texture, petalTexes: Partial<Record<FlowerType, Texture | null>>) {
     this.glowTexture = glowTex;
     this.petalTextures = petalTexes;
 

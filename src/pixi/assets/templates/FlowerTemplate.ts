@@ -9,6 +9,7 @@ import { getGeometricWatermark } from '../security/Watermark';
 import { FLOWER_REGISTRY } from './flowers/registry';
 import {
   getVaseDefsSvg,
+  getVaseItem,
   renderVaseMouthBack,
   renderVaseBody,
   VaseStyle,
@@ -98,6 +99,43 @@ export function getFlowerOnlyPreviewSvg(flowerType: FlowerType): string {
   return `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="10 5 130 135" width="100%" height="100%" class="w-full h-full overflow-visible drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
   ${flowerSvg}
+</svg>
+  `.trim();
+}
+
+/**
+ * 获取花器单独预览 SVG（不含插花，用于花器形制选单真实预览器型）。
+ * 视窗按器型声明的瓶口中心/口径/器高收紧，避免瓶身在卡片中过小。
+ */
+export function getVaseOnlyPreviewSvg(vaseStyle: VaseStyle = 'ribbed_fluted_white'): string {
+  const item = getVaseItem(vaseStyle);
+  const watermarkSvg = getGeometricWatermark();
+  const defsSvg = getVaseDefsSvg();
+  const mouthBackSvg = renderVaseMouthBack(vaseStyle);
+  const vaseBodySvg = renderVaseBody(vaseStyle);
+
+  const centerX = item.mouthCenter?.x ?? 75;
+  const top = (item.mouthCenter?.y ?? 108) - 8;
+  const viewWidth = Math.max((item.mouthWidth ?? 24) * 2.8, 62);
+  const viewHeight = (item.vaseHeight ?? 90) + 24;
+
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="${centerX - viewWidth / 2} ${top} ${viewWidth} ${viewHeight}" width="100%" height="100%" class="w-full h-full overflow-visible drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+  <defs>
+    ${defsSvg}
+  </defs>
+
+  ${watermarkSvg}
+
+  <!-- 案面阴影 -->
+  <ellipse cx="75" cy="193" rx="26" ry="6" fill="#140d07" opacity="0.4" />
+
+  <g id="vaseMouthBack">
+    ${mouthBackSvg}
+  </g>
+  <g id="vaseBody">
+    ${vaseBodySvg}
+  </g>
 </svg>
   `.trim();
 }

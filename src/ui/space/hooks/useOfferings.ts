@@ -113,6 +113,29 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
     openRelicLore(loreId);
   };
 
+  /** 审计模式下点击器物：复制名称到剪贴板，方便登记记录 */
+  const copyAuditName = (name: string) => {
+    const text = name.trim();
+    if (!text) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast(`已复制「${text}」`);
+    } catch {
+      showToast(`【${text}】`);
+    }
+  };
+
   /** 点击瓶身（非花冠区）：循环切换器形 */
   const handleToggleVaseStyle = (id: SceneItemId) => {
     if (id.startsWith('vase_audit_flower_') || (audit.isAuditMode && audit.category === 'flowers')) {
@@ -121,8 +144,10 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
         sound.playPorcelainClink();
         const meta = item.flowerType ? FLOWER_REGISTRY[item.flowerType] : null;
         if (meta) {
+          copyAuditName(meta.name);
           showToast(`🌸【${meta.name}】${meta.poeticTitle} · 名花专项审计中`);
         } else {
+          copyAuditName(item.name);
           showToast(`🌸【${item.name}】· 名花专项审计中`);
         }
         return;
@@ -132,6 +157,7 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
       const item = items[id];
       if (item) {
         sound.playPorcelainClink();
+        copyAuditName(item.name);
         showToast(`🏺【${item.name}】· 花器专项审计中`);
         return;
       }
@@ -199,8 +225,10 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
           sound.playPorcelainClink();
           const meta = item.flowerType ? FLOWER_REGISTRY[item.flowerType] : null;
           if (meta) {
+            copyAuditName(meta.name);
             showToast(`🌸【${meta.name}】${meta.poeticTitle} · 名花专项审计中`);
           } else {
+            copyAuditName(item.name);
             showToast(`🌸【${item.name}】· 名花专项审计中`);
           }
           return;
@@ -278,7 +306,7 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
     sound.playWoodPlacement();
     setItems(
       audit.isAuditMode
-        ? buildAuditItems(audit.category, audit.group, audit.withFlowers, audit.decayHealth)
+        ? buildAuditItems(audit.category, audit.page, audit.withFlowers, audit.decayHealth)
         : buildStandardItems()
     );
     showToast('案面摆设已恢复初始格局');

@@ -27,7 +27,48 @@ export type FlowerType =
   | 'lily_of_valley'
   | 'orchids'
   | 'hydrangeas'
-  | 'daisies';
+  | 'daisies'
+  // 东方花谱扩展：枝骨春信
+  | 'wintersweet'
+  | 'magnolia'
+  | 'peach_blossoms'
+  | 'apricot_blossoms'
+  | 'pear_blossoms'
+  | 'crabapple_blossoms'
+  // 富贵重瓣
+  | 'camellias'
+  | 'azaleas'
+  | 'kerria'
+  | 'hibiscus_mutabilis'
+  // 清供高茎
+  | 'irises'
+  | 'clivia'
+  // 垂蔓串花
+  | 'wisteria'
+  | 'trumpet_creeper'
+  | 'morning_glories'
+  | 'honeysuckle'
+  | 'winter_jasmine'
+  // 圆冠团簇
+  | 'osmanthus'
+  | 'crape_myrtle'
+  | 'globe_amaranth'
+  // 庭院清芳
+  | 'gardenias'
+  | 'jasmine'
+  | 'balloon_flowers'
+  | 'daylilies'
+  | 'hostas'
+  | 'impatiens'
+  | 'hollyhocks'
+  // 奇姿华彩
+  | 'pomegranate_blossoms'
+  | 'chinese_hibiscus'
+  | 'cockscomb'
+  | 'poppies'
+  | 'epiphyllum'
+  | 'spider_lilies'
+  | 'redbuds';
 /** 花瓶点击命中分区：花冠区换花材，瓶身区换器型 */
 export type VaseHitZone = 'flowers' | 'vase';
 
@@ -71,6 +112,40 @@ export type VaseStyle =
   | 'pearlescent_turbine'    // 10. 银曜珠光螺旋涡轮瓶
   | 'twisted_helix_tower'    // 11. 极简莫兰迪旋转扭扭塔瓶
   | 'gradient_sand_volcano'  // 12. 天青流沙渐变圆锥砂陶瓶
+  // ── 当代东方极简原创系列 ──
+  | 'moon_white_orb'         // 13. 月白玉壶春瓶
+  | 'ink_black_meiping'      // 14. 玄墨梅瓶
+  | 'ru_celadon_cong'        // 15. 汝青琮影瓶
+  | 'tea_white_shoulder'     // 16. 茶白贯耳方瓶
+  // ── 历史器物神韵再设计系列 ──
+  | 'tang_sancai_phoenix'    // 17. 唐彩凤首曲柄瓶
+  | 'shang_bronze_gu'        // 18. 商青铜觚花器
+  | 'warring_turquoise_fang' // 19. 战国错金绿松石云纹钫
+  | 'blue_red_double_gourd'  // 20. 青花釉里红双生葫芦瓶
+  // ── 西周国宝重器神韵系列 ──
+  | 'western_zhou_he_zun'    // 21. 宅兹中国何尊花器
+  | 'western_zhou_li_gui'    // 22. 克商利簋方座花器
+  | 'western_zhou_elephant'  // 23. 西周凤鸟纹象尊花器
+  // ── 秦制器物神韵系列 ──
+  | 'qin_chariot_canopy'     // 24. 秦陵铜车马伞盖瓶
+  | 'qin_painted_armor'      // 25. 秦彩绘铠甲俑瓶
+  | 'qin_bronze_crane'       // 26. 秦陵青铜鹤曲颈瓶
+  // ── 隋代南青北白器物神韵系列 ──
+  | 'sui_double_dragon_linked' // 27. 隋月白双龙联腹传瓶
+  | 'sui_lotus_panmouth'       // 28. 隋碧釉莲瓣四系盘口瓶
+  | 'sui_white_chicken_head'   // 29. 隋凝脂白瓷鸡首壶
+  // ── 唐代名窑器物神韵系列 ──
+  | 'tang_secret_celadon_octagonal' // 30. 唐越窑秘色八棱净瓶
+  | 'tang_lushan_splashed_glaze'    // 31. 唐鲁山月斑花釉壶
+  | 'tang_changsha_bird_ewer'       // 32. 唐长沙窑褐绿彩花鸟壶
+  // ── 北宋名窑器物神韵系列 ──
+  | 'song_jun_moon_white'           // 33. 北宋钧窑月白紫霞长颈瓶
+  | 'song_yaozhou_carved_peony'     // 34. 北宋耀州青釉刻牡丹瓶
+  | 'song_cizhou_black_carved_yuhuchun' // 35. 北宋磁州白地剔黑玉壶春瓶
+  // ── 明代名窑与珐琅器神韵系列 ──
+  | 'ming_xuande_lobed_blue_white' // 36. 宣德青花灵芝纹莲瓣瓜棱瓶
+  | 'ming_zhengde_ring_handle_blue_white' // 37. 正德青花缠枝莲双耳环瓶
+  | 'ming_jingtai_cloisonne_lotus_bottle' // 38. 景泰蓝掐丝缠枝莲羽纹瓶
   // ── 向下兼容历史别名 ──
   | 'warm_white_plain'
   | 'painted_iris'
@@ -172,17 +247,12 @@ export interface BgmTrackInfo {
   icon: string;
 }
 
+/**
+ * 专项审计展台类别：名花 / 花器 / 案台。
+ * 名花与花器已改为「按注册表全量目录、每组 5 件翻页」的动态展台
+ * （见 data/auditCatalog.ts），不再有写死的分组枚举。
+ */
 export type AuditCategory = 'flowers' | 'vases' | 'table';
-export type VaseAuditGroup = 'new_unique' | 'designer_twist';
-export type TableAuditGroup = 'all_woods';
-export type FlowerAuditGroup =
-  | 'flowers_tier1_all'   // 🌟 第一梯队 10 花齐放同台
-  | 'flowers_tier1_a'     // 🌺 第一梯队 A 组 (前5名卉：梅花/向日葵/康乃馨/马蹄莲/郁金香)
-  | 'flowers_tier1_b'     // 🪷 第一梯队 B 组 (后5名卉：水仙/铃兰/蝴蝶兰/绣球/雏菊)
-  | 'flowers_classic'     // 💮 经典传承 5 供 (牡丹/百合/清莲/白菊/玫瑰)
-  | 'flowers_bouquets';   // 💐 案前敬献花束平铺对比
-
-export type AuditGroup = FlowerAuditGroup | VaseAuditGroup | TableAuditGroup;
 
 export type LoginMethod = 'phone' | 'wechat' | 'apple';
 

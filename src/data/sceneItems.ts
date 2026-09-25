@@ -15,12 +15,15 @@ import {
   FruitType,
   TableWoodStyle,
   AuditCategory,
-  AuditGroup,
-  VaseAuditGroup,
-  FlowerAuditGroup,
 } from '../types';
 import type { VaseStyle } from '../pixi';
 import { resolveSystemTimeOfDay } from '../utils/timeOfDay';
+import {
+  AUDIT_FLOWER_CATALOG,
+  AUDIT_VASE_CATALOG,
+  formatAuditEntryLabel,
+  getAuditPageEntries,
+} from './auditCatalog';
 
 /* ── 摆件构造器 ───────────────────────────────────────────────────────────── */
 
@@ -73,6 +76,40 @@ export const FLOWER_CYCLE_ORDER: FlowerType[] = [
   'orchids',
   'hydrangeas',
   'daisies',
+  'wintersweet',
+  'magnolia',
+  'peach_blossoms',
+  'apricot_blossoms',
+  'pear_blossoms',
+  'crabapple_blossoms',
+  'camellias',
+  'azaleas',
+  'kerria',
+  'hibiscus_mutabilis',
+  'irises',
+  'clivia',
+  'wisteria',
+  'trumpet_creeper',
+  'morning_glories',
+  'honeysuckle',
+  'winter_jasmine',
+  'osmanthus',
+  'crape_myrtle',
+  'globe_amaranth',
+  'gardenias',
+  'jasmine',
+  'balloon_flowers',
+  'daylilies',
+  'hostas',
+  'impatiens',
+  'hollyhocks',
+  'pomegranate_blossoms',
+  'chinese_hibiscus',
+  'cockscomb',
+  'poppies',
+  'epiphyllum',
+  'spider_lilies',
+  'redbuds',
 ];
 
 /** 点击果盘时循环切换的果品顺序 */
@@ -125,6 +162,40 @@ export const FLOWER_DISPLAY_NAMES: Record<FlowerType, string> = {
   orchids: '幽谷素兰',
   hydrangeas: '团圆绣球',
   daisies: '清纯雏菊',
+  wintersweet: '凌寒腊梅',
+  magnolia: '玉盏玉兰',
+  peach_blossoms: '灼灼桃花',
+  apricot_blossoms: '春雨杏花',
+  pear_blossoms: '晴雪梨花',
+  crabapple_blossoms: '垂丝海棠',
+  camellias: '丹华山茶',
+  azaleas: '映山杜鹃',
+  kerria: '金玉棣棠',
+  hibiscus_mutabilis: '照水芙蓉',
+  irises: '蝶影鸢尾',
+  clivia: '丹霞君子兰',
+  wisteria: '垂云紫藤',
+  trumpet_creeper: '凌云霄花',
+  morning_glories: '晨露牵牛',
+  honeysuckle: '金银忍冬',
+  winter_jasmine: '金英迎春',
+  osmanthus: '月宫金桂',
+  crape_myrtle: '百日紫薇',
+  globe_amaranth: '千日红',
+  gardenias: '玉雪栀子',
+  jasmine: '素馨茉莉',
+  balloon_flowers: '青蓝桔梗',
+  daylilies: '忘忧萱草',
+  hostas: '月下玉簪',
+  impatiens: '染甲凤仙',
+  hollyhocks: '锦塔蜀葵',
+  pomegranate_blossoms: '榴火石榴花',
+  chinese_hibiscus: '丹心朱槿',
+  cockscomb: '锦冠鸡冠花',
+  poppies: '绛绡虞美人',
+  epiphyllum: '月下昙花',
+  spider_lilies: '赤焰彼岸花',
+  redbuds: '同心紫荆',
 };
 
 export const FRUIT_DISPLAY_NAMES: Record<FruitType, string> = {
@@ -213,67 +284,47 @@ export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
   },
 });
 
-export type { AuditCategory, VaseAuditGroup, FlowerAuditGroup, AuditGroup };
+export type { AuditCategory };
 
-/** 1. 雅瓷花器形制专项审计 */
+/** 展台 5 席的横向落位（席距 154，两侧靠前、中间靠后，形成浅弧形避免花冠互压） */
+const AUDIT_SLOTS: { x: number; y: number }[] = [
+  { x: -308, y: 6 },
+  { x: -154, y: -2 },
+  { x: 0, y: -8 },
+  { x: 154, y: -2 },
+  { x: 308, y: 6 },
+];
+
+/** 展台条目的稳定 id（5 席固定，翻页只换内容不换席位） */
+const auditSlotId = (slot: number): SceneItemId => `vase_audit_${slot + 1}`;
+
+/** 1. 雅瓷花器形制专项审计（按目录每页 5 款，新增形制自动入列） */
 export const buildAuditVaseItems = (
-  group: VaseAuditGroup = 'new_unique',
+  page: number = 0,
   withFlowers: boolean = true
 ): Record<SceneItemId, SceneItem> => {
-  if (group === 'new_unique') {
-    // 4 款全新异形与手作/旋涡/流沙微观质感花器 (最新参考图提炼打造)
-    return {
-      vase_audit_1: createVaseItem(
-        'vase_audit_1',
-        withFlowers ? 'peonies' : 'none',
-        { x: -140, y: 0 },
-        'pinched_clay_ruffle',
-        '1. 手作泥捏翻边陶瓶 (梳齿拉坯刮痕粗陶)',
-        0.96
-      ),
-      vase_audit_2: createVaseItem(
-        'vase_audit_2',
-        withFlowers ? 'lilies' : 'none',
-        { x: -46, y: -4 },
-        'pearlescent_turbine',
-        '2. 银曜珠光螺旋涡轮瓶 (8道3D旋转刀锋棱)',
-        0.96
-      ),
-      vase_audit_3: createVaseItem(
-        'vase_audit_3',
-        withFlowers ? 'lotus' : 'none',
-        { x: 46, y: -4 },
-        'twisted_helix_tower',
-        '3. 极简莫兰迪旋转扭扭塔 (90°沙漏扭转腰)',
-        0.96
-      ),
-      vase_audit_4: createVaseItem(
-        'vase_audit_4',
-        withFlowers ? 'roses' : 'none',
-        { x: 140, y: 0 },
-        'gradient_sand_volcano',
-        '4. 天青流沙渐变圆锥瓶 (砂岩颗粒极简锥台)',
-        0.96
-      ),
-    };
-  }
+  const entries = getAuditPageEntries('vases', page);
+  const flowers = AUDIT_FLOWER_CATALOG;
 
-  // designer_twist: 8 款现代几何折痕与器形
-  return {
-    vase_audit_1: createVaseItem('vase_audit_1', withFlowers ? 'peonies' : 'none', { x: -189, y: 4 }, 'ribbed_fluted_white', '1. 极细百褶密棱瓶', 0.82),
-    vase_audit_2: createVaseItem('vase_audit_2', withFlowers ? 'lilies' : 'none', { x: -135, y: 0 }, 'organic_twist_cream', '2. 旋风波浪奶油瓶', 0.82),
-    vase_audit_3: createVaseItem('vase_audit_3', withFlowers ? 'peonies' : 'none', { x: -81, y: -4 }, 'organic_twist_rose', '3. 落樱粉旋风波纹瓶', 0.82),
-    vase_audit_4: createVaseItem('vase_audit_4', withFlowers ? 'roses' : 'none', { x: -27, y: -6 }, 'chiseled_stone_gray', '4. 侘寂砂岩横纹瓶', 0.82),
-    vase_audit_5: createVaseItem('vase_audit_5', withFlowers ? 'lotus' : 'none', { x: 27, y: -6 }, 'fluted_trapezoid_mini', '5. 圆台百褶梯形瓶', 0.82),
-    vase_audit_6: createVaseItem('vase_audit_6', withFlowers ? 'chrysanthemum' : 'none', { x: 81, y: -4 }, 'faceted_gem_prism', '6. 钻石晶体切角瓶', 0.82),
-    vase_audit_7: createVaseItem('vase_audit_7', withFlowers ? 'lilies' : 'none', { x: 135, y: 0 }, 'melon_lobed_celadon', '7. 海棠瓜棱秀颈瓶', 0.82),
-    vase_audit_8: createVaseItem('vase_audit_8', withFlowers ? 'lotus' : 'none', { x: 189, y: 4 }, 'minimal_drop_swan', '8. 极简水滴天鹅瓶', 0.82),
-  };
+  const items: Record<SceneItemId, SceneItem> = {};
+  entries.forEach((entry, slot) => {
+    // 插花比对时，按全局序号轮转取花，保证每只瓶配到的花都不同
+    const flower = flowers.length ? flowers[entry.no % flowers.length].id : 'peonies';
+    items[auditSlotId(slot)] = createVaseItem(
+      auditSlotId(slot),
+      withFlowers ? (flower as FlowerType) : 'none',
+      AUDIT_SLOTS[slot],
+      entry.id as VaseStyle,
+      formatAuditEntryLabel(entry),
+      0.84
+    );
+  });
+  return items;
 };
 
-/** 2. 🌸 名花形神与枯荣生命周期专项审计 */
+/** 2. 🌸 名花形神与枯荣生命周期专项审计（按目录每页 5 款，新增花材自动入列） */
 export const buildAuditFlowerItems = (
-  group: FlowerAuditGroup = 'flowers_tier1_all',
+  page: number = 0,
   decayHealth: number = 1.0
 ): Record<SceneItemId, SceneItem> => {
   const lifecycle = {
@@ -285,239 +336,38 @@ export const buildAuditFlowerItems = (
     autoDespawn: false,
   };
 
-  if (group === 'flowers_tier1_a') {
-    // 5 款第一梯队名花 (前5)
-    return {
-      vase_audit_flower_1: {
-        ...createVaseItem(
-          'vase_audit_flower_1',
-          'plum_blossoms',
-          { x: -144, y: 0 },
-          'ribbed_fluted_white',
-          '1. 傲霜冷香白梅 · 枯瘦挺拔细折枝',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_2: {
-        ...createVaseItem(
-          'vase_audit_flower_2',
-          'sunflowers',
-          { x: -72, y: -4 },
-          'chiseled_stone_gray',
-          '2. 金色灿烂向日 · 葵盘蜂巢蕊',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_3: {
-        ...createVaseItem(
-          'vase_audit_flower_3',
-          'carnations',
-          { x: 0, y: -6 },
-          'organic_twist_rose',
-          '3. 慈孝粉康乃馨 · 锯齿折叠瓣',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_4: {
-        ...createVaseItem(
-          'vase_audit_flower_4',
-          'calla_lilies',
-          { x: 72, y: -4 },
-          'minimal_drop_swan',
-          '4. 素雅圣洁马蹄莲 · 纯白佛焰苞',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_5: {
-        ...createVaseItem(
-          'vase_audit_flower_5',
-          'tulips',
-          { x: 144, y: 0 },
-          'pearlescent_turbine',
-          '5. 优雅高脚红郁金香 · 艳红高杯',
-          0.96
-        ),
-        lifecycle,
-      },
+  const entries = getAuditPageEntries('flowers', page);
+  const vases = AUDIT_VASE_CATALOG;
+
+  const items: Record<SceneItemId, SceneItem> = {};
+  entries.forEach((entry, slot) => {
+    // 依全局序号轮转配瓶，相邻名花不会撞同一器形
+    const vase = vases.length ? vases[entry.no % vases.length].id : 'ribbed_fluted_white';
+    items[auditSlotId(slot)] = {
+      ...createVaseItem(
+        auditSlotId(slot),
+        entry.id as FlowerType,
+        AUDIT_SLOTS[slot],
+        vase as VaseStyle,
+        formatAuditEntryLabel(entry),
+        0.88
+      ),
+      lifecycle,
     };
-  }
-
-  if (group === 'flowers_tier1_b') {
-    // 5 款第一梯队名花 (后5)
-    return {
-      vase_audit_flower_6: {
-        ...createVaseItem(
-          'vase_audit_flower_6',
-          'narcissus',
-          { x: -144, y: 0 },
-          'melon_lobed_celadon',
-          '6. 凌波仙子水仙 · 金盏银台',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_7: {
-        ...createVaseItem(
-          'vase_audit_flower_7',
-          'lily_of_valley',
-          { x: -72, y: -4 },
-          'fluted_trapezoid_mini',
-          '7. 幽谷如意铃兰 · 拱枝乳白银铃',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_8: {
-        ...createVaseItem(
-          'vase_audit_flower_8',
-          'orchids',
-          { x: 0, y: -6 },
-          'twisted_helix_tower',
-          '8. 空谷幽兰蝴蝶兰 · 展翅粉紫唇',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_9: {
-        ...createVaseItem(
-          'vase_audit_flower_9',
-          'hydrangeas',
-          { x: 72, y: -4 },
-          'pinched_clay_ruffle',
-          '9. 团圆锦簇紫绣球 · 繁英聚球',
-          0.96
-        ),
-        lifecycle,
-      },
-      vase_audit_flower_10: {
-        ...createVaseItem(
-          'vase_audit_flower_10',
-          'daisies',
-          { x: 144, y: 0 },
-          'organic_twist_cream',
-          '10. 清纯明朗雏菊 · 金蕊白丝带',
-          0.96
-        ),
-        lifecycle,
-      },
-    };
-  }
-
-  if (group === 'flowers_tier1_all') {
-    // 10 款第一梯队名花同台大展 (双排立体景深)
-    return {
-      // 后排 5 款 (微靠后、略小尺寸营造进深感)
-      vase_audit_flower_6: {
-        ...createVaseItem('vase_audit_flower_6', 'narcissus', { x: -148, y: -10 }, 'melon_lobed_celadon', '6. 凌波水仙', 0.84),
-        lifecycle,
-      },
-      vase_audit_flower_7: {
-        ...createVaseItem('vase_audit_flower_7', 'lily_of_valley', { x: -74, y: -12 }, 'fluted_trapezoid_mini', '7. 幽谷铃兰', 0.84),
-        lifecycle,
-      },
-      vase_audit_flower_8: {
-        ...createVaseItem('vase_audit_flower_8', 'orchids', { x: 0, y: -14 }, 'twisted_helix_tower', '8. 蝴蝶兰', 0.84),
-        lifecycle,
-      },
-      vase_audit_flower_9: {
-        ...createVaseItem('vase_audit_flower_9', 'hydrangeas', { x: 74, y: -12 }, 'pinched_clay_ruffle', '9. 紫绣球', 0.84),
-        lifecycle,
-      },
-      vase_audit_flower_10: {
-        ...createVaseItem('vase_audit_flower_10', 'daisies', { x: 148, y: -10 }, 'organic_twist_cream', '10. 小雏菊', 0.84),
-        lifecycle,
-      },
-
-      // 前排 5 款
-      vase_audit_flower_1: {
-        ...createVaseItem('vase_audit_flower_1', 'plum_blossoms', { x: -148, y: 12 }, 'ribbed_fluted_white', '1. 傲霜冷香白梅', 0.88),
-        lifecycle,
-      },
-      vase_audit_flower_2: {
-        ...createVaseItem('vase_audit_flower_2', 'sunflowers', { x: -74, y: 14 }, 'chiseled_stone_gray', '2. 向日葵', 0.88),
-        lifecycle,
-      },
-      vase_audit_flower_3: {
-        ...createVaseItem('vase_audit_flower_3', 'carnations', { x: 0, y: 16 }, 'organic_twist_rose', '3. 康乃馨', 0.88),
-        lifecycle,
-      },
-      vase_audit_flower_4: {
-        ...createVaseItem('vase_audit_flower_4', 'calla_lilies', { x: 74, y: 14 }, 'minimal_drop_swan', '4. 马蹄莲', 0.88),
-        lifecycle,
-      },
-      vase_audit_flower_5: {
-        ...createVaseItem('vase_audit_flower_5', 'tulips', { x: 148, y: 12 }, 'pearlescent_turbine', '5. 郁金香', 0.88),
-        lifecycle,
-      },
-    };
-  }
-
-  if (group === 'flowers_classic') {
-    // 5 款经典名花
-    return {
-      vase_audit_flower_c1: {
-        ...createVaseItem('vase_audit_flower_c1', 'peonies', { x: -144, y: 0 }, 'warm_white_plain', '经典 · 富贵牡丹', 0.96),
-        lifecycle,
-      },
-      vase_audit_flower_c2: {
-        ...createVaseItem('vase_audit_flower_c2', 'lilies', { x: -72, y: -4 }, 'painted_iris', '经典 · 纯白百合', 0.96),
-        lifecycle,
-      },
-      vase_audit_flower_c3: {
-        ...createVaseItem('vase_audit_flower_c3', 'lotus', { x: 0, y: -6 }, 'celadon_ru', '经典 · 出尘净莲', 0.96),
-        lifecycle,
-      },
-      vase_audit_flower_c4: {
-        ...createVaseItem('vase_audit_flower_c4', 'chrysanthemum', { x: 72, y: -4 }, 'ribbed_fluted_white', '经典 · 傲霜白菊', 0.96),
-        lifecycle,
-      },
-      vase_audit_flower_c5: {
-        ...createVaseItem('vase_audit_flower_c5', 'roses', { x: 144, y: 0 }, 'chiseled_stone_gray', '经典 · 长情玫瑰', 0.96),
-        lifecycle,
-      },
-    };
-  }
-
-  // flowers_bouquets: 案前敬献花束平铺比对
-  return {
-    // 后排 5 束花
-    offered_flower_b6: createBouquetItem('narcissus', { x: -140, y: -4 }, { id: 'offered_flower_b6', name: '水仙花束' }),
-    offered_flower_b7: createBouquetItem('lily_of_valley', { x: -70, y: -4 }, { id: 'offered_flower_b7', name: '铃兰花束' }),
-    offered_flower_b8: createBouquetItem('orchids', { x: 0, y: -4 }, { id: 'offered_flower_b8', name: '蝴蝶兰花束' }),
-    offered_flower_b9: createBouquetItem('hydrangeas', { x: 70, y: -4 }, { id: 'offered_flower_b9', name: '绣球花束' }),
-    offered_flower_b10: createBouquetItem('daisies', { x: 140, y: -4 }, { id: 'offered_flower_b10', name: '雏菊花束' }),
-
-    // 前排 5 束花
-    offered_flower_b1: createBouquetItem('plum_blossoms', { x: -140, y: 18 }, { id: 'offered_flower_b1', name: '冷香素白梅' }),
-    offered_flower_b2: createBouquetItem('sunflowers', { x: -70, y: 18 }, { id: 'offered_flower_b2', name: '向日葵花束' }),
-    offered_flower_b3: createBouquetItem('carnations', { x: 0, y: 18 }, { id: 'offered_flower_b3', name: '康乃馨花束' }),
-    offered_flower_b4: createBouquetItem('calla_lilies', { x: 70, y: 18 }, { id: 'offered_flower_b4', name: '马蹄莲花束' }),
-    offered_flower_b5: createBouquetItem('tulips', { x: 140, y: 18 }, { id: 'offered_flower_b5', name: '郁金香花束' }),
-  };
+  });
+  return items;
 };
 
-/** 3. 统一审计展台物品生成器 */
+/** 3. 统一审计展台物品生成器（名花 / 花器一律按「每组 5 件」翻页） */
 export const buildAuditItems = (
   category: AuditCategory = 'flowers',
-  group: AuditGroup = 'flowers_tier1_all',
+  page: number = 0,
   withFlowers: boolean = true,
   decayHealth: number = 1.0
-): Record<SceneItemId, SceneItem> => {
-  if (category === 'flowers') {
-    const flowerGroup = (
-      ['flowers_tier1_a', 'flowers_tier1_b', 'flowers_tier1_all', 'flowers_classic', 'flowers_bouquets'].includes(group)
-        ? group
-        : 'flowers_tier1_all'
-    ) as FlowerAuditGroup;
-    return buildAuditFlowerItems(flowerGroup, decayHealth);
-  }
-  const vaseGroup = (group === 'designer_twist' ? 'designer_twist' : 'new_unique') as VaseAuditGroup;
-  return buildAuditVaseItems(vaseGroup, withFlowers);
-};
+): Record<SceneItemId, SceneItem> =>
+  category === 'vases'
+    ? buildAuditVaseItems(page, withFlowers)
+    : buildAuditFlowerItems(page, decayHealth);
 
 export const buildInitialItems = (): Record<SceneItemId, SceneItem> => ({});
 

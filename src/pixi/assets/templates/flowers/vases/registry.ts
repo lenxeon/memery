@@ -1,12 +1,12 @@
 /**
  * @file registry.ts
  * @description 花瓶形制注册表 (Base-Registry 扩展架构，纯 TypeScript)。
- * 统一管理 12 款独立花瓶的形制、公共接口与纯 SVG 字符串生成。
+ * 统一管理独立花瓶的形制、公共接口与纯 SVG 字符串生成。
  */
 import { VaseStyle, VaseItemDefinition, normalizeVaseStyle } from './types';
 import { getVaseDefsSvg } from './VaseDefs';
 
-// 导入 12 款独立花瓶定义
+// 导入独立花瓶定义
 import { PinchedClayRuffleVase } from './items/PinchedClayRuffleVase';
 import { PearlescentTurbineVase } from './items/PearlescentTurbineVase';
 import { TwistedHelixTowerVase } from './items/TwistedHelixTowerVase';
@@ -19,6 +19,32 @@ import { FlutedTrapezoidMiniVase } from './items/FlutedTrapezoidMiniVase';
 import { FacetedGemPrismVase } from './items/FacetedGemPrismVase';
 import { MelonLobedCeladonVase } from './items/MelonLobedCeladonVase';
 import { MinimalDropSwanVase } from './items/MinimalDropSwanVase';
+import { MoonWhiteOrbVase } from './items/MoonWhiteOrbVase';
+import { InkBlackMeipingVase } from './items/InkBlackMeipingVase';
+import { RuCeladonCongVase } from './items/RuCeladonCongVase';
+import { TeaWhiteShoulderVase } from './items/TeaWhiteShoulderVase';
+import { TangSancaiPhoenixVase } from './items/TangSancaiPhoenixVase';
+import { ShangBronzeGuVase } from './items/ShangBronzeGuVase';
+import { WarringTurquoiseFangVase } from './items/WarringTurquoiseFangVase';
+import { BlueRedDoubleGourdVase } from './items/BlueRedDoubleGourdVase';
+import { WesternZhouHeZunVase } from './items/WesternZhouHeZunVase';
+import { WesternZhouLiGuiVase } from './items/WesternZhouLiGuiVase';
+import { WesternZhouElephantVase } from './items/WesternZhouElephantVase';
+import { QinChariotCanopyVase } from './items/QinChariotCanopyVase';
+import { QinPaintedArmorVase } from './items/QinPaintedArmorVase';
+import { QinBronzeCraneVase } from './items/QinBronzeCraneVase';
+import { SuiDoubleDragonLinkedVase } from './items/SuiDoubleDragonLinkedVase';
+import { SuiLotusPanmouthVase } from './items/SuiLotusPanmouthVase';
+import { SuiWhiteChickenHeadVase } from './items/SuiWhiteChickenHeadVase';
+import { TangSecretCeladonOctagonalVase } from './items/TangSecretCeladonOctagonalVase';
+import { TangLushanSplashedGlazeVase } from './items/TangLushanSplashedGlazeVase';
+import { TangChangshaBirdEwerVase } from './items/TangChangshaBirdEwerVase';
+import { SongJunMoonWhiteVase } from './items/SongJunMoonWhiteVase';
+import { SongYaozhouCarvedPeonyVase } from './items/SongYaozhouCarvedPeonyVase';
+import { SongCizhouBlackCarvedYuhuchunVase } from './items/SongCizhouBlackCarvedYuhuchunVase';
+import { MingXuandeLobedBlueWhiteVase } from './items/MingXuandeLobedBlueWhiteVase';
+import { MingZhengdeRingHandleBlueWhiteVase } from './items/MingZhengdeRingHandleBlueWhiteVase';
+import { MingJingtaiCloisonneLotusBottle } from './items/MingJingtaiCloisonneLotusBottle';
 
 export { getVaseDefsSvg } from './VaseDefs';
 
@@ -38,6 +64,32 @@ export const VASE_REGISTRY: Record<string, VaseItemDefinition> = {
   faceted_gem_prism: FacetedGemPrismVase,
   melon_lobed_celadon: MelonLobedCeladonVase,
   minimal_drop_swan: MinimalDropSwanVase,
+  moon_white_orb: MoonWhiteOrbVase,
+  ink_black_meiping: InkBlackMeipingVase,
+  ru_celadon_cong: RuCeladonCongVase,
+  tea_white_shoulder: TeaWhiteShoulderVase,
+  tang_sancai_phoenix: TangSancaiPhoenixVase,
+  shang_bronze_gu: ShangBronzeGuVase,
+  warring_turquoise_fang: WarringTurquoiseFangVase,
+  blue_red_double_gourd: BlueRedDoubleGourdVase,
+  western_zhou_he_zun: WesternZhouHeZunVase,
+  western_zhou_li_gui: WesternZhouLiGuiVase,
+  western_zhou_elephant: WesternZhouElephantVase,
+  qin_chariot_canopy: QinChariotCanopyVase,
+  qin_painted_armor: QinPaintedArmorVase,
+  qin_bronze_crane: QinBronzeCraneVase,
+  sui_double_dragon_linked: SuiDoubleDragonLinkedVase,
+  sui_lotus_panmouth: SuiLotusPanmouthVase,
+  sui_white_chicken_head: SuiWhiteChickenHeadVase,
+  tang_secret_celadon_octagonal: TangSecretCeladonOctagonalVase,
+  tang_lushan_splashed_glaze: TangLushanSplashedGlazeVase,
+  tang_changsha_bird_ewer: TangChangshaBirdEwerVase,
+  song_jun_moon_white: SongJunMoonWhiteVase,
+  song_yaozhou_carved_peony: SongYaozhouCarvedPeonyVase,
+  song_cizhou_black_carved_yuhuchun: SongCizhouBlackCarvedYuhuchunVase,
+  ming_xuande_lobed_blue_white: MingXuandeLobedBlueWhiteVase,
+  ming_zhengde_ring_handle_blue_white: MingZhengdeRingHandleBlueWhiteVase,
+  ming_jingtai_cloisonne_lotus_bottle: MingJingtaiCloisonneLotusBottle,
 };
 
 /**

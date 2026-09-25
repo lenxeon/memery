@@ -37,7 +37,17 @@ import {
 } from 'lucide-react';
 import { sound, BGM_TRACKS } from '../../../utils/audio';
 import { resolveSystemTimeOfDay, formatClock, TIME_OF_DAY_LABEL } from '../../../utils/timeOfDay';
-import { BgmTrackId, FloorStyle, AuditCategory, AuditGroup } from '../../../types';
+import { BgmTrackId, FloorStyle, AuditCategory } from '../../../types';
+import {
+  AUDIT_FLOWER_CATALOG,
+  AUDIT_VASE_CATALOG,
+  AuditCatalogEntry,
+  formatAuditEntryLabel,
+} from '../../../data/auditCatalog';
+
+/** 审计目录总件数（随注册表自动增长，新增花材 / 新瓶无需改这里） */
+const AUDIT_FLOWER_TOTAL = AUDIT_FLOWER_CATALOG.length;
+const AUDIT_VASE_TOTAL = AUDIT_VASE_CATALOG.length;
 import { ChineseCornerOrnaments, ChineseCloudDivider, CinnabarSealBadge } from '../../common/ChineseDecorations';
 
 export interface AmbiancePanelProps {
@@ -65,8 +75,13 @@ export interface AmbiancePanelProps {
   onToggleAuditMode?: () => void;
   auditCategory?: AuditCategory;
   onSwitchAuditCategory?: (cat: AuditCategory) => void;
-  auditGroup?: AuditGroup;
-  onSwitchAuditGroup?: (grp: AuditGroup) => void;
+  /** 审计展台：当前组号（0 起）、总组数与本组条目 —— 名花 / 花器各按每组 5 件翻页 */
+  auditPage?: number;
+  auditPageCount?: number;
+  auditPageEntries?: AuditCatalogEntry[];
+  onSwitchAuditPage?: (page: number) => void;
+  onPrevAuditPage?: () => void;
+  onNextAuditPage?: () => void;
   auditWithFlowers?: boolean;
   onToggleAuditFlowers?: () => void;
   flowerDecayHealth?: number;
@@ -132,8 +147,12 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
   onToggleAuditMode,
   auditCategory = 'flowers',
   onSwitchAuditCategory,
-  auditGroup = 'flowers_tier1_all',
-  onSwitchAuditGroup,
+  auditPage = 0,
+  auditPageCount = 1,
+  auditPageEntries = [],
+  onSwitchAuditPage,
+  onPrevAuditPage,
+  onNextAuditPage,
   auditWithFlowers = true,
   onToggleAuditFlowers,
   flowerDecayHealth = 1.0,
@@ -871,7 +890,11 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
                   <label className="text-[11px] font-medium text-amber-200/90 flex items-center justify-between font-serif">
                     <span>品鉴大类</span>
                     <span className="text-[10px] text-stone-400 font-sans font-normal">
-                      {auditCategory === 'flowers' ? '当前：15款名卉形神品鉴' : '当前：12款雅瓷花器形制'}
+                      {auditCategory === 'flowers'
+                        ? `当前：名花 ${AUDIT_FLOWER_TOTAL} 款 · 每组 5 件轮审`
+                        : auditCategory === 'vases'
+                        ? `当前：花器 ${AUDIT_VASE_TOTAL} 款 · 每组 5 件轮审`
+                        : '当前：供案名木质感'}
                     </span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -888,7 +911,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
                       }`}
                     >
                       <span>🌸</span>
-                      <span>名花形神专项 (15款)</span>
+                      <span>名花形神专项 ({AUDIT_FLOWER_TOTAL}款)</span>
                     </button>
 
                     <button
@@ -904,7 +927,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
                       }`}
                     >
                       <span>🏺</span>
-                      <span>花器形制专项 (12款)</span>
+                      <span>花器形制专项 ({AUDIT_VASE_TOTAL}款)</span>
                     </button>
 
                     <button
@@ -920,122 +943,97 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
                       }`}
                     >
                       <span>🪵</span>
-                      <span>供案原木材质 (4款)</span>
+                      <span>供案原木材质 ({TABLE_WOOD_OPTIONS.length}款)</span>
                     </button>
                   </div>
                 </div>
 
-                {/* 2. 展台阵列分组 */}
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-medium text-amber-200/90 font-serif">
-                    {auditCategory === 'flowers' ? '名花陈列分组' : '雅瓷花器分组'}
-                  </label>
-                  {auditCategory === 'flowers' ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                {/* 2. 展台阵列翻页：名花 / 花器各按「每组 5 件」轮审 */}
+                {auditCategory !== 'table' && (
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-medium text-amber-200/90 font-serif flex items-center justify-between">
+                      <span>{auditCategory === 'flowers' ? '名花轮审分组' : '花器轮审分组'}</span>
+                      <span className="text-[10px] text-stone-400 font-sans font-normal font-mono">
+                        第 {auditPage + 1}/{auditPageCount} 组 · 本组 {auditPageEntries.length} 件
+                      </span>
+                    </label>
+
+                    {/* 翻页操作条 */}
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => {
                           if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('flowers_tier1_all');
+                          onPrevAuditPage?.();
                         }}
-                        className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
-                          auditGroup === 'flowers_tier1_all'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
+                        className="px-2 py-1 rounded-lg border border-stone-800 bg-stone-950/50 text-stone-300 hover:text-amber-200 hover:bg-stone-800/50 text-[11px] cursor-pointer transition-all"
                       >
-                        🌟 10花齐放同台
+                        ◀ 上一组
                       </button>
                       <button
                         type="button"
                         onClick={() => {
                           if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('flowers_tier1_a');
+                          onNextAuditPage?.();
                         }}
-                        className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
-                          auditGroup === 'flowers_tier1_a'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
+                        className="px-2 py-1 rounded-lg border border-stone-800 bg-stone-950/50 text-stone-300 hover:text-amber-200 hover:bg-stone-800/50 text-[11px] cursor-pointer transition-all"
                       >
-                        🌺 梯队A (前5)
+                        下一组 ▶
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('flowers_tier1_b');
-                        }}
-                        className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
-                          auditGroup === 'flowers_tier1_b'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
-                      >
-                        🪷 梯队B (后5)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('flowers_classic');
-                        }}
-                        className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all ${
-                          auditGroup === 'flowers_classic'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
-                      >
-                        💮 经典5供名花
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('flowers_bouquets');
-                        }}
-                        className={`py-1.5 px-2 rounded-lg border text-[11px] text-center cursor-pointer transition-all col-span-2 sm:col-span-1 ${
-                          auditGroup === 'flowers_bouquets'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
-                      >
-                        💐 案前敬献花束
-                      </button>
+                      {auditPageCount > 12 && (
+                        <select
+                          value={auditPage}
+                          onChange={(e) => onSwitchAuditPage?.(Number(e.target.value))}
+                          className="px-2 py-1 rounded-lg bg-stone-950/70 border border-stone-800 text-amber-200 text-[11px] cursor-pointer outline-none"
+                          title="直接跳到某一组"
+                        >
+                          {Array.from({ length: auditPageCount }, (_, i) => (
+                            <option key={i} value={i}>
+                              第 {i + 1} 组
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('new_unique');
-                        }}
-                        className={`py-1.5 px-2.5 rounded-lg border text-xs text-center cursor-pointer transition-all ${
-                          auditGroup === 'new_unique'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
-                      >
-                        ✨ 4款异形肌理瓶
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isAuditMode) onToggleAuditMode?.();
-                          onSwitchAuditGroup?.('designer_twist');
-                        }}
-                        className={`py-1.5 px-2.5 rounded-lg border text-xs text-center cursor-pointer transition-all ${
-                          auditGroup === 'designer_twist'
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 font-bold ring-1 ring-amber-400/40'
-                            : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
-                        }`}
-                      >
-                        🎨 8款现代折痕瓶
-                      </button>
+
+                    {/* 组号直达（≤12 组时以圆点快选） */}
+                    {auditPageCount <= 12 && (
+                      <div className="flex items-center flex-wrap gap-1">
+                        {Array.from({ length: auditPageCount }, (_, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              if (!isAuditMode) onToggleAuditMode?.();
+                              onSwitchAuditPage?.(i);
+                            }}
+                            className={`w-6 h-6 rounded-full text-[10px] cursor-pointer transition-all border ${
+                              i === auditPage
+                                ? 'bg-amber-500 border-amber-400 text-stone-950 font-bold'
+                                : 'bg-stone-950/50 border-stone-800 text-stone-400 hover:text-amber-200 hover:bg-stone-800/50'
+                            }`}
+                            title={`第 ${i + 1} 组`}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* 本组 5 件清单 */}
+                    <div className="space-y-1">
+                      {auditPageEntries.map((entry) => (
+                        <div
+                          key={entry.id}
+                          className="px-2 py-1 rounded-lg bg-stone-950/50 border border-stone-800 text-[10px] text-stone-400 truncate"
+                          title={formatAuditEntryLabel(entry)}
+                        >
+                          {formatAuditEntryLabel(entry)}
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* 3. 详细调节项：名花生命枯荣度 & 裸检模式 */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">

@@ -9,7 +9,7 @@
  */
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { AuditCategory, AuditGroup, SceneItem, SceneItemId, TableWoodStyle } from '../../../types';
+import { AuditCategory, SceneItem, SceneItemId, TableWoodStyle } from '../../../types';
 import { sound } from '../../../utils/audio';
 import {
   INITIAL_ITEMS,
@@ -18,6 +18,12 @@ import {
   buildAuditItems,
   buildStandardItems,
 } from '../../../data/sceneItems';
+import {
+  AuditCatalogEntry,
+  getAuditPageCount,
+  getAuditPageEntries,
+  normalizeAuditPage,
+} from '../../../data/auditCatalog';
 import { AuditStageProps } from './AuditStage';
 
 /** 案台（供案本体）受控状态与写入口 */
@@ -37,7 +43,8 @@ export interface AuditTableState {
 export interface AuditInfo {
   isAuditMode: boolean;
   category: AuditCategory;
-  group: AuditGroup;
+  /** 当前组号（0 起）：名花 / 花器按每组 5 件翻页 */
+  page: number;
   withFlowers: boolean;
   decayHealth: number;
 }
@@ -48,8 +55,13 @@ export interface AuditDrawerExtras {
   onToggleAuditMode: () => void;
   auditCategory: AuditCategory;
   onSwitchAuditCategory: (category: AuditCategory) => void;
-  auditGroup: AuditGroup;
-  onSwitchAuditGroup: (group: AuditGroup) => void;
+  /** 当前组号（0 起）与总组数 */
+  auditPage: number;
+  auditPageCount: number;
+  auditPageEntries: AuditCatalogEntry[];
+  onSwitchAuditPage: (page: number) => void;
+  onPrevAuditPage: () => void;
+  onNextAuditPage: () => void;
   auditWithFlowers: boolean;
   onToggleAuditFlowers: () => void;
   flowerDecayHealth: number;
@@ -67,15 +79,12 @@ const describeDecay = (health: number): string =>
     ? '🍂 微枯初衰（生机 55%）'
     : '🥀 岁暮深凋（生机 15%）';
 
-const GROUP_TOAST: Record<AuditGroup, string> = {
-  flowers_tier1_all: '已展示第一梯队 10 款名花齐放同台全景',
-  flowers_tier1_a: '已展示第一梯队前5名花 (梅花/向日葵/康乃馨/马蹄莲/郁金香)',
-  flowers_tier1_b: '已展示第一梯队后5名花 (水仙/铃兰/蝴蝶兰/绣球/雏菊)',
-  flowers_classic: '已展示经典五供名花 (牡丹/百合/清莲/白菊/玫瑰)',
-  flowers_bouquets: '已展示案前敬献花束平铺形态对比',
-  new_unique: '已展示 4 款异形与微观肌理瓶',
-  designer_twist: '已展示 8 款现代几何折痕瓶',
-  all_woods: '已展示 4 款名木实木板式材质',
+/** 翻页提示：列出本组实际陈出的条目 */
+const pageToast = (category: AuditCategory, page: number): string => {
+  const entries = getAuditPageEntries(category, page);
+  const total = getAuditPageCount(category);
+  const label = category === 'vases' ? '花器' : '名花';
+  return `${label}审计 · 第 ${page + 1}/${total} 组：${entries.map((e) => e.name).join('、')}`;
 };
 
 export interface UseAuditStageOptions {
@@ -91,7 +100,8 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
   const [isAuditMode, setIsAuditMode] = useState(false);
   const [auditPos, setAuditPos] = useState<{ x: number; y: number } | null>(null);
   const [auditCategory, setAuditCategory] = useState<AuditCategory>('flowers');
-  const [auditGroup, setAuditGroup] = useState<AuditGroup>('flowers_tier1_all');
+  /** 展台组号（0 起）：名花 / 花器一律「每组 5 件」翻页 */
+  const [auditPage, setAuditPage] = useState(0);
   const [auditWithFlowers, setAuditWithFlowers] = useState(true);
   const [flowerDecayHealth, setFlowerDecayHealth] = useState<number>(1.0);
   const [isAuditCapsuleExpanded, setIsAuditCapsuleExpanded] = useState<boolean>(true);
@@ -115,33 +125,40 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
         showToast('已进入「供案材质专项审计」');
         return;
       }
-      const defaultGroup: AuditGroup = category === 'flowers' ? 'flowers_tier1_all' : 'new_unique';
-      setAuditGroup(defaultGroup);
+      setAuditPage(0);
       sound.playPorcelainClink();
-      setItems(buildAuditItems(category, defaultGroup, auditWithFlowers, flowerDecayHealth));
-      showToast(category === 'flowers' ? '已进入「名花专项审计展台」' : '已进入「花器专项审计展台」');
+      setItems(buildAuditItems(category, 0, auditWithFlowers, flowerDecayHealth));
+      showToast(
+        category === 'flowers'
+          ? `已进入「名花专项审计展台」· ${pageToast(category, 0)}`
+          : `已进入「花器专项审计展台」· ${pageToast(category, 0)}`
+      );
     },
     [auditWithFlowers, flowerDecayHealth, showToast]
   );
 
-  const switchAuditGroup = useCallback(
-    (group: AuditGroup) => {
-      setAuditGroup(group);
+  const switchAuditPage = useCallback(
+    (page: number) => {
+      const next = normalizeAuditPage(auditCategory, page);
+      setAuditPage(next);
       sound.playPorcelainClink();
-      setItems(buildAuditItems(auditCategory, group, auditWithFlowers, flowerDecayHealth));
-      showToast(GROUP_TOAST[group] || '展台已更新');
+      setItems(buildAuditItems(auditCategory, next, auditWithFlowers, flowerDecayHealth));
+      showToast(pageToast(auditCategory, next));
     },
     [auditCategory, auditWithFlowers, flowerDecayHealth, showToast]
   );
+
+  const prevAuditPage = useCallback(() => switchAuditPage(auditPage - 1), [auditPage, switchAuditPage]);
+  const nextAuditPage = useCallback(() => switchAuditPage(auditPage + 1), [auditPage, switchAuditPage]);
 
   const applyDecayHealth = useCallback(
     (health: number) => {
       setFlowerDecayHealth(health);
       sound.playBell(720, 1.5);
-      setItems(buildAuditItems(auditCategory, auditGroup, auditWithFlowers, health));
+      setItems(buildAuditItems(auditCategory, auditPage, auditWithFlowers, health));
       showToast(`名花枯荣生命审计：${describeDecay(health)}`);
     },
-    [auditCategory, auditGroup, auditWithFlowers, showToast]
+    [auditCategory, auditPage, auditWithFlowers, showToast]
   );
 
   const cycleFlowerDecay = useCallback(() => {
@@ -159,11 +176,11 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
     const next = !auditWithFlowers;
     setAuditWithFlowers(next);
     sound.playPorcelainClink();
-    setItems(buildAuditItems(auditCategory, auditGroup, next, flowerDecayHealth));
+    setItems(buildAuditItems(auditCategory, auditPage, next, flowerDecayHealth));
     showToast(
       next ? '已开启插花比对（审计花枝入瓶景深与咬合）' : '已切换为净瓶裸检模式（审计器形、釉色与微观肌理）'
     );
-  }, [auditCategory, auditGroup, auditWithFlowers, flowerDecayHealth, showToast]);
+  }, [auditCategory, auditPage, auditWithFlowers, flowerDecayHealth, showToast]);
 
   const toggleAuditMode = useCallback(() => {
     if (isAuditMode) {
@@ -172,11 +189,15 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
       showToast('已恢复常规五供陈设（香、花、灯、水、果）');
     } else {
       setIsAuditMode(true);
-      setItems(buildAuditItems(auditCategory, auditGroup, auditWithFlowers, flowerDecayHealth));
-      showToast(auditCategory === 'flowers' ? '已进入「名花专项审计展台」' : '已进入「花器专项审计展台」');
+      setItems(buildAuditItems(auditCategory, auditPage, auditWithFlowers, flowerDecayHealth));
+      showToast(
+        auditCategory === 'flowers'
+          ? `已进入「名花专项审计展台」· ${pageToast(auditCategory, auditPage)}`
+          : `已进入「花器专项审计展台」· ${pageToast(auditCategory, auditPage)}`
+      );
     }
     sound.playWoodPlacement();
-  }, [auditCategory, auditGroup, auditWithFlowers, flowerDecayHealth, isAuditMode, showToast]);
+  }, [auditCategory, auditPage, auditWithFlowers, flowerDecayHealth, isAuditMode, showToast]);
 
   /* ── 顶栏「案台材质」快捷审计入口 ─────────────────────────────────────── */
 
@@ -269,17 +290,25 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
     setShowRunner: setShowTableRunner,
   };
 
+  const auditPageCount = getAuditPageCount(auditCategory);
+  const auditPageEntries = getAuditPageEntries(auditCategory, auditPage);
+
   const info: AuditInfo = {
     isAuditMode,
     category: auditCategory,
-    group: auditGroup,
+    page: auditPage,
     withFlowers: auditWithFlowers,
     decayHealth: flowerDecayHealth,
   };
 
   const auditProps: AuditStageProps = {
     category: auditCategory,
-    group: auditGroup,
+    page: auditPage,
+    pageCount: auditPageCount,
+    pageEntries: auditPageEntries,
+    onPrevPage: prevAuditPage,
+    onNextPage: nextAuditPage,
+    onSwitchPage: switchAuditPage,
     withFlowers: auditWithFlowers,
     decayHealth: flowerDecayHealth,
     expanded: isAuditCapsuleExpanded,
@@ -288,7 +317,6 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
     onPointerDown: handleAuditPointerDown,
     onToggleExpanded: () => setIsAuditCapsuleExpanded((prev) => !prev),
     onSwitchCategory: switchAuditCategory,
-    onSwitchGroup: switchAuditGroup,
     onToggleFlowers: toggleAuditFlowers,
     onCycleDecay: cycleFlowerDecay,
     onTriggerPetals: triggerAuditPetals,
@@ -310,8 +338,12 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
       onToggleAuditMode: toggleAuditMode,
       auditCategory,
       onSwitchAuditCategory: switchAuditCategory,
-      auditGroup,
-      onSwitchAuditGroup: switchAuditGroup,
+      auditPage,
+      auditPageCount,
+      auditPageEntries,
+      onSwitchAuditPage: switchAuditPage,
+      onPrevAuditPage: prevAuditPage,
+      onNextAuditPage: nextAuditPage,
       auditWithFlowers,
       onToggleAuditFlowers: toggleAuditFlowers,
       flowerDecayHealth,
@@ -323,8 +355,11 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
       toggleAuditMode,
       auditCategory,
       switchAuditCategory,
-      auditGroup,
-      switchAuditGroup,
+      auditPage,
+      auditPageCount,
+      switchAuditPage,
+      prevAuditPage,
+      nextAuditPage,
       auditWithFlowers,
       toggleAuditFlowers,
       flowerDecayHealth,
