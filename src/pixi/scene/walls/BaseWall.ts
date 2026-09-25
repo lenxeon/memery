@@ -1,79 +1,93 @@
 /**
  * @file BaseWall.ts
- * @description 背景墙外壳（纯 TS 场景元素）：统一处理景深渐变、晨昏光照色相偏移与居中挂落阴影。
+ * @description 背景墙基准（BaseWall）——统一负责「贴哪张背景图 · 遗像落在哪 · 纪念文字落在哪」三件事。
  *
- * 风格模块以 SVG / HTML 字符串注入对应插槽，本文件只负责壳体结构与光照氛围。
+ * 各风格只需给出：
+ *   1) 用哪张背景图（backdropUrl）—— 装饰框一并画在图里
+ *   2) 照片与文字的偏移量微调（portrait / text）
+ * 其余（壁面布局、昼夜调色）由 SceneBackgroundLayer 统一处理，风格侧不再各写一套。
+ *
+ * 本文件只产出「壁面构成规格」——不含任何 DOM / 字符串模板：
+ * 壁面 = 背景大图（装饰框一并画在图里）+ 遗像 + 纪念文字，全部落在 Pixi 画布内；
+ * 背景图由 SceneBackgroundLayer 贴 Sprite，遗像与文字由 MemorialPortraitLayer 绘制。
+ * 程序化矢量壁构（落地罩 / 帷幔 / 圆光罩 / 月洞 / 佛龛）已整体下线，不再渲染。
  */
-import { WallAmbiance } from './types';
+import { WallBackgroundStyle } from '../../../types';
 
-/** 通用鎏金描边渐变（各风格共用） */
-export const WALL_GOLD_FILLET_DEFS = `
-    <linearGradient id="goldFilletGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e8cd8a" />
-      <stop offset="35%" stop-color="#caa262" />
-      <stop offset="70%" stop-color="#9a7638" />
-      <stop offset="100%" stop-color="#6e4f1f" />
-    </linearGradient>`;
+/* ────────────────────────────────────────────────────────────────
+ * 壁面构成规格：BaseWall 的"基因"
+ * ──────────────────────────────────────────────────────────────── */
 
-export interface BaseWallOptions {
-  masterOn?: boolean;
-  sunlightIntensity?: number;
-  ambiance: WallAmbiance;
-  /** 风格专属渐变与图案（SVG <defs> 片段） */
-  defsSlot?: string;
-  /** 风格专属环境装饰层（HTML 片段，如竹影、落地宫灯、青竹） */
-  environmentSlot?: string;
-  /** 风格主体画面（SVG 片段） */
-  contentSlot: string;
+/** 遗像落位微调：一律以「基准位」为原点，单位视口 px */
+export interface WallPortraitPlacement {
+  /** 横向微调（正 = 右） */
+  dx?: number;
+  /** 纵向微调（正 = 下） */
+  dy?: number;
+  /** 遗像与金环的整体缩放（1 = 基准尺寸） */
+  scale?: number;
 }
 
-export const renderBaseWall = ({
-  masterOn = true,
-  sunlightIntensity = 0.92,
-  ambiance,
-  defsSlot = '',
-  environmentSlot = '',
-  contentSlot,
-}: BaseWallOptions): string => {
-  const safeIntensity = Number.isFinite(sunlightIntensity) ? sunlightIntensity : 0.92;
-  const effectiveOpacity = masterOn ? Math.max(0.35, safeIntensity) : 0.45;
+/** 纪念文字落位微调：同样以「基准位」为原点 */
+export interface WallTextPlacement {
+  /** 横向微调（正 = 右） */
+  dx?: number;
+  /** 纵向微调（正 = 下） */
+  dy?: number;
+  /** 题名与副题之间追加的间距 */
+  gap?: number;
+}
 
-  // 柔和天光滤色（screen 混合，绝无硬切边缘）
-  const glow = masterOn
-    ? `<div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-[840px] h-[860px] pointer-events-none transition-all duration-700"
-        style="background:radial-gradient(ellipse at 50% 32%, ${ambiance.halo} 0%, rgba(255,248,230,0.18) 32%, rgba(255,245,220,0.06) 62%, transparent 88%);opacity:${effectiveOpacity};mix-blend-mode:screen"
-      />`
-    : '';
+export interface BaseWallSpec {
+  /** 背景大图（public 下的绝对路径）：装饰框已画在图内，故壁面只剩这一层贴图 */
+  backdropUrl?: string;
+  /** 遗像落位微调 */
+  portrait?: WallPortraitPlacement;
+  /** 纪念文字落位微调 */
+  text?: WallTextPlacement;
+}
 
-  // 窗洞背后的日/月光源
-  const sunOrb =
-    masterOn && ambiance.sunOrb !== 'transparent'
-      ? `<div
-          class="absolute top-12 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full pointer-events-none z-0"
-          style="background:${ambiance.sunOrb};transform:scale(${(
-            0.9 +
-            safeIntensity * 0.4
-          ).toFixed(3)});mix-blend-mode:screen"
-        />`
-      : '';
-
-  return `
-    <div class="absolute inset-x-0 top-0 bottom-0 flex flex-col items-center pointer-events-none select-none z-0 overflow-hidden">
-      ${glow}
-      ${environmentSlot}
-      <div
-        class="relative w-[380px] sm:w-[440px] h-[660px] sm:h-[740px] mt-2 flex flex-col items-center overflow-visible"
-        style="opacity:${effectiveOpacity};transition:opacity 0.6s ease"
-      >
-        ${sunOrb}
-        <svg viewBox="0 0 420 720" class="relative z-10 w-full h-full" preserveAspectRatio="none">
-          <defs>
-            ${WALL_GOLD_FILLET_DEFS}
-            ${defsSlot}
-          </defs>
-          ${contentSlot}
-        </svg>
-      </div>
-    </div>`;
+/** 基准壁面：无背景大图、零偏移 —— 一切缺省由此派生 */
+export const BASE_WALL_SPEC: Required<Pick<BaseWallSpec, 'portrait' | 'text'>> &
+  Omit<BaseWallSpec, 'portrait' | 'text'> = {
+  portrait: { dx: 0, dy: 0, scale: 1 },
+  text: { dx: 0, dy: 0, gap: 0 },
 };
+
+/**
+ * 继承 BaseWall：只覆盖背景图与照片 / 文字的偏移量微调，其余沿用基准。
+ * 未给出的字段逐项回落到 BASE_WALL_SPEC，故风格定义永远只需写差异。
+ */
+export const defineWall = (spec: BaseWallSpec = {}): BaseWallSpec => ({
+  ...BASE_WALL_SPEC,
+  ...spec,
+  portrait: { ...BASE_WALL_SPEC.portrait, ...spec.portrait },
+  text: { ...BASE_WALL_SPEC.text, ...spec.text },
+});
+
+/**
+ * 各风格继承 BaseWall 后的壁面构成（新增风格只需在此加一行）。
+ *
+ * 「场景编号」约定 = WALL_STYLE_OPTIONS 的面板顺序：
+ *   1 晴岚映曜 → wall_02.png   2 暮林晚钟 → wall_01.png   3 华彩生光 → wall_03.png
+ *   4 圆满如月 → wall_04.png   5 古朴苍然 / 6 宝相庄严 → 背景图待出（暂显素色墙）
+ * 以后换背景：新图放进 public/textures/wall/（如 wall_05.png），再改对应一行的 backdropUrl 即可。
+ */
+export const WALL_SPECS: Record<WallBackgroundStyle, BaseWallSpec> = {
+  // 1 晴岚映曜：金色晨光山水
+  classic_dawn: defineWall({ backdropUrl: '/textures/wall/wall_02.png' }),
+  // 2 暮林晚钟：水墨松竹，素壁留白
+  heritage_wood: defineWall({ backdropUrl: '/textures/wall/wall_01.png' }),
+  // 3 华彩生光：荷塘金匾
+  royal_drape: defineWall({ backdropUrl: '/textures/wall/wall_03.png' }),
+  // 4 圆满如月：折枝茶花木框素匾
+  bronze_mirror: defineWall({ backdropUrl: '/textures/wall/wall_04.png' }),
+  // 5 古朴苍然 / 6 宝相庄严：背景图待出（暂显素色墙）
+  brick_screen: defineWall(),
+  lotus_mandorla: defineWall(),
+};
+
+/** 取某风格的壁面构成（未知风格回落晴岚映曜） */
+export const getWallSpec = (style: WallBackgroundStyle): BaseWallSpec =>
+  WALL_SPECS[style] ?? WALL_SPECS.classic_dawn;
+

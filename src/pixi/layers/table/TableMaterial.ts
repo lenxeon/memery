@@ -129,10 +129,10 @@ export class TableMaterial {
       return 0x8a7264;
     }
     if (lighting.timeOfDay === 'sunset') {
-      return 0xffe2cc; // 夕阳：暖金琥珀微泛红
+      return 0xffd0a2; // 夕阳：暖金琥珀微泛红（加强暖调，与晨光拉开差异）
     }
     if (lighting.timeOfDay === 'night') {
-      return 0x7e8fa4; // 夜晚：清冷月光蓝灰
+      return 0xa8957c; // 夜晚：弱光暖调，仅反射变弱不发蓝
     }
     return 0xffffff; // 日景：原汁原味实木本色
   }

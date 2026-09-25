@@ -36,13 +36,15 @@ export function getCachedTexture(cacheKey: string): Texture | null {
 
 /**
  * 将 SVG 字符串转为高分辨率 PixiJS 纹理
+ * @param postProcess 光栅化完成、生成纹理之前的画布后处理（用于叠加程序化材质）
  */
 export async function rasterizeSvgToTexture(
   cacheKey: string,
   svgString: string,
   width: number,
   height: number,
-  scale: number = 2.0
+  scale: number = 2.0,
+  postProcess?: (ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) => void
 ): Promise<Texture> {
   if (textureCache.has(cacheKey)) {
     return textureCache.get(cacheKey)!.texture;
@@ -110,6 +112,15 @@ export async function rasterizeSvgToTexture(
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
+        // 材质后处理（程序化贴图叠加）：失败也不应让整面墙消失
+        if (postProcess) {
+          try {
+            postProcess(ctx, canvas.width, canvas.height);
+          } catch (err) {
+            console.warn('Error applying texture post-process:', err);
+          }
+        }
+
         const texture = Texture.from(canvas);
         textureCache.set(cacheKey, { texture, width, height });
         resolve(texture);
@@ -133,16 +144,3 @@ export async function rasterizeSvgToTexture(
   });
 }
 
-/**
- * 清除纹理缓存
- */
-export function clearSvgTextureCache(): void {
-  textureCache.forEach((entry) => {
-    try {
-      entry.texture.destroy(true);
-    } catch {
-      // ignore
-    }
-  });
-  textureCache.clear();
-}

@@ -2,8 +2,6 @@
  * @file types.ts
  * @description 花卉花瓶组件 Props 与花品纯 TypeScript 类型定义。
  */
-import { FlowerType } from '../../../../types';
-import { ItemLifecycle } from '../../../../types/entity';
 import { VaseStyle, VaseMouthAperture } from './vases/types';
 
 export * from './vases/types';
@@ -33,15 +31,3 @@ export interface FlowerRenderProps {
   spreadFactor?: number;
 }
 
-export type FlowerComponentProps = FlowerRenderProps;
-
-export interface VaseFlowerProps {
-  vaseStyle?: VaseStyle;
-  flowerType?: FlowerType | 'none';
-  scale?: number;
-  className?: string;
-  isRightSide?: boolean;
-  lifecycle?: ItemLifecycle;
-  onRevitalize?: () => void;
-  onClick?: () => void;
-}

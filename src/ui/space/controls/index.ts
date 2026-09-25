@@ -5,3 +5,4 @@
 export * from './BottomDock';
 export * from './FpsMonitor';
 export * from './ZenMusicPlayer';
+export * from './TopBar';

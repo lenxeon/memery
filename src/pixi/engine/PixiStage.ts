@@ -21,6 +21,7 @@ export class PixiStage {
   public stageContainer: Container = new Container();
   public backgroundLayer: Container = new Container();
   public floorLayer: Container = new Container();
+  public portraitLayer: Container = new Container();
   public tableLayer: Container = new Container();
   public propsLayer: Container = new Container();
   public smokeLayer: Container = new Container();
@@ -70,8 +71,9 @@ export class PixiStage {
     this.stageContainer = new Container();
     app.stage.addChild(this.stageContainer);
 
-    // 建立 6 层深度渲染容器
+    // 建立 7 层深度渲染容器（遗像牌位紧贴墙面之上、地坪之下）
     this.stageContainer.addChild(this.backgroundLayer);
+    this.stageContainer.addChild(this.portraitLayer);
     this.stageContainer.addChild(this.floorLayer);
     this.stageContainer.addChild(this.tableLayer);
     this.stageContainer.addChild(this.propsLayer);
@@ -108,6 +110,10 @@ export class PixiStage {
     // 远景背景层：视差系数 0.25
     this.backgroundLayer.x = this.currentParallaxX * 0.25;
     this.backgroundLayer.y = this.currentParallaxY * 0.25;
+
+    // 遗像牌位层：视差系数 0.35（悬于墙面之前，比墙略"近"）
+    this.portraitLayer.x = this.currentParallaxX * 0.35;
+    this.portraitLayer.y = this.currentParallaxY * 0.35;
 
     // 地面层：视差系数 0.45
     this.floorLayer.x = this.currentParallaxX * 0.45;

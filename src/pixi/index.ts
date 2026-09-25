@@ -17,18 +17,8 @@
  *          届时 pixi 目录内不再有任何 tsx，React 侧仅保留挂载容器用的适配组件（置于 ui 侧）。
  */
 
-// ── 空间场景元素（DOM / SVG / Canvas2D 装饰层，随场景一同呈现） ──
-export { WallScene } from './scene/walls/WallScene';
-export type { WallSceneOptions } from './scene/walls/WallScene';
-export { FloorScene } from './scene/FloorScene';
-export type { FloorSceneOptions } from './scene/FloorScene';
-export { GodRaysScene } from './scene/effects/GodRaysScene';
-export type { GodRaysOptions } from './scene/effects/GodRaysScene';
-export { DustScene } from './scene/effects/DustScene';
-export type { DustSceneOptions } from './scene/effects/DustScene';
-
 // ── 领域数据：风格选项（UI 面板用于展示与选择） ──
-export { FLOOR_STYLE_OPTIONS } from './scene/FloorScene';
+export { FLOOR_STYLE_OPTIONS } from './scene/floorOptions';
 export { WALL_STYLE_OPTIONS } from './scene/walls/options';
 
 // ── 领域数据：供品图形模板与注册表 ──

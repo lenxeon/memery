@@ -22,6 +22,8 @@ import {
   Hourglass, 
   Check, 
   Palette, 
+  Clock,
+  Lock,
   X,
   Disc3,
   Play,
@@ -34,6 +36,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { sound, BGM_TRACKS } from '../../../utils/audio';
+import { resolveSystemTimeOfDay, formatClock, TIME_OF_DAY_LABEL } from '../../../utils/timeOfDay';
 import { BgmTrackId, FloorStyle, AuditCategory, AuditGroup } from '../../../types';
 import { ChineseCornerOrnaments, ChineseCloudDivider, CinnabarSealBadge } from '../../common/ChineseDecorations';
 
@@ -158,9 +161,28 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
       setBgmState(state);
     });
   }, []);
+  const timeMode = lighting.timeMode ?? 'system';
+  const [clock, setClock] = useState(() => formatClock());
+
+  // 跟随系统模式下，面板内实时显示本机时间与推算时辰
+  React.useEffect(() => {
+    const timer = window.setInterval(() => setClock(formatClock()), 30 * 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const handleTimeModeChange = (mode: 'system' | 'fixed') => {
+    sound.playBell(mode === 'system' ? 540 : 460, 2);
+    if (mode === 'system') {
+      const tod = resolveSystemTimeOfDay();
+      onUpdateLighting({ timeMode: 'system', timeOfDay: tod });
+    } else {
+      onUpdateLighting({ timeMode: 'fixed' });
+    }
+  };
+
   const handleTimeChange = (tod: TimeOfDay) => {
     sound.playBell(480, 2);
-    onUpdateLighting({ timeOfDay: tod });
+    onUpdateLighting({ timeOfDay: tod, timeMode: 'fixed' });
   };
 
   const handleMasterToggle = () => {
@@ -292,8 +314,50 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
 
         {/* Time of Day Presets */}
         <div className="space-y-2 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30">
-          <label className="block text-amber-200/80 font-medium font-serif mb-1">自然天色时辰</label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="flex items-center justify-between">
+            <label className="block text-amber-200/80 font-medium font-serif">自然天色时辰</label>
+            <span className="text-[10px] text-amber-300/70 font-mono">
+              {timeMode === 'system' ? `跟随系统 · ${clock}` : '固定时辰'}
+            </span>
+          </div>
+
+          {/* 时间模式：跟随系统 / 固定 */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleTimeModeChange('system')}
+              className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-xl border transition-all cursor-pointer ${
+                timeMode === 'system'
+                  ? 'bg-amber-950/60 border-amber-400/80 text-amber-200 ring-1 ring-amber-400/40 font-medium'
+                  : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:bg-stone-800/60'
+              }`}
+              title="按本机时间自动切换天色（白昼 6–17 时 / 黄昏 17–19 时 / 夜色 19–6 时）"
+            >
+              <Clock size={13} className={timeMode === 'system' ? 'text-amber-400' : 'text-stone-500'} />
+              <span>跟随系统</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTimeModeChange('fixed')}
+              className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-xl border transition-all cursor-pointer ${
+                timeMode === 'fixed'
+                  ? 'bg-amber-950/60 border-amber-400/80 text-amber-200 ring-1 ring-amber-400/40 font-medium'
+                  : 'bg-stone-950/60 border-stone-800 text-stone-400 hover:bg-stone-800/60'
+              }`}
+              title="手动固定某一时辰，不随系统时间变化"
+            >
+              <Lock size={13} className={timeMode === 'fixed' ? 'text-amber-400' : 'text-stone-500'} />
+              <span>固定时辰</span>
+            </button>
+          </div>
+
+          {timeMode === 'system' && (
+            <div className="text-[10px] text-stone-400 px-0.5">
+              系统时间 {clock} → 当前自动应用「{TIME_OF_DAY_LABEL[resolveSystemTimeOfDay()]}」，选择下方任一时辰即切换为固定模式
+            </div>
+          )}
+
+          <div className="grid grid-cols-3 gap-2 pt-0.5">
             <button
               type="button"
               onClick={() => handleTimeChange('day')}

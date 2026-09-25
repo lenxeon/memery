@@ -136,7 +136,3 @@ export const FLOWER_REGISTRY: Record<FlowerType, FlowerMetadata> = {
     fallingPetals: DAISY_FALLING_PETALS,
   },
 };
-
-export const getFlowerModule = (type: FlowerType): FlowerMetadata => {
-  return FLOWER_REGISTRY[type] || FLOWER_REGISTRY.peonies;
-};

@@ -48,23 +48,7 @@ export const getVaseItem = (styleId?: VaseStyle): VaseItemDefinition => {
   return VASE_REGISTRY[normId] || RibbedFlutedWhiteVase;
 };
 
-/**
- * 所有可用花瓶定义列表 (供设置面板展示)
- */
-export const VASE_ITEMS: VaseItemDefinition[] = [
-  PinchedClayRuffleVase,
-  PearlescentTurbineVase,
-  TwistedHelixTowerVase,
-  GradientSandVolcanoVase,
-  RibbedFlutedWhiteVase,
-  OrganicTwistCreamVase,
-  OrganicTwistRoseVase,
-  ChiseledStoneGrayVase,
-  FlutedTrapezoidMiniVase,
-  FacetedGemPrismVase,
-  MelonLobedCeladonVase,
-  MinimalDropSwanVase,
-];
+
 
 /**
  * 渲染花瓶瓶口后唇与暗槽纯 SVG 字符串

@@ -14,13 +14,11 @@ import {
   getSingingBowlSvg,
   getSingleBouquetSvg,
 } from './PropSvgTemplates';
-import { FlowerType, FruitType, FloorStyle, WallBackgroundStyle, TableclothStyle, TimeOfDay, TableWoodStyle } from '../../types';
+import { FlowerType, FruitType, FloorStyle, TableclothStyle, TableWoodStyle } from '../../types';
 import { VaseStyle } from './templates/flowers/vases';
 import { getVaseFlowerSvg } from './templates/FlowerTemplate';
 import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
 import { getAltarTableSvg } from './templates/AltarTableTemplate';
-import { getWallModule, renderWallDefs } from '../scene/walls/registry';
-import { WALL_GOLD_FILLET_DEFS } from '../scene/walls/BaseWall';
 
 export class TexturePipeline {
   private static instance: TexturePipeline | null = null;
@@ -348,38 +346,6 @@ export class TexturePipeline {
       return rasterizeSvgToTexture(key, svg, 1120, 320, 2.0);
     } catch (e) {
       console.warn('Failed to rasterize altar table:', e);
-      throw e;
-    }
-  }
-
-  public getWallTexture(
-    wallStyle: WallBackgroundStyle = 'classic_dawn',
-    timeOfDay: TimeOfDay = 'day',
-    masterOn: boolean = true
-  ): Promise<Texture> {
-    const key = `wall_${wallStyle}_${timeOfDay}_${masterOn ? '1' : '0'}`;
-    const cached = getCachedTexture(key);
-    if (cached) return Promise.resolve(cached);
-
-    try {
-      const wallModule = getWallModule(wallStyle);
-      const ambiance = wallModule.getAmbiance(timeOfDay, masterOn);
-      const defsSlot = renderWallDefs(wallStyle, timeOfDay, masterOn);
-      const content = wallModule.renderContent({
-        masterOn,
-        sunlightIntensity: 1.0,
-        timeOfDay,
-        sunAngle: 0,
-        ambiance,
-      });
-
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 720" width="420" height="720">
-  <defs>${WALL_GOLD_FILLET_DEFS}${defsSlot}
-  </defs>${content}
-</svg>`;
-      return rasterizeSvgToTexture(key, svg, 840, 1440, 2.0);
-    } catch (e) {
-      console.warn('Failed to rasterize altar wall:', e);
       throw e;
     }
   }

@@ -57,6 +57,9 @@ export interface PropsLayerCallbacks {
   onInspect?: (id: SceneItemId) => void;
 }
 
+/** 烛火 / 香烟贴图的重绘间隔（单位：帧，60FPS 下 2 帧 ≈ 30FPS 重绘） */
+const EFFECT_REDRAW_STEP = 2;
+
 export class PropsLayer {
   public container: Container = new Container();
 
@@ -81,6 +84,11 @@ export class PropsLayer {
   private draggingId: string | null = null;
 
   private animTime: number = 0;
+  /**
+   * 烛火 / 香烟走 Canvas2D 重绘 + 整张贴图重新上传 GPU，是场景里最贵的逐帧开销。
+   * 累积到 EFFECT_REDRAW_STEP（≈2 帧，即 ~30FPS）才重绘一次，掉帧时自动回落到每帧重绘。
+   */
+  private effectAccum: number = 0;
 
   constructor(pipeline: TexturePipeline) {
     this.pipeline = pipeline;
@@ -588,21 +596,27 @@ export class PropsLayer {
       }
     }
 
-    // 烛火 60FPS 灵动跳跃微动效更新
-    for (const [id, flame] of this.candleFlames.entries()) {
-      if (!flame || !flame.sprite || flame.sprite.destroyed) continue;
-      const item = this.latestItems[id];
-      const isLit = item ? !!item.isLit : true;
-      const health = Number(item?.waxHeight ?? (item?.lifecycle?.health ?? 1.0));
-      flame.update(delta, isLit, 0.15, 1.0, health, 1.0);
-    }
+    // 烛火 / 香烟：Canvas 重绘 + 贴图上传，按 EFFECT_REDRAW_STEP 降频（≈30FPS）
+    this.effectAccum += delta;
+    if (this.effectAccum >= EFFECT_REDRAW_STEP) {
+      const effDelta = this.effectAccum;
+      this.effectAccum = 0;
 
-    // 国风工笔缕烟与三炷立香更新
-    if (this.incenseSmoke && !this.incenseSmoke.sprite.destroyed) {
-      const censerItem = this.latestItems['censer'];
-      const isCenserLit = censerItem ? !!censerItem.isLit : true;
-      const censerHealth = Number(censerItem?.lifecycle?.health ?? (censerItem?.incenseHealth ?? 1.0));
-      this.incenseSmoke.update(delta, isCenserLit, 0.15, 1.0, censerHealth, 'day');
+      for (const [id, flame] of this.candleFlames.entries()) {
+        if (!flame || !flame.sprite || flame.sprite.destroyed) continue;
+        const item = this.latestItems[id];
+        const isLit = item ? !!item.isLit : true;
+        const health = Number(item?.waxHeight ?? (item?.lifecycle?.health ?? 1.0));
+        flame.update(effDelta, isLit, 0.15, 1.0, health, 1.0);
+      }
+
+      // 国风工笔缕烟与三炷立香更新
+      if (this.incenseSmoke && !this.incenseSmoke.sprite.destroyed) {
+        const censerItem = this.latestItems['censer'];
+        const isCenserLit = censerItem ? !!censerItem.isLit : true;
+        const censerHealth = Number(censerItem?.lifecycle?.health ?? (censerItem?.incenseHealth ?? 1.0));
+        this.incenseSmoke.update(effDelta, isCenserLit, 0.15, 1.0, censerHealth, 'day');
+      }
     }
 
     // 每一帧同步烛光位置与光晕

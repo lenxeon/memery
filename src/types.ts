@@ -4,6 +4,9 @@
  */
 export type TimeOfDay = 'day' | 'sunset' | 'night';
 
+/** 天色时辰模式：跟随系统时间自动推算 / 手动固定某一时辰 */
+export type TimeMode = 'system' | 'fixed';
+
 export interface Position2D {
   x: number; // offset in px from table center
   y: number; // vertical depth offset on table
@@ -112,6 +115,8 @@ export interface SceneItem extends GameItemData {}
 export interface LightingSettings {
   masterOn: boolean;
   timeOfDay: TimeOfDay;
+  /** 时辰模式，缺省按 system（跟随系统）处理 */
+  timeMode?: TimeMode;
   sunlightIntensity: number; // 0 to 1
   godRaysEnabled: boolean;
   godRaysIntensity: number; // 0 to 1
