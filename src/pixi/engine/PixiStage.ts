@@ -24,7 +24,7 @@ export class PixiStage {
   public portraitLayer: Container = new Container();
   public wallFrontLayer: Container = new Container();
   public tableLayer: Container = new Container();
-  /** 席垫与蒲团位于桌脚前方、供品下方，避免被供桌遮住。 */
+  /** 蒲团位于桌前、供品下方；席垫在 tableLayer 中绘制于桌体之前。 */
   public groundFrontLayer: Container = new Container();
   public propsLayer: Container = new Container();
   public smokeLayer: Container = new Container();
@@ -74,7 +74,7 @@ export class PixiStage {
     this.stageContainer = new Container();
     app.stage.addChild(this.stageContainer);
 
-    // 墙纸 → 遗像 → 墙灯 → 地坪/延伸的框架 → 供桌；框架可跨墙地交界，但仍在供桌之后。
+    // 墙纸 → 遗像 → 墙灯 → 地坪/框架 → 席垫 → 供桌 → 蒲团与供品。
     this.stageContainer.addChild(this.backgroundLayer);
     this.stageContainer.addChild(this.portraitLayer);
     this.stageContainer.addChild(this.wallFrontLayer);

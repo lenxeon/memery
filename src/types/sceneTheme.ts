@@ -37,7 +37,7 @@ export interface SceneThemePortraitAsset {
   alpha?: number;
 }
 
-/** 铺在透视地坪上、供桌前方的席垫或蒲团透明资产；不包含光照和投影。 */
+/** 铺在地坪上的独立席垫或蒲团透明资产；席垫位于供桌后，蒲团位于供桌前。 */
 export interface SceneThemeGroundAsset {
   url: string;
   /** Rendered width relative to the viewport. Assets use the scene's camera angle and are not re-projected. */

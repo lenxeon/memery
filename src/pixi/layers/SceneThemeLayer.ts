@@ -42,6 +42,9 @@ export class SceneThemeLayer {
   private wallLampGlow: Container = new Container();
   private wallLampGlowSprites: Sprite[][] = [];
   public wallDecorations: Container = new Container();
+  /** The mat sits on the floor behind the table so the table feet can rest on it. */
+  public groundMat: Container = new Container();
+  /** The cushion stays in front of the table and is drawn over the mat. */
   public ground: Container = new Container();
   public foregroundLeft: Container = new Container();
   public foregroundRight: Container = new Container();
@@ -154,7 +157,7 @@ export class SceneThemeLayer {
       role: 'scenery',
     });
     if (wallDecoration) this.mountWallDecoration(this.resolveViewportAsset(wallDecoration.asset), token);
-    if (groundMat) this.groundAssets.push(this.createGroundAsset(groundMat.asset, token));
+    if (groundMat) this.groundAssets.push(this.createGroundAsset(groundMat.asset, token, this.groundMat));
     if (cushion) this.groundAssets.push(this.createGroundAsset(cushion.asset, token));
 
     const instances = [...selection.foreground.left, ...selection.foreground.right]
@@ -210,8 +213,8 @@ export class SceneThemeLayer {
     return { spec, sprite };
   }
 
-  private createGroundAsset(spec: SceneThemeGroundAsset, token: number): GroundSpriteAsset {
-    return this.createAsset(this.ground, spec, token);
+  private createGroundAsset(spec: SceneThemeGroundAsset, token: number, container: Container = this.ground): GroundSpriteAsset {
+    return this.createAsset(container, spec, token);
   }
 
   private mountWallDecoration(spec: SceneThemeViewportAsset, token: number): void {
@@ -376,7 +379,7 @@ export class SceneThemeLayer {
 
   private contentContainers(): Container[] {
     return [this.wallpaperDecorations, this.portraitBack, this.portraitFront, this.wallScenery,
-      this.wallDecorations, this.ground, this.foregroundLeft, this.foregroundRight];
+      this.wallDecorations, this.groundMat, this.ground, this.foregroundLeft, this.foregroundRight];
   }
 
   private clearContainer(container: Container): void {
@@ -394,7 +397,7 @@ export class SceneThemeLayer {
     this.wallAssembly.destroy({ children: true });
     for (const { subTexture } of this.wallAssemblyAssets) subTexture?.destroy(false);
     for (const container of [this.wallpaperDecorations, this.portraitBack, this.portraitFront,
-      this.ground, this.foregroundLeft, this.foregroundRight]) {
+      this.groundMat, this.ground, this.foregroundLeft, this.foregroundRight]) {
       container.destroy({ children: true });
     }
   }

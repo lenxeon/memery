@@ -90,18 +90,18 @@ export const WALL_DECORATION_OPTIONS = [
       ] } }),
 ] as const;
 
-const GROUND_MAT_GEOMETRY = { widthRatio: 0.62, bottomRatio: 0.045 } as const;
-const CUSHION_GEOMETRY = { widthRatio: 0.19, bottomRatio: 0.055 } as const;
+const GROUND_MAT_GEOMETRY = { widthRatio: 0.98, bottomRatio: 0.045 } as const;
+const CUSHION_GEOMETRY = { widthRatio: 0.32, bottomRatio: 0.055 } as const;
 
 export const GROUND_MAT_OPTIONS = [
   ground({ id: 'clear_rush_long_mat', part: 'groundMat', name: '清篾长席', poeticTitle: '清席承步',
-    description: '以整体渲染稿为准，采用真实细篾编织与窄木边；席面低矮铺在桌前地面。', previewUrl: '/themes/classic_dawn/mats/clear-rush-long-mat-clean.png',
+    description: '低机位前宽后窄的细篾长席，铺面覆盖供桌桌脚与蒲团。', previewUrl: '/themes/classic_dawn/mats/clear-rush-long-mat-clean.png',
     asset: { url: '/themes/classic_dawn/mats/clear-rush-long-mat-clean.png', ...GROUND_MAT_GEOMETRY } }),
 ] as const;
 
 export const CUSHION_OPTIONS = [
   ground({ id: 'woven_round_cushion', part: 'cushion', name: '藤编蒲团', poeticTitle: '蒲影静坐',
-    description: '低矮的圆形藤编蒲团，清楚呈现编织顶面与短侧壁，单独叠放在席面上。', previewUrl: '/themes/classic_dawn/cushions/woven-round-cushion-clean.png',
+    description: '低机位下的扁圆藤编蒲团，顶部螺旋编织、前侧短厚编边清晰，单独叠放在席面上。', previewUrl: '/themes/classic_dawn/cushions/woven-round-cushion-clean.png',
     asset: { url: '/themes/classic_dawn/cushions/woven-round-cushion-clean.png', ...CUSHION_GEOMETRY } }),
 ] as const;
 

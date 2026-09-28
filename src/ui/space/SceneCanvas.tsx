@@ -334,9 +334,13 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       stage.floorLayer.addChild(floorLayer.container);
       // Frame and wall attachments share one Pixi group so their placement and scale stay aligned.
       stage.floorLayer.addChild(themeLayer.wallAssembly);
+      // The mat extends under the table feet. Keep both in the same parallax group,
+      // with the mat inserted first so their alignment stays fixed while the scene moves.
+      stage.tableLayer.addChild(themeLayer.groundMat);
       stage.tableLayer.addChild(tableLayer.container);
       // 案体照明层：叠在案体之上、道具之下
       stage.tableLayer.addChild(tableLayer.lightContainer);
+      // Keep the cushion above the mat but in front of the table.
       stage.groundFrontLayer.addChild(themeLayer.ground);
       stage.propsLayer.addChild(propsLayer.container);
       // 前景气光层次：光束（远）→ 烛焰光晕 → 落瓣 → 浮尘（最近）
