@@ -215,6 +215,8 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
     // 0c. 2.5D 透视地坪；主题可提供独享材质，否则使用公共地坪选择。
     const pipeline = TexturePipeline.getInstance();
+    const sceneTheme = getSceneTheme(themeId);
+    const themeFloorMaterial = useThemeFloor ? sceneTheme.floorMaterial : undefined;
     floorLayerRef.current?.render(
       width,
       height,
@@ -222,7 +224,8 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       pipeline.woodPlankTexture,
       pipeline.marbleTileTexture,
       lighting,
-      useThemeFloor ? themeLayerRef.current?.getFloorMaterial() : undefined
+      useThemeFloor ? themeLayerRef.current?.getFloorMaterial() : undefined,
+      themeFloorMaterial
     );
 
     // 0d. 丁达尔光束（Pixi 加色混合，随 lightsLayer 视差一同摆动）
@@ -263,7 +266,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       showPetals: false,
       topWoodStyle: tableWoodStyle,
       legWoodStyle: tableLegWoodStyle,
-      tableAssetUrl: getSceneTheme(themeId).tableAssetUrl,
+      tableAssetUrl: sceneTheme.tableAssetUrl,
       // 地坪水平灭点基线与 FloorLayer 保持一致 (视口下 38%)
       horizonY: height * 0.62,
     });

@@ -6,7 +6,7 @@
 import { Assets, Container, Graphics, Sprite, TilingSprite, Rectangle, BlurFilter, Texture } from 'pixi.js';
 import { TableclothStyle, LightingSettings, TableWoodStyle } from '../../types';
 import { TableMaterial } from './table/TableMaterial';
-import { getMingAltarTableMetrics, getRenderMatchAltarTableMetrics, MING_ALTAR_TABLE_TEXTURE } from './table/MingAltarTableSpec';
+import { getMingAltarTableMetrics, getRenderMatchAltarTableMetrics } from './table/MingAltarTableSpec';
 import { TexturePipeline } from '../assets/TexturePipeline';
 
 /** 场景点光源（烛火），坐标为舞台全局坐标 */
@@ -128,7 +128,6 @@ export class AltarTableLayer {
   private mingTableLoaded: boolean = false;
   private themeTableAssetUrl: string | undefined;
   private tableAssetLoadToken = 0;
-  private legacyTableTexture: Texture | null = null;
   private activeTableIsThemeAsset = false;
   private destroyed: boolean = false;
   private lastRenderOptions: AltarTableRenderOptions | null = null;
@@ -211,21 +210,6 @@ export class AltarTableLayer {
       this.applyWoodTexture();
     });
 
-    Assets.load<Texture>(MING_ALTAR_TABLE_TEXTURE)
-      .then((texture) => {
-        if (this.destroyed || this.mingTableSprite.destroyed) return;
-        this.legacyTableTexture = texture;
-        if (!this.themeTableAssetUrl) {
-          this.mingTableSprite.texture = texture;
-          this.mingTableLoaded = true;
-          this.activeTableIsThemeAsset = false;
-        }
-        if (this.lastRenderOptions) this.render(this.lastRenderOptions);
-      })
-      .catch((err) => {
-        console.warn('Failed to load Ming-style altar table; keeping procedural fallback:', err);
-      });
-
     // 供案本体可直接在场景中拖放以调整前后进深位置
     this.container.eventMode = 'static';
     this.container.cursor = 'grab';
@@ -257,13 +241,9 @@ export class AltarTableLayer {
     this.themeTableAssetUrl = url;
     const token = ++this.tableAssetLoadToken;
     if (!url) {
-      this.mingTableSprite.filters = [];
-      if (this.legacyTableTexture) {
-        this.mingTableSprite.texture = this.legacyTableTexture;
-        this.mingTableLoaded = true;
-        this.activeTableIsThemeAsset = false;
-        if (this.lastRenderOptions) this.render(this.lastRenderOptions);
-      }
+      this.mingTableLoaded = false;
+      this.activeTableIsThemeAsset = false;
+      this.mingTableSprite.visible = false;
       return;
     }
     this.mingTableLoaded = false;
@@ -458,6 +438,23 @@ export class AltarTableLayer {
   public render(options: AltarTableRenderOptions): void {
     this.lastRenderOptions = options;
     this.selectTableAsset(options.tableAssetUrl);
+    if (this.themeTableAssetUrl && (!this.mingTableLoaded || !this.activeTableIsThemeAsset)) {
+      // Don't flash the retired procedural table or the old generic table texture
+      // while this theme's render-match PNG is loading.
+      this.mingTableSprite.visible = false;
+      this.backLegsContainer.visible = false;
+      this.basePanelsContainer.visible = false;
+      this.frontFaceContainer.visible = false;
+      this.topSurfaceContainer.visible = false;
+      this.tableclothContainer.visible = false;
+      this.shadowGraphics.clear();
+      this.lightContainer.visible = false;
+      this.geom = null;
+      this.container.hitArea = null;
+      return;
+    }
+    this.tableclothContainer.visible = true;
+    this.lightContainer.visible = true;
     const {
       centerX,
       tableTopY,

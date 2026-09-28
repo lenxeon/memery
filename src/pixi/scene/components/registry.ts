@@ -73,11 +73,18 @@ export const WALL_SCENERY_OPTIONS = [
 
 export const WALL_DECORATION_OPTIONS = [
   viewport({ id: 'palace_fretwork_lamps', part: 'wallDecoration', name: '回纹宫灯', poeticTitle: '暖阁长明',
-    description: '左右各一盏完整的木框宫灯，作为框架附件按墙面坐标统一缩放，灯面由 Pixi 添加微弱暖光。', previewUrl: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps-unlit.png',
-    asset: { url: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps-unlit.png', fit: 'width', alpha: 1,
+    description: '左右各一盏暖光宫灯，独立裁切并锚定到木框两侧。', previewUrl: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps.png',
+    asset: { url: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps.png', fit: 'width', alpha: 1,
       wallParts: [
-        { frame: { x: 16, y: 52, width: 222, height: 883 }, anchor: { x: 0.10, y: 0.32, widthRatio: 0.085 } },
-        { frame: { x: 1229, y: 52, width: 222, height: 883 }, anchor: { x: 0.90, y: 0.32, widthRatio: 0.085 } },
+        // Center lamps inside the slatted mounting panels; exclude the outer solid edge rails.
+        { frame: { x: 127, y: 131, width: 167, height: 737 }, anchor: {
+          x: 0.10, y: 0.32, widthRatio: 0.06,
+          centerRegionByProfile: { phone: { left: 32, right: 163 }, tablet: { left: 62, right: 257 } },
+        } },
+        { frame: { x: 1243, y: 131, width: 167, height: 737 }, anchor: {
+          x: 0.90, y: 0.32, widthRatio: 0.06,
+          centerRegionByProfile: { phone: { left: 1016, right: 1147 }, tablet: { left: 1791, right: 1986 } },
+        } },
       ] } }),
 ] as const;
 

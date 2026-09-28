@@ -213,13 +213,15 @@ export class FloorLayer {
     woodTexture: Texture | null,
     marbleTexture: Texture | null,
     lighting: LightingSettings,
-    customFloor?: { spec: SceneThemeFloorMaterial; texture: Texture }
+    customFloor?: { spec: SceneThemeFloorMaterial; texture: Texture },
+    pendingThemeFloor?: SceneThemeFloorMaterial
   ): void {
     // ---- 1. 几何：复刻 CSS 3D 投影 ----
     const floorH = Math.max(1, height - getFloorTopY(width, height));
     const containerH = Math.max(40, floorH - TOP_INSET);
     const floorTop = getFloorTopY(width, height);
-    const projectedThemeFloor = customFloor?.spec.mode === 'projected-plane';
+    const floorSpec = customFloor?.spec ?? pendingThemeFloor;
+    const projectedThemeFloor = floorSpec?.mode === 'projected-plane';
     // rotateX 后的纵向压缩率与入深速率（元素空间 v → 3D）
     const projection = getFloorProjection(width, height);
     const { vMax, project } = projection;
@@ -231,16 +233,16 @@ export class FloorLayer {
     // ---- 2. 底色（贴图未就绪时兜底） ----
     this.baseGraphics.clear();
     this.baseGraphics.rect(0, floorTop, width, floorH).fill({
-      color: customFloor?.spec.baseColor ?? BASE_COLOR[floorStyle] ?? 0x8c5a32,
+      color: floorSpec?.baseColor ?? BASE_COLOR[floorStyle] ?? 0x8c5a32,
     });
 
     // ---- 3. 透视贴图 ----
     const pipeline = TexturePipeline.getInstance();
-    const activeTex = customFloor?.texture
-      || pipeline.floorTextures[floorStyle]
-      || (floorStyle === 'marble_tile' ? marbleTexture : woodTexture);
+    const activeTex = customFloor?.texture ?? (pendingThemeFloor
+      ? undefined
+      : pipeline.floorTextures[floorStyle] || (floorStyle === 'marble_tile' ? marbleTexture : woodTexture));
 
-    const key = `${Math.round(width)}x${Math.round(height)}|${customFloor?.spec.mode ?? 'repeat-tile'}|${customFloor?.spec.url ?? floorStyle}`;
+    const key = `${Math.round(width)}x${Math.round(height)}|${floorSpec?.mode ?? 'repeat-tile'}|${floorSpec?.url ?? floorStyle}`;
     if (activeTex && activeTex.source && activeTex.source.width > 1) {
       const projectedPlane = projectedThemeFloor;
       if (projectedPlane) {
@@ -256,7 +258,7 @@ export class FloorLayer {
         const geometry = mesh.geometry as unknown as PerspectiveGeometryLike;
         geometry.setCorners(tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y);
 
-        const tile = customFloor?.spec.tileSize ?? TILE_SIZE[floorStyle] ?? { w: 240, h: 195 };
+        const tile = floorSpec?.tileSize ?? TILE_SIZE[floorStyle] ?? { w: 240, h: 195 };
         const repeatX = projectedPlane ? 1 : width / tile.w;
         const repeatY = projectedPlane ? 1 : vMax / tile.h;
         // CSS background-position: center top —— 水平居中相位，纵向自顶端起铺
@@ -327,7 +329,7 @@ export class FloorLayer {
 
     // ---- 6. 双层实木踢脚线 ----
     this.skirtingGraphics.clear();
-    const board = customFloor?.spec.baseboard ?? BASEBOARD[floorStyle] ?? BASEBOARD.hinoki_wood;
+    const board = floorSpec?.baseboard ?? BASEBOARD[floorStyle] ?? BASEBOARD.hinoki_wood;
     this.skirtingGraphics.rect(0, floorTop, width, 2).fill({ color: board.highlight, alpha: 0.85 });
     this.skirtingGraphics.rect(0, floorTop + 2, width, 10).fill({ color: board.color });
     this.skirtingGraphics.rect(0, floorTop + 2, width, 1).fill({ color: 0x000000, alpha: 0.35 });

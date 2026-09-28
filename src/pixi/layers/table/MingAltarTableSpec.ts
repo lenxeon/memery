@@ -3,8 +3,6 @@
  * Coordinates refer to the 2060×763 source image; visible bounds are used as
  * the design width so its transparent padding does not change scene sizing.
  */
-export const MING_ALTAR_TABLE_TEXTURE = '/textures/altar_table_ming.png';
-
 const IMAGE_WIDTH = 2060;
 const IMAGE_HEIGHT = 763;
 const VISIBLE_LEFT = 40;

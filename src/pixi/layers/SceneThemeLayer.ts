@@ -3,7 +3,7 @@
  * @description 场景主题的独立部件装配器。墙纸由背景层负责，本层按真实深度装配
  * 墙纸装饰、遗像关系、墙面造景、结构附件、地面陈设与左右镜头前景。
  */
-import { Assets, BlurFilter, ColorMatrixFilter, Container, Filter, GlProgram, Graphics, Rectangle, Sprite, Texture } from 'pixi.js';
+import { Assets, BlurFilter, Container, Graphics, Rectangle, Sprite, Texture } from 'pixi.js';
 import { getFloorTopY } from './FloorLayer';
 import { TexturePipeline } from '../assets/TexturePipeline';
 import type {
@@ -24,50 +24,13 @@ export interface MemorialThemeAnchor { x: number; y: number; size: number; }
 type AssetSprite<T> = { spec: T; sprite: Sprite };
 type ForegroundSprite = AssetSprite<SceneThemeViewportAsset> & { instance: SceneForegroundInstance };
 type GroundSpriteAsset = AssetSprite<SceneThemeGroundAsset>;
+type WallPartAnchor = NonNullable<SceneThemeViewportAsset['wallParts']>[number]['anchor'];
 type WallAssemblySprite = AssetSprite<SceneThemeViewportAsset> & {
   role: 'scenery' | 'decoration';
-  anchor?: { x: number; y: number; widthRatio: number };
+  anchor?: WallPartAnchor;
   subTexture?: Texture;
   glowIndex?: number;
 };
-
-const LAMP_LIGHT_VERTEX = `
-in vec2 aPosition;
-out vec2 vTextureCoord;
-uniform vec4 uInputSize;
-uniform vec4 uOutputFrame;
-uniform vec4 uOutputTexture;
-vec4 filterVertexPosition(void) {
-  vec2 position = aPosition * uOutputFrame.zw + uOutputFrame.xy;
-  position.x = position.x * (2.0 / uOutputTexture.x) - 1.0;
-  position.y = position.y * (2.0 * uOutputTexture.z / uOutputTexture.y) - uOutputTexture.z;
-  return vec4(position, 0.0, 1.0);
-}
-vec2 filterTextureCoord(void) {
-  return aPosition * (uOutputFrame.zw * uInputSize.zw);
-}
-void main(void) {
-  gl_Position = filterVertexPosition();
-  vTextureCoord = filterTextureCoord();
-}`;
-
-const LAMP_PAPER_LIGHT_FRAGMENT = `
-in vec2 vTextureCoord;
-out vec4 finalColor;
-uniform sampler2D uTexture;
-void main(void) {
-  vec4 sampleColor = texture(uTexture, vTextureCoord);
-  if (sampleColor.a <= 0.001) {
-    finalColor = sampleColor;
-    return;
-  }
-  vec3 color = sampleColor.rgb / sampleColor.a;
-  float luminance = dot(color, vec3(0.299, 0.587, 0.114));
-  float chroma = max(max(color.r, color.g), color.b) - min(min(color.r, color.g), color.b);
-  float paper = smoothstep(0.48, 0.76, luminance) * (1.0 - smoothstep(0.18, 0.42, chroma));
-  color = min(vec3(1.0), color + vec3(0.24, 0.15, 0.06) * paper);
-  finalColor = vec4(color * sampleColor.a, sampleColor.a);
-}`;
 
 export class SceneThemeLayer {
   public wallpaperDecorations: Container = new Container();
@@ -77,7 +40,7 @@ export class SceneThemeLayer {
   /** Frame and attachments share one wall coordinate system and one responsive transform. */
   public wallAssembly: Container = new Container();
   private wallLampGlow: Container = new Container();
-  private wallLampGlowSprites: Sprite[] = [];
+  private wallLampGlowSprites: Sprite[][] = [];
   public wallDecorations: Container = new Container();
   public ground: Container = new Container();
   public foregroundLeft: Container = new Container();
@@ -104,13 +67,19 @@ export class SceneThemeLayer {
     this.wallScenery.addChild(this.wallSceneryMask);
     const radialGlow = TexturePipeline.getInstance().glowTexture;
     for (let index = 0; index < 2; index += 1) {
-      const glow = new Sprite(radialGlow ?? Texture.EMPTY);
-      glow.anchor.set(0.5);
-      glow.tint = 0xffc36b;
-      glow.alpha = radialGlow ? 0.46 : 0;
-      glow.blendMode = 'add';
-      this.wallLampGlowSprites.push(glow);
-      this.wallLampGlow.addChild(glow);
+      const halo = new Sprite(radialGlow ?? Texture.EMPTY);
+      halo.anchor.set(0.5);
+      halo.tint = 0xffa936;
+      halo.alpha = radialGlow ? 0.30 : 0;
+      halo.blendMode = 'add';
+      const paperSpill = new Sprite(radialGlow ?? Texture.EMPTY);
+      paperSpill.anchor.set(0.5);
+      paperSpill.tint = 0xffd58b;
+      paperSpill.alpha = radialGlow ? 0.38 : 0;
+      paperSpill.blendMode = 'add';
+      const layers = [halo, paperSpill];
+      this.wallLampGlowSprites.push(layers);
+      layers.forEach((glow) => this.wallLampGlow.addChild(glow));
     }
   }
 
@@ -145,7 +114,7 @@ export class SceneThemeLayer {
 
     for (const container of this.contentContainers()) this.clearContainer(container);
     for (const { subTexture } of this.wallAssemblyAssets) subTexture?.destroy(false);
-    this.wallLampGlowSprites.forEach((glow) => { glow.visible = false; });
+    this.wallLampGlowSprites.flat().forEach((glow) => { glow.visible = false; });
     this.viewportAssets = [];
     this.wallAssemblyAssets = [];
     this.portraitBackAssets = [];
@@ -258,11 +227,6 @@ export class SceneThemeLayer {
             label: `wall-lamp-${index}`,
           });
           const sprite = new Sprite(subTexture);
-          const lampGrade = new ColorMatrixFilter();
-          lampGrade.brightness(1.04, true);
-          sprite.filters = [lampGrade, new Filter({
-            glProgram: new GlProgram({ vertex: LAMP_LIGHT_VERTEX, fragment: LAMP_PAPER_LIGHT_FRAGMENT }),
-          })];
           this.wallDecorations.addChild(sprite);
           this.wallAssemblyAssets.push({ spec, sprite, role: 'decoration', anchor, subTexture, glowIndex: index });
         });
@@ -306,12 +270,16 @@ export class SceneThemeLayer {
 
         const anchor = partAnchor ?? spec.wallAnchor;
         if (anchor) {
+          const centerRegion = partAnchor?.centerRegionByProfile?.[profile];
+          const anchorX = centerRegion
+            ? ((centerRegion.left + centerRegion.right) / 2) / authoredWidth
+            : anchor.x;
           sprite.anchor.set(0.5, 0.5);
-          sprite.position.set((anchor.x - 0.5) * authoredWidth, anchor.y * authoredHeight);
+          sprite.position.set((anchorX - 0.5) * authoredWidth, anchor.y * authoredHeight);
           const partScale = (authoredWidth * anchor.widthRatio) / sprite.texture.width;
           sprite.scale.set(partScale);
           sprite.alpha = spec.alpha ?? 1;
-          if (glowIndex !== undefined) this.layoutWallLampGlow(anchor.x, anchor.y, authoredWidth, authoredHeight, glowIndex);
+          if (glowIndex !== undefined) this.layoutWallLampGlow(anchorX, anchor.y, authoredWidth, authoredHeight, glowIndex);
         } else {
           // Wall attachments without an explicit anchor remain centered in the same composition.
           sprite.anchor.set(0.5, 0.5);
@@ -373,11 +341,18 @@ export class SceneThemeLayer {
   }
 
   private layoutWallLampGlow(x: number, y: number, width: number, height: number, index: number): void {
-    const glow = this.wallLampGlowSprites[index];
-    if (!glow || !glow.texture.width || !glow.texture.height) return;
-    glow.position.set((x - 0.5) * width, y * height);
-    glow.scale.set((width * 0.15) / glow.texture.width, (height * 0.19) / glow.texture.height);
-    glow.visible = true;
+    const layers = this.wallLampGlowSprites[index];
+    if (!layers) return;
+    const [halo, paperSpill] = layers;
+    if (!halo.texture.width || !halo.texture.height || !paperSpill.texture.width || !paperSpill.texture.height) return;
+    const centerX = (x - 0.5) * width;
+    const centerY = y * height;
+    halo.position.set(centerX, centerY);
+    halo.scale.set((width * 0.22) / halo.texture.width, (height * 0.22) / halo.texture.height);
+    paperSpill.position.set(centerX, centerY);
+    paperSpill.scale.set((width * 0.12) / paperSpill.texture.width, (height * 0.14) / paperSpill.texture.height);
+    halo.visible = true;
+    paperSpill.visible = true;
   }
 
   private layoutPortraitAssets(assets: AssetSprite<SceneThemePortraitAsset>[]): void {

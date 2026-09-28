@@ -89,7 +89,17 @@ export interface SceneThemeViewportAsset {
   /** Atlas frames mounted as independent Pixi sprites inside the wall group. */
   wallParts?: Array<{
     frame: { x: number; y: number; width: number; height: number };
-    anchor: { x: number; y: number; widthRatio: number };
+    anchor: {
+      /** Normalized fallback position when no source region is provided. */
+      x: number;
+      y: number;
+      widthRatio: number;
+      /** Authored source-pixel region whose horizontal midpoint should center this part. */
+      centerRegionByProfile?: {
+        phone?: { left: number; right: number };
+        tablet?: { left: number; right: number };
+      };
+    };
   }>;
 }
 
