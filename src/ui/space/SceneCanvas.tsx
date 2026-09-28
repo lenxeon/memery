@@ -210,7 +210,15 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
         lighting.masterOn ? lighting.sunlightIntensity : 0.2,
         lighting.timeOfDay
       );
-      themeLayerRef.current?.render(width, height, themeId, portraitLayerRef.current.getThemeAnchor(), sceneAssembly);
+      themeLayerRef.current?.render(
+        width,
+        height,
+        themeId,
+        portraitLayerRef.current.getThemeAnchor(),
+        sceneAssembly,
+        lighting,
+        getSceneTheme(themeId).lightRig
+      );
     }
 
     // 0c. 2.5D 透视地坪；主题可提供独享材质，否则使用公共地坪选择。
@@ -225,7 +233,8 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       pipeline.marbleTileTexture,
       lighting,
       useThemeFloor ? themeLayerRef.current?.getFloorMaterial() : undefined,
-      themeFloorMaterial
+      themeFloorMaterial,
+      sceneTheme.lightRig
     );
 
     // 0d. 丁达尔光束（Pixi 加色混合，随 lightsLayer 视差一同摆动）

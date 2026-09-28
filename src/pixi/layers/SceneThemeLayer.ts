@@ -11,9 +11,11 @@ import type {
   SceneForegroundInstance,
   SceneThemeFloorMaterial,
   SceneThemeGroundAsset,
+  SceneThemeLightRig,
   SceneThemeId,
   SceneThemePortraitAsset,
   SceneThemeViewportAsset,
+  LightingSettings,
 } from '../../types';
 import { getSceneComponentOption, getSceneForeground } from '../scene/components';
 import { getSceneTheme } from '../scene/themes';
@@ -61,6 +63,8 @@ export class SceneThemeLayer {
   private memorial: MemorialThemeAnchor = { x: 0, y: 0, size: 144 };
   private floorMaterial: SceneThemeFloorMaterial | null = null;
   private floorTexture: Texture | null = null;
+  private lighting: LightingSettings | null = null;
+  private lightRig: SceneThemeLightRig | null = null;
   /** Per-viewport wall bounds; crop architectural PNG spill below the wall/floor seam. */
   private wallSceneryMask: Graphics = new Graphics();
 
@@ -91,10 +95,14 @@ export class SceneThemeLayer {
     height: number,
     themeId: SceneThemeId,
     memorial: MemorialThemeAnchor,
-    selection?: SceneAssemblySelection | null
+    selection?: SceneAssemblySelection | null,
+    lighting?: LightingSettings,
+    lightRig?: SceneThemeLightRig
   ): void {
     this.viewport = { width, height };
     this.memorial = memorial;
+    this.lighting = lighting ?? null;
+    this.lightRig = lightRig ?? null;
     const definition = getSceneTheme(themeId);
     const effectiveSelection = selection ?? definition.defaultAssembly ?? null;
     const deviceProfile = this.getDeviceProfile();
@@ -289,7 +297,9 @@ export class SceneThemeLayer {
           const partScale = (authoredWidth * anchor.widthRatio) / sprite.texture.width;
           sprite.scale.set(partScale);
           sprite.alpha = spec.alpha ?? 1;
-          if (glowIndex !== undefined) this.layoutWallLampGlow(anchorX, anchor.y, authoredWidth, authoredHeight, glowIndex);
+          if (glowIndex !== undefined) {
+            this.layoutWallLampGlow(anchorX, anchor.y, authoredWidth, authoredHeight, glowIndex);
+          }
         } else {
           // Wall attachments without an explicit anchor remain centered in the same composition.
           sprite.anchor.set(0.5, 0.5);
@@ -355,14 +365,22 @@ export class SceneThemeLayer {
     if (!layers) return;
     const [halo, paperSpill] = layers;
     if (!halo.texture.width || !halo.texture.height || !paperSpill.texture.width || !paperSpill.texture.height) return;
+    const lighting = this.lighting;
+    const sunlight = Math.min(1, Math.max(0, lighting?.sunlightIntensity ?? 0.75));
+    const timeFactor = lighting?.timeOfDay === 'night' ? 0.82 : lighting?.timeOfDay === 'sunset' ? 0.96 : 1;
+    const lampEnergy = lighting?.masterOn === false ? 0 : (0.42 + sunlight * 0.58) * timeFactor;
     const centerX = (x - 0.5) * width;
     const centerY = y * height;
     halo.position.set(centerX, centerY);
-    halo.scale.set((width * 0.30) / halo.texture.width, (height * 0.27) / halo.texture.height);
+    halo.scale.set((width * 0.38) / halo.texture.width, (height * 0.32) / halo.texture.height);
+    halo.tint = this.lightRig?.keyColor ?? 0xffd58a;
+    halo.alpha = 0.34 * lampEnergy;
     paperSpill.position.set(centerX, centerY);
-    paperSpill.scale.set((width * 0.17) / paperSpill.texture.width, (height * 0.19) / paperSpill.texture.height);
-    halo.visible = true;
-    paperSpill.visible = true;
+    paperSpill.scale.set((width * 0.20) / paperSpill.texture.width, (height * 0.24) / paperSpill.texture.height);
+    paperSpill.tint = 0xffffd5;
+    paperSpill.alpha = 0.42 * lampEnergy;
+    halo.visible = lampEnergy > 0;
+    paperSpill.visible = lampEnergy > 0;
   }
 
   private layoutPortraitAssets(assets: AssetSprite<SceneThemePortraitAsset>[]): void {

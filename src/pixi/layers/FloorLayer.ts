@@ -12,7 +12,7 @@
  * 两种方式都通过同一组四边投影，确保视角保持一致。
  */
 import { ColorMatrixFilter, Container, Graphics, PerspectiveMesh, Sprite, Texture } from 'pixi.js';
-import { FloorStyle, LightingSettings, SceneThemeFloorMaterial, TimeOfDay } from '../../types';
+import { FloorStyle, LightingSettings, SceneThemeFloorMaterial, SceneThemeLightRig, TimeOfDay } from '../../types';
 import { TexturePipeline } from '../assets/TexturePipeline';
 
 /** ---- CSS 3D 投影参数（沿用旧版 DOM 实现的取值，保证观感一致） ---- */
@@ -214,7 +214,8 @@ export class FloorLayer {
     marbleTexture: Texture | null,
     lighting: LightingSettings,
     customFloor?: { spec: SceneThemeFloorMaterial; texture: Texture },
-    pendingThemeFloor?: SceneThemeFloorMaterial
+    pendingThemeFloor?: SceneThemeFloorMaterial,
+    lightRig?: SceneThemeLightRig
   ): void {
     // ---- 1. 几何：复刻 CSS 3D 投影 ----
     const floorH = Math.max(1, height - getFloorTopY(width, height));
@@ -343,31 +344,52 @@ export class FloorLayer {
 
     // ---- 7. 运行时地面反射带与案体接地投影 ----
     const lightFactor = lighting.masterOn ? lighting.sunlightIntensity : 0.08;
-    if (lighting.masterOn && lighting.godRaysEnabled) {
+    if (lighting.masterOn) {
       if (!this.reflectionTexture) {
         this.reflectionTexture = createRadialTexture([
-          { offset: 0, alpha: 0.9 },
-          { offset: 0.24, alpha: 0.48 },
-          { offset: 0.7, alpha: 0 },
+          { offset: 0, alpha: 0.8 },
+          { offset: 0.24, alpha: 0.56 },
+          { offset: 0.62, alpha: 0.18 },
+          { offset: 1, alpha: 0 },
         ]);
-        this.reflectionSprites = [0.34, 0.66].map(() => {
+        this.reflectionSprites = [0, 1, 2].map(() => {
           const sprite = new Sprite(this.reflectionTexture!);
           sprite.anchor.set(0.5);
+          sprite.blendMode = 'add';
           this.container.addChildAt(sprite, this.container.getChildIndex(this.tintGraphics) + 1);
           return sprite;
         });
       }
-      const bandWidth = Math.max(22, width * 0.09);
-      const bandHeight = containerH;
-      this.reflectionSprites.forEach((sprite, index) => {
+      const source = lightRig?.source ?? { x: 0.5, y: 0.12 };
+      const angle = (lighting.sunAngle * Math.PI) / 180;
+      const sourceShift = (source.x - 0.5) * width * 0.12;
+      const floorCenterY = floorTop + TOP_INSET + containerH * 0.59;
+      const [wash, leftReflection, rightReflection] = this.reflectionSprites;
+      const reflectionTint = lightRig?.keyColor ?? ambiance.reflection.color;
+
+      // Broad, low-opacity bounce gives the whole floor a warm light field.
+      wash.visible = true;
+      wash.texture.source.scaleMode = 'linear';
+      wash.tint = reflectionTint;
+      wash.alpha = lightFactor * 0.18;
+      wash.position.set(width * 0.5 + sourceShift, floorCenterY);
+      wash.width = width * 0.92;
+      wash.height = containerH * 0.78;
+      wash.rotation = -angle * 0.18;
+
+      // Two softer vertical reflections suggest light traveling from the wall
+      // toward the viewer; the angle and source move them with the active rig.
+      [leftReflection, rightReflection].forEach((sprite, index) => {
         sprite.visible = true;
         sprite.texture.source.scaleMode = 'linear';
         sprite.tint = ambiance.reflection.color;
-        sprite.alpha = lightFactor * 0.85 * ambiance.reflection.alpha;
-        sprite.x = width * (index === 0 ? 0.34 : 0.66) + lighting.sunAngle * 0.7;
-        sprite.y = floorTop + TOP_INSET + containerH / 2;
-        sprite.width = bandWidth;
-        sprite.height = bandHeight;
+        const timeScale = ambiance.reflection.alpha / 0.12;
+        sprite.alpha = lightFactor * 0.24 * Math.min(1.35, timeScale);
+        sprite.x = width * (index === 0 ? 0.39 : 0.63) + sourceShift;
+        sprite.y = floorCenterY;
+        sprite.width = width * 0.22;
+        sprite.height = containerH * 1.02;
+        sprite.rotation = -angle * 0.48;
       });
     } else {
       for (const sprite of this.reflectionSprites) sprite.visible = false;
