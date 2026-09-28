@@ -75,23 +75,23 @@ export const WALL_SCENERY_OPTIONS = [
 
 export const WALL_DECORATION_OPTIONS = [
   viewport({ id: 'palace_fretwork_lamps', part: 'wallDecoration', name: '回纹宫灯', poeticTitle: '暖阁长明',
-    description: '左右各一盏暖光宫灯，独立裁切并锚定到木框两侧。', previewUrl: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps.png',
+    description: '左右各一盏薄木框暖光宫灯，灯纸为主体，独立裁切并锚定到木框两侧。', previewUrl: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps.png',
     asset: { url: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps.png', fit: 'width', alpha: 1,
       wallParts: [
         // Center lamps inside the slatted mounting panels; exclude the outer solid edge rails.
-        { frame: { x: 232, y: 25, width: 199, height: 937 }, anchor: {
-          x: 0.10, y: 0.32, widthRatio: 0.056,
+        { frame: { x: 70, y: 12, width: 192, height: 877 }, anchor: {
+          x: 0.10, y: 0.32, widthRatio: 0.07,
           centerRegionByProfile: { phone: { left: 32, right: 163 }, tablet: { left: 62, right: 257 } },
         } },
-        { frame: { x: 1104, y: 26, width: 200, height: 936 }, anchor: {
-          x: 0.90, y: 0.32, widthRatio: 0.056,
+        { frame: { x: 530, y: 12, width: 190, height: 877 }, anchor: {
+          x: 0.90, y: 0.32, widthRatio: 0.07,
           centerRegionByProfile: { phone: { left: 1016, right: 1147 }, tablet: { left: 1791, right: 1986 } },
         } },
       ] } }),
 ] as const;
 
-const GROUND_MAT_GEOMETRY = { widthRatio: 0.98, bottomRatio: 0.045 } as const;
-const CUSHION_GEOMETRY = { widthRatio: 0.32, bottomRatio: 0.055 } as const;
+const GROUND_MAT_GEOMETRY = { widthRatio: 1.20, bottomRatio: 0.045 } as const;
+const CUSHION_GEOMETRY = { widthRatio: 0.32, bottomRatio: 0.095 } as const;
 
 export const GROUND_MAT_OPTIONS = [
   ground({ id: 'clear_rush_long_mat', part: 'groundMat', name: '清篾长席', poeticTitle: '清席承步',
@@ -101,7 +101,7 @@ export const GROUND_MAT_OPTIONS = [
 
 export const CUSHION_OPTIONS = [
   ground({ id: 'woven_round_cushion', part: 'cushion', name: '藤编蒲团', poeticTitle: '蒲影静坐',
-    description: '低机位下的扁圆藤编蒲团，顶部螺旋编织、前侧短厚编边清晰，单独叠放在席面上。', previewUrl: '/themes/classic_dawn/cushions/woven-round-cushion-clean.png',
+    description: '低机位下厚实饱满的藤编蒲团，顶部螺旋编织、前侧多层编边清晰，单独叠放在席面上。', previewUrl: '/themes/classic_dawn/cushions/woven-round-cushion-clean.png',
     asset: { url: '/themes/classic_dawn/cushions/woven-round-cushion-clean.png', ...CUSHION_GEOMETRY } }),
 ] as const;
 

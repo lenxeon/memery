@@ -63,13 +63,13 @@
   "groundGeometry": {
     "groundMat": {
       "shape": "camera-matched-woven-long-mat",
-      "screenWidthRatio": 0.98,
+      "screenWidthRatio": 1.2,
       "frontEdgeBottomRatio": 0.045
     },
     "cushion": {
       "shape": "camera-matched-round-braided-cushion",
       "screenWidthRatio": 0.32,
-      "frontEdgeBottomRatio": 0.055
+      "frontEdgeBottomRatio": 0.095
     }
   },
   "floor": {

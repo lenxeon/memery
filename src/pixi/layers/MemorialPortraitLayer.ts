@@ -147,6 +147,9 @@ const bakeInnerShadowTexture = (): Texture => {
   const ctx = canvas.getContext('2d');
   if (ctx) {
     const r = size / 2;
+    ctx.beginPath();
+    ctx.arc(r, r, r, 0, Math.PI * 2);
+    ctx.clip();
     const grad = ctx.createRadialGradient(r, r, 0, r, r, r);
     grad.addColorStop(0, 'rgba(140, 100, 50, 0)');
     grad.addColorStop(0.74, 'rgba(140, 100, 50, 0.05)');
@@ -182,7 +185,6 @@ export class MemorialPortraitLayer {
   private photoGroup: Container = new Container();
   private photoBackdrop: Graphics = new Graphics();
   private photoSprite: Sprite;
-  private photoMask: Graphics = new Graphics();
   private innerShadow: Sprite;
   private hoverVeil: Graphics = new Graphics();
   private hoverCamera: Graphics = new Graphics();
@@ -204,6 +206,8 @@ export class MemorialPortraitLayer {
 
   private photoUrl = '';
   private photoToken = 0;
+  private photoImage: HTMLImageElement | null = null;
+  private photoTexture: Texture | null = null;
 
   private hoverTarget = 0;
   private hoverCurrent = 0;
@@ -275,12 +279,10 @@ export class MemorialPortraitLayer {
 
     this.photoGroup.addChild(this.photoBackdrop);
     this.photoGroup.addChild(this.photoSprite);
-    this.photoGroup.addChild(this.photoMask);
     this.photoGroup.addChild(this.innerShadow);
     this.photoGroup.addChild(this.hoverVeil);
     this.photoGroup.addChild(this.hoverCamera);
     this.photoGroup.addChild(this.hoverLabel);
-    this.photoSprite.mask = this.photoMask;
     this.root.addChild(this.photoGroup);
 
     this.root.addChild(this.titleText);
@@ -383,11 +385,7 @@ export class MemorialPortraitLayer {
     this.ringSprite.width = this.ringSize;
     this.ringSprite.height = this.ringSize;
 
-    // 遗像：圆形遮罩 + 琥珀底衬 + 内缘投影 + 悬停遮罩
-    this.photoMask.clear();
-    this.photoMask.circle(0, 0, photoR);
-    this.photoMask.fill(0xffffff);
-
+    // 遗像：圆形照片纹理 + 琥珀底衬 + 内缘投影 + 悬停遮罩
     this.photoBackdrop.clear();
     this.photoBackdrop.circle(0, 0, photoR);
     this.photoBackdrop.fill(0xfffbeb);
@@ -470,17 +468,38 @@ export class MemorialPortraitLayer {
   public destroy(): void {
     this.container.removeAllListeners();
     this.container.destroy({ children: true });
+    this.photoTexture?.destroy(true);
+    this.photoTexture = null;
   }
 
-  /** 照片按 object-cover 规则铺满圆形（取较大缩放，多余部分被圆形遮罩裁掉） */
+  /** 将照片按 object-cover 绘制到圆形画布，圆外像素保持透明。 */
   private applyPhotoCover(): void {
-    const tex = this.photoSprite.texture;
-    const tw = tex?.width || 0;
-    const th = tex?.height || 0;
-    if (!tw || !th) return;
-    const scale = Math.max(this.photoSize / tw, this.photoSize / th);
-    this.photoSprite.width = tw * scale;
-    this.photoSprite.height = th * scale;
+    const img = this.photoImage;
+    if (!img || !img.naturalWidth || !img.naturalHeight || this.photoSize <= 0) return;
+
+    const resolution = Math.min(window.devicePixelRatio || 1, 2);
+    const size = Math.max(1, Math.ceil(this.photoSize * resolution));
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const scale = Math.max(size / img.naturalWidth, size / img.naturalHeight);
+    const drawWidth = img.naturalWidth * scale;
+    const drawHeight = img.naturalHeight * scale;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, (size - drawWidth) / 2, (size - drawHeight) / 2, drawWidth, drawHeight);
+
+    const texture = Texture.from(canvas);
+    texture.source.scaleMode = 'linear';
+    this.photoTexture?.destroy(true);
+    this.photoTexture = texture;
+    this.photoSprite.texture = texture;
+    this.photoSprite.width = this.photoSize;
+    this.photoSprite.height = this.photoSize;
     this.photoSprite.position.set(0, 0);
   }
 
@@ -491,8 +510,7 @@ export class MemorialPortraitLayer {
 
     const apply = (img: HTMLImageElement) => {
       if (token !== this.photoToken) return;
-      const tex = Texture.from(img);
-      this.photoSprite.texture = tex;
+      this.photoImage = img;
       this.applyPhotoCover();
     };
 

@@ -33,15 +33,15 @@ export const TABLE_PLAN_BOUNDS = {
  */
 const DEFAULT_SPOTS: Record<string, PlanSpot> = {
   // 与 PropsLayer 默认布局同基准（xOffset 已随桌宽放大，取常用桌宽下的近似值）
-  vase_left: { x: -180, y: -46 },
-  vase_right: { x: 180, y: -46 },
-  candle_left: { x: -82, y: -40 },
-  candle_right: { x: 82, y: -40 },
-  fruit_left: { x: -131, y: -28 },
-  fruit_right: { x: 131, y: -28 },
-  censer: { x: 0, y: -38 },
-  tea_cups: { x: 0, y: -18 },
-  singing_bowl: { x: -69, y: -8 },
+  vase_left: { x: -190, y: -39 },
+  vase_right: { x: 190, y: -39 },
+  candle_left: { x: -95, y: -28 },
+  candle_right: { x: 95, y: -28 },
+  fruit_left: { x: -150, y: -16 },
+  fruit_right: { x: 150, y: -16 },
+  censer: { x: 0, y: -37 },
+  tea_cups: { x: 0, y: -12 },
+  singing_bowl: { x: -62, y: -18 },
 };
 
 /**

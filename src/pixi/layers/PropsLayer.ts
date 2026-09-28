@@ -125,15 +125,15 @@ export class PropsLayer {
     const tableDepth = getMingAltarTableSurfaceDepth(altarWidth);
     const depthUnits = tableDepth / scaleFactor;
     const defaultLayouts: Record<string, { xOffset: number; yOffset: number }> = {
-      vase_left:    { xOffset: -164 * spread, yOffset: -46 },
-      vase_right:   { xOffset:  164 * spread, yOffset: -46 },
-      candle_left:  { xOffset:  -74 * spread, yOffset: -40 },
-      candle_right: { xOffset:   74 * spread, yOffset: -40 },
-      fruit_left:   { xOffset: -118 * spread, yOffset: -28 },
-      fruit_right:  { xOffset:  118 * spread, yOffset: -28 },
-      censer:       { xOffset:    0,          yOffset: -38 },
-      tea_cups:     { xOffset:    0,          yOffset: -18 },
-      singing_bowl: { xOffset:  -62 * spread, yOffset:  -8 },
+      vase_left:    { xOffset: -190 * spread, yOffset: -39 },
+      vase_right:   { xOffset:  190 * spread, yOffset: -39 },
+      candle_left:  { xOffset:  -95 * spread, yOffset: -28 },
+      candle_right: { xOffset:   95 * spread, yOffset: -28 },
+      fruit_left:   { xOffset: -150 * spread, yOffset: -16 },
+      fruit_right:  { xOffset:  150 * spread, yOffset: -16 },
+      censer:       { xOffset:    0,          yOffset: -37 },
+      tea_cups:     { xOffset:    0,          yOffset: -12 },
+      singing_bowl: { xOffset:  -62 * spread, yOffset: -18 },
     };
 
     this.latestItems = items;

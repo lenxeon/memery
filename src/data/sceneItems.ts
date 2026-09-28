@@ -232,27 +232,27 @@ export type TableWoodOptionId = (typeof TABLE_WOOD_OPTIONS)[number]['id'];
 
 /** 供案常规陈设（五供齐备：香、花、灯、水、果） */
 export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
-  vase_left: createVaseItem('vase_left', 'peonies', { x: -164, y: -4 }, 'warm_white_plain', '富贵牡丹花瓶 (左)'),
-  vase_right: createVaseItem('vase_right', 'lilies', { x: 164, y: -4 }, 'painted_iris', '纯洁百合花瓶 (右)'),
+  vase_left: createVaseItem('vase_left', 'peonies', { x: -190, y: -39 }, 'warm_white_plain', '富贵牡丹花瓶 (左)'),
+  vase_right: createVaseItem('vase_right', 'lilies', { x: 190, y: -39 }, 'painted_iris', '纯洁百合花瓶 (右)'),
   candle_left: {
     id: 'candle_left',
     type: 'candle',
     name: '长明红烛 (左)',
-    position: { x: -74, y: 3 },
+    position: { x: -95, y: -28 },
     isLit: true,
   },
   candle_right: {
     id: 'candle_right',
     type: 'candle',
     name: '长明红烛 (右)',
-    position: { x: 74, y: 3 },
+    position: { x: 95, y: -28 },
     isLit: true,
   },
   censer: {
     id: 'censer',
     type: 'censer',
     name: '青瓷清香香炉 (中)',
-    position: { x: 0, y: 6 },
+    position: { x: 0, y: -37 },
     isLit: true,
   },
   fruit_left: {
@@ -260,26 +260,20 @@ export const buildStandardItems = (): Record<SceneItemId, SceneItem> => ({
     type: 'fruit',
     name: '平安红富士苹果盘 (左)',
     fruitType: 'apples',
-    position: { x: -118, y: 16 },
+    position: { x: -150, y: -16 },
   },
   fruit_right: {
     id: 'fruit_right',
     type: 'fruit',
     name: '吉祥砂糖橘盘 (右)',
     fruitType: 'oranges',
-    position: { x: 118, y: 16 },
+    position: { x: 150, y: -16 },
   },
   tea_cups: {
     id: 'tea_cups',
     type: 'tea_cups',
     name: '虔诚敬茶三盏',
-    position: { x: 0, y: 22 },
-  },
-  singing_bowl: {
-    id: 'singing_bowl',
-    type: 'singing_bowl',
-    name: '静心铜磬颂钵 (左前)',
-    position: { x: -62, y: 32 },
+    position: { x: 0, y: -12 },
   },
 });
 
