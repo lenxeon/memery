@@ -370,9 +370,9 @@ export class TexturePipeline {
     const ctx = canvas.getContext('2d')!;
     const center = size / 2;
     const grad = ctx.createRadialGradient(center, center, 2, center, center, center);
-    grad.addColorStop(0, 'rgba(255, 238, 198, 0.62)');
-    grad.addColorStop(0.28, 'rgba(255, 218, 148, 0.38)');
-    grad.addColorStop(0.62, 'rgba(245, 181, 93, 0.14)');
+    grad.addColorStop(0, 'rgba(255, 244, 211, 0.86)');
+    grad.addColorStop(0.28, 'rgba(255, 224, 158, 0.62)');
+    grad.addColorStop(0.62, 'rgba(245, 181, 93, 0.28)');
     grad.addColorStop(1, 'rgba(222, 143, 54, 0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, size, size);

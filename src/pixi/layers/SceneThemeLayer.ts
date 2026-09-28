@@ -77,12 +77,12 @@ export class SceneThemeLayer {
       const halo = new Sprite(radialGlow ?? Texture.EMPTY);
       halo.anchor.set(0.5);
       halo.tint = 0xffb84a;
-      halo.alpha = radialGlow ? 0.48 : 0;
+      halo.alpha = radialGlow ? 0.32 : 0;
       halo.blendMode = 'add';
       const paperSpill = new Sprite(radialGlow ?? Texture.EMPTY);
       paperSpill.anchor.set(0.5);
       paperSpill.tint = 0xffdfa0;
-      paperSpill.alpha = radialGlow ? 0.52 : 0;
+      paperSpill.alpha = radialGlow ? 0.30 : 0;
       paperSpill.blendMode = 'add';
       const layers = [halo, paperSpill];
       this.wallLampGlowSprites.push(layers);
@@ -372,13 +372,13 @@ export class SceneThemeLayer {
     const centerX = (x - 0.5) * width;
     const centerY = y * height;
     halo.position.set(centerX, centerY);
-    halo.scale.set((width * 0.38) / halo.texture.width, (height * 0.32) / halo.texture.height);
+    halo.scale.set((width * 0.48) / halo.texture.width, (height * 0.42) / halo.texture.height);
     halo.tint = this.lightRig?.keyColor ?? 0xffd58a;
     halo.alpha = 0.34 * lampEnergy;
     paperSpill.position.set(centerX, centerY);
-    paperSpill.scale.set((width * 0.20) / paperSpill.texture.width, (height * 0.24) / paperSpill.texture.height);
-    paperSpill.tint = 0xffffd5;
-    paperSpill.alpha = 0.42 * lampEnergy;
+    paperSpill.scale.set((width * 0.24) / paperSpill.texture.width, (height * 0.30) / paperSpill.texture.height);
+    paperSpill.tint = 0xffe8bd;
+    paperSpill.alpha = 0.32 * lampEnergy;
     halo.visible = lampEnergy > 0;
     paperSpill.visible = lampEnergy > 0;
   }

@@ -6,9 +6,9 @@
   "assetPolicy": {
     "wallpaper": "opaque-responsive-phone-and-tablet-contained-within-wall-zone-y-0.70-0.74",
     "wallScenery": "phone-frame-fills-canvas-width-and-extends-below-wall-floor-seam-tablet-frame-width-ratio-0.90",
-    "transparentLayers": "rgba-neutral-material-light-no-emission-no-cast-shadow",
+    "transparentLayers": "rgba-material-assets-may-include-reference-matched-baked-light-and-shadow",
     "wallDecoration": "front-facing-symmetric-simple-frame-panel-no-hanging-hardware",
-    "floorMaterial": "single-full-plane-polished-chestnut-image-projected-through-shared-scene-camera-no-baked-highlights",
+    "floorMaterial": "single-full-plane-polished-chestnut-image-projected-through-shared-scene-camera-with-reference-matched-baked-light-and-shadow",
     "groundAssets": "camera-matched-transparent-sprites-no-scene-light-no-cast-shadow-no-double-projection",
     "foreground": "left-right-independent-rgba-no-bokeh-no-light-spots-no-runtime-blur-no-color-tint",
     "initialAudit": "one-coherent-selected-asset-per-slot-expand-only-after-user-approval"
@@ -77,7 +77,7 @@
     "name": "暖栗漆面地板",
     "file": "floor/polished-chestnut-plane-render-match-v2.png",
     "renderMode": "projected-plane",
-    "lighting": "runtime-only"
+    "lighting": "baked-reference-matched-warm-light-and-shadow-plus-runtime-light-rig"
   },
   "foreground": {
     "left": [

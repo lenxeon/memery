@@ -352,7 +352,7 @@ export class FloorLayer {
           { offset: 0.62, alpha: 0.18 },
           { offset: 1, alpha: 0 },
         ]);
-        this.reflectionSprites = [0, 1, 2].map(() => {
+        this.reflectionSprites = [0, 1, 2, 3].map(() => {
           const sprite = new Sprite(this.reflectionTexture!);
           sprite.anchor.set(0.5);
           sprite.blendMode = 'add';
@@ -363,18 +363,18 @@ export class FloorLayer {
       const source = lightRig?.source ?? { x: 0.5, y: 0.12 };
       const angle = (lighting.sunAngle * Math.PI) / 180;
       const sourceShift = (source.x - 0.5) * width * 0.12;
-      const floorCenterY = floorTop + TOP_INSET + containerH * 0.59;
-      const [wash, leftReflection, rightReflection] = this.reflectionSprites;
+      const floorCenterY = floorTop + TOP_INSET + containerH * 0.56;
+      const [wash, leftReflection, rightReflection, foregroundReflection] = this.reflectionSprites;
       const reflectionTint = lightRig?.keyColor ?? ambiance.reflection.color;
 
       // Broad, low-opacity bounce gives the whole floor a warm light field.
       wash.visible = true;
       wash.texture.source.scaleMode = 'linear';
       wash.tint = reflectionTint;
-      wash.alpha = lightFactor * 0.18;
+      wash.alpha = lightFactor * 0.30;
       wash.position.set(width * 0.5 + sourceShift, floorCenterY);
-      wash.width = width * 0.92;
-      wash.height = containerH * 0.78;
+      wash.width = width * 0.96;
+      wash.height = containerH * 0.88;
       wash.rotation = -angle * 0.18;
 
       // Two softer vertical reflections suggest light traveling from the wall
@@ -384,13 +384,23 @@ export class FloorLayer {
         sprite.texture.source.scaleMode = 'linear';
         sprite.tint = ambiance.reflection.color;
         const timeScale = ambiance.reflection.alpha / 0.12;
-        sprite.alpha = lightFactor * 0.24 * Math.min(1.35, timeScale);
+        sprite.alpha = lightFactor * 0.34 * Math.min(1.35, timeScale);
         sprite.x = width * (index === 0 ? 0.39 : 0.63) + sourceShift;
         sprite.y = floorCenterY;
         sprite.width = width * 0.22;
-        sprite.height = containerH * 1.02;
+        sprite.height = containerH * 1.10;
         sprite.rotation = -angle * 0.48;
       });
+
+      // A broad near-field sheen makes the reflected light legible at phone size.
+      foregroundReflection.visible = true;
+      foregroundReflection.texture.source.scaleMode = 'linear';
+      foregroundReflection.tint = ambiance.reflection.color;
+      foregroundReflection.alpha = lightFactor * 0.34 * Math.min(1.35, ambiance.reflection.alpha / 0.12);
+      foregroundReflection.position.set(width * 0.5 + sourceShift * 0.65, floorTop + TOP_INSET + containerH * 0.86);
+      foregroundReflection.width = width * 0.84;
+      foregroundReflection.height = containerH * 0.25;
+      foregroundReflection.rotation = -angle * 0.16;
     } else {
       for (const sprite of this.reflectionSprites) sprite.visible = false;
     }
