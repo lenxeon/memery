@@ -65,17 +65,17 @@ export class SceneThemeLayer {
     this.wallAssembly.addChild(this.wallScenery, this.wallLampGlow, this.wallDecorations);
     this.wallScenery.mask = this.wallSceneryMask;
     this.wallScenery.addChild(this.wallSceneryMask);
-    const radialGlow = TexturePipeline.getInstance().glowTexture;
+    const radialGlow = TexturePipeline.getInstance().wallLampGlowTexture;
     for (let index = 0; index < 2; index += 1) {
       const halo = new Sprite(radialGlow ?? Texture.EMPTY);
       halo.anchor.set(0.5);
-      halo.tint = 0xffa936;
-      halo.alpha = radialGlow ? 0.30 : 0;
+      halo.tint = 0xffb84a;
+      halo.alpha = radialGlow ? 0.48 : 0;
       halo.blendMode = 'add';
       const paperSpill = new Sprite(radialGlow ?? Texture.EMPTY);
       paperSpill.anchor.set(0.5);
-      paperSpill.tint = 0xffd58b;
-      paperSpill.alpha = radialGlow ? 0.38 : 0;
+      paperSpill.tint = 0xffdfa0;
+      paperSpill.alpha = radialGlow ? 0.52 : 0;
       paperSpill.blendMode = 'add';
       const layers = [halo, paperSpill];
       this.wallLampGlowSprites.push(layers);
@@ -144,8 +144,10 @@ export class SceneThemeLayer {
     const cushion = getSceneComponentOption('cushion', selection.cushionId);
 
     if (wallpaperDecoration) {
-      this.portraitBackAssets.push(this.createAsset(this.portraitBack, wallpaperDecoration.backAsset, token));
-      this.portraitFrontAssets.push(this.createAsset(this.portraitFront, wallpaperDecoration.frontAsset, token));
+      this.portraitBackAssets.push(this.createAsset(this.portraitBack, this.resolvePortraitAsset(wallpaperDecoration.backAsset), token));
+      if (wallpaperDecoration.frontAsset) {
+        this.portraitFrontAssets.push(this.createAsset(this.portraitFront, this.resolvePortraitAsset(wallpaperDecoration.frontAsset), token));
+      }
     }
     if (wallScenery) this.wallAssemblyAssets.push({
       ...this.createAsset(this.wallScenery, this.resolveViewportAsset(wallScenery.asset), token),
@@ -179,6 +181,11 @@ export class SceneThemeLayer {
   }
 
   private resolveViewportAsset(spec: SceneThemeViewportAsset): SceneThemeViewportAsset {
+    const url = spec.responsiveAssets?.[this.getDeviceProfile()];
+    return url ? { ...spec, url } : spec;
+  }
+
+  private resolvePortraitAsset(spec: SceneThemePortraitAsset): SceneThemePortraitAsset {
     const url = spec.responsiveAssets?.[this.getDeviceProfile()];
     return url ? { ...spec, url } : spec;
   }
@@ -348,9 +355,9 @@ export class SceneThemeLayer {
     const centerX = (x - 0.5) * width;
     const centerY = y * height;
     halo.position.set(centerX, centerY);
-    halo.scale.set((width * 0.22) / halo.texture.width, (height * 0.22) / halo.texture.height);
+    halo.scale.set((width * 0.30) / halo.texture.width, (height * 0.27) / halo.texture.height);
     paperSpill.position.set(centerX, centerY);
-    paperSpill.scale.set((width * 0.12) / paperSpill.texture.width, (height * 0.14) / paperSpill.texture.height);
+    paperSpill.scale.set((width * 0.17) / paperSpill.texture.width, (height * 0.19) / paperSpill.texture.height);
     halo.visible = true;
     paperSpill.visible = true;
   }

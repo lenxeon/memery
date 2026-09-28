@@ -58,6 +58,7 @@ export class TexturePipeline {
 
   // 烛光与高光光晕贴图 (Additive Blending)
   public glowTexture: Texture | null = null;
+  public wallLampGlowTexture: Texture | null = null;
 
   // 花瓣粒子贴图
   public petalTextures: Partial<Record<FlowerType, Texture | null>> = {
@@ -95,6 +96,7 @@ export class TexturePipeline {
       // 1. 生成程序化柔和烟雾与烛光粒子纹理 (同步即时生成)
       this.smokeParticleTexture = this.generateSoftRadialTexture(64, 'rgba(235, 230, 222, 0.45)');
       this.glowTexture = this.generateCandleGlowTexture();
+      this.wallLampGlowTexture = this.generateWallLampGlowTexture();
 
       // 2. 生成各花系落花粒子纹理
       const petalColors: Record<FlowerType, string> = {
@@ -347,16 +349,33 @@ export class TexturePipeline {
 
     const center = size / 2;
     const grad = ctx.createRadialGradient(center, center, 2, center, center, center);
-    grad.addColorStop(0, 'rgba(255, 185, 55, 0.58)');    // 饱满暖金透光，烛照氛围明亮
-    grad.addColorStop(0.25, 'rgba(255, 148, 35, 0.38)'); // 温暖琥珀橙
-    grad.addColorStop(0.60, 'rgba(235, 92, 18, 0.15)');  // 幽微余韵
-    grad.addColorStop(1.0, 'rgba(200, 50, 0, 0)');        // 渐隐消散
+    grad.addColorStop(0, 'rgba(255, 185, 55, 0.58)');
+    grad.addColorStop(0.25, 'rgba(255, 148, 35, 0.38)');
+    grad.addColorStop(0.60, 'rgba(235, 92, 18, 0.15)');
+    grad.addColorStop(1.0, 'rgba(200, 50, 0, 0)');
 
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(center, center, center, 0, Math.PI * 2);
     ctx.fill();
 
+    return Texture.from(canvas);
+  }
+
+  public generateWallLampGlowTexture(): Texture {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+    const center = size / 2;
+    const grad = ctx.createRadialGradient(center, center, 2, center, center, center);
+    grad.addColorStop(0, 'rgba(255, 238, 198, 0.62)');
+    grad.addColorStop(0.28, 'rgba(255, 218, 148, 0.38)');
+    grad.addColorStop(0.62, 'rgba(245, 181, 93, 0.14)');
+    grad.addColorStop(1, 'rgba(222, 143, 54, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
     return Texture.from(canvas);
   }
 

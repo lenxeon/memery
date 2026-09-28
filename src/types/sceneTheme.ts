@@ -28,6 +28,7 @@ export interface SceneThemePortraitPlacement {
 /** 依附遗像锚点的透明资产，尺寸和位移都以遗像环直径为单位。 */
 export interface SceneThemePortraitAsset {
   url: string;
+  responsiveAssets?: Partial<Record<'phone' | 'tablet', string>>;
   widthInPortraits: number;
   dxInPortraits?: number;
   dyInPortraits?: number;

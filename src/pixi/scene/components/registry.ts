@@ -31,7 +31,7 @@ export interface ScenePortraitComponentOption {
   description: string;
   previewUrl: string;
   backAsset: SceneThemePortraitAsset;
-  frontAsset: SceneThemePortraitAsset;
+  frontAsset?: SceneThemePortraitAsset;
 }
 
 export interface SceneGroundComponentOption {
@@ -59,9 +59,11 @@ export const WALLPAPER_OPTIONS = [
 
 export const WALLPAPER_DECORATION_OPTIONS = [
   portrait({ id: 'plum_encircling', part: 'wallpaperDecoration', name: '梅枝流芳', poeticTitle: '春信绕影',
-    description: '白梅从左上环抱遗像，保留中心透明。', previewUrl: '/themes/classic_dawn/wall-overlays/plum-encircling.png',
-    backAsset: { url: '/themes/classic_dawn/wall-overlays/plum-encircling.png', widthInPortraits: 3.1, alpha: 0.88 },
-    frontAsset: { url: '/themes/classic_dawn/wall-overlays/plum-encircling-front.png', widthInPortraits: 1.7, dxInPortraits: -0.42, dyInPortraits: 0.26, alpha: 0.9 } }),
+    description: '淡色梅枝从左上入画，手机和平板使用各自构图。', previewUrl: '/themes/classic_dawn/wall-overlays/phone/plum-blossom-branch.png',
+    backAsset: { url: '/themes/classic_dawn/wall-overlays/phone/plum-blossom-branch.png',
+      responsiveAssets: { phone: '/themes/classic_dawn/wall-overlays/phone/plum-blossom-branch.png', tablet: '/themes/classic_dawn/wall-overlays/tablet/plum-blossom-branch.png' },
+      widthInPortraits: 3.5, dxInPortraits: -1.0, dyInPortraits: -1.15, alpha: 1 },
+  }),
 ] as const;
 
 export const WALL_SCENERY_OPTIONS = [
@@ -77,12 +79,12 @@ export const WALL_DECORATION_OPTIONS = [
     asset: { url: '/themes/classic_dawn/wall-decor/palace-fretwork-lamps.png', fit: 'width', alpha: 1,
       wallParts: [
         // Center lamps inside the slatted mounting panels; exclude the outer solid edge rails.
-        { frame: { x: 127, y: 131, width: 167, height: 737 }, anchor: {
-          x: 0.10, y: 0.32, widthRatio: 0.06,
+        { frame: { x: 232, y: 25, width: 199, height: 937 }, anchor: {
+          x: 0.10, y: 0.32, widthRatio: 0.056,
           centerRegionByProfile: { phone: { left: 32, right: 163 }, tablet: { left: 62, right: 257 } },
         } },
-        { frame: { x: 1243, y: 131, width: 167, height: 737 }, anchor: {
-          x: 0.90, y: 0.32, widthRatio: 0.06,
+        { frame: { x: 1104, y: 26, width: 200, height: 936 }, anchor: {
+          x: 0.90, y: 0.32, widthRatio: 0.056,
           centerRegionByProfile: { phone: { left: 1016, right: 1147 }, tablet: { left: 1791, right: 1986 } },
         } },
       ] } }),
