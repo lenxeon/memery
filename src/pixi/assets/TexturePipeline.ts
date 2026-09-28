@@ -18,7 +18,7 @@ import { FlowerType, FruitType, FloorStyle, TableclothStyle, TableWoodStyle } fr
 import { VaseStyle, getVaseItem } from './templates/flowers/vases';
 import { getVaseFlowerSvg } from './templates/FlowerTemplate';
 import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
-import { getAltarTableSvg } from './templates/AltarTableTemplate';
+import { getAltarTableSvg, getAltarTableclothOverlaySvg } from './templates/AltarTableTemplate';
 
 /**
  * 花器纹理缓存修订号。
@@ -397,6 +397,23 @@ export class TexturePipeline {
       return rasterizeSvgToTexture(key, svg, 1120, 320, 2.0);
     } catch (e) {
       console.warn('Failed to rasterize altar table:', e);
+      throw e;
+    }
+  }
+
+  public getAltarTableclothOverlayTexture(
+    tableclothStyle: TableclothStyle = 'autumn_gold',
+    showPetals: boolean = true
+  ): Promise<Texture> {
+    const key = `altar_tablecloth_overlay_${tableclothStyle}_${showPetals ? '1' : '0'}`;
+    const cached = getCachedTexture(key);
+    if (cached) return Promise.resolve(cached);
+
+    try {
+      const svg = getAltarTableclothOverlaySvg({ tableclothStyle, showPetals });
+      return rasterizeSvgToTexture(key, svg, 1120, 320, 2.0);
+    } catch (e) {
+      console.warn('Failed to rasterize altar tablecloth overlay:', e);
       throw e;
     }
   }

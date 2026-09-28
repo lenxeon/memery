@@ -13,6 +13,7 @@ import { SceneItem, SceneItemId, FlowerType, FruitType, VaseHitZone } from '../.
 import { AltarLightSource } from './AltarTableLayer';
 import { VaseStyle } from '../assets/templates/flowers/vases';
 import { sound } from '../../utils/audio';
+import { getMingAltarTableSurfaceDepth } from './table/MingAltarTableSpec';
 
 /**
  * 花瓶命中区（容器局部坐标，单位 px，随容器 scale 缩放）。
@@ -118,10 +119,10 @@ export class PropsLayer {
 
     // xOffset 以 560 为基准比例尺，随 scaleFactor 同步放大
     const spread = scaleFactor;
-    // 台面进深与 AltarTableLayer 一致（depth = 54u，u = tableWidth / 560）。
+    // 台面进深以提取后的明式桌面实测尺寸为准，并与 AltarTableLayer 共用同一套比例。
     // yOffset 语义为「相对台面前沿的纵深」：0 = 紧贴前沿，负值向案里（后方）退，
     // 必须落在 [-depthUnits, 0] 带内，否则道具会浮在台面之外的正立面上。
-    const tableDepth = 54 * (altarWidth / 560);
+    const tableDepth = getMingAltarTableSurfaceDepth(altarWidth);
     const depthUnits = tableDepth / scaleFactor;
     const defaultLayouts: Record<string, { xOffset: number; yOffset: number }> = {
       vase_left:    { xOffset: -164 * spread, yOffset: -46 },
@@ -257,7 +258,7 @@ export class PropsLayer {
               Math.min(this.currentAltarCenterX + boundsX, startContX + dx)
             );
             // 纵向只允许在台面进深带内移动（后沿 -tableDepth ~ 前沿 0）
-            const dragDepth = 54 * (this.currentAltarWidth / 560);
+            const dragDepth = getMingAltarTableSurfaceDepth(this.currentAltarWidth);
             const newY = Math.max(
               this.currentAltarTopY - dragDepth,
               Math.min(this.currentAltarTopY, startContY + dy)

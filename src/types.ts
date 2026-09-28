@@ -176,12 +176,14 @@ export type WallBackgroundStyle =
   | 'royal_drape'     // 🎭 3. 华彩生光 · 皇家帷幔 (深绯皇家丝绒帷幔束以金绳流苏 · 暖金华彩透光)
   | 'bronze_mirror'   // 🌕 4. 圆满如月 · 铜镜华光 (古法镏金大圆铜镜莲纹铸边 · 暖辉圆满映照)
   | 'brick_screen'    // 🏯 5. 古朴苍然 · 青砖影壁 (传统青砖雕花影壁如意寿纹 · 蝠纹祖制典雅)
-  | 'lotus_mandorla'; // 🪷 6. 宝相庄严 · 莲台佛境 (盛唐泥金宝相莲花曼陀罗光背 · 佛光福佑庄严)
+  | 'lotus_mandorla'  // 🪷 6. 宝相庄严 · 莲台佛境 (盛唐泥金宝相莲花曼陀罗光背 · 佛光福佑庄严)
+  | 'ancestral_hall'; // 🏮 7. 祠堂暖阁 · 慈颜春晖 (紫檀月洞门与宫灯 · 梅枝远山)
 
 export type SceneItemId = string;
 
 // Re-export game entity types
 export * from './types/entity';
+export * from './types/sceneTheme';
 
 import { GameItemData } from './types/entity';
 

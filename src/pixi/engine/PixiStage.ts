@@ -22,7 +22,10 @@ export class PixiStage {
   public backgroundLayer: Container = new Container();
   public floorLayer: Container = new Container();
   public portraitLayer: Container = new Container();
+  public wallFrontLayer: Container = new Container();
   public tableLayer: Container = new Container();
+  /** 席垫与蒲团位于桌脚前方、供品下方，避免被供桌遮住。 */
+  public groundFrontLayer: Container = new Container();
   public propsLayer: Container = new Container();
   public smokeLayer: Container = new Container();
   public lightsLayer: Container = new Container();
@@ -71,11 +74,13 @@ export class PixiStage {
     this.stageContainer = new Container();
     app.stage.addChild(this.stageContainer);
 
-    // 建立 7 层深度渲染容器（遗像牌位紧贴墙面之上、地坪之下）
+    // 墙纸 → 遗像 → 墙灯 → 地坪/延伸的框架 → 供桌；框架可跨墙地交界，但仍在供桌之后。
     this.stageContainer.addChild(this.backgroundLayer);
     this.stageContainer.addChild(this.portraitLayer);
+    this.stageContainer.addChild(this.wallFrontLayer);
     this.stageContainer.addChild(this.floorLayer);
     this.stageContainer.addChild(this.tableLayer);
+    this.stageContainer.addChild(this.groundFrontLayer);
     this.stageContainer.addChild(this.propsLayer);
     this.stageContainer.addChild(this.smokeLayer);
     this.stageContainer.addChild(this.lightsLayer);
@@ -115,6 +120,10 @@ export class PixiStage {
     this.portraitLayer.x = this.currentParallaxX * 0.35;
     this.portraitLayer.y = this.currentParallaxY * 0.35;
 
+    // 墙面造景与结构附件比遗像略近、仍远于地面。
+    this.wallFrontLayer.x = this.currentParallaxX * 0.4;
+    this.wallFrontLayer.y = this.currentParallaxY * 0.4;
+
     // 地面层：视差系数 0.45
     this.floorLayer.x = this.currentParallaxX * 0.45;
     this.floorLayer.y = this.currentParallaxY * 0.45;
@@ -122,6 +131,10 @@ export class PixiStage {
     // 供桌层：视差系数 0.75
     this.tableLayer.x = this.currentParallaxX * 0.75;
     this.tableLayer.y = this.currentParallaxY * 0.75;
+
+    // 近景席垫略近于供桌，位于桌脚前，但仍在桌面供品之后。
+    this.groundFrontLayer.x = this.currentParallaxX * 0.82;
+    this.groundFrontLayer.y = this.currentParallaxY * 0.82;
 
     // 供品道具层：视差系数 0.95
     this.propsLayer.x = this.currentParallaxX * 0.95;

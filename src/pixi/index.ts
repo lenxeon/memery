@@ -20,6 +20,20 @@
 // ── 领域数据：风格选项（UI 面板用于展示与选择） ──
 export { FLOOR_STYLE_OPTIONS } from './scene/floorOptions';
 export { WALL_STYLE_OPTIONS } from './scene/walls/options';
+export { SCENE_THEME_REGISTRY, SCENE_THEME_OPTIONS, getSceneTheme } from './scene/themes';
+export {
+  SCENE_COMPONENT_GROUPS,
+  SCENE_FOREGROUND_OPTIONS,
+  WALLPAPER_OPTIONS,
+  WALLPAPER_DECORATION_OPTIONS,
+  WALL_SCENERY_OPTIONS,
+  WALL_DECORATION_OPTIONS,
+  GROUND_MAT_OPTIONS,
+  CUSHION_OPTIONS,
+  createDefaultSceneAssembly,
+  getSceneComponentOption,
+  getSceneForeground,
+} from './scene/components';
 
 // ── 领域数据：供品图形模板与注册表 ──
 export { FLOWER_REGISTRY } from './assets/templates/flowers';
@@ -30,6 +44,7 @@ export { getFlowerOnlyPreviewSvg, getVaseOnlyPreviewSvg } from './assets/templat
 export type {
   SpaceData,
   SpaceScene,
+  SpaceTheme,
   SpaceWall,
   SpaceFloor,
   SpaceTable,
@@ -45,6 +60,14 @@ export type {
   FlowerType,
   FruitType,
   WallBackgroundStyle,
+  SceneThemeId,
+  SceneThemeDefinition,
+  SceneAssemblyPart,
+  SceneAssemblySelection,
+  SceneForegroundSide,
+  SceneForegroundInstance,
+  SceneForegroundComposition,
+  SceneForegroundDefinition,
   FloorStyle,
   TableclothStyle,
   TableWoodStyle,

@@ -20,7 +20,16 @@ import type {
   FloorStyle,
   TableclothStyle,
   TableWoodStyle,
+  SceneThemeId,
+  SceneAssemblySelection,
 } from '../types';
+
+/** 一套完整镜头主题：统一装配背景、深度附件、地面陈设与光源预设。 */
+export interface SpaceTheme {
+  id: SceneThemeId;
+  /** 可选的独立部件装配；省略时采用主题默认组合。 */
+  assembly?: SceneAssemblySelection | null;
+}
 
 /** 背景墙 */
 export interface SpaceWall {
@@ -53,7 +62,8 @@ export interface SpaceTable {
 
 /** 空间整体：墙、地、案 */
 export interface SpaceScene {
-  wall: SpaceWall;
+  theme: SpaceTheme;
+  /** 主题应用后仍允许用户单独覆盖的地坪选择。 */
   floor: SpaceFloor;
   table: SpaceTable;
 }

@@ -336,3 +336,27 @@ export function getAltarTableSvg(options: AltarTableOptions = {}): string {
 </svg>
   `.trim();
 }
+
+/**
+ * 桌布覆盖层专用 SVG：保留原案面织物与前围幔，移除旧案体、木面与落影，
+ * 以便织物可以叠加在独立的明式条案素材上，而不把旧桌子一起盖回来。
+ */
+export function getAltarTableclothOverlaySvg(options: AltarTableOptions = {}): string {
+  let svg = getAltarTableSvg({ ...options, showTableRunner: true });
+  const obsoleteTableParts: RegExp[] = [
+    /<g id="tableBaseStructure">[\s\S]*?<\/g>\s*/,
+    /<polygon points="14,16 546,16 556,70 4,70" fill="url\(#woodTableTopGrad\)" stroke="#cfb290" stroke-width="0\.8" \/>\s*/,
+    /<path d="M 25 24 Q 280 23 535 24"[^>]*\/>\s*/,
+    /<path d="M 18 40 Q 280 39 542 40"[^>]*\/>\s*/,
+    /<path d="M 10 56 Q 280 55 550 56"[^>]*\/>\s*/,
+    /<ellipse cx="280" cy="45" rx="210" ry="18" fill="#fff9ef" opacity="0\.12" \/>\s*/,
+    /<g id="valanceTableFeet">[\s\S]*?<\/g>\s*/,
+    /<ellipse cx="76" cy="152"[^>]*\/>\s*/,
+    /<ellipse cx="484" cy="152"[^>]*\/>\s*/,
+    /<rect x="74" y="150" width="412" height="4"[^>]*\/>\s*/,
+    /<ellipse cx="[^"]+" cy="158" rx="270" ry="10" fill="url\(#tableFloorShadowGrad\)" \/>\s*/,
+  ];
+
+  for (const pattern of obsoleteTableParts) svg = svg.replace(pattern, '');
+  return svg;
+}

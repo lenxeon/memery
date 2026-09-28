@@ -8,10 +8,15 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { PixiStage } from '../../pixi/engine/PixiStage';
 import { TexturePipeline } from '../../pixi/assets/TexturePipeline';
 import { SceneBackgroundLayer } from '../../pixi/layers/SceneBackgroundLayer';
+import { SceneThemeLayer } from '../../pixi/layers/SceneThemeLayer';
+import { getSceneComponentOption } from '../../pixi/scene/components';
+import { getSceneTheme } from '../../pixi/scene/themes';
+import { getSceneCompositionWidth } from '../../pixi/scene/SceneViewportLayout';
 import { FloorLayer } from '../../pixi/layers/FloorLayer';
 import { GodRaysLayer } from '../../pixi/layers/GodRaysLayer';
 import { DustMotesLayer } from '../../pixi/layers/DustMotesLayer';
 import { AltarTableLayer } from '../../pixi/layers/AltarTableLayer';
+import { getMingAltarTableMetrics, getRenderMatchAltarTableMetrics } from '../../pixi/layers/table/MingAltarTableSpec';
 import { MemorialPortraitLayer, StageInsets } from '../../pixi/layers/MemorialPortraitLayer';
 import { PropsLayer } from '../../pixi/layers/PropsLayer';
 import { SmokeParticleEmitter } from '../../pixi/effects/SmokeParticleEmitter';
@@ -21,7 +26,8 @@ import {
   SceneItemId,
   LightingSettings,
   MemorialInfo,
-  WallBackgroundStyle,
+  SceneThemeId,
+  SceneAssemblySelection,
   FloorStyle,
   TableclothStyle,
   TableWoodStyle,
@@ -41,8 +47,12 @@ const DEFAULT_STAGE_INSETS: StageInsets = { top: 64, bottom: 96 };
 export interface SceneCanvasProps {
   items: Record<SceneItemId, SceneItem>;
   lighting: LightingSettings;
-  wallStyle: WallBackgroundStyle;
+  themeId: SceneThemeId;
+  /** 墙体、地面陈设与左右前景的独立部件组合。 */
+  sceneAssembly?: SceneAssemblySelection | null;
   floorStyle: FloorStyle;
+  /** 为 false 时用户已手动选择公共地材，不再使用主题自带地材。 */
+  useThemeFloor?: boolean;
   tableclothStyle: TableclothStyle;
   tableWoodStyle?: TableWoodStyle;
   /** 腿足构架独立材质（桌腿/牙板/横枨） */
@@ -73,8 +83,10 @@ export interface SceneCanvasProps {
 export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   items,
   lighting,
-  wallStyle,
+  themeId,
+  sceneAssembly,
   floorStyle,
+  useThemeFloor = true,
   tableclothStyle,
   tableWoodStyle = 'walnut',
   tableLegWoodStyle = 'walnut',
@@ -105,6 +117,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
   // 场景图层实例
   const bgLayerRef = useRef<SceneBackgroundLayer | null>(null);
+  const themeLayerRef = useRef<SceneThemeLayer | null>(null);
   const floorLayerRef = useRef<FloorLayer | null>(null);
   const godRaysLayerRef = useRef<GodRaysLayer | null>(null);
   const dustLayerRef = useRef<DustMotesLayer | null>(null);
@@ -155,18 +168,22 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   // forward ∈ [-1, 1]：前后移动伴随近大远小，前移时贴近镜头、后移时退向纵深
   const getTableLayout = useCallback((width: number, height: number, forward: number = 0) => {
     const centerX = width * 0.5;
-    // 供案横向长度（对标经典设计稿，适度舒展且两侧通透留白）+ 前后进深缩放
+    // 供案宽度按画布比例定义，手机与 iPad 都保持墙面与供桌的主体比例。
     const depthScale = 1 + forward * 0.07;
-    let tableWidth = Math.min(width - 32, width < 640 ? 540 : 620) * depthScale;
-    tableWidth = Math.min(tableWidth, width - 20);
-    const tableHeight = tableWidth * (166 / 560);
-    // 台面前沿到桌脚底部的垂挂高度（在 560:166 视口中为 96 单位）
-    const tableHangingHeight = tableWidth * (96 / 560);
+    const compositionWidth = getSceneCompositionWidth(width, height);
+    const tableWidth = Math.max(compositionWidth * 0.84, Math.min(compositionWidth * 0.92, compositionWidth * 0.90 * depthScale));
+    const tableMetrics = themeId === 'classic_dawn'
+      ? getRenderMatchAltarTableMetrics(tableWidth)
+      : getMingAltarTableMetrics(tableWidth);
+    const tableHeight = tableMetrics.topExtent + tableMetrics.footDrop;
+    // 桌面前沿到新素材桌脚底部的垂挂高度，确保足端贴地。
+    const tableHangingHeight = tableMetrics.footDrop;
     // 底部留出开阔地板透视余量：前移收窄（贴近镜头），后移加宽（退向纵深）
-    const tableBottomOffset = (width < 640 ? 44 : 58) - forward * 24;
+    // 让供桌落在墙地交界附近，留出窄地面带给席垫与蒲团。
+    const tableBottomOffset = height * 0.125 - forward * 24;
     const tableTopY = height - tableBottomOffset - tableHangingHeight;
     return { centerX, tableTopY, tableWidth, tableHeight };
-  }, []);
+  }, [themeId]);
 
   // 重绘全部图层
   const renderAll = useCallback(() => {
@@ -177,11 +194,26 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     // 0. 远景背景墙（纯 Pixi 坐标系渲染，与供案共用同一 centerX，杜绝 DOM/CSS 布局错位）
     // TEMP_DEBUG: 临时关闭墙面渲染，仅看地面
     if (!DISABLE_WALL) {
-      bgLayerRef.current?.render(width, height, lighting, wallStyle);
+      const wallpaperAsset = sceneAssembly
+        ? getSceneComponentOption('wallpaper', sceneAssembly.wallpaperId)?.asset
+        : getSceneTheme(themeId).wall?.wallpaper;
+      const deviceProfile = width < 700 ? 'phone' : 'tablet';
+      const wallpaper = wallpaperAsset?.responsiveAssets?.[deviceProfile] ?? wallpaperAsset?.url;
+      bgLayerRef.current?.render(width, height, lighting, themeId, wallpaper);
     }
     if (bgLayerRef.current) bgLayerRef.current.container.visible = !DISABLE_WALL;
 
-    // 0b. 2.5D 透视地坪（PerspectiveMesh 复刻 CSS 3D 投影，位于墙层之上）
+    // 0b. 遗像与主题锚点先完成布局，地坪即可读取主题自带材质。
+    if (portraitLayerRef.current) {
+      portraitLayerRef.current.layout(width, height, stageInsets ?? DEFAULT_STAGE_INSETS, themeId);
+      portraitLayerRef.current.setLighting(
+        lighting.masterOn ? lighting.sunlightIntensity : 0.2,
+        lighting.timeOfDay
+      );
+      themeLayerRef.current?.render(width, height, themeId, portraitLayerRef.current.getThemeAnchor(), sceneAssembly);
+    }
+
+    // 0c. 2.5D 透视地坪；主题可提供独享材质，否则使用公共地坪选择。
     const pipeline = TexturePipeline.getInstance();
     floorLayerRef.current?.render(
       width,
@@ -189,13 +221,17 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       floorStyle,
       pipeline.woodPlankTexture,
       pipeline.marbleTileTexture,
-      lighting
+      lighting,
+      useThemeFloor ? themeLayerRef.current?.getFloorMaterial() : undefined
     );
 
-    // 0c. 丁达尔光束（Pixi 加色混合，随 lightsLayer 视差一同摆动）
-    godRaysLayerRef.current?.render(width, height, lighting);
+    // 0d. 丁达尔光束（Pixi 加色混合，随 lightsLayer 视差一同摆动）
+    const raySource = themeId === 'classic_dawn'
+      ? getSceneTheme(themeId).lightRig.source
+      : { x: 0.5, y: 0.12 };
+    godRaysLayerRef.current?.render(width, height, lighting, raySource);
 
-    // 0d. 光束中的浮尘（与场景共用 Ticker，密度/日照/风力同光照联动）
+    // 0e. 光束中的浮尘（与场景共用 Ticker，密度/日照/风力同光照联动）
     dustLayerRef.current?.layout(width, height);
     dustLayerRef.current?.setOptions({
       density: lighting.dustDensity,
@@ -203,15 +239,6 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       windForce: lighting.windForce,
       timeOfDay: lighting.timeOfDay,
     });
-
-    // 0e. 遗像牌位：Pixi 坐标系内定位（舞台区 18% / 20% 处，夹在踢脚线之上）
-    if (portraitLayerRef.current) {
-      portraitLayerRef.current.layout(width, height, stageInsets ?? DEFAULT_STAGE_INSETS, wallStyle);
-      portraitLayerRef.current.setLighting(
-        lighting.masterOn ? lighting.sunlightIntensity : 0.2,
-        lighting.timeOfDay
-      );
-    }
 
     // 1. 供案几何与桌布 (置于用户近前前景，开阔背景纵深)
     const forward = activeForwardRef.current;
@@ -236,6 +263,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       showPetals: false,
       topWoodStyle: tableWoodStyle,
       legWoodStyle: tableLegWoodStyle,
+      tableAssetUrl: getSceneTheme(themeId).tableAssetUrl,
       // 地坪水平灭点基线与 FloorLayer 保持一致 (视口下 38%)
       horizonY: height * 0.62,
     });
@@ -245,7 +273,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
     // 2. 供品与道具 (1:1 同步置于供案台面)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-    }, [items, wallStyle, floorStyle, tableclothStyle, tableWoodStyle, tableLegWoodStyle, showTableRunner, lighting, stageInsets, getViewportDimensions, getTableLayout]);
+    }, [items, themeId, sceneAssembly, floorStyle, useThemeFloor, tableclothStyle, tableWoodStyle, tableLegWoodStyle, showTableRunner, lighting, stageInsets, getViewportDimensions, getTableLayout]);
 
   // 始终持有最新重绘函数（供案拖放时按最新状态即时重绘）
   const renderAllRef = useRef(renderAll);
@@ -284,6 +312,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
       // 构建分层与特效系统
       const bgLayer = new SceneBackgroundLayer();
+      const themeLayer = new SceneThemeLayer(() => renderAllRef.current());
       const floorLayer = new FloorLayer();
       const godRaysLayer = new GodRaysLayer();
       const dustLayer = new DustMotesLayer();
@@ -295,17 +324,25 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
       // 装载到 2.5D 深度视差容器中
       stage.backgroundLayer.addChild(bgLayer.container);
+      stage.backgroundLayer.addChild(themeLayer.wallpaperDecorations);
+      stage.portraitLayer.addChild(themeLayer.portraitBack);
       stage.portraitLayer.addChild(portraitLayer.container);
+      stage.portraitLayer.addChild(themeLayer.portraitFront);
       stage.floorLayer.addChild(floorLayer.container);
+      // Frame and wall attachments share one Pixi group so their placement and scale stay aligned.
+      stage.floorLayer.addChild(themeLayer.wallAssembly);
       stage.tableLayer.addChild(tableLayer.container);
       // 案体照明层：叠在案体之上、道具之下
       stage.tableLayer.addChild(tableLayer.lightContainer);
+      stage.groundFrontLayer.addChild(themeLayer.ground);
       stage.propsLayer.addChild(propsLayer.container);
       // 前景气光层次：光束（远）→ 烛焰光晕 → 落瓣 → 浮尘（最近）
       stage.lightsLayer.addChild(godRaysLayer.container);
       stage.lightsLayer.addChild(pixiEffects.lightsContainer);
       stage.lightsLayer.addChild(pixiEffects.petalsContainer);
       stage.lightsLayer.addChild(dustLayer.container);
+      stage.lightsLayer.addChild(themeLayer.foregroundLeft);
+      stage.lightsLayer.addChild(themeLayer.foregroundRight);
 
       // 绑定特效与道具交互
       propsLayer.bindEffects(null as any, pixiEffects);
@@ -351,6 +388,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       });
 
       bgLayerRef.current = bgLayer;
+      themeLayerRef.current = themeLayer;
       floorLayerRef.current = floorLayer;
       godRaysLayerRef.current = godRaysLayer;
       dustLayerRef.current = dustLayer;
@@ -397,6 +435,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       isReadyRef.current = false;
       window.removeEventListener('resize', handleResize);
       bgLayerRef.current?.destroy();
+      themeLayerRef.current?.destroy();
       floorLayerRef.current?.destroy();
       godRaysLayerRef.current?.destroy();
       dustLayerRef.current?.destroy();
@@ -413,8 +452,10 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     if (!isReadyRef.current) return;
     renderAll();
   }, [
-    wallStyle,
+    themeId,
+    sceneAssembly,
     floorStyle,
+    useThemeFloor,
     tableclothStyle,
     tableWoodStyle,
     tableLegWoodStyle,

@@ -14,7 +14,8 @@
  * - 纵向能量在落地前即衰减归零，光落在空中而非糊在器物上；
  * - 每一束都有独立相位：呼吸、摇曳、横向漂移互不同步，避免"整片一起动"的贴纸感。
  *
- * 光束几何沿用旧 SVG 的 800×1000 viewBox 坐标，保证迁移前后构图一致。
+ * 光束以主题 lightRig.source 为起点，沿场景共享的 sunAngle 倾斜；尾端向地面铺开。
+ * 几何仍沿用旧 SVG 的 800×1000 viewBox 坐标，保留原来的柔光形态。
  */
 import { Container, Sprite, Texture } from 'pixi.js';
 import { LightingSettings, TimeOfDay } from '../../types';
@@ -22,9 +23,6 @@ import { LightingSettings, TimeOfDay } from '../../types';
 /** 旧 SVG 的 viewBox 尺寸——所有光束顶点均以此坐标系定义 */
 const VIEWBOX_W = 800;
 const VIEWBOX_H = 1000;
-/** 光束旋转轴（viewBox 坐标，等同旧版 transform-origin: 400px 120px） */
-const PIVOT_VX = 400;
-const PIVOT_VY = 120;
 
 interface BeamSpec {
   /** 顶左 / 顶右 / 底右 / 底左（viewBox 坐标，构成梯形） */
@@ -78,7 +76,7 @@ const TEX_W = 256;
 const TEX_H = 512;
 const HAZE_TEX_SIZE = 256;
 
-let beamTextures: Texture[] | null = null;
+const beamTextureCache = new Map<string, Texture[]>();
 
 /** 烘焙单束：梯形 → 纵向能量渐变 → 横向羽化（代替 SVG 的高斯模糊） */
 const bakeBeamTexture = (spec: BeamSpec): Texture => {
@@ -131,9 +129,27 @@ const bakeBeamTexture = (spec: BeamSpec): Texture => {
   return Texture.from(canvas);
 };
 
-const getBeamTextures = (): Texture[] => {
-  if (!beamTextures) beamTextures = BEAMS.map(bakeBeamTexture);
-  return beamTextures;
+const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
+
+/** 将光束顶端从默认中轴移到主题光源位置，尾端仍铺向完整地面。 */
+const getBeamSpecsForSource = (sourceX: number): BeamSpec[] => {
+  const horizontalOffset = (sourceX - 0.5) * VIEWBOX_W;
+  const shiftX = (x: number, y: number): number => x + horizontalOffset * clamp01(1 - y / VIEWBOX_H);
+  return BEAMS.map((beam) => ({
+    ...beam,
+    x1: shiftX(beam.x1, beam.y1),
+    x2: shiftX(beam.x2, beam.y2),
+    x3: shiftX(beam.x3, beam.y3),
+    x4: shiftX(beam.x4, beam.y4),
+  }));
+};
+
+const getBeamTextures = (sourceKey: string, specs: BeamSpec[]): Texture[] => {
+  const cached = beamTextureCache.get(sourceKey);
+  if (cached) return cached;
+  const textures = specs.map(bakeBeamTexture);
+  beamTextureCache.set(sourceKey, textures);
+  return textures;
 };
 
 let hazeTexture: Texture | null = null;
@@ -171,7 +187,7 @@ interface BeamRuntime {
 export class GodRaysLayer {
   public container: Container = new Container();
 
-  /** 光束组：以光源为轴整体旋转（太阳角），组内为各束精灵 */
+  /** 光束组：以主题光源位置为轴整体旋转（太阳角），组内为各束精灵 */
   private group: Container = new Container();
   private beamSprites: Sprite[] = [];
   private beamRuntime: BeamRuntime[] = [];
@@ -184,19 +200,11 @@ export class GodRaysLayer {
   private pivotX: number = 0;
   private pivotY: number = 0;
   private time: number = 0;
+  private beamSourceKey = '';
+  private beamSpecs: BeamSpec[] = BEAMS;
 
   constructor() {
-    const textures = getBeamTextures();
-
-    BEAMS.forEach((spec, i) => {
-      const sprite = new Sprite(textures[i]);
-      sprite.anchor.set(0, 0);
-      sprite.blendMode = 'add';
-      sprite.alpha = spec.alpha;
-      this.beamSprites.push(sprite);
-      this.beamRuntime.push({ x: 0, y: 0, w: 1, h: 1, alpha: 0, phase: i * 1.7 + 0.4 });
-      this.group.addChild(sprite);
-    });
+    this.configureBeamSource(0.5);
 
     this.hazeSprite = new Sprite(getHazeTexture());
     this.hazeSprite.anchor.set(0.5, 0.5);
@@ -208,18 +216,23 @@ export class GodRaysLayer {
   }
 
   /** 按视口与光照重建光束几何与配色 */
-  public render(width: number, height: number, lighting: LightingSettings): void {
+  public render(width: number, height: number, lighting: LightingSettings, source = { x: 0.5, y: 0.12 }): void {
     const enabled = lighting.masterOn && lighting.godRaysEnabled && lighting.godRaysIntensity > 0.02;
     this.container.visible = enabled;
     if (!enabled) return;
 
+    const sourceX = clamp01(source.x);
+    const sourceY = clamp01(source.y);
+    const sourceKey = sourceX.toFixed(3);
+    if (sourceKey !== this.beamSourceKey) this.configureBeamSource(sourceX);
+
     const sx = width / VIEWBOX_W;
     const sy = height / VIEWBOX_H;
-    this.pivotX = PIVOT_VX * sx;
-    this.pivotY = PIVOT_VY * sy;
+    this.pivotX = sourceX * width;
+    this.pivotY = sourceY * height;
 
     this.group.position.set(this.pivotX, this.pivotY);
-    // 太阳角：与旧版一致的温和倾角（±30° → ±13.5°）
+    // 太阳角：旧版角度映射保留，负值代表光束向画面左侧倾斜。
     this.baseRotation = (lighting.sunAngle * 0.45 * Math.PI) / 180;
     this.group.rotation = this.baseRotation;
 
@@ -227,7 +240,7 @@ export class GodRaysLayer {
     // 两级收敛：滑杆 → 薄纱级透明度，且单束不越过 MAX_BEAM_ALPHA
     this.baseAlpha = Math.min(1, (Number(lighting.godRaysIntensity) || 0) * INTENSITY_SCALE);
 
-    BEAMS.forEach((spec, i) => {
+    this.beamSpecs.forEach((spec, i) => {
       const sprite = this.beamSprites[i];
       const xs = [spec.x1, spec.x2, spec.x3, spec.x4].map((v) => v * sx);
       const ys = [spec.y1, spec.y2, spec.y3, spec.y4].map((v) => v * sy);
@@ -251,7 +264,7 @@ export class GodRaysLayer {
     });
 
     // 光源辉光：尺度随视口，亮度随强度与时段（夜色收敛）
-    this.hazeBaseSize = Math.max(width * 0.9, height * 0.7);
+    this.hazeBaseSize = Math.max(width * 0.64, height * 0.48);
     this.hazeSprite.position.set(0, 0);
     this.hazeSprite.width = this.hazeBaseSize;
     this.hazeSprite.height = this.hazeBaseSize;
@@ -260,6 +273,29 @@ export class GodRaysLayer {
       this.baseAlpha *
       (lighting.timeOfDay === 'night' ? 0.24 : lighting.timeOfDay === 'sunset' ? 0.42 : 0.34);
     this.hazeSprite.alpha = this.hazeBaseAlpha;
+  }
+
+  private configureBeamSource(sourceX: number): void {
+    const key = sourceX.toFixed(3);
+    if (key === this.beamSourceKey && this.beamSprites.length) return;
+    for (const sprite of this.beamSprites) {
+      this.group.removeChild(sprite);
+      sprite.destroy();
+    }
+    this.beamSprites = [];
+    this.beamRuntime = [];
+    this.beamSpecs = getBeamSpecsForSource(sourceX);
+    const textures = getBeamTextures(key, this.beamSpecs);
+    this.beamSpecs.forEach((spec, i) => {
+      const sprite = new Sprite(textures[i]);
+      sprite.anchor.set(0, 0);
+      sprite.blendMode = 'add';
+      sprite.alpha = spec.alpha;
+      this.beamSprites.push(sprite);
+      this.beamRuntime.push({ x: 0, y: 0, w: 1, h: 1, alpha: 0, phase: i * 1.7 + 0.4 });
+      this.group.addChildAt(sprite, i);
+    });
+    this.beamSourceKey = key;
   }
 
   /**

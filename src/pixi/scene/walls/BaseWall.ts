@@ -2,9 +2,8 @@
  * @file BaseWall.ts
  * @description 背景墙基准（BaseWall）——统一负责「贴哪张背景图 · 遗像落在哪 · 纪念文字落在哪」三件事。
  *
- * 各风格只需给出：
- *   1) 用哪张背景图（backdropUrl）—— 装饰框一并画在图里
- *   2) 照片与文字的偏移量微调（portrait / text）
+ * 背景图与照片 / 文字的偏移量均由空间主题注册表给出；本模块只把完整主题
+ * 适配为旧墙面/遗像层仍在使用的轻量规格。
  * 其余（壁面布局、昼夜调色）由 SceneBackgroundLayer 统一处理，风格侧不再各写一套。
  *
  * 本文件只产出「壁面构成规格」——不含任何 DOM / 字符串模板：
@@ -13,6 +12,7 @@
  * 程序化矢量壁构（落地罩 / 帷幔 / 圆光罩 / 月洞 / 佛龛）已整体下线，不再渲染。
  */
 import { WallBackgroundStyle } from '../../../types';
+import { getSceneTheme } from '../themes';
 
 /* ────────────────────────────────────────────────────────────────
  * 壁面构成规格：BaseWall 的"基因"
@@ -65,29 +65,28 @@ export const defineWall = (spec: BaseWallSpec = {}): BaseWallSpec => ({
   text: { ...BASE_WALL_SPEC.text, ...spec.text },
 });
 
-/**
- * 各风格继承 BaseWall 后的壁面构成（新增风格只需在此加一行）。
- *
- * 「场景编号」约定 = WALL_STYLE_OPTIONS 的面板顺序：
- *   1 晴岚映曜 → wall_02.png   2 暮林晚钟 → wall_01.png   3 华彩生光 → wall_03.png
- *   4 圆满如月 → wall_04.png   5 古朴苍然 / 6 宝相庄严 → 背景图待出（暂显素色墙）
- * 以后换背景：新图放进 public/textures/wall/（如 wall_05.png），再改对应一行的 backdropUrl 即可。
- */
-export const WALL_SPECS: Record<WallBackgroundStyle, BaseWallSpec> = {
-  // 1 晴岚映曜：金色晨光山水
-  classic_dawn: defineWall({ backdropUrl: '/textures/wall/wall_02.png' }),
-  // 2 暮林晚钟：水墨松竹，素壁留白
-  heritage_wood: defineWall({ backdropUrl: '/textures/wall/wall_01.png' }),
-  // 3 华彩生光：荷塘金匾
-  royal_drape: defineWall({ backdropUrl: '/textures/wall/wall_03.png' }),
-  // 4 圆满如月：折枝茶花木框素匾
-  bronze_mirror: defineWall({ backdropUrl: '/textures/wall/wall_04.png' }),
-  // 5 古朴苍然 / 6 宝相庄严：背景图待出（暂显素色墙）
-  brick_screen: defineWall(),
-  lotus_mandorla: defineWall(),
-};
-
 /** 取某风格的壁面构成（未知风格回落晴岚映曜） */
-export const getWallSpec = (style: WallBackgroundStyle): BaseWallSpec =>
-  WALL_SPECS[style] ?? WALL_SPECS.classic_dawn;
-
+export const getWallSpec = (
+  style: WallBackgroundStyle,
+  wallpaperOverride?: string,
+  deviceProfile: 'phone' | 'tablet' = 'phone'
+): BaseWallSpec => {
+  const sceneTheme = getSceneTheme(style);
+  const portrait = sceneTheme.wall?.portrait ?? sceneTheme.portrait;
+  return defineWall({
+    backdropUrl: wallpaperOverride
+      ?? sceneTheme.wall?.wallpaper?.responsiveAssets?.[deviceProfile]
+      ?? sceneTheme.wall?.wallpaper?.url
+      ?? sceneTheme.backdropUrl,
+    portrait: {
+      dx: portrait?.dx,
+      dy: portrait?.dy,
+      scale: portrait?.scale,
+    },
+    text: {
+      dx: portrait?.textDx,
+      dy: portrait?.textDy,
+      gap: portrait?.textGap,
+    },
+  });
+};

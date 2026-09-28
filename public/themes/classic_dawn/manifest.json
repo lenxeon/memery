@@ -1,0 +1,114 @@
+{
+  "themeId": "classic_dawn",
+  "name": "晴岚映曜",
+  "poeticTitle": "晨光沐影",
+  "version": 1,
+  "assetPolicy": {
+    "wallpaper": "opaque-responsive-phone-and-tablet-contained-within-wall-zone-y-0.70-0.74",
+    "wallScenery": "phone-frame-fills-canvas-width-and-extends-below-wall-floor-seam-tablet-frame-width-ratio-0.90",
+    "transparentLayers": "rgba-neutral-material-light-no-emission-no-cast-shadow",
+    "wallDecoration": "front-facing-symmetric-simple-frame-panel-no-hanging-hardware",
+    "floorMaterial": "single-full-plane-polished-chestnut-image-projected-through-shared-scene-camera-no-baked-highlights",
+    "groundAssets": "camera-matched-transparent-sprites-no-scene-light-no-cast-shadow-no-double-projection",
+    "foreground": "left-right-independent-rgba-no-bokeh-no-light-spots-no-runtime-blur-no-color-tint",
+    "initialAudit": "one-coherent-selected-asset-per-slot-expand-only-after-user-approval"
+  },
+  "wallpaper": [
+    {
+      "id": "ink_warm_silk",
+      "name": "水墨梅山",
+      "phoneFile": "wallpapers/phone/ink-landscape-render-match.png",
+      "tabletFile": "wallpapers/tablet/ink-landscape-render-match.png"
+    }
+  ],
+  "wallpaperDecoration": [
+    {
+      "id": "plum_encircling",
+      "name": "梅枝流芳",
+      "backFile": "wall-overlays/plum-encircling.png",
+      "frontFile": "wall-overlays/plum-encircling-front.png"
+    }
+  ],
+  "wallScenery": [
+    {
+      "id": "moon_gate_rosewood",
+      "name": "月洞紫檀",
+      "phoneFile": "wall-scenery/phone/moon-gate-rosewood-render-match.png",
+      "tabletFile": "wall-scenery/tablet/moon-gate-rosewood-render-match.png",
+      "phoneWidthRatio": 1.0,
+      "tabletWidthRatio": 0.9
+    }
+  ],
+  "wallDecoration": [
+    {
+      "id": "palace_fretwork_lamps",
+      "name": "回纹宫灯",
+      "file": "wall-decor/palace-fretwork-lamps-unlit.png"
+    }
+  ],
+  "groundMat": [
+    {
+      "id": "clear_rush_long_mat",
+      "name": "清篾长席",
+      "file": "mats/clear-rush-long-mat-clean.png"
+    }
+  ],
+  "cushion": [
+    {
+      "id": "woven_round_cushion",
+      "name": "藤编蒲团",
+      "file": "cushions/woven-round-cushion-clean.png"
+    }
+  ],
+  "groundGeometry": {
+    "groundMat": {
+      "shape": "camera-matched-woven-long-mat",
+      "screenWidthRatio": 0.62,
+      "frontEdgeBottomRatio": 0.045
+    },
+    "cushion": {
+      "shape": "camera-matched-round-braided-cushion",
+      "screenWidthRatio": 0.19,
+      "frontEdgeBottomRatio": 0.055
+    }
+  },
+  "floor": {
+    "id": "polished_chestnut_plane",
+    "name": "暖栗漆面地板",
+    "file": "floor/polished-chestnut-plane-render-match-v2.png",
+    "renderMode": "projected-plane",
+    "lighting": "runtime-only"
+  },
+  "foreground": {
+    "left": [
+      {
+        "id": "warm_foliage_left",
+        "name": "暖庭枝影·左",
+        "file": "foregrounds/warm-foliage-left-clean.png"
+      }
+    ],
+    "right": [
+      {
+        "id": "warm_foliage_right",
+        "name": "暖庭枝影·右",
+        "file": "foregrounds/warm-foliage-right-clean.png"
+      }
+    ]
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.82,
+      "y": 0.12
+    },
+    "sunAngle": -20,
+    "sunlightIntensity": 0.92,
+    "godRaysIntensity": 0.68,
+    "godRaysEnabled": true,
+    "keyColor": "#ffedc2",
+    "ambientColor": "#f2e8dc",
+    "shadowDirection": {
+      "x": -0.76,
+      "y": 0.65
+    }
+  }
+}

@@ -140,8 +140,10 @@ export const HallSpacePage: React.FC<HallSpacePageProps> = ({ currentUser, onReq
         <SceneCanvas
           items={items}
           lighting={ambience.lighting}
-          wallStyle={ambience.wallStyle}
+          themeId={ambience.themeId}
+          sceneAssembly={ambience.sceneAssembly}
           floorStyle={ambience.floorStyle}
+          useThemeFloor={ambience.useThemeFloor}
           tableclothStyle={ambience.tableclothStyle}
           tableWoodStyle={audit.table.woodStyle}
           tableLegWoodStyle={audit.table.legWoodStyle}

@@ -14,10 +14,18 @@ import {
   LightingSettings,
   TableclothStyle,
   TableWoodStyle,
-  WallBackgroundStyle,
+  SceneThemeId,
+  SceneAssemblyPart,
+  SceneAssemblySelection,
+  SceneForegroundSide,
   FloorStyle,
 } from '../../../types';
-import { FLOOR_STYLE_OPTIONS, WALL_STYLE_OPTIONS } from '../../../pixi';
+import {
+  FLOOR_STYLE_OPTIONS,
+  SCENE_THEME_OPTIONS,
+  createDefaultSceneAssembly,
+  getSceneTheme,
+} from '../../../pixi';
 import { useWorldLoop } from '../../../utils/useWorldLoop';
 import { resolveSystemTimeOfDay } from '../../../utils/timeOfDay';
 import { sound } from '../../../utils/audio';
@@ -26,11 +34,23 @@ import { openAgreement } from '../../agreement';
 import { INITIAL_LIGHTING } from '../../../data/sceneItems';
 import { AuditDrawerExtras } from '../audit/useAuditStage';
 
+const DEFAULT_THEME = getSceneTheme('classic_dawn');
+
+const cloneAssembly = (assembly: SceneAssemblySelection): SceneAssemblySelection => ({
+  ...assembly,
+  foreground: {
+    left: assembly.foreground.left.map((item) => ({ ...item })),
+    right: assembly.foreground.right.map((item) => ({ ...item })),
+  },
+});
+
 /** 案台（供案本体）中与抽屉共享的两项状态 */
 export interface HallAmbianceTable {
   woodStyle: TableWoodStyle;
+  legWoodStyle: TableWoodStyle;
   showRunner: boolean;
   setWoodStyle: (style: TableWoodStyle) => void;
+  setLegWoodStyle: (style: TableWoodStyle) => void;
   setShowRunner: (value: boolean) => void;
 }
 
@@ -56,16 +76,23 @@ export const useHallAmbience = ({
   auditExtras,
   onToggleAllCandles,
 }: UseHallAmbienceOptions) => {
-  const [lighting, setLighting] = useState<LightingSettings>(INITIAL_LIGHTING);
+  const [lighting, setLighting] = useState<LightingSettings>(() => ({
+    ...INITIAL_LIGHTING,
+    ...DEFAULT_THEME.preset.lighting,
+  }));
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showPetals, setShowPetals] = useState(false);
-  const [tableclothStyle, setTableclothStyle] = useState<TableclothStyle>('autumn_gold');
+  const [tableclothStyle, setTableclothStyle] = useState<TableclothStyle>(DEFAULT_THEME.preset.tablecloth);
 
-  // 背景墙（默认沉香花格 · 木构长廊）
-  const [wallStyle, setWallStyle] = useState<WallBackgroundStyle>('heritage_wood');
+  // 空间主题（默认主题 01：晴岚映曜）
+  const [themeId, setThemeId] = useState<SceneThemeId>('classic_dawn');
+  const [sceneAssembly, setSceneAssembly] = useState<SceneAssemblySelection | null>(() =>
+    DEFAULT_THEME.defaultAssembly ? cloneAssembly(DEFAULT_THEME.defaultAssembly) : null
+  );
 
   // 地面（默认晴岚暖木地坪）
-  const [floorStyle, setFloorStyle] = useState<FloorStyle>('hinoki_wood');
+  const [floorStyle, setFloorStyle] = useState<FloorStyle>(DEFAULT_THEME.preset.floor);
+  const [useThemeFloor, setUseThemeFloor] = useState(true);
 
   /* ── 时辰跟随系统 ─────────────────────────────────────────────────────── */
 
@@ -107,15 +134,67 @@ export const useHallAmbience = ({
 
   /* ── 环境切换 ─────────────────────────────────────────────────────────── */
 
-  const handleWallStyleChange = (style: WallBackgroundStyle) => {
-    setWallStyle(style);
-    const opt = WALL_STYLE_OPTIONS.find((o) => o.id === style);
+  const handleThemeChange = (id: SceneThemeId) => {
+    const sceneTheme = getSceneTheme(id);
+    setThemeId(id);
+    setSceneAssembly(sceneTheme.defaultAssembly ? cloneAssembly(sceneTheme.defaultAssembly) : null);
+    setFloorStyle(sceneTheme.preset.floor);
+    setUseThemeFloor(true);
+    setTableclothStyle(sceneTheme.preset.tablecloth);
+    table.setWoodStyle(sceneTheme.preset.tableWood);
+    table.setLegWoodStyle(sceneTheme.preset.tableWood);
+    table.setShowRunner(sceneTheme.preset.tableRunner);
+    setLighting((prev) => ({ ...prev, ...sceneTheme.preset.lighting }));
+    const opt = SCENE_THEME_OPTIONS.find((o) => o.id === id);
     sound.playBell(540, 2);
-    showToast(`已切换背景风格为「${opt?.name || ''} · ${opt?.poeticTitle || ''}」`);
+    showToast(`已切换空间主题为「${opt?.name || ''} · ${opt?.poeticTitle || ''}」`);
+  };
+
+  const handleSceneComponentChange = (part: SceneAssemblyPart, id: string) => {
+    const keyByPart: Record<SceneAssemblyPart, keyof Omit<SceneAssemblySelection, 'foreground'>> = {
+      wallpaper: 'wallpaperId',
+      wallpaperDecoration: 'wallpaperDecorationId',
+      wallScenery: 'wallSceneryId',
+      wallDecoration: 'wallDecorationId',
+      groundMat: 'groundMatId',
+      cushion: 'cushionId',
+    };
+    setSceneAssembly((current) => ({
+      ...(current ? cloneAssembly(current) : createDefaultSceneAssembly()),
+      [keyByPart[part]]: id,
+    }));
+    sound.playWoodPlacement();
+  };
+
+  const addForeground = (side: SceneForegroundSide, foregroundId: string) => {
+    setSceneAssembly((current) => {
+      const next = current ? cloneAssembly(current) : createDefaultSceneAssembly();
+      const list = next.foreground[side];
+      list.push({
+        instanceId: `${side}-${foregroundId}-${Date.now()}-${list.length}`,
+        foregroundId,
+        side,
+        order: list.length,
+      });
+      return next;
+    });
+    sound.playWoodPlacement();
+  };
+
+  const removeForeground = (side: SceneForegroundSide, foregroundId: string) => {
+    setSceneAssembly((current) => {
+      if (!current) return current;
+      const next = cloneAssembly(current);
+      const index = next.foreground[side].map((item) => item.foregroundId).lastIndexOf(foregroundId);
+      if (index >= 0) next.foreground[side].splice(index, 1);
+      return next;
+    });
+    sound.playWoodPlacement();
   };
 
   const handleFloorStyleChange = (style: FloorStyle) => {
     setFloorStyle(style);
+    setUseThemeFloor(false);
     sound.playWoodPlacement();
     const opt = FLOOR_STYLE_OPTIONS.find((o) => o.id === style);
     showToast(`已切换地面材质为「${opt?.name || ''} · ${opt?.poeticTitle || ''}」`);
@@ -164,8 +243,12 @@ export const useHallAmbience = ({
     },
     showPetals,
     onTogglePetals: () => setShowPetals((v) => !v),
-    wallStyle,
-    onChangeWallStyle: handleWallStyleChange,
+    themeId,
+    onChangeTheme: handleThemeChange,
+    sceneAssembly,
+    onChangeSceneComponent: handleSceneComponentChange,
+    onAddForeground: addForeground,
+    onRemoveForeground: removeForeground,
     timeScale,
     onUpdateTimeScale: setTimeScale,
     ...auditExtras,
@@ -185,7 +268,8 @@ export const useHallAmbience = ({
     tableclothStyle,
     table.woodStyle,
     floorStyle,
-    wallStyle,
+    themeId,
+    sceneAssembly,
     showPetals,
     timeScale,
     auditExtras,
@@ -211,9 +295,14 @@ export const useHallAmbience = ({
   return {
     lighting,
     updateLighting,
-    wallStyle,
-    handleWallStyleChange,
+    themeId,
+    handleThemeChange,
+    sceneAssembly,
+    handleSceneComponentChange,
+    addForeground,
+    removeForeground,
     floorStyle,
+    useThemeFloor,
     handleFloorStyleChange,
     tableclothStyle,
     setTableclothStyle,

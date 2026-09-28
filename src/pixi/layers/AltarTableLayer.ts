@@ -1,26 +1,12 @@
 /**
  * @file AltarTableLayer.ts
- * @description PixiJS 真实实木【明式条案形制】中式古典供案渲染系统。
- *
- * 遵循明式条案经典构造（挺拔、通透、端庄）：
- * 1. 上台面板 (Top Surface Slab)：浅收敛梯形大板，后沿内缩量按地坪灭点
- *    收敛关系实时推算，保证台面透视与地面透视一致、不失真。
- * 2. 台面厚度立面 (Front Edge Slab)：22.5u 实木厚板封边，顶沿天光倒角线与底口拼缝。
- * 3. 腿足构架 (Leg & Apron Frame)：
- *    - 左右落地圆料感实木腿足，腿间通透，不做整板封闭。
- *    - 大边牙板 (Apron)：与腿足同一平面横贯衔接，承上启下。
- *    - 低位横枨 (Stretcher)：连接左右腿足，结构稳定且增添层次。
- *    - 后腿透视内收，隐于阴影，营造纵深。
- * 4. 着地环境遮蔽阴影 (Floor AO Shadows)：足端接触阴影与案底大面积柔和落影。
- * 5. 材质自治：由 TableMaterial 自闭环管理 4 款名木纹理与动态热更新，
- *    台面 (topWoodStyle) 与腿足 (legWoodStyle) 支持独立材质搭配。
- *
- * 所有构件尺寸均以 560 单位经典设计稿为基准按 u = tableWidth / 560 等比换算，
- * 并与布局系统 tableHangingHeight (96/560) 精确对齐，确保足底接地位置一致。
+ * @description PixiJS 明式长案场景层。默认使用透明桌体素材呈现造型与木纹，
+ * Pixi 继续负责桌体布局、拖动、场景灯光、桌布覆盖与落地阴影；加载失败时保留旧矢量方案。
  */
-import { Container, Graphics, Sprite, TilingSprite, Rectangle, BlurFilter } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, TilingSprite, Rectangle, BlurFilter, Texture } from 'pixi.js';
 import { TableclothStyle, LightingSettings, TableWoodStyle } from '../../types';
 import { TableMaterial } from './table/TableMaterial';
+import { getMingAltarTableMetrics, getRenderMatchAltarTableMetrics, MING_ALTAR_TABLE_TEXTURE } from './table/MingAltarTableSpec';
 import { TexturePipeline } from '../assets/TexturePipeline';
 
 /** 场景点光源（烛火），坐标为舞台全局坐标 */
@@ -64,6 +50,18 @@ interface AltarTableGeometry {
  */
 const LEG_TILE_ROTATION = Math.PI / 2;
 
+const WOOD_STYLE_TINT: Record<TableWoodStyle, number> = {
+  white_oak: 0xffffdf,
+  huanghuali: 0xffd0a5,
+  cherry: 0xffb9ab,
+  walnut: 0xffffff,
+};
+
+const blendTint = (first: number, second: number): number => {
+  const channel = (shift: number) => Math.round((((first >> shift) & 0xff) + ((second >> shift) & 0xff)) / 2);
+  return (channel(16) << 16) | (channel(8) << 8) | channel(0);
+};
+
 /** 供案本体拖放回调（用于场景内直接拖动调整前后进深位置） */
 export interface AltarTableDragCallbacks {
   onDragStart?: () => void;
@@ -85,6 +83,7 @@ export interface AltarTableRenderOptions {
   legWoodStyle?: TableWoodStyle;
   /** 地坪水平灭点基线 Y（用于台面透视收缩计算），缺省按 tableTopY - 220 估算 */
   horizonY?: number;
+  tableAssetUrl?: string;
 }
 
 export class AltarTableLayer {
@@ -121,7 +120,18 @@ export class AltarTableLayer {
   // 5. 装饰桌布容器 (仅在开启桌布时叠加)
   private tableclothContainer: Container = new Container();
   private tableclothSprite: Sprite = new Sprite();
+  private tableclothMaskGraphics: Graphics = new Graphics();
   private currentTableclothKey: string = '';
+
+  // Extracted Ming-style table image; the old procedural geometry remains a load-failure fallback.
+  private mingTableSprite: Sprite = new Sprite();
+  private mingTableLoaded: boolean = false;
+  private themeTableAssetUrl: string | undefined;
+  private tableAssetLoadToken = 0;
+  private legacyTableTexture: Texture | null = null;
+  private activeTableIsThemeAsset = false;
+  private destroyed: boolean = false;
+  private lastRenderOptions: AltarTableRenderOptions | null = null;
 
   // 6. 基于光源位置的局部照明层（环境压暗 + 烛火点光源衰减照亮）
   //    独立容器：与案体同位但不继承案体色温 tint
@@ -151,6 +161,9 @@ export class AltarTableLayer {
     // 严格按纵深前后层次排列
     this.shadowGraphics.filters = [this.shadowBlurFilter];
     this.container.addChild(this.shadowGraphics);
+    this.mingTableSprite.visible = false;
+    this.mingTableSprite.eventMode = 'none';
+    this.container.addChild(this.mingTableSprite);
     this.container.addChild(this.backLegsContainer);
     this.container.addChild(this.basePanelsContainer);
     this.container.addChild(this.frontFaceContainer);
@@ -190,11 +203,28 @@ export class AltarTableLayer {
     // 桌布精灵
     this.tableclothSprite.visible = false;
     this.tableclothContainer.addChild(this.tableclothSprite);
+    this.tableclothContainer.mask = this.tableclothMaskGraphics;
+    this.container.addChild(this.tableclothMaskGraphics);
 
     // 订阅材质动态加载，任一部位材质就绪即热更新
     this.unsubscribeMaterial = TableMaterial.getInstance().onUpdate(() => {
       this.applyWoodTexture();
     });
+
+    Assets.load<Texture>(MING_ALTAR_TABLE_TEXTURE)
+      .then((texture) => {
+        if (this.destroyed || this.mingTableSprite.destroyed) return;
+        this.legacyTableTexture = texture;
+        if (!this.themeTableAssetUrl) {
+          this.mingTableSprite.texture = texture;
+          this.mingTableLoaded = true;
+          this.activeTableIsThemeAsset = false;
+        }
+        if (this.lastRenderOptions) this.render(this.lastRenderOptions);
+      })
+      .catch((err) => {
+        console.warn('Failed to load Ming-style altar table; keeping procedural fallback:', err);
+      });
 
     // 供案本体可直接在场景中拖放以调整前后进深位置
     this.container.eventMode = 'static';
@@ -220,6 +250,34 @@ export class AltarTableLayer {
     this.container.on('pointerup', endDrag);
     this.container.on('pointerupoutside', endDrag);
     this.container.on('pointercancel', endDrag);
+  }
+
+  private selectTableAsset(url?: string): void {
+    if (url === this.themeTableAssetUrl) return;
+    this.themeTableAssetUrl = url;
+    const token = ++this.tableAssetLoadToken;
+    if (!url) {
+      this.mingTableSprite.filters = [];
+      if (this.legacyTableTexture) {
+        this.mingTableSprite.texture = this.legacyTableTexture;
+        this.mingTableLoaded = true;
+        this.activeTableIsThemeAsset = false;
+        if (this.lastRenderOptions) this.render(this.lastRenderOptions);
+      }
+      return;
+    }
+    this.mingTableLoaded = false;
+    Assets.load<Texture>(url).then((texture) => {
+      if (this.destroyed || token !== this.tableAssetLoadToken || this.mingTableSprite.destroyed) return;
+      this.mingTableSprite.texture = texture;
+      this.mingTableLoaded = true;
+      this.activeTableIsThemeAsset = true;
+      this.mingTableSprite.tint = 0xffffff;
+      // The theme table is a finished render-match PNG; preserve its authored wood color.
+      this.mingTableSprite.filters = [];
+      this.container.tint = 0xffffff;
+      if (this.lastRenderOptions) this.render(this.lastRenderOptions);
+    }).catch((error) => console.error(`Failed to load theme altar table: ${url}`, error));
   }
 
   /**
@@ -256,6 +314,22 @@ export class AltarTableLayer {
         s.texture = legTex;
       }
     }
+
+    const topTint = WOOD_STYLE_TINT[this.currentTopWoodStyle];
+    const legTint = WOOD_STYLE_TINT[this.currentLegWoodStyle];
+    this.mingTableSprite.tint = this.activeTableIsThemeAsset
+      ? 0xffffff
+      : topTint === legTint ? topTint : blendTint(topTint, legTint);
+  }
+
+  private layoutTableclothSprite(tableWidth: number, mingMetrics: ReturnType<typeof getMingAltarTableMetrics> | null): void {
+    this.tableclothSprite.anchor.set(0.5, 70 / 166);
+    this.tableclothSprite.x = 0;
+    this.tableclothSprite.y = 0;
+    this.tableclothSprite.width = tableWidth;
+    this.tableclothSprite.height = mingMetrics
+      ? (mingMetrics.surfaceDepth + mingMetrics.frontThickness + mingMetrics.apronHeight) * (166 / 120)
+      : tableWidth * (166 / 560);
   }
 
   /**
@@ -281,7 +355,7 @@ export class AltarTableLayer {
   public setLighting(lighting: LightingSettings): void {
     this.currentLighting = lighting;
     const tint = TableMaterial.getInstance().calculateTint(lighting);
-    this.container.tint = tint;
+    this.container.tint = this.activeTableIsThemeAsset ? 0xffffff : tint;
     this.renderLighting();
   }
 
@@ -382,6 +456,8 @@ export class AltarTableLayer {
    * 渲染明式条案形制实木供案
    */
   public render(options: AltarTableRenderOptions): void {
+    this.lastRenderOptions = options;
+    this.selectTableAsset(options.tableAssetUrl);
     const {
       centerX,
       tableTopY,
@@ -412,20 +488,24 @@ export class AltarTableLayer {
     // ── 明式条案几何规范（u 为经典设计稿换算单位） ──
     const u = tableWidth / 560;
     const halfW = tableWidth * 0.5;
+    const measuredMetrics = this.activeTableIsThemeAsset
+      ? getRenderMatchAltarTableMetrics(tableWidth)
+      : getMingAltarTableMetrics(tableWidth);
+    const mingMetrics = this.mingTableLoaded ? measuredMetrics : null;
 
-    // 1. 上台面板：进深 54u，后沿内缩量按地坪灭点收敛关系推算。
-    //    透视几何：前沿距灭点 eyeDist，台面屏幕进深 depth，
-    //    精确收敛内缩 = halfW * depth / eyeDist；取 0.45 阻尼避免视觉过冲。
-    const depth = 54 * u;
+    // 旧矢量回退桌面的进深为 54u；新素材则使用按源图测得的真实台面进深。
+    // 透视几何仍由回退绘制使用：收敛内缩按 eyeDist 与台面深度计算。
+    const depth = mingMetrics?.surfaceDepth ?? 54 * u;
     const eyeDist = Math.max(90, tableTopY - (horizonY ?? tableTopY - 220));
     const inset = Math.min(halfW * 0.3, ((halfW * depth) / eyeDist) * 0.45);
 
     // 2. 台面正前料厚立面
-    const frontThickness = 22.5 * u;
+    const frontThickness = mingMetrics?.frontThickness ?? 22.5 * u;
 
-    // 3. 落地基准：与布局系统 tableHangingHeight (96/560) 精确一致
+    // 3. 落地基准与新桌图统一；使旧矢量回退也能贴住相同地面位置。
     const baseTopY = frontThickness;
-    const baseBottomY = tableWidth * (96 / 560);
+    // Keep the procedural fallback grounded on the same baseline as the new raster.
+    const baseBottomY = measuredMetrics.footDrop;
 
     // 4. 腿足构架（腿间通透，不做整板封闭）
     const legW = 32 * u;          // 腿足宽度（挺拔修长）
@@ -455,12 +535,36 @@ export class AltarTableLayer {
     this.lightContainer.y = tableTopY;
 
     // 供案本体命中区域：台面 + 正立面 + 腿足构架（供场景内直接拖放调整进深）
-    this.container.hitArea = new Rectangle(
-      -halfW,
-      -depth - 6 * u,
-      tableWidth,
-      depth + baseBottomY + 12 * u
-    );
+    const hitTop = mingMetrics ? -mingMetrics.topExtent : -depth - 6 * u;
+    this.container.hitArea = new Rectangle(-halfW, hitTop, tableWidth, baseBottomY - hitTop + 12 * u);
+
+    this.mingTableSprite.visible = !!mingMetrics;
+    if (mingMetrics) {
+      this.mingTableSprite.anchor.set(0.5, 0);
+      this.mingTableSprite.x = 0;
+      this.mingTableSprite.y = mingMetrics.spriteY;
+      this.mingTableSprite.width = mingMetrics.spriteWidth;
+      this.mingTableSprite.height = mingMetrics.spriteHeight;
+      this.backLegsContainer.visible = false;
+      this.basePanelsContainer.visible = false;
+      this.frontFaceContainer.visible = false;
+      this.topSurfaceContainer.visible = false;
+      this.tableclothMaskGraphics.clear();
+      this.tableclothMaskGraphics
+        .poly([-halfW + inset, -depth, halfW - inset, -depth, halfW, 0, -halfW, 0])
+        .fill({ color: 0xffffff })
+        .rect(-halfW + 8 * u, 0, tableWidth - 16 * u, mingMetrics.frontThickness + mingMetrics.apronHeight)
+        .fill({ color: 0xffffff });
+    } else {
+      this.backLegsContainer.visible = true;
+      this.basePanelsContainer.visible = true;
+      this.frontFaceContainer.visible = true;
+      this.topSurfaceContainer.visible = true;
+      this.tableclothMaskGraphics.clear();
+      this.tableclothMaskGraphics
+        .rect(-halfW, -depth - 6 * u, tableWidth, depth + baseBottomY + 12 * u)
+        .fill({ color: 0xffffff });
+    }
 
     // ──────────────────────────────────────────
     // 1. 渲染上台面板 (Top Surface Slab)
@@ -502,6 +606,33 @@ export class AltarTableLayer {
       trX,
       trY,
     };
+
+    if (mingMetrics) {
+      const apronYForAsset = mingMetrics.frontThickness;
+      const apronXForAsset = mingMetrics.apronX;
+      Object.assign(this.geom, {
+        depth: mingMetrics.surfaceDepth,
+        frontThickness: mingMetrics.frontThickness,
+        baseTopY: apronYForAsset,
+        baseBottomY: mingMetrics.footDrop,
+        leftLegX: mingMetrics.leftLegX,
+        rightLegX: mingMetrics.rightLegX,
+        legW: mingMetrics.legWidth,
+        backLeftLegX: mingMetrics.leftLegX + mingMetrics.legWidth * 0.65,
+        backRightLegX: mingMetrics.rightLegX + mingMetrics.legWidth * 0.3,
+        backLegW: mingMetrics.legWidth * 0.75,
+        backLegTopY: apronYForAsset + mingMetrics.apronHeight,
+        backLegBottomY: mingMetrics.footDrop - 12 * u,
+        apronX: apronXForAsset,
+        apronW: mingMetrics.apronWidth,
+        apronY: apronYForAsset,
+        apronH: mingMetrics.apronHeight,
+        tlX: -halfW + 12 * u,
+        tlY: -mingMetrics.surfaceDepth,
+        trX: halfW - 12 * u,
+        trY: -mingMetrics.surfaceDepth,
+      });
+    }
 
     if (!this.topSurfaceSprite) {
       this.topSurfaceSprite = new TilingSprite({
@@ -784,24 +915,50 @@ export class AltarTableLayer {
       alpha: 0.15,
     });
 
+    if (mingMetrics) {
+      // The raster has longer legs and a different leg spread than the former vector table.
+      // Re-anchor contact shadows to the extracted image's actual foot positions.
+      this.shadowGraphics.clear();
+      const leftFootX = mingMetrics.leftLegX + mingMetrics.legWidth * 0.5;
+      const rightFootX = mingMetrics.rightLegX + mingMetrics.legWidth * 0.5;
+      for (const footX of [leftFootX, rightFootX]) {
+        this.shadowGraphics.ellipse(footX + 3 * u, mingMetrics.footDrop + 1, mingMetrics.legWidth * 0.58, 3.8).fill({
+          color: 0x140803,
+          alpha: 0.43,
+        });
+      }
+      this.shadowGraphics.ellipse(0, mingMetrics.footDrop + 2, halfW * 0.68, 7.5).fill({
+        color: 0x140803,
+        alpha: 0.24,
+      });
+      this.shadowGraphics.ellipse(0, mingMetrics.footDrop + 10, halfW * 0.56, 4).fill({
+        color: 0x140803,
+        alpha: 0.14,
+      });
+    }
+
     // ──────────────────────────────────────────
     // 6. 渲染可选装饰桌布 (仅当开启时呈现)
     // ──────────────────────────────────────────
     if (showTableRunner) {
       this.tableclothContainer.visible = true;
-      const tableclothKey = `${tableclothStyle}_${showPetals}`;
+      const tableclothKey = `${mingMetrics ? 'ming' : 'legacy'}_${tableclothStyle}_${showPetals}`;
       if (this.currentTableclothKey !== tableclothKey) {
         this.currentTableclothKey = tableclothKey;
+        this.tableclothSprite.visible = false;
         const pipeline = TexturePipeline.getInstance();
-        pipeline.getAltarTableTexture(tableclothStyle, true, showPetals).then((tex) => {
-          if (!this.tableclothSprite.destroyed) {
+        const overlay = mingMetrics
+          ? pipeline.getAltarTableclothOverlayTexture(tableclothStyle, showPetals)
+          : pipeline.getAltarTableTexture(tableclothStyle, true, showPetals);
+        overlay.then((tex) => {
+          if (!this.destroyed && !this.tableclothSprite.destroyed && this.currentTableclothKey === tableclothKey) {
             this.tableclothSprite.texture = tex;
-            this.tableclothSprite.anchor.set(0.5, 70 / 166);
-            this.tableclothSprite.width = tableWidth;
-            this.tableclothSprite.height = tableWidth * (166 / 560);
+            this.layoutTableclothSprite(tableWidth, mingMetrics);
             this.tableclothSprite.visible = true;
           }
-        });
+        }).catch((err) => console.warn('Failed to load altar tablecloth:', err));
+      } else if (this.tableclothSprite.texture.width > 1) {
+        this.layoutTableclothSprite(tableWidth, mingMetrics);
       }
     } else {
       this.tableclothContainer.visible = false;
@@ -819,6 +976,7 @@ export class AltarTableLayer {
   }
 
   public destroy(): void {
+    this.destroyed = true;
     this.unsubscribeMaterial?.();
     this.topSurfaceMask.destroy();
     this.lightContainer.destroy({ children: true });

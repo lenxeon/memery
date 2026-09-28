@@ -1,0 +1,7 @@
+interface:
+  display_name: "Memery 场景主题系统"
+  short_description: "定义可组合墙体、地面与左右前景主题资产"
+  default_prompt: "Use $memery-scene-theme when designing or implementing a Memery scene theme with named replaceable PNG components, layered wall depth, split mats and cushions, and independently composable left/right foreground instances."
+
+policy:
+  allow_implicit_invocation: true

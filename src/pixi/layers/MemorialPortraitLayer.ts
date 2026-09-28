@@ -441,6 +441,11 @@ export class MemorialPortraitLayer {
     this.applyLighting();
   }
 
+  /** 主题附件只读取公开锚点，不接触遗像层内部节点。 */
+  public getThemeAnchor(): { x: number; y: number; size: number } {
+    return { x: this.centerX, y: this.centerY, size: this.ringSize };
+  }
+
   /** 逐帧：金环缓转（120s 一圈）、光晕呼吸、悬停与按压的缩放阻尼 */
   public update(delta: number): void {
     this.time += delta / 60;

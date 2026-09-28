@@ -17,7 +17,6 @@ import {
   AuditCategory,
 } from '../types';
 import type { VaseStyle } from '../pixi';
-import { resolveSystemTimeOfDay } from '../utils/timeOfDay';
 import {
   AUDIT_FLOWER_CATALOG,
   AUDIT_VASE_CATALOG,
@@ -377,8 +376,9 @@ export const INITIAL_ITEMS: Record<SceneItemId, SceneItem> = buildInitialItems()
 
 export const INITIAL_LIGHTING: LightingSettings = {
   masterOn: true,
-  timeOfDay: resolveSystemTimeOfDay(),
-  timeMode: 'system',
+  // 默认固定在白昼上午（不跟随系统时钟）：开局天色恒定，时辰仅由用户手动切换
+  timeOfDay: 'day',
+  timeMode: 'fixed',
   sunlightIntensity: 0.92,
   godRaysEnabled: true,
   godRaysIntensity: 0.88,

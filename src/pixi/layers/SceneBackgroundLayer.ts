@@ -44,7 +44,8 @@ export class SceneBackgroundLayer {
     width: number,
     height: number,
     lighting: LightingSettings,
-    wallStyle: WallBackgroundStyle = 'classic_dawn'
+    wallStyle: WallBackgroundStyle = 'classic_dawn',
+    wallpaperOverride?: string
   ): void {
     const isSunset = lighting.timeOfDay === 'sunset';
     const isNight = lighting.timeOfDay === 'night';
@@ -61,7 +62,8 @@ export class SceneBackgroundLayer {
 
     // 2. 壁面由 BaseWall 统一给出：贴哪张背景图（装饰框已在图内）
     this.viewport = { w: width, h: height };
-    this.renderBackdrop(lighting, getWallSpec(wallStyle));
+    const deviceProfile = width < 700 ? 'phone' : 'tablet';
+    this.renderBackdrop(lighting, getWallSpec(wallStyle, wallpaperOverride, deviceProfile));
   }
 
   /**
@@ -104,8 +106,8 @@ export class SceneBackgroundLayer {
   /**
    * 背景大图布局：中轴线对齐 + 一边优先贴合。
    *
-   * 优先保证「宽」贴满（横向铺满、中轴对称，绝不出现左右留白的竖带）；
-   * 竖向则要求至少盖到踢脚线以下 WALL_BACKDROP_SKIRT_OVERLAP —— 多出的部分
+   * 按墙区等比 cover，优先避免左右留白；超出部分从中心裁切。
+   * 竖向至少盖到踢脚线以下 WALL_BACKDROP_SKIRT_OVERLAP —— 多出的部分
    * 要么溢出屏幕顶部裁掉、要么压在踢脚线/地坪这些更上层的图之下，
    * 因此任何视口下都不会留白、不会出现缝，也不会拉伸变形。
    */
@@ -120,7 +122,7 @@ export class SceneBackgroundLayer {
     const zoneBottom = floorTop + WALL_BACKDROP_SKIRT_OVERLAP;
     const zoneH = Math.max(MIN_WALL_H, zoneBottom);
 
-    // 宽优先，竖向兜底：取两者较大者 ⇒ 两边都覆盖，宁可裁不露白
+    // 墙纸必须铺满墙区。手机与 iPad 使用各自的墙纸构图，其他比例按安全区等比裁切。
     const scale = Math.max(w / tex.width, zoneH / tex.height) * WALL_BACKDROP_ZOOM;
 
     sprite.anchor.set(0.5, 1); // 中轴 + 底缘为锚

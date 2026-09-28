@@ -8,16 +8,16 @@
  * 单应映射，因此只要把世界矩形的四角用同一套投影公式算出来，纹理的近大远小收敛就是数学精确的；
  * 中间网格顶点由单应变换采样，纵向细分足够密即可消除分片线性误差。
  *
- * 纹理平铺走 GPU：uv 超出 [0,1] + 纹理 repeat 寻址（等价 CSS background-repeat），
- * 并开启 mipmap 保证远处不摩尔纹、近处不糊。
+ * 旧材质以 GPU repeat 寻址平铺；完整地面图使用单张 UV 0~1 的平面材质，
+ * 两种方式都通过同一组四边投影，确保视角保持一致。
  */
 import { ColorMatrixFilter, Container, Graphics, PerspectiveMesh, Sprite, Texture } from 'pixi.js';
-import { FloorStyle, LightingSettings, TimeOfDay } from '../../types';
+import { FloorStyle, LightingSettings, SceneThemeFloorMaterial, TimeOfDay } from '../../types';
 import { TexturePipeline } from '../assets/TexturePipeline';
 
 /** ---- CSS 3D 投影参数（沿用旧版 DOM 实现的取值，保证观感一致） ---- */
-const FLOOR_H_BASE = 210; // h-[210px]
-const FLOOR_H_SM = 240; // sm:h-[240px]
+/** 手机竖屏的地面只占画面底部约 28%，让墙面和供桌成为主视觉。 */
+const FLOOR_HEIGHT_RATIO = 0.28;
 const TOP_INSET = 16; // top-4
 const PERSPECTIVE_D = 420; // perspective: 420px
 const PERSPECTIVE_ORIGIN_Y = -0.15; // perspective-origin: 50% -15%
@@ -28,7 +28,36 @@ const ELEMENT_H_RATIO = 2.6; // h-[260%]
 
 /** 踢脚线（地坪顶缘）的屏幕 y —— 所有层的纵向对齐基准（墙底、案底均以此为锚） */
 export const getFloorTopY = (width: number, height: number): number =>
-  height - (width >= 640 ? FLOOR_H_SM : FLOOR_H_BASE);
+  height * (1 - FLOOR_HEIGHT_RATIO);
+
+export interface FloorProjection {
+  vMax: number;
+  project: (u: number, v: number) => { x: number; y: number };
+  screenYToV: (screenY: number) => number;
+}
+
+/** Shared ground-plane homography used by the floor texture and floor props. */
+export const getFloorProjection = (width: number, height: number): FloorProjection => {
+  const floorH = Math.max(1, height - getFloorTopY(width, height));
+  const containerH = Math.max(40, floorH - TOP_INSET);
+  const floorTop = getFloorTopY(width, height);
+  const aRate = SCALE_Y * Math.cos(ROT_X);
+  const bRate = SCALE_Y * Math.sin(ROT_X);
+  const originY = PERSPECTIVE_ORIGIN_Y * containerH;
+  const vMax = (containerH * PERSPECTIVE_D) / (aRate * PERSPECTIVE_D + (containerH - originY) * bRate);
+  const project = (u: number, v: number): { x: number; y: number } => {
+    const s = PERSPECTIVE_D / (PERSPECTIVE_D - bRate * v);
+    return {
+      x: width / 2 + (u - width / 2) * SCALE_X * s,
+      y: floorTop + TOP_INSET + originY + (aRate * v - originY) * s,
+    };
+  };
+  const screenYToV = (screenY: number): number => {
+    const y = screenY - (floorTop + TOP_INSET);
+    return (y * PERSPECTIVE_D) / (aRate * PERSPECTIVE_D + (y - originY) * bRate);
+  };
+  return { vMax, project, screenYToV };
+};
 
 /** 网格细分：横向线性（2 即精确），纵向承担全部透视压缩，需足够密 */
 const GRID_X = 4;
@@ -68,7 +97,7 @@ interface Ambiance {
   saturation: number;
   hue: number;
   tint: { color: number; alpha: number };
-  puddle: { color: number; alpha: number };
+  reflection: { color: number; alpha: number };
 }
 
 /** 与旧版 CSS filter / 叠色一一对应 */
@@ -78,7 +107,7 @@ const AMBIANCE_OFF: Ambiance = {
   saturation: 0.6,
   hue: 0,
   tint: { color: 0x050403, alpha: 0.75 },
-  puddle: { color: 0xffc878, alpha: 0.06 },
+  reflection: { color: 0xffc878, alpha: 0 },
 };
 
 const AMBIANCE_BY_TIME: Record<TimeOfDay, Ambiance> = {
@@ -88,7 +117,7 @@ const AMBIANCE_BY_TIME: Record<TimeOfDay, Ambiance> = {
     saturation: 1.02,
     hue: 0,
     tint: { color: 0xfff8e6, alpha: 0.05 },
-    puddle: { color: 0xfff0eb, alpha: 0.65 },
+    reflection: { color: 0xffedc2, alpha: 0.12 },
   },
   sunset: {
     brightness: 0.94,
@@ -96,7 +125,7 @@ const AMBIANCE_BY_TIME: Record<TimeOfDay, Ambiance> = {
     saturation: 1.38,
     hue: 0,
     tint: { color: 0xd8761f, alpha: 0.26 },
-    puddle: { color: 0xffc66a, alpha: 0.62 },
+    reflection: { color: 0xffd18a, alpha: 0.16 },
   },
   night: {
     brightness: 0.55,
@@ -104,7 +133,7 @@ const AMBIANCE_BY_TIME: Record<TimeOfDay, Ambiance> = {
     saturation: 0.85,
     hue: 0,
     tint: { color: 0x191009, alpha: 0.32 },
-    puddle: { color: 0xffdca8, alpha: 0.2 },
+    reflection: { color: 0xffdca8, alpha: 0.06 },
   },
 };
 
@@ -164,7 +193,8 @@ export class FloorLayer {
 
   private tintGraphics: Graphics = new Graphics();
   private depthGradient: Sprite = new Sprite(Texture.WHITE);
-  private puddleSprite: Sprite | null = null;
+  private reflectionSprites: Sprite[] = [];
+  private reflectionTexture: Texture | null = null;
   private skirtingGraphics: Graphics = new Graphics();
   private contactShadow: Sprite | null = null;
 
@@ -182,33 +212,17 @@ export class FloorLayer {
     floorStyle: FloorStyle,
     woodTexture: Texture | null,
     marbleTexture: Texture | null,
-    lighting: LightingSettings
+    lighting: LightingSettings,
+    customFloor?: { spec: SceneThemeFloorMaterial; texture: Texture }
   ): void {
     // ---- 1. 几何：复刻 CSS 3D 投影 ----
-    const floorH = width >= 640 ? FLOOR_H_SM : FLOOR_H_BASE;
+    const floorH = Math.max(1, height - getFloorTopY(width, height));
     const containerH = Math.max(40, floorH - TOP_INSET);
     const floorTop = getFloorTopY(width, height);
+    const projectedThemeFloor = customFloor?.spec.mode === 'projected-plane';
     // rotateX 后的纵向压缩率与入深速率（元素空间 v → 3D）
-    const aRate = SCALE_Y * Math.cos(ROT_X);
-    const bRate = SCALE_Y * Math.sin(ROT_X);
-    const originY = PERSPECTIVE_ORIGIN_Y * containerH;
-    // 使投影落点恰为容器底缘的元素空间纵向坐标（由 Y(v)=C 解出）
-    const vMax = (containerH * PERSPECTIVE_D) / (aRate * PERSPECTIVE_D + (containerH - originY) * bRate);
-
-    // 元素空间 (u, v) → 屏幕坐标
-    const project = (u: number, v: number): { x: number; y: number } => {
-      const s = PERSPECTIVE_D / (PERSPECTIVE_D - bRate * v);
-      return {
-        x: width / 2 + (u - width / 2) * SCALE_X * s,
-        y: floorTop + TOP_INSET + originY + (aRate * v - originY) * s,
-      };
-    };
-    // 屏幕纵坐标 → 元素空间纵向坐标（Y 的反函数，用于把 CSS 渐变还原到屏幕空间）
-    const vAtScreenY = (screenY: number): number => {
-      const y = screenY - (floorTop + TOP_INSET);
-      return (y * PERSPECTIVE_D) / (aRate * PERSPECTIVE_D + (y - originY) * bRate);
-    };
-
+    const projection = getFloorProjection(width, height);
+    const { vMax, project } = projection;
     const tl = project(0, 0);
     const tr = project(width, 0);
     const br = project(width, vMax);
@@ -216,16 +230,24 @@ export class FloorLayer {
 
     // ---- 2. 底色（贴图未就绪时兜底） ----
     this.baseGraphics.clear();
-    this.baseGraphics.rect(0, floorTop, width, floorH).fill({ color: BASE_COLOR[floorStyle] ?? 0x8c5a32 });
+    this.baseGraphics.rect(0, floorTop, width, floorH).fill({
+      color: customFloor?.spec.baseColor ?? BASE_COLOR[floorStyle] ?? 0x8c5a32,
+    });
 
     // ---- 3. 透视贴图 ----
     const pipeline = TexturePipeline.getInstance();
-    const activeTex =
-      pipeline.floorTextures[floorStyle] || (floorStyle === 'marble_tile' ? marbleTexture : woodTexture);
+    const activeTex = customFloor?.texture
+      || pipeline.floorTextures[floorStyle]
+      || (floorStyle === 'marble_tile' ? marbleTexture : woodTexture);
 
-    const key = `${Math.round(width)}x${Math.round(height)}|${floorStyle}`;
+    const key = `${Math.round(width)}x${Math.round(height)}|${customFloor?.spec.mode ?? 'repeat-tile'}|${customFloor?.spec.url ?? floorStyle}`;
     if (activeTex && activeTex.source && activeTex.source.width > 1) {
-      this.ensureTiling(activeTex);
+      const projectedPlane = projectedThemeFloor;
+      if (projectedPlane) {
+        if (activeTex.source.addressMode !== 'clamp-to-edge') activeTex.source.addressMode = 'clamp-to-edge';
+      } else {
+        this.ensureTiling(activeTex);
+      }
       if (this.meshKey !== key || !this.mesh) {
         this.rebuildMesh(activeTex, key);
       }
@@ -234,12 +256,12 @@ export class FloorLayer {
         const geometry = mesh.geometry as unknown as PerspectiveGeometryLike;
         geometry.setCorners(tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y);
 
-        const tile = TILE_SIZE[floorStyle] ?? { w: 240, h: 195 };
-        const repeatX = width / tile.w;
-        const repeatY = vMax / tile.h;
+        const tile = customFloor?.spec.tileSize ?? TILE_SIZE[floorStyle] ?? { w: 240, h: 195 };
+        const repeatX = projectedPlane ? 1 : width / tile.w;
+        const repeatY = projectedPlane ? 1 : vMax / tile.h;
         // CSS background-position: center top —— 水平居中相位，纵向自顶端起铺
-        const offsetPx = ((((width - tile.w) / 2) % tile.w) + tile.w) % tile.w;
-        const phaseX = -offsetPx / tile.w;
+        const offsetPx = projectedPlane ? 0 : ((((width - tile.w) / 2) % tile.w) + tile.w) % tile.w;
+        const phaseX = projectedPlane ? 0 : -offsetPx / tile.w;
         const uvBuffer = geometry.buffers[1];
         const base = this.baseUvs;
         if (base && uvBuffer) {
@@ -250,7 +272,7 @@ export class FloorLayer {
           uvBuffer.update();
         }
         mesh.visible = true;
-        this.applyAmbianceFilter(lighting);
+        this.applyAmbianceFilter(lighting, projectedThemeFloor);
       }
     } else if (this.mesh) {
       this.mesh.visible = false;
@@ -263,20 +285,21 @@ export class FloorLayer {
     for (let i = 0; i <= samples; i++) {
       const t = i / samples; // 屏幕纵向 0（远）→ 1（近）
       const screenY = floorTop + TOP_INSET + containerH * t;
-      const v = vAtScreenY(screenY);
+      const v = projection.screenYToV(screenY);
       const p = Math.min(1, Math.max(0, v / elementH));
-      // CSS: linear-gradient(to bottom, rgba(0,0,0,.35) 0%, rgba(0,0,0,.08) 35%, transparent 65%)
+      // Theme floor art is already graded as a complete material; keep the scene depth cue gentle.
+      const depthStrength = projectedThemeFloor ? 0.62 : 1;
       let alpha = 0;
-      if (p <= 0.35) alpha = 0.35 + ((0.08 - 0.35) * p) / 0.35;
-      else if (p <= 0.65) alpha = 0.08 * (1 - (p - 0.35) / 0.3);
+      if (p <= 0.35) alpha = (0.35 + ((0.08 - 0.35) * p) / 0.35) * depthStrength;
+      else if (p <= 0.65) alpha = 0.08 * (1 - (p - 0.35) / 0.3) * depthStrength;
       // CSS: radial-gradient(ellipse at 50% 100%, transparent 55%, rgba(0,0,0,.22) 100%)
       const radialP = 1 - p; // 元素底部为椭圆中心，可见区位于元素上部
-      const radialAlpha = radialP <= 0.55 ? 0 : (0.22 * (radialP - 0.55)) / 0.45;
+      const radialAlpha = radialP <= 0.55 ? 0 : (0.22 * depthStrength * (radialP - 0.55)) / 0.45;
       const total = 1 - (1 - alpha) * (1 - radialAlpha);
       stops.push({ offset: t, color: `rgba(0, 0, 0, ${total.toFixed(3)})` });
     }
     // 渐变只随几何变化，缓存复用（避免每次重绘都新建纹理）
-    const gradientKey = `${Math.round(width)}x${Math.round(height)}`;
+    const gradientKey = `${Math.round(width)}x${Math.round(height)}|theme:${projectedThemeFloor}`;
     if (this.gradientKey !== gradientKey) {
       const previous = this.depthGradient.texture;
       this.depthGradient.texture = createVerticalGradientTexture(stops);
@@ -295,11 +318,16 @@ export class FloorLayer {
     this.tintGraphics.clear();
     this.tintGraphics
       .rect(0, floorTop + TOP_INSET, width, containerH)
-      .fill({ color: ambiance.tint.color, alpha: ambiance.tint.alpha });
+      .fill({
+        color: ambiance.tint.color,
+        alpha: projectedThemeFloor && lighting.masterOn && lighting.timeOfDay === 'day'
+          ? 0
+          : ambiance.tint.alpha * (projectedThemeFloor ? 0.65 : 1),
+      });
 
     // ---- 6. 双层实木踢脚线 ----
     this.skirtingGraphics.clear();
-    const board = BASEBOARD[floorStyle] ?? BASEBOARD.hinoki_wood;
+    const board = customFloor?.spec.baseboard ?? BASEBOARD[floorStyle] ?? BASEBOARD.hinoki_wood;
     this.skirtingGraphics.rect(0, floorTop, width, 2).fill({ color: board.highlight, alpha: 0.85 });
     this.skirtingGraphics.rect(0, floorTop + 2, width, 10).fill({ color: board.color });
     this.skirtingGraphics.rect(0, floorTop + 2, width, 1).fill({ color: 0x000000, alpha: 0.35 });
@@ -311,31 +339,36 @@ export class FloorLayer {
       .rect(0, floorTop, width, 18)
       .fill({ color: ambiance.tint.color, alpha: ambiance.tint.alpha });
 
-    // ---- 7. 天光光斑与案体接地投影 ----
+    // ---- 7. 运行时地面反射带与案体接地投影 ----
     const lightFactor = lighting.masterOn ? lighting.sunlightIntensity : 0.08;
     if (lighting.masterOn && lighting.godRaysEnabled) {
-      if (!this.puddleSprite) {
-        this.puddleSprite = new Sprite(
-          createRadialTexture([
-            { offset: 0, alpha: 1 },
-            { offset: 0.7, alpha: 0 },
-          ])
-        );
-        this.puddleSprite.anchor.set(0.5);
-        this.container.addChildAt(this.puddleSprite, this.container.getChildIndex(this.tintGraphics) + 1);
+      if (!this.reflectionTexture) {
+        this.reflectionTexture = createRadialTexture([
+          { offset: 0, alpha: 0.9 },
+          { offset: 0.24, alpha: 0.48 },
+          { offset: 0.7, alpha: 0 },
+        ]);
+        this.reflectionSprites = [0.34, 0.66].map(() => {
+          const sprite = new Sprite(this.reflectionTexture!);
+          sprite.anchor.set(0.5);
+          this.container.addChildAt(sprite, this.container.getChildIndex(this.tintGraphics) + 1);
+          return sprite;
+        });
       }
-      const pw = Math.min(width * 0.88, 740);
-      const ph = 140;
-      this.puddleSprite.visible = true;
-      this.puddleSprite.texture.source.scaleMode = 'linear';
-      this.puddleSprite.tint = ambiance.puddle.color;
-      this.puddleSprite.alpha = lightFactor * 0.85 * ambiance.puddle.alpha;
-      this.puddleSprite.x = width / 2 + lighting.sunAngle * 3;
-      this.puddleSprite.y = floorTop + floorH / 2;
-      this.puddleSprite.width = pw;
-      this.puddleSprite.height = ph;
-    } else if (this.puddleSprite) {
-      this.puddleSprite.visible = false;
+      const bandWidth = Math.max(22, width * 0.09);
+      const bandHeight = containerH;
+      this.reflectionSprites.forEach((sprite, index) => {
+        sprite.visible = true;
+        sprite.texture.source.scaleMode = 'linear';
+        sprite.tint = ambiance.reflection.color;
+        sprite.alpha = lightFactor * 0.85 * ambiance.reflection.alpha;
+        sprite.x = width * (index === 0 ? 0.34 : 0.66) + lighting.sunAngle * 0.7;
+        sprite.y = floorTop + TOP_INSET + containerH / 2;
+        sprite.width = bandWidth;
+        sprite.height = bandHeight;
+      });
+    } else {
+      for (const sprite of this.reflectionSprites) sprite.visible = false;
     }
 
     if (!this.contactShadow) {
@@ -398,13 +431,17 @@ export class FloorLayer {
   }
 
   /** 还原 CSS filter: brightness / contrast / saturate / hue-rotate */
-  private applyAmbianceFilter(lighting: LightingSettings): void {
+  private applyAmbianceFilter(lighting: LightingSettings, projectedThemeFloor = false): void {
     const ambiance = lighting.masterOn
       ? AMBIANCE_BY_TIME[lighting.timeOfDay as TimeOfDay] ?? AMBIANCE_BY_TIME.day
       : AMBIANCE_OFF;
     const filter = this.colorFilter;
     filter.reset();
-    filter.brightness(ambiance.brightness, true);
+    // A render-match theme floor already carries its intended material color.
+    // Keep the daytime base pixels untouched; sunset/night still receive the
+    // shared environment grade below.
+    if (projectedThemeFloor && lighting.masterOn && lighting.timeOfDay === 'day') return;
+    filter.brightness(ambiance.brightness * (projectedThemeFloor ? 1.08 : 1), true);
     filter.contrast(ambiance.contrast - 1, true);
     filter.saturate(ambiance.saturation - 1, true);
     if (ambiance.hue !== 0) filter.hue(ambiance.hue, true);
