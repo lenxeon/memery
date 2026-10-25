@@ -3,12 +3,13 @@
  * @description 场景主题的独立部件装配器。墙纸由背景层负责，本层按真实深度装配
  * 墙纸装饰、遗像关系、墙面造景、结构附件、地面陈设与左右镜头前景。
  */
-import { Assets, BlurFilter, Container, Graphics, Rectangle, Sprite, Texture } from 'pixi.js';
+import { Assets, Container, Graphics, Rectangle, Sprite, Texture } from 'pixi.js';
 import { getFloorTopY } from './FloorLayer';
 import { TexturePipeline } from '../assets/TexturePipeline';
 import type {
   SceneAssemblySelection,
   SceneForegroundInstance,
+  SceneForegroundDefinition,
   SceneThemeFloorMaterial,
   SceneThemeGroundAsset,
   SceneThemeLightRig,
@@ -24,7 +25,10 @@ import { getSceneCompositionWidth } from '../scene/SceneViewportLayout';
 export interface MemorialThemeAnchor { x: number; y: number; size: number; }
 
 type AssetSprite<T> = { spec: T; sprite: Sprite };
-type ForegroundSprite = AssetSprite<SceneThemeViewportAsset> & { instance: SceneForegroundInstance };
+type ForegroundSprite = AssetSprite<SceneThemeViewportAsset> & {
+  instance: SceneForegroundInstance;
+  definition: SceneForegroundDefinition;
+};
 type GroundSpriteAsset = AssetSprite<SceneThemeGroundAsset>;
 type WallPartAnchor = NonNullable<SceneThemeViewportAsset['wallParts']>[number]['anchor'];
 type WallAssemblySprite = AssetSprite<SceneThemeViewportAsset> & {
@@ -51,7 +55,8 @@ export class SceneThemeLayer {
   public foregroundLeft: Container = new Container();
   public foregroundRight: Container = new Container();
 
-  private mountKey = '';
+  private roomKey = '';
+  private foregroundKey = '';
   private loadToken = 0;
   private viewportAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
   private wallAssemblyAssets: WallAssemblySprite[] = [];
@@ -106,8 +111,25 @@ export class SceneThemeLayer {
     const definition = getSceneTheme(themeId);
     const effectiveSelection = selection ?? definition.defaultAssembly ?? null;
     const deviceProfile = this.getDeviceProfile();
-    const nextKey = JSON.stringify({ themeId, selection: effectiveSelection, deviceProfile });
-    if (this.mountKey !== nextKey) this.mountTheme(themeId, effectiveSelection, nextKey);
+    const nextRoomKey = JSON.stringify({
+      themeId,
+      deviceProfile,
+      wallpaperDecorationId: effectiveSelection?.wallpaperDecorationId,
+      wallSceneryId: effectiveSelection?.wallSceneryId,
+      wallDecorationId: effectiveSelection?.wallDecorationId,
+      groundMatId: effectiveSelection?.groundMatId,
+      cushionId: effectiveSelection?.cushionId,
+    });
+    const nextFgKey = JSON.stringify(effectiveSelection?.foreground);
+
+    if (this.roomKey !== nextRoomKey) {
+      this.roomKey = nextRoomKey;
+      this.foregroundKey = nextFgKey;
+      this.mountTheme(themeId, effectiveSelection);
+    } else if (this.foregroundKey !== nextFgKey) {
+      this.foregroundKey = nextFgKey;
+      this.mountForegroundOnly(effectiveSelection, definition.foregroundSetIds);
+    }
     this.layout();
   }
 
@@ -116,8 +138,7 @@ export class SceneThemeLayer {
     return { spec: this.floorMaterial, texture: this.floorTexture };
   }
 
-  private mountTheme(themeId: SceneThemeId, selection: SceneAssemblySelection | null, key: string): void {
-    this.mountKey = key;
+  private mountTheme(themeId: SceneThemeId, selection: SceneAssemblySelection | null): void {
     const token = ++this.loadToken;
     const definition = getSceneTheme(themeId);
     this.floorMaterial = definition.floorMaterial ?? null;
@@ -133,7 +154,7 @@ export class SceneThemeLayer {
     this.groundAssets = [];
     this.foregroundAssets = [];
 
-    if (selection) this.mountSelection(selection, token);
+    if (selection) this.mountSelection(selection, token, definition.foregroundSetIds);
     else this.mountLegacyLayers(definition.layers, token);
 
     if (this.floorMaterial) {
@@ -147,7 +168,7 @@ export class SceneThemeLayer {
     }
   }
 
-  private mountSelection(selection: SceneAssemblySelection, token: number): void {
+  private mountSelection(selection: SceneAssemblySelection, token: number, foregroundSetIds?: string[]): void {
     const wallpaperDecoration = getSceneComponentOption('wallpaperDecoration', selection.wallpaperDecorationId);
     const wallScenery = getSceneComponentOption('wallScenery', selection.wallSceneryId);
     const wallDecoration = getSceneComponentOption('wallDecoration', selection.wallDecorationId);
@@ -173,9 +194,41 @@ export class SceneThemeLayer {
     for (const instance of instances) {
       const definition = getSceneForeground(instance.foregroundId);
       if (!definition || definition.side !== instance.side) continue;
+      if (foregroundSetIds && !foregroundSetIds.includes(definition.setId)) continue;
       const container = instance.side === 'left' ? this.foregroundLeft : this.foregroundRight;
       const mounted = this.createAsset(container, this.resolveViewportAsset(definition.asset), token);
-      this.foregroundAssets.push({ ...mounted, instance });
+      mounted.sprite.eventMode = 'static';
+      mounted.sprite.cursor = 'pointer';
+      mounted.sprite.on('pointertap', (event) => {
+        event.stopPropagation();
+        window.dispatchEvent(new CustomEvent('memery:foreground-tap', { detail: { side: instance.side } }));
+      });
+      this.foregroundAssets.push({ ...mounted, instance, definition });
+    }
+  }
+
+  private mountForegroundOnly(selection: SceneAssemblySelection | null, foregroundSetIds?: string[]): void {
+    const token = ++this.loadToken;
+    this.clearContainer(this.foregroundLeft);
+    this.clearContainer(this.foregroundRight);
+    this.foregroundAssets = [];
+    if (!selection) return;
+
+    const instances = [...selection.foreground.left, ...selection.foreground.right]
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    for (const instance of instances) {
+      const definition = getSceneForeground(instance.foregroundId);
+      if (!definition || definition.side !== instance.side) continue;
+      if (foregroundSetIds && !foregroundSetIds.includes(definition.setId)) continue;
+      const container = instance.side === 'left' ? this.foregroundLeft : this.foregroundRight;
+      const mounted = this.createAsset(container, this.resolveViewportAsset(definition.asset), token);
+      mounted.sprite.eventMode = 'static';
+      mounted.sprite.cursor = 'pointer';
+      mounted.sprite.on('pointertap', (event) => {
+        event.stopPropagation();
+        window.dispatchEvent(new CustomEvent('memery:foreground-tap', { detail: { side: instance.side } }));
+      });
+      this.foregroundAssets.push({ ...mounted, instance, definition });
     }
   }
 
@@ -201,13 +254,10 @@ export class SceneThemeLayer {
     return url ? { ...spec, url } : spec;
   }
 
-  private createAsset<T extends { url: string; alpha?: number; blur?: number }>(container: Container, spec: T, token: number): AssetSprite<T> {
+  private createAsset<T extends { url: string; alpha?: number }>(container: Container, spec: T, token: number): AssetSprite<T> {
     const sprite = new Sprite(Texture.EMPTY);
     sprite.visible = false;
     sprite.alpha = spec.alpha ?? 1;
-    if (spec.blur && spec.blur > 0) {
-      sprite.filters = [new BlurFilter({ strength: spec.blur, quality: 2 })];
-    }
     container.addChild(sprite);
     Assets.load(spec.url)
       .then((texture) => {
@@ -310,7 +360,7 @@ export class SceneThemeLayer {
       }
     } else {
       this.wallSceneryMask.clear().rect(0, 0, width, wallBottom).fill({ color: 0xffffff });
-      this.wallAssembly.position.set(0, 0);
+      this.wallAssembly.position.set(width * 0.5, 0);
       this.wallAssembly.scale.set(1);
     }
     const compositionWidth = getSceneCompositionWidth(width, height);
@@ -348,13 +398,21 @@ export class SceneThemeLayer {
       sprite.alpha = spec.alpha ?? 1;
     }
 
-    for (const { spec, sprite, instance } of this.foregroundAssets) {
+    for (const { spec, sprite, instance, definition } of this.foregroundAssets) {
       if (!sprite.texture.width || !sprite.texture.height) continue;
-      const targetWidth = compositionWidth * (spec.widthRatio ?? 0.56) * 0.78 * (instance.scale ?? 1);
-      const scale = targetWidth / sprite.texture.width;
+      const minHeight = Math.max(0, definition.minHeightRatio);
+      const maxHeight = Math.max(minHeight, definition.maxHeightRatio);
+      const requestedHeight = definition.defaultHeightRatio * (instance.scale ?? 1);
+      const visibleHeightRatio = Math.min(maxHeight, Math.max(minHeight, requestedHeight));
+      const bottomOverflowRatio = Math.min(0.5, Math.max(0, definition.bottomOverflowRatio ?? 0));
+      const spriteHeightRatio = visibleHeightRatio / (1 - bottomOverflowRatio);
+      const scale = (height * spriteHeightRatio) / sprite.texture.height;
       const isLeft = instance.side === 'left';
       sprite.anchor.set(isLeft ? 0 : 1, 1);
-      sprite.position.set((isLeft ? 0 : width) + width * (instance.offsetX ?? 0), height + height * (instance.offsetY ?? 0));
+      const offsetX = Math.min(0.36, Math.max(-0.36, instance.offsetX ?? 0));
+      const offsetY = Math.min(0.04, Math.max(-0.04, instance.offsetY ?? 0));
+      const bottomOverflow = height * spriteHeightRatio * bottomOverflowRatio;
+      sprite.position.set((isLeft ? 0 : width) + width * offsetX, height + height * offsetY + bottomOverflow);
       sprite.scale.set(scale);
       sprite.alpha = (spec.alpha ?? 1) * (instance.alpha ?? 1);
     }
@@ -374,11 +432,11 @@ export class SceneThemeLayer {
     halo.position.set(centerX, centerY);
     halo.scale.set((width * 0.48) / halo.texture.width, (height * 0.42) / halo.texture.height);
     halo.tint = this.lightRig?.keyColor ?? 0xffd58a;
-    halo.alpha = 0.34 * lampEnergy;
+    halo.alpha = 0.22 * lampEnergy;
     paperSpill.position.set(centerX, centerY);
     paperSpill.scale.set((width * 0.24) / paperSpill.texture.width, (height * 0.30) / paperSpill.texture.height);
-    paperSpill.tint = 0xffe8bd;
-    paperSpill.alpha = 0.32 * lampEnergy;
+    paperSpill.tint = 0xffdfaa;
+    paperSpill.alpha = 0.18 * lampEnergy;
     halo.visible = lampEnergy > 0;
     paperSpill.visible = lampEnergy > 0;
   }

@@ -23,7 +23,9 @@ export const SCENE_THEME_REGISTRY: Record<SceneThemeId, SceneThemeDefinition> = 
       },
       portrait: { scale: 1.02, dy: 6, textDy: 2, textGap: 2 },
     },
-    defaultAssembly: createDefaultSceneAssembly(),
+    foregroundSetIds: ['plum_blossom', 'camellia', 'osmanthus', 'magnolia', 'peach_blossom', 'wintersweet'],
+    defaultForegroundSetId: 'plum_blossom',
+    defaultAssembly: createDefaultSceneAssembly('plum_blossom'),
     floorMaterial: {
       url: '/themes/classic_dawn/floor/polished-chestnut-plane-render-match-v2.png',
       mode: 'projected-plane',
@@ -98,7 +100,9 @@ export const SCENE_THEME_REGISTRY: Record<SceneThemeId, SceneThemeDefinition> = 
       wallpaper: { url: '/themes/ancestral_warmth/wallpapers/ink-warm-silk.png', fit: 'cover' },
       portrait: { scale: 1.04, dy: 8, textDy: 4, textGap: 2 },
     },
-    defaultAssembly: createDefaultSceneAssembly(),
+    foregroundSetIds: ['warm_foliage'],
+    defaultForegroundSetId: 'warm_foliage',
+    defaultAssembly: createDefaultSceneAssembly('warm_foliage'),
     floorMaterial: {
       url: '/themes/ancestral_warmth/floor-wood.png',
       tileSize: { w: 310, h: 310 },

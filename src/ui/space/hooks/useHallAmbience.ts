@@ -22,6 +22,7 @@ import {
 } from '../../../types';
 import {
   FLOOR_STYLE_OPTIONS,
+  SCENE_FOREGROUND_OPTIONS,
   SCENE_THEME_OPTIONS,
   createDefaultSceneAssembly,
   getSceneTheme,
@@ -84,7 +85,7 @@ export const useHallAmbience = ({
   const [showPetals, setShowPetals] = useState(false);
   const [tableclothStyle, setTableclothStyle] = useState<TableclothStyle>(DEFAULT_THEME.preset.tablecloth);
 
-  // 空间主题（默认主题 01：晴岚映曜）
+  // 默认进入列表第一个「晴岚映曜」主题。
   const [themeId, setThemeId] = useState<SceneThemeId>('classic_dawn');
   const [sceneAssembly, setSceneAssembly] = useState<SceneAssemblySelection | null>(() =>
     DEFAULT_THEME.defaultAssembly ? cloneAssembly(DEFAULT_THEME.defaultAssembly) : null
@@ -166,31 +167,44 @@ export const useHallAmbience = ({
     sound.playWoodPlacement();
   };
 
-  const addForeground = (side: SceneForegroundSide, foregroundId: string) => {
+  const selectForeground = (side: SceneForegroundSide, foregroundId: string) => {
     setSceneAssembly((current) => {
-      const next = current ? cloneAssembly(current) : createDefaultSceneAssembly();
-      const list = next.foreground[side];
-      list.push({
-        instanceId: `${side}-${foregroundId}-${Date.now()}-${list.length}`,
+      const themeDefault = getSceneTheme(themeId).defaultAssembly;
+      const next = current ? cloneAssembly(current) : themeDefault ? cloneAssembly(themeDefault) : createDefaultSceneAssembly();
+      const previous = next.foreground[side][0];
+      next.foreground[side] = [{
+        instanceId: `${side}-${foregroundId}`,
         foregroundId,
         side,
-        order: list.length,
-      });
+        order: 0,
+        ...(previous?.offsetX !== undefined ? { offsetX: previous.offsetX } : {}),
+        ...(previous?.offsetY !== undefined ? { offsetY: previous.offsetY } : {}),
+      }];
       return next;
     });
     sound.playWoodPlacement();
   };
 
-  const removeForeground = (side: SceneForegroundSide, foregroundId: string) => {
-    setSceneAssembly((current) => {
-      if (!current) return current;
-      const next = cloneAssembly(current);
-      const index = next.foreground[side].map((item) => item.foregroundId).lastIndexOf(foregroundId);
-      if (index >= 0) next.foreground[side].splice(index, 1);
-      return next;
-    });
-    sound.playWoodPlacement();
-  };
+  useEffect(() => {
+    const cycleForeground = (event: Event) => {
+      const side = (event as CustomEvent<{ side?: SceneForegroundSide }>).detail?.side;
+      if (side !== 'left' && side !== 'right') return;
+
+      const allowedSetIds = getSceneTheme(themeId).foregroundSetIds ?? [];
+      const candidates = SCENE_FOREGROUND_OPTIONS.filter(
+        (option) => option.side === side && allowedSetIds.includes(option.setId),
+      );
+      if (candidates.length === 0) return;
+
+      const currentId = sceneAssembly?.foreground[side]?.[0]?.foregroundId;
+      const currentIndex = candidates.findIndex((option) => option.id === currentId);
+      const next = candidates[(currentIndex + 1) % candidates.length];
+      selectForeground(side, next.id);
+    };
+
+    window.addEventListener('memery:foreground-tap', cycleForeground);
+    return () => window.removeEventListener('memery:foreground-tap', cycleForeground);
+  }, [themeId, sceneAssembly]);
 
   const handleFloorStyleChange = (style: FloorStyle) => {
     setFloorStyle(style);
@@ -247,8 +261,7 @@ export const useHallAmbience = ({
     onChangeTheme: handleThemeChange,
     sceneAssembly,
     onChangeSceneComponent: handleSceneComponentChange,
-    onAddForeground: addForeground,
-    onRemoveForeground: removeForeground,
+    onSelectForeground: selectForeground,
     timeScale,
     onUpdateTimeScale: setTimeScale,
     ...auditExtras,
@@ -299,8 +312,7 @@ export const useHallAmbience = ({
     handleThemeChange,
     sceneAssembly,
     handleSceneComponentChange,
-    addForeground,
-    removeForeground,
+    selectForeground,
     floorStyle,
     useThemeFloor,
     handleFloorStyleChange,

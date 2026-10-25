@@ -457,7 +457,6 @@ export class FloorLayer {
     });
     const geometry = mesh.geometry as unknown as PerspectiveGeometryLike;
     this.baseUvs = Float32Array.from(geometry.buffers[1].data);
-    mesh.filters = [this.colorFilter];
     // 插在底色之上、纵深渐变之下
     this.container.addChildAt(mesh, 1);
     this.mesh = mesh;
@@ -474,7 +473,11 @@ export class FloorLayer {
     // A render-match theme floor already carries its intended material color.
     // Keep the daytime base pixels untouched; sunset/night still receive the
     // shared environment grade below.
-    if (projectedThemeFloor && lighting.masterOn && lighting.timeOfDay === 'day') return;
+    if (projectedThemeFloor && lighting.masterOn && lighting.timeOfDay === 'day') {
+      if (this.mesh) this.mesh.filters = [];
+      return;
+    }
+    if (this.mesh) this.mesh.filters = [filter];
     filter.brightness(ambiance.brightness * (projectedThemeFloor ? 1.08 : 1), true);
     filter.contrast(ambiance.contrast - 1, true);
     filter.saturate(ambiance.saturation - 1, true);

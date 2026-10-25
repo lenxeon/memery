@@ -106,15 +106,59 @@ export const CUSHION_OPTIONS = [
 ] as const;
 
 const foreground = (definition: SceneForegroundDefinition): SceneForegroundDefinition => definition;
-// Keep foreground assets crisp; depth is expressed through placement and alpha,
-// while any optional focus blur remains a separate runtime effect.
-const FOREGROUND_BLUR_STRENGTH = 0.15;
+// Foreground foliage assets already contain their soft near-focus treatment;
+// do not add a runtime filter to these full-height transparent sprites.
+
+const foregroundHeight = { defaultHeightRatio: 0.22, minHeightRatio: 0.18, maxHeightRatio: 0.4 } as const;
+
+const foregroundPair = (
+  setId: string,
+  name: string,
+  poeticTitle: string,
+  plant: string,
+  description: string
+): SceneForegroundDefinition[] => (['left', 'right'] as const).map((side) => {
+  const isLeft = side === 'left';
+  const assetPath = `/scene-assets/foregrounds/${setId}/${side}.png`;
+  // Bump this value when overwriting a public asset so browser and Pixi caches reload it.
+  const url = isLeft ? `${assetPath}?v=20261025-left-foreground-r2` : assetPath;
+  return foreground({
+    id: `${setId}_${side}`,
+    setId,
+    themeId: 'classic_dawn',
+    name: `${name}·${side === 'left' ? '左' : '右'}`,
+    poeticTitle,
+    description,
+    plant,
+    focusTreatment: isLeft
+      ? '中央枝冠清晰，靠近镜头的下侧花叶轻柔虚化，参考 50mm f/1.4 浅景深；不使用运行时模糊滤镜。'
+      : '花叶保持可辨，枝梢带轻柔近景感；不使用运行时模糊滤镜。',
+    ...foregroundHeight,
+    defaultHeightRatio: side === 'left' ? 0.4 : foregroundHeight.defaultHeightRatio,
+    bottomOverflowRatio: isLeft && setId === 'plum_blossom' ? 0.12 : 0,
+    side,
+    previewUrl: url,
+    asset: { url, fit: 'width', widthRatio: 0.34, alpha: 1 },
+  });
+});
 
 export const SCENE_FOREGROUND_OPTIONS: SceneForegroundDefinition[] = [
-  foreground({ id: 'warm_foliage_left', side: 'left', name: '暖庭枝影·左', poeticTitle: '近叶含光', description: '左侧绿叶与浅色花朵，形成近景层次。',
-    previewUrl: '/themes/classic_dawn/foregrounds/warm-foliage-left-clean.png', asset: { url: '/themes/classic_dawn/foregrounds/warm-foliage-left-clean.png', fit: 'width', widthRatio: 0.44, alpha: 1, blur: FOREGROUND_BLUR_STRENGTH } }),
-  foreground({ id: 'warm_foliage_right', side: 'right', name: '暖庭枝影·右', poeticTitle: '夕照入庭', description: '右侧竹叶与浅色花朵，形成近景层次。',
-    previewUrl: '/themes/classic_dawn/foregrounds/warm-foliage-right-clean.png', asset: { url: '/themes/classic_dawn/foregrounds/warm-foliage-right-clean.png', fit: 'width', widthRatio: 0.44, alpha: 1, blur: FOREGROUND_BLUR_STRENGTH } }),
+  foreground({ id: 'warm_foliage_left', setId: 'warm_foliage', themeId: 'classic_dawn', side: 'left',
+    name: '暖庭枝影·左', poeticTitle: '近叶含光', description: '左侧暖色枝叶与浅花，作为经典主题的近景。',
+    plant: '暖庭花叶', focusTreatment: '近处花叶轻柔，主体仍可辨；不使用运行时模糊滤镜。', ...foregroundHeight,
+    previewUrl: '/themes/classic_dawn/foregrounds/warm-foliage-left-clean.png',
+    asset: { url: '/themes/classic_dawn/foregrounds/warm-foliage-left-clean.png', fit: 'width', widthRatio: 0.34, alpha: 1 } }),
+  foreground({ id: 'warm_foliage_right', setId: 'warm_foliage', themeId: 'classic_dawn', side: 'right',
+    name: '暖庭枝影·右', poeticTitle: '夕照入庭', description: '右侧暖色枝叶与浅花，作为经典主题的近景。',
+    plant: '暖庭花叶', focusTreatment: '近处花叶轻柔，主体仍可辨；不使用运行时模糊滤镜。', ...foregroundHeight,
+    previewUrl: '/themes/classic_dawn/foregrounds/warm-foliage-right-clean.png',
+    asset: { url: '/themes/classic_dawn/foregrounds/warm-foliage-right-clean.png', fit: 'width', widthRatio: 0.34, alpha: 1 } }),
+  ...foregroundPair('plum_blossom', '梅枝暖雪', '春信入庭', '梅花', '主枝直立上行、侧枝自然分布，深褐枝条配暖白梅花；构图从底边入画，不露根部与树干终点。'),
+  ...foregroundPair('camellia', '山茶含春', '茶香映雪', '山茶花', '木本山茶与米白花瓣，暖粉花心呼应朱木和柔金墙色。'),
+  ...foregroundPair('osmanthus', '桂影秋香', '金粟微明', '桂花', '细枝与金桂点缀暖色花叶，保持轻巧的边缘层次。'),
+  ...foregroundPair('magnolia', '玉兰初绽', '玉堂清影', '玉兰', '木本玉兰配象牙白花朵，色彩克制，轮廓向上舒展。'),
+  ...foregroundPair('peach_blossom', '桃枝浅绯', '春色含烟', '桃花', '棕褐枝条与浅粉花朵，降低饱和度以贴合祠堂暖色。'),
+  ...foregroundPair('wintersweet', '腊梅疏影', '寒香入暖', '腊梅', '细木枝与淡金腊梅，枝形清瘦，适合作为较轻的边缘前景。'),
 ];
 
 export const SCENE_COMPONENT_GROUPS = [
@@ -150,14 +194,15 @@ export function getSceneComponentOption(part: SceneAssemblyPart, id: string) {
 export const getSceneForeground = (id: string): SceneForegroundDefinition | undefined =>
   SCENE_FOREGROUND_OPTIONS.find((option) => option.id === id);
 
-const defaultForeground = (side: SceneForegroundSide, foregroundId: string): SceneForegroundInstance => ({
+const defaultForeground = (side: SceneForegroundSide, foregroundId: string, offsetX = 0): SceneForegroundInstance => ({
   instanceId: `default-${side}-${foregroundId}`,
   foregroundId,
   side,
   order: 0,
+  ...(offsetX ? { offsetX } : {}),
 });
 
-export const createDefaultSceneAssembly = (): SceneAssemblySelection => ({
+export const createDefaultSceneAssembly = (foregroundSetId = 'warm_foliage'): SceneAssemblySelection => ({
   wallpaperId: 'ink_warm_silk',
   wallpaperDecorationId: 'plum_encircling',
   wallSceneryId: 'moon_gate_rosewood',
@@ -165,7 +210,7 @@ export const createDefaultSceneAssembly = (): SceneAssemblySelection => ({
   groundMatId: 'clear_rush_long_mat',
   cushionId: 'woven_round_cushion',
   foreground: {
-    left: [defaultForeground('left', 'warm_foliage_left')],
-    right: [defaultForeground('right', 'warm_foliage_right')],
+    left: [defaultForeground('left', `${foregroundSetId}_left`, foregroundSetId === 'plum_blossom' ? -0.36 : 0)],
+    right: [defaultForeground('right', `${foregroundSetId}_right`)],
   },
 });

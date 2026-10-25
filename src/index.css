@@ -6,6 +6,20 @@
 @source "./ui";
 @source "./utils";
 
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* ── 夏日微风风吹律动 (60FPS GPU-Accelerated Botanical Wind Dynamics) ──
    特性：硬件加速合成层 (will-change: transform + translate3d)，完全规避 CPU 重排与重绘；
    动作幅度肉眼清晰可见，花瓣与每片叶子都有专属的风吹律动；

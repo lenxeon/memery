@@ -97,7 +97,7 @@ export class AltarTableLayer {
   // 1. 底层：着地接触阴影与案底环境遮蔽
   private shadowGraphics: Graphics = new Graphics();
   /** 足端落影专用柔化模糊（随案体尺度调整强度，避免硬边椭圆） */
-  private shadowBlurFilter: BlurFilter = new BlurFilter({ strength: 2.2, quality: 3 });
+  private shadowBlurFilter: BlurFilter = new BlurFilter({ strength: 2.2, quality: 2 });
 
   // 2. 腿足承重构架容器 (牙板、横枨、左右腿足、构件光影)
   private basePanelsContainer: Container = new Container();
@@ -139,7 +139,7 @@ export class AltarTableLayer {
   private ambientDimGraphics: Graphics = new Graphics();
   private pointLightGraphics: Graphics = new Graphics();
   /** 点光源高斯模糊：抹去同心圆层带，让光斑成为柔和的光雾 */
-  private lightBlurFilter: BlurFilter = new BlurFilter({ strength: 9, quality: 3 });
+  private lightBlurFilter: BlurFilter = new BlurFilter({ strength: 9, quality: 2 });
   private silhouetteMask: Graphics = new Graphics();
   private candleLights: AltarLightSource[] = [];
   private lastLightsKey: string = '';
@@ -153,6 +153,7 @@ export class AltarTableLayer {
 
   // 供案本体拖放（前后进深调整）
   private dragCallbacks: AltarTableDragCallbacks = {};
+  private isPointerDown: boolean = false;
   private isDragging: boolean = false;
   private dragStartY: number = 0;
 
@@ -210,26 +211,39 @@ export class AltarTableLayer {
       this.applyWoodTexture();
     });
 
-    // 供案本体可直接在场景中拖放以调整前后进深位置
+    // 供案本体可直接在场景中拖放以调整前后进深位置（增加拖拽死区防微抖点击）
+    const DRAG_THRESHOLD = 8;
     this.container.eventMode = 'static';
     this.container.cursor = 'grab';
     this.container.on('pointerdown', (e) => {
       if (!this.dragCallbacks.onDragStart) return;
       e.stopPropagation();
-      this.isDragging = true;
+      this.isPointerDown = true;
+      this.isDragging = false;
       this.dragStartY = e.global.y;
-      this.container.cursor = 'grabbing';
-      this.dragCallbacks.onDragStart();
     });
     this.container.on('globalpointermove', (e) => {
-      if (!this.isDragging) return;
-      this.dragCallbacks.onDrag?.(e.global.y - this.dragStartY);
+      if (!this.isPointerDown) return;
+      const dy = e.global.y - this.dragStartY;
+      if (!this.isDragging) {
+        if (Math.abs(dy) > DRAG_THRESHOLD) {
+          this.isDragging = true;
+          this.container.cursor = 'grabbing';
+          this.dragCallbacks.onDragStart?.();
+        }
+      }
+      if (this.isDragging) {
+        this.dragCallbacks.onDrag?.(dy);
+      }
     });
     const endDrag = () => {
-      if (!this.isDragging) return;
-      this.isDragging = false;
-      this.container.cursor = 'grab';
-      this.dragCallbacks.onDragEnd?.();
+      if (!this.isPointerDown) return;
+      this.isPointerDown = false;
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.container.cursor = 'grab';
+        this.dragCallbacks.onDragEnd?.();
+      }
     };
     this.container.on('pointerup', endDrag);
     this.container.on('pointerupoutside', endDrag);
@@ -379,7 +393,13 @@ export class AltarTableLayer {
     this.pointLightGraphics.clear();
 
     const influence = this.getCandleInfluence();
-    if (influence <= 0.01) return;
+    if (influence <= 0.01) {
+      this.ambientDimGraphics.visible = false;
+      this.pointLightGraphics.visible = false;
+      return;
+    }
+    this.ambientDimGraphics.visible = true;
+    this.pointLightGraphics.visible = true;
 
     // 案体剪影：台面梯形 + 厚板立面 + 牙板 + 前后四条腿足
     this.silhouetteMask

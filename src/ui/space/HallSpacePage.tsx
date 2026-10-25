@@ -91,7 +91,7 @@ export const HallSpacePage: React.FC<HallSpacePageProps> = ({ currentUser, onReq
   // 舞台区（顶栏与底栏之间）相对全屏画布的上下内缩：
   // Pixi 画布铺满全屏，遗像需要这两个数字才能复刻原先 top-[18%] 的纵向定位
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const [stageInsets, setStageInsets] = useState({ top: 64, bottom: 96 });
+  const [stageInsets, setStageInsets] = useState({ top: 48, bottom: 0 });
 
   useLayoutEffect(() => {
     const el = stageRef.current;
@@ -125,7 +125,7 @@ export const HallSpacePage: React.FC<HallSpacePageProps> = ({ currentUser, onReq
 
   return (
     <main
-      className={`relative w-full h-screen overflow-hidden flex flex-col items-center justify-between select-none transition-colors duration-700 font-sans ${ambience.backgroundClass}`}
+      className={`relative w-full h-full min-h-full h-screen h-[100dvh] overflow-hidden flex flex-col items-center justify-between select-none transition-colors duration-700 font-sans ${ambience.backgroundClass}`}
     >
       {/* Wall Texture Effect (Hardware accelerated, zero blend cost) */}
       <div

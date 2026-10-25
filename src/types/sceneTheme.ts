@@ -76,8 +76,6 @@ export interface SceneThemeViewportAsset {
     tablet?: string;
   };
   alpha?: number;
-  /** Runtime Pixi blur strength; keep blur out of the source PNG. */
-  blur?: number;
   /** Position a wall attachment in the wall-scenery group's authored coordinate space. */
   wallAnchor?: {
     /** Normalized horizontal position in the wall composition. */
@@ -134,9 +132,20 @@ export type SceneForegroundSide = 'left' | 'right';
 /** 一件完整、可重复入镜的前景定义。左右只决定从哪一侧入画。 */
 export interface SceneForegroundDefinition {
   id: string;
+  /** Stable pair identifier shared by its left/right assets and any themes that reuse it. */
+  setId: string;
+  themeId: SceneThemeId;
   name: string;
   poeticTitle: string;
   description: string;
+  plant: string;
+  /** Short production note describing the baked near-focus treatment. */
+  focusTreatment: string;
+  defaultHeightRatio: number;
+  minHeightRatio: number;
+  maxHeightRatio: number;
+  /** Portion of the sprite height that continues below the viewport edge. */
+  bottomOverflowRatio?: number;
   side: SceneForegroundSide;
   previewUrl: string;
   asset: SceneThemeViewportAsset;
@@ -203,6 +212,10 @@ export interface SceneThemeDefinition {
   portrait?: SceneThemePortraitPlacement;
   /** 主题进入时采用的部件组合；未提供时沿用历史整张背景。 */
   defaultAssembly?: SceneAssemblySelection;
+  /** Theme-local foreground candidate pairs available in the environment panel. */
+  foregroundSetIds?: string[];
+  /** The selected pair used by defaultAssembly for this theme. */
+  defaultForegroundSetId?: string;
   layers?: {
     /** 墙面上的灯、窗、帘、植物等独立附件，位于遗像之后。 */
     backgroundAccessories?: SceneThemeViewportAsset[];

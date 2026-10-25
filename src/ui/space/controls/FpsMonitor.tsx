@@ -3,7 +3,7 @@
  * @description 实时性能监控小部件，显示当前渲染帧率（FPS）与运行状态。
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { Activity, Gauge, ChevronDown, ChevronUp, AlertTriangle, CheckCircle2, Flame, Sparkles, Layers } from 'lucide-react';
+import { Activity, Gauge, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface FpsMonitorProps {
   className?: string;
@@ -101,7 +101,7 @@ export const FpsMonitor: React.FC<FpsMonitorProps> = ({ className = '' }) => {
       <div
         onClick={() => setIsExpanded(!isExpanded)}
         className={`group flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-md border shadow-xs cursor-pointer transition-all hover:scale-105 active:scale-95 ${status.badgeBg}`}
-        title="点击查看页面性能与掉帧瓶颈分析"
+        title="查看 requestAnimationFrame 帧率与帧间隔；不等同 GPU 绘制耗时"
       >
         <span className={`w-2 h-2 rounded-full ${status.dot}`} />
         <span className="font-mono font-bold text-xs tracking-tight">
@@ -143,39 +143,25 @@ export const FpsMonitor: React.FC<FpsMonitorProps> = ({ className = '' }) => {
               </div>
             </div>
             <div className="bg-stone-800/80 p-2 rounded-xl text-center border border-stone-700/50">
-              <div className="text-[10px] text-stone-400">单帧耗时</div>
+              <div className="text-[10px] text-stone-400">帧间隔</div>
               <div className="font-mono text-base font-bold text-stone-100">
                 {frameTime}<span className="text-[10px] font-normal text-stone-400">ms</span>
               </div>
             </div>
             <div className="bg-stone-800/80 p-2 rounded-xl text-center border border-stone-700/50">
-              <div className="text-[10px] text-stone-400">最低掉帧</div>
+              <div className="text-[10px] text-stone-400">最低帧率</div>
               <div className="font-mono text-base font-bold text-stone-300">
                 {minFps}
               </div>
             </div>
           </div>
 
-          {/* Diagnostic Bottlenecks */}
-          <div className="space-y-1.5 text-[11px] text-stone-300">
-            <div className="font-medium text-amber-300/90 flex items-center gap-1">
-              <AlertTriangle size={12} />
-              <span>当前页面主要性能开销瓶颈：</span>
+          <div className="rounded-lg border border-stone-700/40 bg-stone-800/50 p-2 text-[10.5px] leading-relaxed text-stone-300">
+            <div className="mb-1 flex items-center gap-1 font-medium text-amber-300/90">
+              <Gauge size={12} />
+              <span>监测范围</span>
             </div>
-            <div className="bg-stone-800/50 rounded-lg p-2 space-y-1.5 border border-stone-700/40 text-[10.5px]">
-              <div className="flex items-start gap-1.5">
-                <Sparkles size={12} className="text-amber-400 mt-0.5 shrink-0" />
-                <span><strong>Canvas shadowBlur 高斯模糊</strong>：DustMotes 每帧对 80+ 尘埃微粒调用 shadowBlur，开销极大</span>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <Flame size={12} className="text-orange-400 mt-0.5 shrink-0" />
-                <span><strong>高频对象分配与多循环</strong>：双蜡烛与香炉并发 4 个 requestAnimationFrame 独立循环，并在循环中生成 RadialGradient</span>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <Layers size={12} className="text-cyan-400 mt-0.5 shrink-0" />
-                <span><strong>全屏复合滤镜层叠</strong>：SVG feGaussianBlur(32px) + mix-blend-mode: screen + blur-3xl 导致 GPU 合成开销过重</span>
-              </div>
-            </div>
+            本面板统计 requestAnimationFrame 回调频率和相邻回调间隔，不直接测量单帧 JS 或 GPU 绘制时间。定位合成与呈现延迟请使用 Performance trace。
           </div>
 
           <div className="mt-2.5 text-[10px] text-stone-400 text-right">

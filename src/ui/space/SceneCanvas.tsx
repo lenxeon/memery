@@ -41,8 +41,7 @@ const DISABLE_WALL = false;
 /** TEMP_DEBUG: 置为 true 时不渲染供案（含案体照明层），恢复时改回 false */
 const DISABLE_TABLE = false;
 
-/** 未量测到舞台内缩时的兜底值（近似顶栏 + 底栏高度） */
-const DEFAULT_STAGE_INSETS: StageInsets = { top: 64, bottom: 96 };
+const DEFAULT_STAGE_INSETS: StageInsets = { top: 48, bottom: 0 };
 
 export interface SceneCanvasProps {
   items: Record<SceneItemId, SceneItem>;
@@ -513,20 +512,6 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     }
   }, [petalTrigger, lastOfferedFlower]);
 
-  // 5. 鼠标与触摸视差交互
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!stageRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    stageRef.current.setParallaxInput(nx, ny);
-  };
-
-  const handleMouseLeave = () => {
-    if (!stageRef.current) return;
-    stageRef.current.setParallaxInput(0, 0);
-  };
-
   // 禁用场景内浏览器原生右键/长按菜单，避免拖放供品时误弹出
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -539,8 +524,6 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     <div
       ref={containerRef}
       className={`relative w-full h-full overflow-hidden select-none ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       onContextMenu={handleContextMenu}
       onDragStart={handleDragStart}
     />

@@ -83,8 +83,7 @@ export interface AmbiancePanelProps {
   onChangeTheme?: (id: SceneThemeId) => void;
   sceneAssembly?: SceneAssemblySelection | null;
   onChangeSceneComponent?: (part: SceneAssemblyPart, id: string) => void;
-  onAddForeground?: (side: SceneForegroundSide, foregroundId: string) => void;
-  onRemoveForeground?: (side: SceneForegroundSide, foregroundId: string) => void;
+  onSelectForeground?: (side: SceneForegroundSide, foregroundId: string) => void;
   showPetals?: boolean;
   onTogglePetals?: () => void;
   timeScale?: number;
@@ -159,8 +158,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
   onChangeTheme,
   sceneAssembly,
   onChangeSceneComponent,
-  onAddForeground,
-  onRemoveForeground,
+  onSelectForeground,
   showPetals = true,
   onTogglePetals,
   timeScale = 1,
@@ -217,6 +215,11 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
     };
     return sceneAssembly[keyByPart[part]];
   };
+
+  const foregroundSetIds = SCENE_THEME_OPTIONS.find((option) => option.id === themeId)?.foregroundSetIds ?? [];
+  const foregroundOptions = SCENE_FOREGROUND_OPTIONS.filter(
+    (option) => foregroundSetIds.includes(option.setId)
+  );
 
   // 跟随系统模式下，面板内实时显示本机时间与推算时辰
   React.useEffect(() => {
@@ -366,14 +369,13 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
           </div>
         </div>
 
-        {/* 可换部件目录：每个单选插槽至少三件，前景左右可重复添加。 */}
+        {/* 可换部件目录：墙体部件单选，左右前景各自单选替换。 */}
         <div className="space-y-3 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30 text-xs">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="font-serif font-semibold text-amber-200">镜头部件审阅</div>
-              <div className="text-[10px] text-stone-500 mt-0.5">墙体分层独立切换 · 前景左右分别叠加</div>
+              <div className="text-[10px] text-stone-500 mt-0.5">墙体分层独立切换 · 前景左右分别切换</div>
             </div>
-            <span className="text-[9px] px-2 py-1 rounded-full border border-amber-500/30 text-amber-300/80">每类 3 件</span>
           </div>
 
           {SCENE_COMPONENT_GROUPS.map((group) => (
@@ -414,37 +416,32 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
             <div key={side} className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-medium text-amber-100/90">{side === 'left' ? '左侧前景系统' : '右侧前景系统'}</span>
-                <span className="text-[9px] text-stone-500">可多次入镜</span>
+                <span className="text-[9px] text-stone-500">左右滑动选择</span>
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                {SCENE_FOREGROUND_OPTIONS.filter((option) => option.side === side).map((option) => {
-                  const count = sceneAssembly?.foreground[side].filter((item) => item.foregroundId === option.id).length ?? 0;
+              <div className="flex gap-1.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-1 snap-x snap-mandatory">
+                {foregroundOptions.filter((option) => option.side === side).map((option) => {
+                  const selected = sceneAssembly?.foreground[side].some((item) => item.foregroundId === option.id) ?? false;
                   return (
-                    <div key={option.id} className={`rounded-lg overflow-hidden border ${count > 0 ? 'border-amber-500/70 bg-amber-950/30' : 'border-stone-700 bg-stone-950/70'}`}>
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => onSelectForeground?.(side, option.id)}
+                      aria-pressed={selected}
+                      aria-label={`${option.name}${selected ? '，已选中' : ''}`}
+                      title={`${option.name} · ${option.description}`}
+                      className={`relative flex w-24 shrink-0 snap-start flex-col overflow-hidden rounded-lg border text-left transition-colors cursor-pointer ${selected ? 'border-amber-400 ring-1 ring-amber-400/50 bg-amber-950/40' : 'border-stone-700 bg-stone-950/70 hover:border-amber-700'}`}
+                    >
                       <div
-                        className="h-14 bg-[#2b241d] bg-contain bg-no-repeat bg-center"
+                        className="h-16 w-full bg-[#2b241d] bg-contain bg-no-repeat bg-center"
                         style={{ backgroundImage: `url(${option.previewUrl})` }}
                       />
-                      <div className="px-1.5 py-1 space-y-1">
-                        <div className="text-[9px] text-stone-300 truncate">{option.name}</div>
-                        <div className="flex items-center justify-between">
-                          <button
-                            type="button"
-                            onClick={() => onRemoveForeground?.(side, option.id)}
-                            disabled={count === 0}
-                            className="w-5 h-5 rounded border border-stone-600 text-stone-300 disabled:opacity-30 cursor-pointer"
-                            aria-label={`移除一个${option.name}`}
-                          >−</button>
-                          <span className="text-[9px] text-amber-300 tabular-nums">{count}</span>
-                          <button
-                            type="button"
-                            onClick={() => onAddForeground?.(side, option.id)}
-                            className="w-5 h-5 rounded border border-amber-600/70 text-amber-300 cursor-pointer"
-                            aria-label={`添加一个${option.name}`}
-                          >+</button>
-                        </div>
-                      </div>
-                    </div>
+                      <div className={`w-full truncate px-1.5 py-1 text-[9px] ${selected ? 'text-amber-200' : 'text-stone-300'}`}>{option.name}</div>
+                      {selected && (
+                        <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-stone-950 shadow">
+                          <Check size={11} strokeWidth={3} />
+                        </span>
+                      )}
+                    </button>
                   );
                 })}
               </div>
