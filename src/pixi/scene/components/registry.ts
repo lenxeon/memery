@@ -135,7 +135,7 @@ const foregroundPair = (
       : '花叶保持可辨，枝梢带轻柔近景感；不使用运行时模糊滤镜。',
     ...foregroundHeight,
     defaultHeightRatio: side === 'left' ? 0.4 : foregroundHeight.defaultHeightRatio,
-    bottomOverflowRatio: isLeft && setId === 'plum_blossom' ? 0.12 : 0,
+    bottomOverflowRatio: isLeft ? 0.12 : 0,
     side,
     previewUrl: url,
     asset: { url, fit: 'width', widthRatio: 0.34, alpha: 1 },
@@ -194,12 +194,12 @@ export function getSceneComponentOption(part: SceneAssemblyPart, id: string) {
 export const getSceneForeground = (id: string): SceneForegroundDefinition | undefined =>
   SCENE_FOREGROUND_OPTIONS.find((option) => option.id === id);
 
-const defaultForeground = (side: SceneForegroundSide, foregroundId: string, offsetX = 0): SceneForegroundInstance => ({
+const defaultForeground = (side: SceneForegroundSide, foregroundId: string): SceneForegroundInstance => ({
   instanceId: `default-${side}-${foregroundId}`,
   foregroundId,
   side,
   order: 0,
-  ...(offsetX ? { offsetX } : {}),
+  offsetX: side === 'left' ? -0.36 : 0,
 });
 
 export const createDefaultSceneAssembly = (foregroundSetId = 'warm_foliage'): SceneAssemblySelection => ({
@@ -210,7 +210,7 @@ export const createDefaultSceneAssembly = (foregroundSetId = 'warm_foliage'): Sc
   groundMatId: 'clear_rush_long_mat',
   cushionId: 'woven_round_cushion',
   foreground: {
-    left: [defaultForeground('left', `${foregroundSetId}_left`, foregroundSetId === 'plum_blossom' ? -0.36 : 0)],
+    left: [defaultForeground('left', `${foregroundSetId}_left`)],
     right: [defaultForeground('right', `${foregroundSetId}_right`)],
   },
 });
