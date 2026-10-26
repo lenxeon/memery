@@ -206,6 +206,15 @@ export class MemorialPortraitLayer {
 
   private photoUrl = '';
   private photoToken = 0;
+  private photoReady: Promise<void> = Promise.resolve();
+
+  public async whenReady(): Promise<void> {
+    let pending: Promise<void>;
+    do {
+      pending = this.photoReady;
+      await pending;
+    } while (pending !== this.photoReady);
+  }
   private photoImage: HTMLImageElement | null = null;
   private photoTexture: Texture | null = null;
 
@@ -514,21 +523,23 @@ export class MemorialPortraitLayer {
       this.applyPhotoCover();
     };
 
-    const attempt = (target: string, useCors: boolean) => {
-      const img = new Image();
-      img.referrerPolicy = 'no-referrer';
-      if (useCors) img.crossOrigin = 'anonymous';
-      img.onload = () => apply(img);
-      img.onerror = () => {
-        if (token !== this.photoToken) return;
-        if (target !== FALLBACK_PHOTO_URL) {
-          attempt(FALLBACK_PHOTO_URL, true);
-        }
+    this.photoReady = new Promise<void>((resolve) => {
+      const attempt = (target: string, useCors: boolean) => {
+        const img = new Image();
+        img.referrerPolicy = 'no-referrer';
+        if (useCors) img.crossOrigin = 'anonymous';
+        img.onload = () => { apply(img); resolve(); };
+        img.onerror = () => {
+          if (token === this.photoToken && target !== FALLBACK_PHOTO_URL) {
+            attempt(FALLBACK_PHOTO_URL, true);
+          } else {
+            resolve();
+          }
+        };
+        img.src = target;
       };
-      img.src = target;
-    };
-
-    attempt(url, needsCors(url));
+      attempt(url, needsCors(url));
+    });
   }
 
   /** 光环配色 + 题名昼夜配色与投影 */

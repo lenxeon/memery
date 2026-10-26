@@ -362,7 +362,7 @@ export const buildAuditItems = (
     ? buildAuditVaseItems(page, withFlowers)
     : buildAuditFlowerItems(page, decayHealth);
 
-export const buildInitialItems = (): Record<SceneItemId, SceneItem> => ({});
+export const buildInitialItems = (): Record<SceneItemId, SceneItem> => buildStandardItems();
 
 /* ── 初始场景常量 ────────────────────────────────────────────────────────── */
 

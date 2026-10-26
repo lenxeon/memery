@@ -33,8 +33,13 @@ export function useWorldLoop({
 
   const onEntityEventRef = useRef(onEntityEvent);
   onEntityEventRef.current = onEntityEvent;
+  const hasActiveLifecycle = Object.entries(items).some(([id, item]) => {
+    if (!item?.lifecycle) return false;
+    return !(id.startsWith('candle') || id === 'censer') || !!item.isLit;
+  });
 
   useEffect(() => {
+    if (isPaused || timeScale <= 0 || !hasActiveLifecycle) return;
     let animId: number;
 
     const tick = (now: number) => {
@@ -149,7 +154,7 @@ export function useWorldLoop({
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [isPaused, timeScale, lighting, soundEnabled, onUpdateItems]);
+  }, [isPaused, timeScale, hasActiveLifecycle, lighting, soundEnabled, onUpdateItems]);
 
   const togglePause = useCallback(() => {
     setIsPaused((p) => !p);

@@ -4,7 +4,7 @@
  * 全面接管场景环境、地面材质、红木供案与所有供品摆件的 2.5D WebGL 渲染，
  * 采用原生动态 Canvas 挂载与 StrictMode 防 context lost 保护机制。
  */
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { PixiStage } from '../../pixi/engine/PixiStage';
 import { TexturePipeline } from '../../pixi/assets/TexturePipeline';
 import { SceneBackgroundLayer } from '../../pixi/layers/SceneBackgroundLayer';
@@ -40,6 +40,8 @@ import { sound } from '../../pixi/../utils/audio';
 const DISABLE_WALL = false;
 /** TEMP_DEBUG: 置为 true 时不渲染供案（含案体照明层），恢复时改回 false */
 const DISABLE_TABLE = false;
+const ENABLE_GOD_RAYS = false;
+const ENABLE_SCENE_SHADOWS = false;
 
 const DEFAULT_STAGE_INSETS: StageInsets = { top: 48, bottom: 0 };
 
@@ -89,7 +91,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   tableclothStyle,
   tableWoodStyle = 'walnut',
   tableLegWoodStyle = 'walnut',
-  tableForward = 0,
+  tableForward = 0.5,
   showTableRunner = true,
   petalTrigger = 0,
   lastOfferedFlower = 'peonies',
@@ -108,6 +110,11 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<PixiStage | null>(null);
   const isReadyRef = useRef<boolean>(false);
+  const [sceneLoadState, setSceneLoadState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const renderRevisionRef = useRef(0);
+  const floorReadyRef = useRef<Promise<void>>(Promise.resolve());
+  const memorialRef = useRef(memorial);
+  memorialRef.current = memorial;
 
   // 供案前后进深：拖动过程中本地即时生效，松手后提交给外部状态
   const activeForwardRef = useRef<number>(tableForward);
@@ -187,6 +194,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   // 重绘全部图层
   const renderAll = useCallback(() => {
     if (!isReadyRef.current) return;
+    renderRevisionRef.current += 1;
     const { width, height } = getViewportDimensions();
     viewportSizeRef.current = { width, height };
 
@@ -223,6 +231,9 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     // 0c. 2.5D 透视地坪；主题可提供独享材质，否则使用公共地坪选择。
     const pipeline = TexturePipeline.getInstance();
     const sceneTheme = getSceneTheme(themeId);
+    floorReadyRef.current = useThemeFloor && sceneTheme.floorMaterial
+      ? Promise.resolve()
+      : pipeline.whenFloorReady(floorStyle);
     const themeFloorMaterial = useThemeFloor ? sceneTheme.floorMaterial : undefined;
     floorLayerRef.current?.render(
       width,
@@ -311,7 +322,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       const { width, height } = getViewportDimensions();
       viewportSizeRef.current = { width, height };
 
-      await stage.init({ container, width, height });
+      await stage.init({ container, width, height, deferFirstFrame: true });
       if (!isMounted) {
         stage.destroy();
         return;
@@ -320,14 +331,18 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       // 初始化纹理管线
       const pipeline = TexturePipeline.getInstance();
       await pipeline.init();
+      if (!isMounted) {
+        stage.destroy();
+        return;
+      }
 
       // 构建分层与特效系统
       const bgLayer = new SceneBackgroundLayer();
       const themeLayer = new SceneThemeLayer(() => renderAllRef.current());
-      const floorLayer = new FloorLayer();
-      const godRaysLayer = new GodRaysLayer();
+      const floorLayer = new FloorLayer(ENABLE_SCENE_SHADOWS);
+      const godRaysLayer = ENABLE_GOD_RAYS ? new GodRaysLayer() : null;
       const dustLayer = new DustMotesLayer();
-      const tableLayer = new AltarTableLayer();
+      const tableLayer = new AltarTableLayer(ENABLE_SCENE_SHADOWS);
       const portraitLayer = new MemorialPortraitLayer();
       const propsLayer = new PropsLayer(pipeline);
 
@@ -352,7 +367,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       stage.groundFrontLayer.addChild(themeLayer.ground);
       stage.propsLayer.addChild(propsLayer.container);
       // 前景气光层次：光束（远）→ 烛焰光晕 → 落瓣 → 浮尘（最近）
-      stage.lightsLayer.addChild(godRaysLayer.container);
+      if (godRaysLayer) stage.lightsLayer.addChild(godRaysLayer.container);
       stage.lightsLayer.addChild(pixiEffects.lightsContainer);
       stage.lightsLayer.addChild(pixiEffects.petalsContainer);
       stage.lightsLayer.addChild(dustLayer.container);
@@ -380,7 +395,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
           callbacksRef.current.onEditMemorial?.();
         },
       });
-      if (memorial) portraitLayer.setInfo(memorial);
+      if (memorialRef.current) portraitLayer.setInfo(memorialRef.current);
 
       // 供案本体拖放：直接在场景中上下拖动调整前后进深（近大远小）
       tableLayer.setDragCallbacks({
@@ -421,19 +436,49 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
         dustLayerRef.current?.update(delta);
         portraitLayerRef.current?.update(delta);
         // 案体光照随烛火真实位置与明灭状态实时衰减照亮
-        tableLayerRef.current?.setCandleLights(propsLayer.getCandleLightSources());
+        if (tableLayer.needsCandleLightSources()) {
+          tableLayer.setCandleLights(propsLayer.getCandleLightSources());
+        }
       });
 
       isReadyRef.current = true;
-      renderAll();
-
-      // 地坪贴图为异步 Image 加载，落地后补一次重绘（否则首屏仅显示兜底底色）
-      window.setTimeout(() => {
-        if (isMounted) renderAllRef.current();
-      }, 500);
+      let initialAssetsLaidOut = false;
+      while (isMounted && stage.app) {
+        renderAllRef.current();
+        const loadingRevision = renderRevisionRef.current;
+        await Promise.all([
+          bgLayer.whenReady(), themeLayer.whenReady(), tableLayer.whenReady(),
+          portraitLayer.whenReady(), propsLayer.whenReady(), floorReadyRef.current,
+        ]);
+        if (!isMounted || !stage.app) return;
+        // Apply late floor textures and repeat if asset callbacks or settings
+        // changed the scene while the previous set of loads was settling.
+        if (!initialAssetsLaidOut || loadingRevision !== renderRevisionRef.current) {
+          initialAssetsLaidOut = true;
+          continue;
+        }
+        propsLayer.update(2);
+        pixiEffects.update(0);
+        dustLayer.update(0);
+        if (tableLayer.needsCandleLightSources()) {
+          tableLayer.setCandleLights(propsLayer.getCandleLightSources());
+        }
+        const readyRevision = renderRevisionRef.current;
+        await stage.app.renderer.prepare.upload(stage.app.stage);
+        if (!isMounted || !stage.app) return;
+        if (readyRevision !== renderRevisionRef.current) continue;
+        stage.app.render();
+        stage.app.canvas.style.visibility = 'visible';
+        stage.app.start();
+        setSceneLoadState('ready');
+        break;
+      }
     };
 
-    initEngine();
+    void initEngine().catch((error) => {
+      console.error('Failed to initialize scene:', error);
+      if (isMounted) setSceneLoadState('error');
+    });
 
     const handleResize = () => {
       if (!stageRef.current || !containerRef.current) return;
@@ -522,10 +567,17 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
   return (
     <div
-      ref={containerRef}
       className={`relative w-full h-full overflow-hidden select-none ${className}`}
+      aria-busy={sceneLoadState === 'loading'}
       onContextMenu={handleContextMenu}
       onDragStart={handleDragStart}
-    />
+    >
+      <div ref={containerRef} className="absolute inset-0" />
+      {sceneLoadState !== 'ready' && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#f5eee6] text-sm text-[#89745a]" role="status">
+          {sceneLoadState === 'error' ? '场景加载失败，请刷新重试' : '场景加载中…'}
+        </div>
+      )}
+    </div>
   );
 };

@@ -77,6 +77,7 @@ export class PropsLayer {
   private candleFlames: Map<string, CandleFlameRenderer> = new Map();
   private incenseSmoke: IncenseSmokeRenderer = new IncenseSmokeRenderer();
   private latestItems: Record<string, SceneItem> = {};
+  private readonly pendingTextures = new Set<Promise<unknown>>();
 
   private currentAltarCenterX = 0;
   private currentAltarTopY = 0;
@@ -93,6 +94,18 @@ export class PropsLayer {
 
   constructor(pipeline: TexturePipeline) {
     this.pipeline = pipeline;
+  }
+
+  public async whenReady(): Promise<void> {
+    while (this.pendingTextures.size) await Promise.allSettled([...this.pendingTextures]);
+  }
+
+  private trackTextureLoad(pending: Promise<unknown>): void {
+    this.pendingTextures.add(pending);
+    void pending.then(
+      () => this.pendingTextures.delete(pending),
+      () => this.pendingTextures.delete(pending)
+    );
   }
 
   public bindEffects(smoke: SmokeParticleEmitter, effects: PixiEffects): void {
@@ -362,14 +375,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getVaseTexture(flower, isRight, vaseStyle, qHealth).then((tex) => {
+          this.trackTextureLoad(this.pipeline.getVaseTexture(flower, isRight, vaseStyle, qHealth).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.94);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
       } else if (id === 'censer') {
         const isLit = !!item.isLit;
@@ -379,14 +392,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getCenserTexture(isLit).then((tex) => {
+          this.trackTextureLoad(this.pipeline.getCenserTexture(isLit).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.92);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
 
         // 将拉格朗日工笔缕烟与三炷立香精确附着在香炉香灰池中心 (cy=13.5)
@@ -412,14 +425,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getCandleTexture(qHealth, isLit).then((tex) => {
+          this.trackTextureLoad(this.pipeline.getCandleTexture(qHealth, isLit).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 1.0);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
 
         // 绑定 60FPS 动态真实烛火到蜡烛凹槽 (火苗高度~24px，纤巧灵动)
@@ -442,14 +455,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getFruitTexture(fruitType).then((tex) => {
+          this.trackTextureLoad(this.pipeline.getFruitTexture(fruitType).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.88);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
       } else if (id === 'tea_cups') {
         targetKey = 'tea_cups_trio';
@@ -458,14 +471,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getTeaCupsTexture().then((tex) => {
+          this.trackTextureLoad(this.pipeline.getTeaCupsTexture().then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.88);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
       } else if (id === 'singing_bowl') {
         targetKey = 'singing_bowl_brass';
@@ -474,14 +487,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getSingingBowlTexture().then((tex) => {
+          this.trackTextureLoad(this.pipeline.getSingingBowlTexture().then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.85);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
       } else if (id.startsWith('offered_flower')) {
         const fType = (item.flowerType || 'peonies') as FlowerType;
@@ -491,14 +504,14 @@ export class PropsLayer {
 
         if (this.propTextureKeys.get(id) !== targetKey) {
           this.propTextureKeys.set(id, targetKey);
-          this.pipeline.getSingleBouquetTexture(fType).then((tex) => {
+          this.trackTextureLoad(this.pipeline.getSingleBouquetTexture(fType).then((tex) => {
             if (sprite && !sprite.destroyed) {
               sprite.texture = tex;
               sprite.anchor.set(0.5, 0.5);
               sprite.width = targetW;
               sprite.height = targetH;
             }
-          });
+          }));
         }
       }
 
@@ -605,6 +618,7 @@ export class PropsLayer {
 
       for (const [id, flame] of this.candleFlames.entries()) {
         if (!flame || !flame.sprite || flame.sprite.destroyed) continue;
+        if (!flame.sprite.visible || !flame.sprite.parent) continue;
         const item = this.latestItems[id];
         const isLit = item ? !!item.isLit : true;
         const health = Number(item?.waxHeight ?? (item?.lifecycle?.health ?? 1.0));
@@ -612,7 +626,7 @@ export class PropsLayer {
       }
 
       // 国风工笔缕烟与三炷立香更新
-      if (this.incenseSmoke && !this.incenseSmoke.sprite.destroyed) {
+      if (this.incenseSmoke && !this.incenseSmoke.sprite.destroyed && this.incenseSmoke.sprite.parent) {
         const censerItem = this.latestItems['censer'];
         const isCenserLit = censerItem ? !!censerItem.isLit : true;
         const censerHealth = Number(censerItem?.lifecycle?.health ?? (censerItem?.incenseHealth ?? 1.0));

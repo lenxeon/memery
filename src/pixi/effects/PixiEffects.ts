@@ -146,6 +146,10 @@ export class PixiEffects {
     scale: number = 1.0,
     windForce: number = 0.15
   ): void {
+    const state = this.candleState;
+    if (state.hasState && state.leftX === leftX && state.leftY === leftY && state.leftLit === leftLit
+      && state.rightX === rightX && state.rightY === rightY && state.rightLit === rightLit
+      && state.scale === scale) return;
     this.candleState = { leftX, leftY, leftLit, rightX, rightY, rightLit, scale, hasState: true };
     this.applyCandleGlow();
   }

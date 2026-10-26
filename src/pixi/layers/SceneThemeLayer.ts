@@ -3,7 +3,7 @@
  * @description 场景主题的独立部件装配器。墙纸由背景层负责，本层按真实深度装配
  * 墙纸装饰、遗像关系、墙面造景、结构附件、地面陈设与左右镜头前景。
  */
-import { Assets, Container, Graphics, Rectangle, Sprite, Texture } from 'pixi.js';
+import { Assets, Container, Graphics, Polygon, Rectangle, Sprite, Texture } from 'pixi.js';
 import { getFloorTopY } from './FloorLayer';
 import { TexturePipeline } from '../assets/TexturePipeline';
 import type {
@@ -38,6 +38,25 @@ type WallAssemblySprite = AssetSprite<SceneThemeViewportAsset> & {
   glowIndex?: number;
 };
 
+const ellipseHitArea = (
+  width: number,
+  height: number,
+  centerXRatio: number,
+  centerYRatio: number,
+  radiusXRatio: number,
+  radiusYRatio: number
+): Polygon => {
+  const points: number[] = [];
+  for (let index = 0; index < 32; index += 1) {
+    const angle = (index / 32) * Math.PI * 2;
+    points.push(
+      width * (centerXRatio + Math.cos(angle) * radiusXRatio),
+      height * (centerYRatio + Math.sin(angle) * radiusYRatio)
+    );
+  }
+  return new Polygon(points);
+};
+
 export class SceneThemeLayer {
   public wallpaperDecorations: Container = new Container();
   public portraitBack: Container = new Container();
@@ -58,12 +77,15 @@ export class SceneThemeLayer {
   private roomKey = '';
   private foregroundKey = '';
   private loadToken = 0;
+  private foregroundLoadToken = 0;
   private viewportAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
   private wallAssemblyAssets: WallAssemblySprite[] = [];
   private portraitBackAssets: AssetSprite<SceneThemePortraitAsset>[] = [];
   private portraitFrontAssets: AssetSprite<SceneThemePortraitAsset>[] = [];
   private groundAssets: GroundSpriteAsset[] = [];
   private foregroundAssets: ForegroundSprite[] = [];
+  private readonly pendingAssets = new Set<Promise<unknown>>();
+  private assetLoadError: unknown = null;
   private viewport = { width: 0, height: 0 };
   private memorial: MemorialThemeAnchor = { x: 0, y: 0, size: 144 };
   private floorMaterial: SceneThemeFloorMaterial | null = null;
@@ -74,6 +96,19 @@ export class SceneThemeLayer {
   private wallSceneryMask: Graphics = new Graphics();
 
   constructor(private readonly onAssetReady?: () => void) {
+    for (const [container, side] of [
+      [this.foregroundLeft, 'left'],
+      [this.foregroundRight, 'right'],
+    ] as const) {
+      container.eventMode = 'static';
+      container.interactiveChildren = false;
+      container.cursor = 'pointer';
+      container.on('pointertap', (event) => {
+        event.stopPropagation();
+        window.dispatchEvent(new CustomEvent('memery:foreground-tap', { detail: { side } }));
+      });
+    }
+
     this.wallAssembly.addChild(this.wallScenery, this.wallLampGlow, this.wallDecorations);
     this.wallScenery.mask = this.wallSceneryMask;
     this.wallScenery.addChild(this.wallSceneryMask);
@@ -138,8 +173,23 @@ export class SceneThemeLayer {
     return { spec: this.floorMaterial, texture: this.floorTexture };
   }
 
+  public async whenReady(): Promise<void> {
+    while (this.pendingAssets.size) await Promise.allSettled([...this.pendingAssets]);
+    if (this.assetLoadError) throw this.assetLoadError;
+  }
+
+  private trackAssetLoad(pending: Promise<unknown>): void {
+    this.pendingAssets.add(pending);
+    void pending.then(
+      () => this.pendingAssets.delete(pending),
+      () => this.pendingAssets.delete(pending)
+    );
+  }
+
   private mountTheme(themeId: SceneThemeId, selection: SceneAssemblySelection | null): void {
     const token = ++this.loadToken;
+    this.foregroundLoadToken += 1;
+    this.assetLoadError = null;
     const definition = getSceneTheme(themeId);
     this.floorMaterial = definition.floorMaterial ?? null;
     this.floorTexture = null;
@@ -158,13 +208,16 @@ export class SceneThemeLayer {
     else this.mountLegacyLayers(definition.layers, token);
 
     if (this.floorMaterial) {
-      Assets.load(this.floorMaterial.url)
+      this.trackAssetLoad(Assets.load(this.floorMaterial.url)
         .then((texture) => {
           if (token !== this.loadToken) return;
           this.floorTexture = texture;
           this.onAssetReady?.();
         })
-        .catch((error) => console.error(`Failed to load theme floor: ${this.floorMaterial?.url}`, error));
+        .catch((error) => {
+          if (token === this.loadToken) this.assetLoadError = error;
+          console.error(`Failed to load theme floor: ${this.floorMaterial?.url}`, error);
+        }));
     }
   }
 
@@ -196,19 +249,14 @@ export class SceneThemeLayer {
       if (!definition || definition.side !== instance.side) continue;
       if (foregroundSetIds && !foregroundSetIds.includes(definition.setId)) continue;
       const container = instance.side === 'left' ? this.foregroundLeft : this.foregroundRight;
-      const mounted = this.createAsset(container, this.resolveViewportAsset(definition.asset), token);
-      mounted.sprite.eventMode = 'static';
-      mounted.sprite.cursor = 'pointer';
-      mounted.sprite.on('pointertap', (event) => {
-        event.stopPropagation();
-        window.dispatchEvent(new CustomEvent('memery:foreground-tap', { detail: { side: instance.side } }));
-      });
+      const mounted = this.createAsset(container, this.resolveViewportAsset(definition.asset), this.foregroundLoadToken);
+      mounted.sprite.eventMode = 'none';
       this.foregroundAssets.push({ ...mounted, instance, definition });
     }
   }
 
   private mountForegroundOnly(selection: SceneAssemblySelection | null, foregroundSetIds?: string[]): void {
-    const token = ++this.loadToken;
+    const token = ++this.foregroundLoadToken;
     this.clearContainer(this.foregroundLeft);
     this.clearContainer(this.foregroundRight);
     this.foregroundAssets = [];
@@ -222,12 +270,7 @@ export class SceneThemeLayer {
       if (foregroundSetIds && !foregroundSetIds.includes(definition.setId)) continue;
       const container = instance.side === 'left' ? this.foregroundLeft : this.foregroundRight;
       const mounted = this.createAsset(container, this.resolveViewportAsset(definition.asset), token);
-      mounted.sprite.eventMode = 'static';
-      mounted.sprite.cursor = 'pointer';
-      mounted.sprite.on('pointertap', (event) => {
-        event.stopPropagation();
-        window.dispatchEvent(new CustomEvent('memery:foreground-tap', { detail: { side: instance.side } }));
-      });
+      mounted.sprite.eventMode = 'none';
       this.foregroundAssets.push({ ...mounted, instance, definition });
     }
   }
@@ -237,7 +280,7 @@ export class SceneThemeLayer {
     for (const spec of layers?.portraitBack ?? []) this.portraitBackAssets.push(this.createAsset(this.portraitBack, spec, token));
     for (const spec of layers?.portraitFront ?? []) this.portraitFrontAssets.push(this.createAsset(this.portraitFront, spec, token));
     for (const spec of layers?.ground ?? []) this.groundAssets.push(this.createGroundAsset(spec, token));
-    for (const spec of layers?.foreground ?? []) this.viewportAssets.push(this.createAsset(this.foregroundLeft, this.resolveViewportAsset(spec), token));
+    for (const spec of layers?.foreground ?? []) this.viewportAssets.push(this.createAsset(this.foregroundLeft, this.resolveViewportAsset(spec), this.foregroundLoadToken));
   }
 
   private getDeviceProfile(): 'phone' | 'tablet' {
@@ -259,15 +302,22 @@ export class SceneThemeLayer {
     sprite.visible = false;
     sprite.alpha = spec.alpha ?? 1;
     container.addChild(sprite);
-    Assets.load(spec.url)
+    this.trackAssetLoad(Assets.load(spec.url)
       .then((texture) => {
-        if (token !== this.loadToken || sprite.destroyed) return;
+        const currentToken = container === this.foregroundLeft || container === this.foregroundRight
+          ? this.foregroundLoadToken : this.loadToken;
+        if (token !== currentToken || sprite.destroyed) return;
         sprite.texture = texture;
         sprite.visible = true;
         this.layout();
         this.onAssetReady?.();
       })
-      .catch((error) => console.error(`Failed to load scene component: ${spec.url}`, error));
+      .catch((error) => {
+        const currentToken = container === this.foregroundLeft || container === this.foregroundRight
+          ? this.foregroundLoadToken : this.loadToken;
+        if (token === currentToken) this.assetLoadError = error;
+        console.error(`Failed to load scene component: ${spec.url}`, error);
+      }));
     return { spec, sprite };
   }
 
@@ -284,7 +334,7 @@ export class SceneThemeLayer {
       return;
     }
 
-    Assets.load(spec.url)
+    this.trackAssetLoad(Assets.load(spec.url)
       .then((atlas: Texture) => {
         if (token !== this.loadToken) return;
         spec.wallParts?.forEach(({ frame, anchor }, index) => {
@@ -301,12 +351,19 @@ export class SceneThemeLayer {
         this.layout();
         this.onAssetReady?.();
       })
-      .catch((error) => console.error(`Failed to load scene component: ${spec.url}`, error));
+      .catch((error) => {
+        if (token === this.loadToken) this.assetLoadError = error;
+        console.error(`Failed to load scene component: ${spec.url}`, error);
+      }));
   }
 
   private layout(): void {
     const { width, height } = this.viewport;
     if (width <= 0 || height <= 0) return;
+
+    // Keep foreground cycling within the narrow edge zones marked in the scene.
+    this.foregroundLeft.hitArea = ellipseHitArea(width, height, 0.09, 0.805, 0.09, 0.195);
+    this.foregroundRight.hitArea = ellipseHitArea(width, height, 0.92, 0.82, 0.08, 0.18);
 
     // FloorLayer owns the shared wall/floor boundary. Recompute the clipping mask
     // on every viewport layout so tall phone and shorter tablet screens stay aligned.
@@ -470,6 +527,7 @@ export class SceneThemeLayer {
 
   public destroy(): void {
     ++this.loadToken;
+    ++this.foregroundLoadToken;
     this.wallAssembly.destroy({ children: true });
     for (const { subTexture } of this.wallAssemblyAssets) subTexture?.destroy(false);
     for (const container of [this.wallpaperDecorations, this.portraitBack, this.portraitFront,

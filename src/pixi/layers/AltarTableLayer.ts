@@ -95,6 +95,7 @@ export class AltarTableLayer {
   private backRightLegSprite: TilingSprite | null = null;
 
   // 1. 底层：着地接触阴影与案底环境遮蔽
+  private shadowCacheContainer: Container = new Container();
   private shadowGraphics: Graphics = new Graphics();
   /** 足端落影专用柔化模糊（随案体尺度调整强度，避免硬边椭圆） */
   private shadowBlurFilter: BlurFilter = new BlurFilter({ strength: 2.2, quality: 2 });
@@ -128,6 +129,8 @@ export class AltarTableLayer {
   private mingTableLoaded: boolean = false;
   private themeTableAssetUrl: string | undefined;
   private tableAssetLoadToken = 0;
+  private tableAssetReady: Promise<unknown> = Promise.resolve();
+  private tableAssetError: unknown = null;
   private activeTableIsThemeAsset = false;
   private destroyed: boolean = false;
   private lastRenderOptions: AltarTableRenderOptions | null = null;
@@ -157,10 +160,13 @@ export class AltarTableLayer {
   private isDragging: boolean = false;
   private dragStartY: number = 0;
 
-  constructor() {
+  constructor(private readonly shadowsEnabled = true) {
     // 严格按纵深前后层次排列
-    this.shadowGraphics.filters = [this.shadowBlurFilter];
-    this.container.addChild(this.shadowGraphics);
+    this.shadowGraphics.filters = shadowsEnabled ? [this.shadowBlurFilter] : [];
+    this.shadowCacheContainer.addChild(this.shadowGraphics);
+    if (shadowsEnabled) this.shadowCacheContainer.cacheAsTexture(true);
+    this.shadowCacheContainer.visible = shadowsEnabled;
+    this.container.addChild(this.shadowCacheContainer);
     this.mingTableSprite.visible = false;
     this.mingTableSprite.eventMode = 'none';
     this.container.addChild(this.mingTableSprite);
@@ -253,15 +259,17 @@ export class AltarTableLayer {
   private selectTableAsset(url?: string): void {
     if (url === this.themeTableAssetUrl) return;
     this.themeTableAssetUrl = url;
+    this.tableAssetError = null;
     const token = ++this.tableAssetLoadToken;
     if (!url) {
+      this.tableAssetReady = Promise.resolve();
       this.mingTableLoaded = false;
       this.activeTableIsThemeAsset = false;
       this.mingTableSprite.visible = false;
       return;
     }
     this.mingTableLoaded = false;
-    Assets.load<Texture>(url).then((texture) => {
+    this.tableAssetReady = Assets.load<Texture>(url).then((texture) => {
       if (this.destroyed || token !== this.tableAssetLoadToken || this.mingTableSprite.destroyed) return;
       this.mingTableSprite.texture = texture;
       this.mingTableLoaded = true;
@@ -271,7 +279,19 @@ export class AltarTableLayer {
       this.mingTableSprite.filters = [];
       this.container.tint = 0xffffff;
       if (this.lastRenderOptions) this.render(this.lastRenderOptions);
-    }).catch((error) => console.error(`Failed to load theme altar table: ${url}`, error));
+    }).catch((error) => {
+      if (token === this.tableAssetLoadToken) this.tableAssetError = error;
+      console.error(`Failed to load theme altar table: ${url}`, error);
+    });
+  }
+
+  public async whenReady(): Promise<void> {
+    let pending: Promise<unknown>;
+    do {
+      pending = this.tableAssetReady;
+      await pending;
+    } while (pending !== this.tableAssetReady);
+    if (this.tableAssetError) throw this.tableAssetError;
   }
 
   /**
@@ -378,6 +398,10 @@ export class AltarTableLayer {
     this.renderLighting();
   }
 
+  public needsCandleLightSources(): boolean {
+    return this.geom !== null && this.getCandleInfluence() > 0.01;
+  }
+
   /**
    * 按光源位置重算案体照明：
    * 1. 环境光压暗层：整案沉入暗部（受案体剪影遮罩约束，不污染墙地）；
@@ -468,12 +492,14 @@ export class AltarTableLayer {
       this.topSurfaceContainer.visible = false;
       this.tableclothContainer.visible = false;
       this.shadowGraphics.clear();
+      this.shadowCacheContainer.visible = false;
       this.lightContainer.visible = false;
       this.geom = null;
       this.container.hitArea = null;
       return;
     }
     this.tableclothContainer.visible = true;
+    this.shadowCacheContainer.visible = this.shadowsEnabled;
     this.lightContainer.visible = true;
     const {
       centerX,
@@ -888,70 +914,76 @@ export class AltarTableLayer {
     //    后足有略淡略窄的接触影与落影尾部相融，四足均明确落地。
     // ──────────────────────────────────────────
     // 柔化强度随案体尺度等比缩放，保证不同桌宽下虚化程度一致
-    this.shadowBlurFilter.strength = Math.max(1.6, 2.2 * u);
-    this.shadowGraphics.clear();
-
-    const drawSharedFootShadow = (frontFootX: number, backFootX: number) => {
-      // 视觉透视：天光自前上方投射，落影向后（朝后腿方向）延展。
-      // 1) 落影尾部：先画，从足端向后腿方向拖出并覆盖后足，随距离渐淡
-      const tailCx = (frontFootX + backFootX) / 2 + 5 * u;
-      const tailRx = (Math.abs(frontFootX - backFootX) + legW * 0.5 + backLegW * 0.5) / 2 + 8 * u;
-      this.shadowGraphics.ellipse(tailCx, baseBottomY - 1, tailRx, 3.5).fill({
-        color: 0x140803,
-        alpha: 0.2,
-      });
-      // 2) 后足接触阴影：足位因透视上收 5u，略窄略淡于前足，确保后腿明确落地
-      this.shadowGraphics.ellipse(backFootX, baseBottomY - 4 * u, backLegW * 0.72, 3.2).fill({
-        color: 0x140803,
-        alpha: 0.38,
-      });
-      // 3) 主接触阴影：贴前足端，略偏后，最实
-      this.shadowGraphics.ellipse(frontFootX + 4 * u, baseBottomY + 1, legW * 0.85, 4.5).fill({
-        color: 0x140803,
-        alpha: 0.46,
-      });
-      // 4) 足底压实微核（模糊后仍保留接地实感）
-      this.shadowGraphics.ellipse(frontFootX + 3 * u, baseBottomY + 1.5, legW * 0.45, 2.4).fill({
-        color: 0x120702,
-        alpha: 0.26,
-      });
-    };
-    // 左侧前足 + 后足阴影组
-    drawSharedFootShadow(leftLegX + legW * 0.5, backLeftLegX + backLegW * 0.5);
-    // 右侧前足 + 后足阴影组
-    drawSharedFootShadow(rightLegX + legW * 0.5, backRightLegX + backLegW * 0.5);
-
-    // 案底大面积开阔环境光遮蔽（AO）柔和落影（上缘覆盖后足底，收敛宽度避免贯穿横带）
-    this.shadowGraphics.ellipse(0, baseBottomY + 3, halfW * 0.72, 9).fill({
-      color: 0x140803,
-      alpha: 0.24,
-    });
-    // 案前浅淡前投落影（增强接地感）
-    this.shadowGraphics.ellipse(0, baseBottomY + 12, halfW * 0.6, 4.5).fill({
-      color: 0x140803,
-      alpha: 0.15,
-    });
-
-    if (mingMetrics) {
-      // The raster has longer legs and a different leg spread than the former vector table.
-      // Re-anchor contact shadows to the extracted image's actual foot positions.
+    if (this.shadowsEnabled) {
+      this.shadowBlurFilter.strength = Math.max(1.6, 2.2 * u);
       this.shadowGraphics.clear();
-      const leftFootX = mingMetrics.leftLegX + mingMetrics.legWidth * 0.5;
-      const rightFootX = mingMetrics.rightLegX + mingMetrics.legWidth * 0.5;
-      for (const footX of [leftFootX, rightFootX]) {
-        this.shadowGraphics.ellipse(footX + 3 * u, mingMetrics.footDrop + 1, mingMetrics.legWidth * 0.58, 3.8).fill({
+
+      const drawSharedFootShadow = (frontFootX: number, backFootX: number) => {
+        // 视觉透视：天光自前上方投射，落影向后（朝后腿方向）延展。
+        // 1) 落影尾部：先画，从足端向后腿方向拖出并覆盖后足，随距离渐淡
+        const tailCx = (frontFootX + backFootX) / 2 + 5 * u;
+        const tailRx = (Math.abs(frontFootX - backFootX) + legW * 0.5 + backLegW * 0.5) / 2 + 8 * u;
+        this.shadowGraphics.ellipse(tailCx, baseBottomY - 1, tailRx, 3.5).fill({
           color: 0x140803,
-          alpha: 0.43,
+          alpha: 0.2,
         });
-      }
-      this.shadowGraphics.ellipse(0, mingMetrics.footDrop + 2, halfW * 0.68, 7.5).fill({
+        // 2) 后足接触阴影：足位因透视上收 5u，略窄略淡于前足，确保后腿明确落地
+        this.shadowGraphics.ellipse(backFootX, baseBottomY - 4 * u, backLegW * 0.72, 3.2).fill({
+          color: 0x140803,
+          alpha: 0.38,
+        });
+        // 3) 主接触阴影：贴前足端，略偏后，最实
+        this.shadowGraphics.ellipse(frontFootX + 4 * u, baseBottomY + 1, legW * 0.85, 4.5).fill({
+          color: 0x140803,
+          alpha: 0.46,
+        });
+        // 4) 足底压实微核（模糊后仍保留接地实感）
+        this.shadowGraphics.ellipse(frontFootX + 3 * u, baseBottomY + 1.5, legW * 0.45, 2.4).fill({
+          color: 0x120702,
+          alpha: 0.26,
+        });
+      };
+      // 左侧前足 + 后足阴影组
+      drawSharedFootShadow(leftLegX + legW * 0.5, backLeftLegX + backLegW * 0.5);
+      // 右侧前足 + 后足阴影组
+      drawSharedFootShadow(rightLegX + legW * 0.5, backRightLegX + backLegW * 0.5);
+
+      // 案底大面积开阔环境光遮蔽（AO）柔和落影（上缘覆盖后足底，收敛宽度避免贯穿横带）
+      this.shadowGraphics.ellipse(0, baseBottomY + 3, halfW * 0.72, 9).fill({
         color: 0x140803,
         alpha: 0.24,
       });
-      this.shadowGraphics.ellipse(0, mingMetrics.footDrop + 10, halfW * 0.56, 4).fill({
+      // 案前浅淡前投落影（增强接地感）
+      this.shadowGraphics.ellipse(0, baseBottomY + 12, halfW * 0.6, 4.5).fill({
         color: 0x140803,
-        alpha: 0.14,
+        alpha: 0.15,
       });
+
+      if (mingMetrics) {
+        // The raster has longer legs and a different leg spread than the former vector table.
+        // Re-anchor contact shadows to the extracted image's actual foot positions.
+        this.shadowGraphics.clear();
+        const leftFootX = mingMetrics.leftLegX + mingMetrics.legWidth * 0.5;
+        const rightFootX = mingMetrics.rightLegX + mingMetrics.legWidth * 0.5;
+        for (const footX of [leftFootX, rightFootX]) {
+          this.shadowGraphics.ellipse(footX + 3 * u, mingMetrics.footDrop + 1, mingMetrics.legWidth * 0.58, 3.8).fill({
+            color: 0x140803,
+            alpha: 0.43,
+          });
+        }
+        this.shadowGraphics.ellipse(0, mingMetrics.footDrop + 2, halfW * 0.68, 7.5).fill({
+          color: 0x140803,
+          alpha: 0.24,
+        });
+        this.shadowGraphics.ellipse(0, mingMetrics.footDrop + 10, halfW * 0.56, 4).fill({
+          color: 0x140803,
+          alpha: 0.14,
+        });
+      }
+
+      // Blur the static contact shadows only when their geometry changes. The cache
+      // inherits renderer resolution and keeps the existing filter and drawing.
+      this.shadowCacheContainer.updateCacheTexture();
     }
 
     // ──────────────────────────────────────────

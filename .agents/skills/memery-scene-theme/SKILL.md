@@ -76,7 +76,6 @@ description: Define and implement Memery scene themes as named, replaceable wall
 - 绿叶只作花枝陪衬。控制叶片数量、面积和饱和度，以低饱和暖橄榄绿或灰绿为主，避免浓密、鲜亮的青绿抢过花色、红木和暖色场景；六套之间保持相近的绿叶视觉占比与色彩重量。
 - 左右 PNG 必须各自包含完整的枝叶花朵构图和自然透明留白；枝梢保持在画布内，透明画布外侧留有安全边距。保持另一侧及画面中央透明，不得合并成全屏贴图。源 PNG 按基准设计坐标的原生尺寸显示；禁止任何针对前景素材的代码缩放、拉升、压缩、裁切或非等比变换。若高度或枝幅不合适，修改并覆盖源 PNG 本身。场景只可按安全框移动前景位置；不得让底端显示根、树桩、花盆、主干断头或树干落地点。可以让完整素材的画布下端位于视口之外，但不得裁改素材来达成构图。前景透明边缘需自然，底部/近镜头柔焦程度应一致可解释。预留受限位置拖动能力：以主题安全框约束 `offsetX`、`offsetY`，禁止用户缩放。
 - 完整前景组图须先以所属主题的整体渲染稿审核色彩、比例与遮挡；候选 PNG 制作后再由代码注册。主题专属素材放在 `public/themes/<theme-id>/foregrounds/<set-id>/left.png` 和 `right.png`；需要跨主题复用的素材放在共享库 `public/scene-assets/foregrounds/<set-id>/left.png` 和 `right.png`。注册表 URL 使用站点根路径绝对地址（如 `/scene-assets/foregrounds/plum_blossom/left.png`），不要使用相对路径或把共享素材绑定到单个主题目录。在 `src/pixi/scene/components/registry.ts` 注册左右 `SceneForegroundDefinition`，并在 `src/pixi/scene/themes/registry.ts` 为每个主题显式声明可用 `foregroundSetIds` 和默认实例；设置 UI 只能呈现当前主题允许的候选。共享库中的素材也必须由至少一个主题显式引用，不得留下孤立素材或让默认组引用不存在的 id。
-- 本项目左侧前景审阅未完成期间，每次回复都展示当前注册的六张左侧 PNG，使用最新的正式素材路径，不用历史候选图代替；替换正式素材后，展示更新后的六张。
 - 主题定义不得自动叠加全部六套候选。默认只选择经用户审计的套组；其余组作为可替换候选进入该主题目录，默认场景中不重复绘制。
 
 ## 候选目录和命名

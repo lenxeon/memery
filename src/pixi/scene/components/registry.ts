@@ -91,7 +91,7 @@ export const WALL_DECORATION_OPTIONS = [
 ] as const;
 
 const GROUND_MAT_GEOMETRY = { widthRatio: 1.20, bottomRatio: 0.045 } as const;
-const CUSHION_GEOMETRY = { widthRatio: 0.32, bottomRatio: 0.095 } as const;
+const CUSHION_GEOMETRY = { widthRatio: 0.32, bottomRatio: 0.065 } as const;
 
 export const GROUND_MAT_OPTIONS = [
   ground({ id: 'clear_rush_long_mat', part: 'groundMat', name: '清篾长席', poeticTitle: '清席承步',
@@ -110,6 +110,8 @@ const foreground = (definition: SceneForegroundDefinition): SceneForegroundDefin
 // do not add a runtime filter to these full-height transparent sprites.
 
 const foregroundHeight = { defaultHeightRatio: 0.22, minHeightRatio: 0.18, maxHeightRatio: 0.4 } as const;
+const foregroundBaseHeightRatio = 0.4;
+const rightForegroundScaleRatio = 0.74;
 
 const foregroundPair = (
   setId: string,
@@ -121,7 +123,9 @@ const foregroundPair = (
   const isLeft = side === 'left';
   const assetPath = `/scene-assets/foregrounds/${setId}/${side}.png`;
   // Bump this value when overwriting a public asset so browser and Pixi caches reload it.
-  const url = isLeft ? `${assetPath}?v=20261025-left-foreground-r2` : assetPath;
+  const url = isLeft
+    ? `${assetPath}?v=20261026-left-foreground-blur-r4`
+    : `${assetPath}?v=20261026-right-from-left-half-r1`;
   return foreground({
     id: `${setId}_${side}`,
     setId,
@@ -131,11 +135,13 @@ const foregroundPair = (
     description,
     plant,
     focusTreatment: isLeft
-      ? '中央枝冠清晰，靠近镜头的下侧花叶轻柔虚化，参考 50mm f/1.4 浅景深；不使用运行时模糊滤镜。'
-      : '花叶保持可辨，枝梢带轻柔近景感；不使用运行时模糊滤镜。',
+      ? '五组素材统一追加高斯模糊（半径 4 px）；玉兰沿用既有虚化版本；虚化烘焙进 PNG，不使用运行时模糊滤镜。'
+      : '使用对应左图左半幅原像素，放置在同尺寸右侧画布的右半边；不缩放、不镜像，焦外虚化烘焙在 PNG。',
     ...foregroundHeight,
-    defaultHeightRatio: side === 'left' ? 0.4 : foregroundHeight.defaultHeightRatio,
-    bottomOverflowRatio: isLeft ? 0.12 : 0,
+    defaultHeightRatio: isLeft
+      ? foregroundBaseHeightRatio
+      : foregroundBaseHeightRatio * rightForegroundScaleRatio,
+    bottomOverflowRatio: 0.12,
     side,
     previewUrl: url,
     asset: { url, fit: 'width', widthRatio: 0.34, alpha: 1 },

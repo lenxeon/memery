@@ -30,6 +30,17 @@ export class SceneBackgroundLayer {
   private viewport: { w: number; h: number } = { w: 0, h: 0 };
   private backdropUrl: string = '';
   private backdropToken: number = 0;
+  private backdropReady: Promise<unknown> = Promise.resolve();
+  private backdropError: unknown = null;
+
+  public async whenReady(): Promise<void> {
+    let pending: Promise<unknown>;
+    do {
+      pending = this.backdropReady;
+      await pending;
+    } while (pending !== this.backdropReady);
+    if (this.backdropError) throw this.backdropError;
+  }
 
   constructor() {
     this.wallBackdropSprite.visible = false;
@@ -75,6 +86,9 @@ export class SceneBackgroundLayer {
     const isNight = lighting.timeOfDay === 'night';
 
     if (!url) {
+      this.backdropToken += 1;
+      this.backdropReady = Promise.resolve();
+      this.backdropError = null;
       this.wallBackdropSprite.visible = false;
       this.backdropUrl = '';
       return;
@@ -85,9 +99,10 @@ export class SceneBackgroundLayer {
 
     if (this.backdropUrl !== url) {
       this.backdropUrl = url;
+      this.backdropError = null;
       const token = ++this.backdropToken;
       sprite.visible = false;
-      Assets.load(url)
+      this.backdropReady = Assets.load(url)
         .then((tex) => {
           if (token !== this.backdropToken || sprite.destroyed) return;
           sprite.texture = tex;
@@ -95,6 +110,7 @@ export class SceneBackgroundLayer {
           this.layoutWallBackdrop();
         })
         .catch((err) => {
+          if (token === this.backdropToken) this.backdropError = err;
           console.error('Failed to load wall backdrop:', err);
         });
     } else if (sprite.texture && sprite.texture.width > 0) {

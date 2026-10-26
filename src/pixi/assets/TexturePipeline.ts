@@ -40,6 +40,8 @@ export const getVaseTextureCacheKey = (
 export class TexturePipeline {
   private static instance: TexturePipeline | null = null;
   public isLoaded: boolean = false;
+  private initPromise: Promise<void> | null = null;
+  private readonly floorReady: Partial<Record<FloorStyle, Promise<void>>> = {};
 
   // 地板真实材质贴图 (5大古典禅意地板)
   public woodPlankTexture: Texture | null = null;
@@ -89,9 +91,12 @@ export class TexturePipeline {
   /**
    * 初始化核心静态资产与预编译纹理
    */
-  public async init(): Promise<void> {
-    if (this.isLoaded) return;
+  public init(): Promise<void> {
+    if (this.isLoaded) return Promise.resolve();
+    return this.initPromise ??= this.initialize();
+  }
 
+  private async initialize(): Promise<void> {
     try {
       // 1. 生成程序化柔和烟雾与烛光粒子纹理 (同步即时生成)
       this.smokeParticleTexture = this.generateSoftRadialTexture(64, 'rgba(235, 230, 222, 0.45)');
@@ -168,6 +173,10 @@ export class TexturePipeline {
     }
   }
 
+  public whenFloorReady(style: FloorStyle): Promise<void> {
+    return this.floorReady[style] ?? Promise.resolve();
+  }
+
   private loadFloorTextures(): void {
     const urls: Record<string, string> = {
       hinoki_wood: '/textures/hinoki_wood.jpg',
@@ -179,22 +188,27 @@ export class TexturePipeline {
     };
 
     for (const [key, url] of Object.entries(urls)) {
-      try {
-        const img = new Image();
-        img.src = url;
-        img.onload = () => {
-          const tex = Texture.from(img);
-          this.floorTextures[key as FloorStyle] = tex;
-          if (key === 'herringbone_wood' || key === 'wood_planks') {
-            this.woodPlankTexture = tex;
-          }
-          if (key === 'marble_tile') {
-            this.marbleTileTexture = tex;
-          }
-        };
-      } catch (e) {
-        console.warn('Could not load floor texture:', key, e);
-      }
+      this.floorReady[key as FloorStyle] = new Promise<void>((resolve) => {
+        try {
+          const img = new Image();
+          img.onload = () => {
+            const tex = Texture.from(img);
+            this.floorTextures[key as FloorStyle] = tex;
+            if (key === 'herringbone_wood' || key === 'wood_planks') {
+              this.woodPlankTexture = tex;
+            }
+            if (key === 'marble_tile') {
+              this.marbleTileTexture = tex;
+            }
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = url;
+        } catch (e) {
+          console.warn('Could not load floor texture:', key, e);
+          resolve();
+        }
+      });
     }
   }
 

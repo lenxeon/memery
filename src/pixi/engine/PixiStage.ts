@@ -4,12 +4,16 @@
  * 负责场景分层容器管理与视口响应式适配。
  * 具备独立 Canvas 创建与 StrictMode 防 context lost 保护。
  */
-import { Application, Container } from 'pixi.js';
+import { Application, Container, extensions, PrepareSystem } from 'pixi.js';
+
+// PixiJS exports PrepareSystem but requires explicit registration before renderer creation.
+extensions.add(PrepareSystem);
 
 export interface PixiStageOptions {
   container: HTMLElement;
   width: number;
   height: number;
+  deferFirstFrame?: boolean;
 }
 
 export class PixiStage {
@@ -37,6 +41,7 @@ export class PixiStage {
     await app.init({
       width: Math.max(100, Math.round(options.width)),
       height: Math.max(100, Math.round(options.height)),
+      autoStart: !options.deferFirstFrame,
       // 1.5 caps high-DPI render targets at 2.25× CSS pixels (instead of 4× at DPR 2).
       resolution: Math.min(window.devicePixelRatio || 1, 1.5),
       autoDensity: true,
@@ -60,6 +65,7 @@ export class PixiStage {
     app.canvas.style.width = '100%';
     app.canvas.style.height = '100%';
     app.canvas.style.display = 'block';
+    app.canvas.style.visibility = options.deferFirstFrame ? 'hidden' : 'visible';
     app.canvas.style.touchAction = 'none';
     // 禁用移动端长按弹出的图片操作菜单与系统选择
     (app.canvas.style as CSSStyleDeclaration & { WebkitTouchCallout: string }).WebkitTouchCallout = 'none';

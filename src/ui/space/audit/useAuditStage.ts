@@ -110,7 +110,7 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
   // ── 案台状态 ──
   const [tableWoodStyle, setTableWoodStyle] = useState<TableWoodStyle>(DEFAULT_TABLE_WOOD_STYLE);
   const [tableLegWoodStyle, setTableLegWoodStyle] = useState<TableWoodStyle>(DEFAULT_TABLE_WOOD_STYLE);
-  const [tableForward, setTableForward] = useState(0);
+  const [tableForward, setTableForward] = useState(0.5);
   const [showTableRunner, setShowTableRunner] = useState(false);
 
   const clampForward = useCallback((value: number) => setTableForward(Math.max(-1, Math.min(1, value))), []);
@@ -264,8 +264,8 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
 
   const resetTableForward = useCallback(() => {
     sound.playWoodPlacement();
-    setTableForward(0);
-    showToast('供案前后位置已复位');
+    setTableForward(0.5);
+    showToast('供案已复位至默认前移位置');
   }, [showToast]);
 
   const toggleTableRunner = useCallback(() => {

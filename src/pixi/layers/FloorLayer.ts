@@ -198,7 +198,7 @@ export class FloorLayer {
   private skirtingGraphics: Graphics = new Graphics();
   private contactShadow: Sprite | null = null;
 
-  constructor() {
+  constructor(private readonly shadowsEnabled = true) {
     this.container.addChild(this.baseGraphics);
     // 透视网格在底色之上
     this.container.addChild(this.depthGradient);
@@ -405,6 +405,10 @@ export class FloorLayer {
       for (const sprite of this.reflectionSprites) sprite.visible = false;
     }
 
+    if (!this.shadowsEnabled) {
+      if (this.contactShadow) this.contactShadow.visible = false;
+      return;
+    }
     if (!this.contactShadow) {
       this.contactShadow = new Sprite(
         createRadialTexture([

@@ -1,22 +1,25 @@
 /**
  * @file IncenseSmokeRenderer.ts
- * @description PixiJS 国风禅意工笔香烟与三炷立香高保真渲染器。
- * 100% 完整复刻原版 IncenseSmoke.tsx 的拉格朗日流体力学质点流（Lagrangian Puff Ribbon）。
- * 呈现 86px 挺拔沉静的高香柱身、三缕同心徐徐升腾的 1.5px~3.3px 纤巧柔光缕烟多边形，
- * 以及细若游丝的 0.7px 工笔高光中流线，彻底消灭失火般的圆形滚滚浓烟！
+ * @description 三炷立香与细薄直升的轻烟：烟根收细，上段缓慢扩散并渐隐。
  */
-import { Sprite, Texture } from 'pixi.js';
+import { CanvasSource, Rectangle, Sprite, Texture } from 'pixi.js';
 
 interface SmokeNode {
   x: number;
   y: number;
-  vx: number;
   vy: number;
   age: number;
   maxAge: number;
   width: number;
-  alpha: number;
 }
+
+const SMOKE_EMISSION_STEP = 4;
+const SMOKE_WIDTH_SCALE = 1.5;
+const SMOKE_STREAMS = [
+  { life: 138, speed: 0.50, baseWidth: 0.42, maxWidth: 1.8, sway: 0.42, phase: -0.8 },
+  { life: 158, speed: 0.53, baseWidth: 0.48, maxWidth: 2.2, sway: 0.50, phase: 0.2 },
+  { life: 148, speed: 0.51, baseWidth: 0.44, maxWidth: 1.95, sway: 0.46, phase: 1.1 },
+] as const;
 
 export class IncenseSmokeRenderer {
   public sprite: Sprite;
@@ -26,21 +29,29 @@ export class IncenseSmokeRenderer {
 
   private trails: SmokeNode[][] = [[], [], []];
   private time: number = 0;
-  private frameCount: number = 0;
+  private emissionAccum: number = 0;
   private litTransition: number = 1.0;
 
   private readonly canvasW = 160;
   private readonly canvasH = 280;
+  // The three streams stay near centerX. Upload only this strip while Texture.trim
+  // preserves the original sprite size, anchor and all drawing coordinates.
+  private readonly contentLeft = 56;
+  private readonly contentWidth = 48;
   private readonly centerX = 80;
   private readonly burnerBaseY = 278;
 
   constructor() {
     this.canvas = document.createElement('canvas');
-    this.canvas.width = this.canvasW * 2;
+    this.canvas.width = this.contentWidth * 2;
     this.canvas.height = this.canvasH * 2;
     this.ctx = this.canvas.getContext('2d', { alpha: true })!;
 
-    this.texture = Texture.from(this.canvas);
+    this.texture = new Texture({
+      source: new CanvasSource({ resource: this.canvas, resolution: 1 }),
+      orig: new Rectangle(0, 0, this.canvasW * 2, this.canvasH * 2),
+      trim: new Rectangle(this.contentLeft * 2, 0, this.contentWidth * 2, this.canvasH * 2),
+    });
     this.sprite = new Sprite(this.texture);
     // 锚点精确对齐香炉香灰口底面 (centerX=80, burnerBaseY=278)
     this.sprite.anchor.set(this.centerX / this.canvasW, this.burnerBaseY / this.canvasH);
@@ -57,14 +68,14 @@ export class IncenseSmokeRenderer {
     const ctx = this.ctx;
     if (!ctx) return;
 
-    this.time += 0.016 * delta;
-    this.frameCount++;
+    const step = Math.min(6, Math.max(0, delta));
+    this.time += step / 60;
 
     const currentHealth = Math.max(0, Math.min(1.0, health));
 
     // 平滑点燃/熄灭过渡
     const targetLit = isLit && currentHealth > 0.02 ? 1.0 : 0.0;
-    this.litTransition += (targetLit - this.litTransition) * 0.05 * delta;
+    this.litTransition += (targetLit - this.litTransition) * (1 - Math.exp(-0.05 * step));
 
     // 1. 香体长度与保留香脚 (原版标准尺寸：中心香 86px，两侧香 78px)
     const STUB_CENTER_LEN = 28;
@@ -91,6 +102,7 @@ export class IncenseSmokeRenderer {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.save();
     ctx.scale(2, 2);
+    ctx.translate(-this.contentLeft, 0);
 
     // ── 1. 绘制三炷清香香身 ─────────────────────────────────────────
     ctx.lineCap = 'round';
@@ -131,218 +143,104 @@ export class IncenseSmokeRenderer {
       }
     }
 
-    // ── 环境自然呼吸与偶尔阵风系统 ──
-    const breathCycle = Math.sin(this.time * 0.92);
-    const gustPulse = Math.pow(Math.max(0, Math.sin(this.time * 0.35)), 2.6) * 1.4;
-    const organicWind = (windForce * 1.2) + (breathCycle * 0.45) + (gustPulse * (breathCycle >= 0 ? 0.7 : -0.7));
-
-    // ── 2. 真实热对流缓缓升腾与自然扩散模拟 ──
+    // ── 2. 细烟直升：细小扰动随烟上行，离开香头后才逐渐展开 ──
     const trails = this.trails;
-
-    // ── 三炷香差异化配置：更加纤巧薄透，三缕各具高低粗细与 S 弯波纹形态 ──
-    const STREAM_PROFILES = [
-      {
-        // s = 0: 左侧香（纤巧柔美，偏左起弯，高度约 38px，宽度约 1.5px）
-        ageMultiplier: 0.86,
-        baseW: 0.50,
-        maxW: 1.5,
-        tipW: 0.12,
-        waveFreq: 0.165,
-        waveTimeSpeed: 1.25,
-        wavePhaseOffset: -0.7,
-        amplitude: 1.5,
-        laneBias: -1.3,
-      },
-      {
-        // s = 1: 中央主香（最挺拔高挑，主干饱满舒朗，高度约 46px，宽度约 2.0px）
-        ageMultiplier: 1.0,
-        baseW: 0.60,
-        maxW: 2.0,
-        tipW: 0.15,
-        waveFreq: 0.140,
-        waveTimeSpeed: 1.35,
-        wavePhaseOffset: 0.0,
-        amplitude: 1.8,
-        laneBias: 0.0,
-      },
-      {
-        // s = 2: 右侧香（中等舒朗，偏右起弯，高度约 42px，宽度约 1.7px）
-        ageMultiplier: 0.92,
-        baseW: 0.55,
-        maxW: 1.7,
-        tipW: 0.12,
-        waveFreq: 0.150,
-        waveTimeSpeed: 1.45,
-        wavePhaseOffset: 0.8,
-        amplitude: 1.6,
-        laneBias: 1.3,
-      },
-    ];
-
-    // 每 2 帧发射一个新烟气质点
-    if (this.litTransition > 0.02 && this.frameCount % 2 === 0) {
-      for (let s = 0; s < dynamicEmbers.length; s++) {
-        const emb = dynamicEmbers[s];
-        const prof = STREAM_PROFILES[s];
-        trails[s].unshift({
-          x: emb.x,
-          y: emb.y - 0.5,
-          vx: 0,
-          // 缓缓上升：静谧平缓的对流速度 (-0.56 ~ -0.62 px/frame)
-          vy: -(0.58 + Math.random() * 0.04) * lateFactor,
-          age: 0,
-          // 基准生命周期缩减至 68 帧（上升高度约 38~46px）
-          maxAge: Math.round((68 + Math.random() * 8) * prof.ageMultiplier),
-          width: prof.baseW,
-          alpha: 0,
-        });
-      }
-    }
-
-    // 更新烟气粒子生命周期 (三缕各具形态与尺寸，微风优雅 S 弯波纹，尾部变尖细)
+    const wind = Math.max(-1, Math.min(1, windForce));
+    const follow = 1 - Math.exp(-0.2 * step);
     for (let s = 0; s < trails.length; s++) {
       const trail = trails[s];
       const emb = dynamicEmbers[s];
-      const prof = STREAM_PROFILES[s];
+      const profile = SMOKE_STREAMS[s];
 
       for (let i = trail.length - 1; i >= 0; i--) {
         const node = trail[i];
-        node.age += delta;
-
+        node.age += step;
         if (node.age >= node.maxAge) {
           trail.splice(i, 1);
           continue;
         }
 
-        // 垂直平缓升腾
-        node.y += node.vy * delta;
+        node.y += node.vy * step;
+        const height = Math.max(0, emb.y - node.y);
+        const progress = Math.min(1, node.age / node.maxAge);
+        const release = Math.pow(Math.min(1, height / 24), 1.5);
+        const flowPhase = height * 0.15 - this.time * 2.1 + profile.phase;
+        const sway = Math.sin(height * 0.045 - this.time * 0.55 + profile.phase) * profile.sway;
+        const fineWisp = Math.sin(flowPhase) * 0.12;
+        const drift = wind * 1.2 * progress * progress;
+        node.x += (emb.x + (sway + fineWisp) * release + drift - node.x) * follow;
 
-        // 距离各自香头的垂直升腾高度
-        const distFromEmber = Math.max(0, emb.y - node.y);
-        const p = Math.min(1.0, distFromEmber / 48);
-
-        // 1. 各自独立的曲线摇曳（不同波长、周期与相位，动作克制从容）：
-        const wavePhase = distFromEmber * prof.waveFreq - this.time * prof.waveTimeSpeed + prof.wavePhaseOffset;
-        const amplitude = prof.amplitude * Math.sin(Math.min(1.0, p * 1.1) * Math.PI * 0.82);
-        const sCurveWave = Math.sin(wavePhase) * amplitude;
-
-        // 2. 独立安全间距通道与偏向（绝对互不缠绕）
-        const laneSpread = prof.laneBias * Math.pow(p, 1.15);
-
-        // 3. 室内极微弱的自然微风协同漂移
-        const windDrift = (windForce * 0.14) * (1.6 * Math.pow(p, 1.1));
-
-        // 目标横向位置
-        const targetX = emb.x + sCurveWave + laneSpread + windDrift;
-
-        // 平滑向目标位置过渡
-        node.x += (targetX - node.x) * 0.22;
-
-        // 4. 差异化烟体造型：优雅收束变细
-        const prog = node.age / node.maxAge;
-        if (prog < 0.22) {
-          // 根部出烟段：自香尖渐次展开
-          const t = prog / 0.22;
-          node.width = prof.baseW + t * (prof.maxW - prof.baseW);
-          node.alpha = 0.2 + t * 0.6;
-        } else if (prog < 0.62) {
-          // 中段躯干：饱满流转的工笔主幔
-          const t = (prog - 0.22) / 0.40;
-          const arch = Math.sin(t * Math.PI);
-          node.width = prof.maxW * (0.88 + arch * 0.12);
-          node.alpha = 0.8 - t * 0.12;
-        } else {
-          // 尾部渐尖段（变尖细！优雅收束至极细锋芒尖梢）
-          const t = (prog - 0.62) / 0.38;
-          node.width = Math.max(prof.tipW, prof.maxW * Math.pow(1.0 - t, 1.35));
-          node.alpha = 0.68 * Math.pow(1.0 - t, 1.25);
-        }
+        // 上段轻轻散开，宽度中的细微起伏随流上行；透明度负责末端消散。
+        const spread = progress * progress * (3 - 2 * progress);
+        node.width = (profile.baseWidth + (profile.maxWidth - profile.baseWidth) * spread)
+          * (0.93 + 0.07 * Math.sin(flowPhase));
       }
     }
 
-    // ── 3. 绘制缓缓上升、薄透轻灵且尾端变尖细的柔光工笔缕烟 ──
+    // 按经过的时间发射，维持不同帧率下的烟丝间距。
+    if (targetLit > 0) {
+      this.emissionAccum += step;
+      while (this.emissionAccum >= SMOKE_EMISSION_STEP) {
+        this.emissionAccum -= SMOKE_EMISSION_STEP;
+        for (let s = 0; s < trails.length; s++) {
+          const emb = dynamicEmbers[s];
+          const profile = SMOKE_STREAMS[s];
+          const vy = -profile.speed * lateFactor;
+          const age = this.emissionAccum;
+          trails[s].unshift({
+            x: emb.x,
+            y: emb.y - 0.4 + vy * age,
+            vy,
+            age,
+            maxAge: profile.life,
+            width: profile.baseWidth,
+          });
+        }
+      }
+    } else {
+      this.emissionAccum = 0;
+    }
+
+    // ── 3. 淡灰烟芯与低透明度外缘，沿高度渐隐 ──
     if (this.litTransition > 0.02) {
-      // 降低基准不透明度，呈现若隐若现的空气通透感
-      const baseAlpha = Math.min(0.65, density * 0.55) * lateFactor * this.litTransition;
+      const baseAlpha = Math.min(0.72, Math.max(0, density) * 0.64) * lateFactor * this.litTransition;
+      const smokeColor = isNightMode ? '223, 226, 227' : '220, 224, 226';
+      const smokeEdgeColor = isNightMode ? '155, 160, 162' : '156, 164, 166';
 
       for (let s = 0; s < trails.length; s++) {
         const trail = trails[s];
         if (trail.length < 3) continue;
 
-        const leftPoints: { x: number; y: number }[] = [];
-        const rightPoints: { x: number; y: number }[] = [];
+        const gradientStartY = dynamicEmbers[s].y;
+        const gradientEndY = trail[trail.length - 1].y;
+        const edgeGrad = ctx.createLinearGradient(0, gradientStartY, 0, gradientEndY);
+        edgeGrad.addColorStop(0, `rgba(${smokeEdgeColor}, 0)`);
+        edgeGrad.addColorStop(0.05, `rgba(${smokeEdgeColor}, ${0.16 * baseAlpha})`);
+        edgeGrad.addColorStop(0.18, `rgba(${smokeEdgeColor}, ${0.48 * baseAlpha})`);
+        edgeGrad.addColorStop(0.42, `rgba(${smokeEdgeColor}, ${0.36 * baseAlpha})`);
+        edgeGrad.addColorStop(0.70, `rgba(${smokeEdgeColor}, ${0.14 * baseAlpha})`);
+        edgeGrad.addColorStop(0.88, `rgba(${smokeEdgeColor}, ${0.025 * baseAlpha})`);
+        edgeGrad.addColorStop(1, `rgba(${smokeEdgeColor}, 0)`);
 
-        for (let i = 0; i < trail.length; i++) {
-          const node = trail[i];
-          // 稍微收细半宽，使烟雾更显清瘦灵动
-          const halfW = (node.width * 0.45) * (0.75 + 0.25 * lateFactor);
-          leftPoints.push({ x: node.x - halfW, y: node.y });
-          rightPoints.push({ x: node.x + halfW, y: node.y });
-        }
-
-        // Pass 1: 纤巧轻透缕烟多边形（柔美 S 弯工笔流体，尾部尖细闭合）
-        ctx.beginPath();
-        ctx.moveTo(leftPoints[0].x, leftPoints[0].y);
-        for (let i = 0; i < leftPoints.length - 1; i++) {
-          const xc = (leftPoints[i].x + leftPoints[i + 1].x) / 2;
-          const yc = (leftPoints[i].y + leftPoints[i + 1].y) / 2;
-          ctx.quadraticCurveTo(leftPoints[i].x, leftPoints[i].y, xc, yc);
-        }
-        // 汇聚于尖细尾梢顶端极点
-        const apexNode = trail[trail.length - 1];
-        ctx.lineTo(apexNode.x, apexNode.y - 0.8);
-        ctx.lineTo(rightPoints[rightPoints.length - 1].x, rightPoints[rightPoints.length - 1].y);
-        for (let i = rightPoints.length - 1; i > 0; i--) {
-          const xc = (rightPoints[i].x + rightPoints[i - 1].x) / 2;
-          const yc = (rightPoints[i].y + rightPoints[i - 1].y) / 2;
-          ctx.quadraticCurveTo(rightPoints[i].x, rightPoints[i].y, xc, yc);
-        }
-        ctx.closePath();
-
-        const bottomY = trail[0].y;
-        const topY = trail[trail.length - 1].y;
-        const streamGrad = ctx.createLinearGradient(0, bottomY, 0, topY);
-
-        if (isNightMode) {
-          streamGrad.addColorStop(0, `rgba(252, 246, 236, 0.05)`);
-          streamGrad.addColorStop(0.18, `rgba(250, 244, 232, ${0.52 * baseAlpha})`);
-          streamGrad.addColorStop(0.55, `rgba(244, 238, 226, ${0.42 * baseAlpha})`);
-          streamGrad.addColorStop(0.82, `rgba(235, 228, 216, ${0.20 * baseAlpha})`);
-          streamGrad.addColorStop(1.0, `rgba(220, 212, 200, 0)`);
-        } else {
-          streamGrad.addColorStop(0, `rgba(255, 254, 250, 0.06)`);
-          streamGrad.addColorStop(0.18, `rgba(254, 251, 244, ${0.56 * baseAlpha})`);
-          streamGrad.addColorStop(0.55, `rgba(250, 246, 238, ${0.45 * baseAlpha})`);
-          streamGrad.addColorStop(0.82, `rgba(242, 238, 230, ${0.22 * baseAlpha})`);
-          streamGrad.addColorStop(1.0, `rgba(225, 220, 210, 0)`);
-        }
-
+        const streamGrad = ctx.createLinearGradient(0, gradientStartY, 0, gradientEndY);
+        streamGrad.addColorStop(0, `rgba(${smokeColor}, 0)`);
+        streamGrad.addColorStop(0.05, `rgba(${smokeColor}, ${0.16 * baseAlpha})`);
+        streamGrad.addColorStop(0.18, `rgba(${smokeColor}, ${0.48 * baseAlpha})`);
+        streamGrad.addColorStop(0.42, `rgba(${smokeColor}, ${0.36 * baseAlpha})`);
+        streamGrad.addColorStop(0.70, `rgba(${smokeColor}, ${0.14 * baseAlpha})`);
+        streamGrad.addColorStop(0.88, `rgba(${smokeColor}, ${0.025 * baseAlpha})`);
+        streamGrad.addColorStop(1, `rgba(${smokeColor}, 0)`);
+        ctx.fillStyle = edgeGrad;
+        ctx.globalAlpha = 0.26;
+        this.drawSmokeRibbon(trail, 2.6);
         ctx.fillStyle = streamGrad;
-        ctx.fill();
-
-        // Pass 2: 细若游丝的工笔高光中脊线（沿波纹脊线延伸至尾部渐隐）
-        ctx.beginPath();
-        ctx.moveTo(trail[0].x, trail[0].y);
-        const spineLimit = Math.max(3, Math.floor(trail.length * 0.85));
-        for (let i = 0; i < spineLimit - 1; i++) {
-          const xc = (trail[i].x + trail[i + 1].x) / 2;
-          const yc = (trail[i].y + trail[i + 1].y) / 2;
-          ctx.quadraticCurveTo(trail[i].x, trail[i].y, xc, yc);
-        }
-
-        const coreGrad = ctx.createLinearGradient(0, bottomY, 0, topY);
-        coreGrad.addColorStop(0, `rgba(255, 255, 255, 0)`);
-        coreGrad.addColorStop(0.14, `rgba(255, 255, 255, ${0.20 * baseAlpha})`);
-        coreGrad.addColorStop(0.45, `rgba(254, 252, 248, ${0.12 * baseAlpha})`);
-        coreGrad.addColorStop(0.75, `rgba(245, 240, 232, 0)`);
-
-        ctx.strokeStyle = coreGrad;
-        ctx.lineWidth = 0.35;
-        ctx.stroke();
+        ctx.globalAlpha = 1;
+        this.drawSmokeRibbon(trail, 0.8);
       }
     }
 
     // ── 4. 纤巧内敛的香头火炭 ──
+    const emberSizeScale = 0.6;
     for (let i = 0; i < dynamicEmbers.length; i++) {
       const emb = dynamicEmbers[i];
       if (this.litTransition > 0.02 && currentHealth > 0.02) {
@@ -350,19 +248,20 @@ export class IncenseSmokeRenderer {
         const emberBreath = 0.82 + emberCycle * 0.18;
 
         // 微晕
-        const rGlow = ctx.createRadialGradient(emb.x, emb.y, 0.4, emb.x, emb.y, 4.2 * lateFactor);
+        const glowRadius = 4.2 * lateFactor * emberSizeScale;
+        const rGlow = ctx.createRadialGradient(emb.x, emb.y, 0.4 * emberSizeScale, emb.x, emb.y, glowRadius);
         rGlow.addColorStop(0, `rgba(255, 100, 30, ${0.65 * emberBreath * this.litTransition})`);
         rGlow.addColorStop(0.4, `rgba(245, 60, 15, ${0.25 * emberBreath * this.litTransition})`);
         rGlow.addColorStop(1, 'rgba(200, 40, 10, 0)');
         ctx.fillStyle = rGlow;
         ctx.beginPath();
-        ctx.arc(emb.x, emb.y, 4.2 * lateFactor, 0, Math.PI * 2);
+        ctx.arc(emb.x, emb.y, glowRadius, 0, Math.PI * 2);
         ctx.fill();
 
         // 核心亮点
         ctx.fillStyle = `rgba(255, 200, 120, ${0.9 * emberBreath * this.litTransition})`;
         ctx.beginPath();
-        ctx.arc(emb.x, emb.y, 0.75 * lateFactor, 0, Math.PI * 2);
+        ctx.arc(emb.x, emb.y, 0.75 * lateFactor * emberSizeScale, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -371,6 +270,34 @@ export class IncenseSmokeRenderer {
 
     // 更新 GPU 纹理源
     this.texture.source.update();
+  }
+
+  private drawSmokeRibbon(trail: SmokeNode[], widthScale: number): void {
+    const ctx = this.ctx;
+    const half = widthScale * SMOKE_WIDTH_SCALE * 0.5;
+    const first = trail[0];
+    const last = trail[trail.length - 1];
+    ctx.beginPath();
+    ctx.moveTo(first.x - first.width * half, first.y);
+    for (let i = 0; i < trail.length - 1; i++) {
+      const node = trail[i];
+      const next = trail[i + 1];
+      const x = node.x - node.width * half;
+      const nextX = next.x - next.width * half;
+      ctx.quadraticCurveTo(x, node.y, (x + nextX) * 0.5, (node.y + next.y) * 0.5);
+    }
+    ctx.lineTo(last.x - last.width * half, last.y);
+    ctx.lineTo(last.x + last.width * half, last.y);
+    for (let i = trail.length - 1; i > 0; i--) {
+      const node = trail[i];
+      const next = trail[i - 1];
+      const x = node.x + node.width * half;
+      const nextX = next.x + next.width * half;
+      ctx.quadraticCurveTo(x, node.y, (x + nextX) * 0.5, (node.y + next.y) * 0.5);
+    }
+    ctx.lineTo(first.x + first.width * half, first.y);
+    ctx.closePath();
+    ctx.fill();
   }
 
   public destroy(): void {

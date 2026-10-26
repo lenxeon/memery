@@ -315,7 +315,7 @@ export const AuditStage: React.FC<AuditStageProps> = ({
                     type="button"
                     onClick={onResetTableForward}
                     className="px-1.5 py-0.5 rounded-full bg-stone-900/80 border border-stone-700 text-stone-400 hover:text-amber-200 hover:border-amber-500/50 cursor-pointer transition-all active:scale-95 text-[10px]"
-                    title="复位供案至标准前后位置"
+                    title="复位供案至默认前移位置"
                   >
                     复位
                   </button>
