@@ -1,123 +1,489 @@
 /**
  * @file registry.ts
- * @description 空间主题注册表。新增主题只需注册一份定义并放入对应 PNG 资产。
+ * @description 通用主题配置加载器。主题的构图、素材、桌面测量和默认装配来自 public/themes 下的 JSONC。
  */
-import type { SceneThemeDefinition, SceneThemeId } from '../../../types';
-import { createDefaultSceneAssembly } from '../components';
+import type {
+  SceneAssemblySelection,
+  SceneForegroundSide,
+  SceneForegroundDefinition,
+  SceneThemeDefinition,
+  SceneThemeId,
+  SceneThemeTableDefinition,
+  SceneThemeViewportAsset,
+  SceneThemeGroundAsset,
+  SceneThemePortraitAsset,
+} from '../../../types';
 
-const theme = (definition: SceneThemeDefinition): SceneThemeDefinition => definition;
+interface ThemeCatalog {
+  schemaVersion: number;
+  themes: Array<{ id: string; manifest: string }>;
+}
 
-export const SCENE_THEME_REGISTRY: Record<SceneThemeId, SceneThemeDefinition> = {
-  classic_dawn: theme({
-    id: 'classic_dawn',
-    name: '晴岚映曜', poeticTitle: '晨光沐影', iconText: '🏛️',
-    desc: '支摘槛窗 · 横披纳远岫、冰裂格心透光', tag: '经典圣洁',
-    wall: {
-      wallpaper: {
-        url: '/themes/classic_dawn/wallpapers/phone/ink-landscape-render-match.png',
-        fit: 'cover',
-        responsiveAssets: {
-          phone: '/themes/classic_dawn/wallpapers/phone/ink-landscape-render-match.png',
-          tablet: '/themes/classic_dawn/wallpapers/tablet/ink-landscape-render-match.png',
-        },
-      },
-      portrait: { scale: 1.02, dy: 6, textDy: 2, textGap: 2 },
-    },
-    foregroundSetIds: ['plum_blossom', 'camellia', 'osmanthus', 'magnolia', 'peach_blossom', 'wintersweet'],
-    defaultForegroundSetId: 'plum_blossom',
-    defaultAssembly: createDefaultSceneAssembly('plum_blossom'),
-    floorMaterial: {
-      url: '/themes/classic_dawn/floor/polished-chestnut-plane-render-match-v2.png',
-      mode: 'projected-plane',
-      baseColor: 0x805339,
-      baseboard: { color: 0x6f3d22, highlight: 0xc28a58 },
-    },
-    tableAssetUrl: '/themes/classic_dawn/table/altar-table-render-match.png',
-    preset: { floor: 'hinoki_wood', tablecloth: 'autumn_gold', tableWood: 'walnut', tableRunner: false,
-      lighting: { sunAngle: -20, sunlightIntensity: 0.92, godRaysIntensity: 0.68, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.82, y: 0.12 }, sunAngle: -20, sunlightIntensity: 0.92,
-      godRaysIntensity: 0.68, godRaysEnabled: true, keyColor: 0xffedc2, ambientColor: 0xf2e8dc,
-      shadowDirection: { x: -0.76, y: 0.65 } },
-  }),
-  heritage_wood: theme({
-    id: 'heritage_wood',
-    name: '暮林晚钟', poeticTitle: '沉香花格', iconText: '🏮',
-    desc: '紫檀落地罩 · 素壁留白只嵌一扇冰裂漏窗', tag: '传家古韵',
-    wall: { wallpaper: { url: '/textures/wall/wall_01.png', fit: 'cover' } },
-    preset: { floor: 'walnut_plank', tablecloth: 'indigo_linen', tableWood: 'walnut', tableRunner: true,
-      lighting: { sunAngle: 8, sunlightIntensity: 0.64, godRaysIntensity: 0.24, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.28, y: 0.16 }, sunAngle: 8, sunlightIntensity: 0.64,
-      godRaysIntensity: 0.24, godRaysEnabled: true, keyColor: 0xffd49b, ambientColor: 0xd9c6af,
-      shadowDirection: { x: 0.68, y: 0.72 } },
-  }),
-  royal_drape: theme({
-    id: 'royal_drape',
-    name: '华彩生光', poeticTitle: '皇家帷幔', iconText: '🎭',
-    desc: '深绛丝绒帷幔半开 · 幔内月洞一线远岫', tag: '庄重华美',
-    wall: { wallpaper: { url: '/textures/wall/wall_03.png', fit: 'cover' } },
-    preset: { floor: 'herringbone_wood', tablecloth: 'cinnabar_red', tableWood: 'cherry', tableRunner: true,
-      lighting: { sunAngle: -8, sunlightIntensity: 0.74, godRaysIntensity: 0.32, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.76, y: 0.16 }, sunAngle: -8, sunlightIntensity: 0.74,
-      godRaysIntensity: 0.32, godRaysEnabled: true, keyColor: 0xffcc83, ambientColor: 0x9e624f,
-      shadowDirection: { x: -0.72, y: 0.7 } },
-  }),
-  bronze_mirror: theme({
-    id: 'bronze_mirror',
-    name: '圆满如月', poeticTitle: '铜镜华光', iconText: '🌕',
-    desc: '圆光罩镶镏金铜镜 · 莲瓣铸边镜中借景', tag: '圆满通达',
-    wall: { wallpaper: { url: '/textures/wall/wall_04.png', fit: 'cover' } },
-    preset: { floor: 'hinoki_wood', tablecloth: 'moonlight_white', tableWood: 'walnut', tableRunner: false,
-      lighting: { sunAngle: -4, sunlightIntensity: 0.8, godRaysIntensity: 0.28, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.68, y: 0.1 }, sunAngle: -4, sunlightIntensity: 0.8,
-      godRaysIntensity: 0.28, godRaysEnabled: true, keyColor: 0xffe1a9, ambientColor: 0xe9dcc8,
-      shadowDirection: { x: -0.64, y: 0.76 } },
-  }),
-  brick_screen: theme({
-    id: 'brick_screen',
-    name: '古朴苍然', poeticTitle: '月洞空灵', iconText: '🪟',
-    desc: '月洞门水墨二重远山 · 冰裂漏窗竹影宫灯', tag: '东方雅意',
-    preset: { floor: 'zen_tatami', tablecloth: 'evergreen_pine', tableWood: 'walnut', tableRunner: true,
-      lighting: { sunAngle: 12, sunlightIntensity: 0.58, godRaysIntensity: 0.18, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.24, y: 0.14 }, sunAngle: 12, sunlightIntensity: 0.58,
-      godRaysIntensity: 0.18, godRaysEnabled: true, keyColor: 0xe8d7bb, ambientColor: 0xa8aca1,
-      shadowDirection: { x: 0.78, y: 0.62 } },
-  }),
-  lotus_mandorla: theme({
-    id: 'lotus_mandorla',
-    name: '宝相庄严', poeticTitle: '莲台佛境', iconText: '🪷',
-    desc: '佛龛欢门暖金 · 两层宝相花莲台一缕清香', tag: '福佑庄严',
-    preset: { floor: 'marble_tile', tablecloth: 'sandalwood_purple', tableWood: 'walnut', tableRunner: true,
-      lighting: { sunAngle: 0, sunlightIntensity: 0.66, godRaysIntensity: 0.22, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.5, y: 0.08 }, sunAngle: 0, sunlightIntensity: 0.66,
-      godRaysIntensity: 0.22, godRaysEnabled: true, keyColor: 0xffd57d, ambientColor: 0x6d594b,
-      shadowDirection: { x: 0, y: 1 } },
-  }),
-  ancestral_hall: theme({
-    id: 'ancestral_hall',
-    name: '祠堂暖阁', poeticTitle: '慈颜春晖', iconText: '🏮',
-    desc: '紫檀月洞门 · 双侧宫灯 · 梅枝远山', tag: '中式祠堂',
-    wall: {
-      wallpaper: { url: '/themes/ancestral_warmth/wallpapers/ink-warm-silk.png', fit: 'cover' },
-      portrait: { scale: 1.04, dy: 8, textDy: 4, textGap: 2 },
-    },
-    foregroundSetIds: ['warm_foliage'],
-    defaultForegroundSetId: 'warm_foliage',
-    defaultAssembly: createDefaultSceneAssembly('warm_foliage'),
-    floorMaterial: {
-      url: '/themes/ancestral_warmth/floor-wood.png',
-      tileSize: { w: 310, h: 310 },
-      baseColor: 0xc78d51,
-      baseboard: { color: 0x6f3d22, highlight: 0xc28a58 },
-    },
-    preset: { floor: 'hinoki_wood', tablecloth: 'moonlight_white', tableWood: 'huanghuali', tableRunner: true,
-      lighting: { sunAngle: -18, sunlightIntensity: 0.86, godRaysIntensity: 0.34, godRaysEnabled: true } },
-    lightRig: { source: { x: 0.86, y: 0.16 }, sunAngle: -18, sunlightIntensity: 0.86,
-      godRaysIntensity: 0.34, godRaysEnabled: true, keyColor: 0xffc86b, ambientColor: 0xe7c99d,
-      shadowDirection: { x: -0.82, y: 0.57 } },
-  }),
+type RawAssembly = Omit<SceneAssemblySelection, 'wallSceneryId' | 'foreground'> & {
+  frameId: string;
+  offerings: SceneThemeDefinition['defaultOfferings'];
+  foreground: Record<SceneForegroundSide, { foregroundId: string; offsetX?: number; offsetY?: number; alpha?: number }>;
 };
 
-export const SCENE_THEME_OPTIONS = Object.values(SCENE_THEME_REGISTRY);
+const registry: Record<string, SceneThemeDefinition> = {};
+const options: SceneThemeDefinition[] = [];
+let loadPromise: Promise<void> | null = null;
 
-export const getSceneTheme = (id: SceneThemeId): SceneThemeDefinition =>
-  SCENE_THEME_REGISTRY[id] ?? SCENE_THEME_REGISTRY.classic_dawn;
+/** Remove JSONC comments without touching comment-like text inside quoted strings. */
+const stripJsonComments = (source: string): string => {
+  let result = '';
+  let inString = false;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    const next = source[index + 1];
+    if (lineComment) {
+      if (char === '\n' || char === '\r') {
+        lineComment = false;
+        result += char;
+      } else result += ' ';
+      continue;
+    }
+    if (blockComment) {
+      if (char === '*' && next === '/') {
+        result += '  ';
+        index += 1;
+        blockComment = false;
+      } else result += char === '\n' || char === '\r' ? char : ' ';
+      continue;
+    }
+    if (inString) {
+      result += char;
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+    if (char === '"') {
+      inString = true;
+      result += char;
+    } else if (char === '/' && next === '/') {
+      result += '  ';
+      index += 1;
+      lineComment = true;
+    } else if (char === '/' && next === '*') {
+      result += '  ';
+      index += 1;
+      blockComment = true;
+    } else result += char;
+  }
+  return result;
+};
+
+const parseJsonc = <T,>(source: string, path: string): T => {
+  try {
+    return JSON.parse(stripJsonComments(source)) as T;
+  } catch (error) {
+    throw new Error(`Invalid theme JSONC at ${path}: ${String(error)}`);
+  }
+};
+
+const publicUrl = (path: string): string => `/${path.replace(/^\/+/, '')}`;
+const parseColor = (value: string | number): number =>
+  typeof value === 'number' ? value : Number.parseInt(value.replace(/^#/, ''), 16);
+
+const withAssetUrls = <T extends { assets?: Partial<Record<'phone' | 'tablet', string>>; asset?: string }>(value: T) => {
+  const responsiveAssets = value.assets
+    ? Object.fromEntries(Object.entries(value.assets).map(([profile, path]) => [profile, publicUrl(path!)])) as Partial<Record<'phone' | 'tablet', string>>
+    : undefined;
+  return {
+    url: publicUrl(value.asset ?? value.assets?.phone ?? value.assets?.tablet ?? ''),
+    ...(responsiveAssets ? { responsiveAssets } : {}),
+  };
+};
+
+interface RawAsset {
+  id: string;
+  name: string;
+  poeticTitle?: string;
+  description?: string;
+  previewUrl?: string;
+  asset?: string;
+  assets?: Partial<Record<'phone' | 'tablet', string>>;
+  video?: { asset: string };
+  fit?: SceneThemeViewportAsset['fit'];
+  position?: { x?: number; y?: number; widthRatio?: number };
+  responsiveWidthRatios?: { phone?: number; tablet?: number };
+  bottomExtensionRatio?: number;
+  widthRatio?: number;
+  alpha?: number;
+  backAsset?: RawAsset & Omit<SceneThemePortraitAsset, 'url' | 'responsiveAssets'>;
+  frontAsset?: RawAsset & Omit<SceneThemePortraitAsset, 'url' | 'responsiveAssets'>;
+  wallParts?: SceneThemeViewportAsset['wallParts'];
+}
+
+interface RawThemeManifest {
+  schemaVersion: number;
+  themeId: string;
+  name: string;
+  poeticTitle: string;
+  iconText: string;
+  desc: string;
+  tag: string;
+  version: number;
+  sceneBackground?: { mode: 'single-background'; asset: string };
+  wall?: {
+    wallpaper: RawAsset;
+    wallpaperDecorations: RawAsset[];
+    frame: RawAsset;
+    frameDecorations: RawAsset[];
+    portrait: NonNullable<SceneThemeDefinition['wall']>['portrait'];
+  } | null;
+  ground?: {
+    floor: { id: string; name: string; asset: string; baseColor: number | string; baseboard: { color: number | string; highlight: number | string }; bakedLighting?: boolean } | null;
+    groundMat: RawAsset & SceneThemeGroundAsset;
+    cushion: RawAsset & SceneThemeGroundAsset;
+  } | null;
+  table?: SceneThemeTableDefinition | null;
+  foregroundCandidates?: {
+    left: Record<string, Omit<SceneForegroundDefinition, 'themeId' | 'side' | 'asset' | 'previewUrl'> & { asset: string; previewUrl?: string; widthRatio?: number }>;
+    right: Record<string, Omit<SceneForegroundDefinition, 'themeId' | 'side' | 'asset' | 'previewUrl'> & { asset: string; previewUrl?: string; widthRatio?: number }>;
+  } | null;
+  defaultAssembly?: RawAssembly | null;
+  foregroundSetIds?: string[];
+  defaultForegroundSetId?: string;
+  preset: SceneThemeDefinition['preset'];
+  lightRig: Omit<SceneThemeDefinition['lightRig'], 'keyColor' | 'ambientColor'> & { keyColor: number | string; ambientColor: number | string };
+}
+
+const portraitAsset = (raw: RawAsset): SceneThemePortraitAsset => ({
+  ...withAssetUrls(raw),
+  widthInPortraits: Number((raw as unknown as SceneThemePortraitAsset).widthInPortraits ?? 1),
+  dxInPortraits: (raw as unknown as SceneThemePortraitAsset).dxInPortraits,
+  dyInPortraits: (raw as unknown as SceneThemePortraitAsset).dyInPortraits,
+  anchorX: (raw as unknown as SceneThemePortraitAsset).anchorX,
+  anchorY: (raw as unknown as SceneThemePortraitAsset).anchorY,
+  alpha: raw.alpha,
+});
+
+const validateThemeManifest = (raw: RawThemeManifest): void => {
+  const assert = (condition: unknown, message: string): void => {
+    if (!condition) throw new Error(`Invalid theme manifest ${raw.themeId}: ${message}`);
+  };
+  assert(Boolean(raw.themeId && raw.name && raw.poeticTitle), 'themeId, name and poeticTitle are required');
+  if (raw.sceneBackground) {
+    const { mode, asset } = raw.sceneBackground;
+    assert(mode === 'single-background', 'sceneBackground.mode must be "single-background"');
+    assert(typeof asset === 'string' && asset.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(asset) && !asset.split('/').includes('..'), 'sceneBackground.asset must reference a PNG inside the current theme directory');
+    assert(raw.wall == null, 'single-background themes must not define split wall layers');
+    assert(Boolean(raw.ground && raw.ground.floor == null && raw.table && raw.defaultAssembly && raw.foregroundCandidates), 'single-background themes require a null ground.floor plus configured ground props, table, assembly and foreground candidates');
+    const ground = raw.ground!;
+    const table = raw.table!;
+    const defaultAssembly = raw.defaultAssembly!;
+    const foregroundCandidates = raw.foregroundCandidates!;
+    for (const [field, path] of [['ground.groundMat.asset', ground.groundMat.asset], ['ground.cushion.asset', ground.cushion.asset], ['table.asset', table.asset]] as const) {
+      assert(typeof path === 'string' && path.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(path) && !path.split('/').includes('..'), `${field} must reference a PNG inside the current theme directory`);
+    }
+    assert(defaultAssembly.groundMatId === ground.groundMat.id, 'defaultAssembly.groundMatId must reference ground.groundMat.id');
+    assert(defaultAssembly.cushionId === ground.cushion.id, 'defaultAssembly.cushionId must reference ground.cushion.id');
+    const leftSetIds = new Set(Object.values(foregroundCandidates.left).map(({ setId }) => setId));
+    const rightSetIds = new Set(Object.values(foregroundCandidates.right).map(({ setId }) => setId));
+    for (const setId of raw.foregroundSetIds ?? []) assert(leftSetIds.has(setId) && rightSetIds.has(setId), `foregroundSetIds entry ${setId} must have both left and right candidates`);
+    for (const side of ['left', 'right'] as const) {
+      assert(Boolean(foregroundCandidates[side][defaultAssembly.foreground[side].foregroundId]), `default foreground ${side}.${defaultAssembly.foreground[side].foregroundId} is missing from its candidate object`);
+    }
+    const { usableArea } = table.surface;
+    for (const [itemId, offering] of Object.entries(defaultAssembly.offerings ?? {})) {
+      const { u, v } = offering.position;
+      assert(u >= usableArea.uMin && u <= usableArea.uMax && v >= usableArea.vMin && v <= usableArea.vMax, `default offering ${itemId} must fall inside table.surface.usableArea`);
+    }
+    return;
+  }
+  assert(Boolean(raw.wall && raw.ground && raw.table && raw.defaultAssembly && raw.foregroundCandidates), 'split themes require wall, ground, table, defaultAssembly and foregroundCandidates');
+  const wall = raw.wall!;
+  const ground = raw.ground!;
+  const table = raw.table!;
+  const defaultAssembly = raw.defaultAssembly!;
+  const foregroundCandidates = raw.foregroundCandidates!;
+  const wallpaper = wall.wallpaper;
+  if (wallpaper.video !== undefined) {
+    const videoPath = wallpaper.video?.asset;
+    assert(typeof videoPath === 'string' && videoPath.startsWith(`themes/${raw.themeId}/`) && /\.mp4$/i.test(videoPath) && !videoPath.split('/').includes('..'), 'wall.wallpaper.video.asset must reference an MP4 inside the current theme directory');
+    assert(typeof wallpaper.assets?.phone === 'string' && /\.png$/i.test(wallpaper.assets.phone), 'video wallpapers require a static assets.phone PNG poster');
+  }
+  const bottomExtensionRatio = wall.frame.bottomExtensionRatio;
+  assert(bottomExtensionRatio === undefined || (Number.isFinite(bottomExtensionRatio) && bottomExtensionRatio >= 0 && bottomExtensionRatio <= 0.15), 'wall.frame.bottomExtensionRatio must be between 0 and 0.15');
+  const floor = ground.floor;
+  assert(Boolean(floor), 'split themes require ground.floor; use null only when a single scene background already contains the floor');
+  const floorSpec = floor!;
+  assert(typeof floorSpec.asset === 'string' && floorSpec.asset.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(floorSpec.asset) && !floorSpec.asset.split('/').includes('..'), 'ground.floor.asset must reference a PNG inside the current theme directory');
+  assert(floorSpec.bakedLighting === undefined || typeof floorSpec.bakedLighting === 'boolean', 'ground.floor.bakedLighting must be a boolean');
+  assert(!('mode' in floorSpec) && !('tileSize' in floorSpec), 'ground.floor no longer supports legacy material modes or tile sizes');
+  assert(defaultAssembly.wallpaperId === wall.wallpaper.id, 'defaultAssembly.wallpaperId must reference wall.wallpaper.id');
+  assert(defaultAssembly.frameId === wall.frame.id, 'defaultAssembly.frameId must reference wall.frame.id');
+  assert(defaultAssembly.wallpaperDecorationId === 'none' || wall.wallpaperDecorations.some(({ id }) => id === defaultAssembly.wallpaperDecorationId), 'defaultAssembly.wallpaperDecorationId must reference a wallpaper decoration or "none"');
+  assert(defaultAssembly.wallDecorationId === 'none' || wall.frameDecorations.some(({ id }) => id === defaultAssembly.wallDecorationId), 'defaultAssembly.wallDecorationId must reference a frame decoration or "none"');
+  assert(defaultAssembly.groundMatId === ground.groundMat.id, 'defaultAssembly.groundMatId must reference ground.groundMat.id');
+  assert(defaultAssembly.cushionId === ground.cushion.id, 'defaultAssembly.cushionId must reference ground.cushion.id');
+  const leftSetIds = new Set(Object.values(foregroundCandidates.left).map(({ setId }) => setId));
+  const rightSetIds = new Set(Object.values(foregroundCandidates.right).map(({ setId }) => setId));
+  for (const setId of raw.foregroundSetIds ?? []) {
+    assert(leftSetIds.has(setId) && rightSetIds.has(setId), `foregroundSetIds entry ${setId} must have both left and right candidates`);
+  }
+  for (const side of ['left', 'right'] as const) {
+    const selected = defaultAssembly.foreground[side].foregroundId;
+    assert(Boolean(foregroundCandidates[side][selected]), `default foreground ${side}.${selected} is missing from its candidate object`);
+  }
+  const { usableArea } = table.surface;
+  for (const [itemId, offering] of Object.entries(defaultAssembly.offerings ?? {})) {
+    const { u, v } = offering.position;
+    assert(u >= 0 && u <= 1 && v >= 0 && v <= 1, `default offering ${itemId} coordinates must be within 0..1`);
+    assert(u >= usableArea.uMin && u <= usableArea.uMax && v >= usableArea.vMin && v <= usableArea.vMax, `default offering ${itemId} must fall inside table.surface.usableArea`);
+  }
+  const points = Object.values(table.surface.assetQuad);
+  assert(points.every(({ x, y }) => x >= 0 && x <= 1 && y >= 0 && y <= 1), 'table.surface.assetQuad points must be normalized to 0..1');
+};
+
+const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
+  if (raw.schemaVersion !== 1) throw new Error(`Unsupported theme schemaVersion: ${raw.schemaVersion}`);
+  validateThemeManifest(raw);
+  if (raw.sceneBackground) {
+    const ground = raw.ground!;
+    const table = raw.table!;
+    const foregroundConfig = raw.foregroundCandidates!;
+    const rawAssembly = raw.defaultAssembly!;
+    const groundAsset = (rawAsset: RawAsset & SceneThemeGroundAsset): SceneThemeGroundAsset => ({
+      ...rawAsset,
+      url: publicUrl(rawAsset.asset ?? rawAsset.url),
+      widthRatio: rawAsset.widthRatio,
+      bottomRatio: rawAsset.bottomRatio,
+      previewUrl: publicUrl(rawAsset.previewUrl ?? rawAsset.asset ?? rawAsset.url),
+    });
+    const foregroundCandidates: SceneForegroundDefinition[] = (['left', 'right'] as const).flatMap((side) =>
+      Object.entries(foregroundConfig[side]).map(([id, candidate]) => ({
+        ...candidate,
+        id,
+        themeId: raw.themeId,
+        side,
+        previewUrl: publicUrl(candidate.previewUrl ?? candidate.asset),
+        asset: { url: publicUrl(candidate.asset), fit: 'width', widthRatio: candidate.widthRatio ?? 0.34, alpha: 1 },
+      }))
+    );
+    const { frameId, offerings, foreground, ...assembly } = rawAssembly;
+    return {
+      id: raw.themeId,
+      name: raw.name,
+      poeticTitle: raw.poeticTitle,
+      iconText: raw.iconText,
+      desc: raw.desc,
+      tag: raw.tag,
+      sceneBackground: publicUrl(raw.sceneBackground.asset),
+      components: {
+        groundMat: {
+          id: ground.groundMat.id,
+          name: ground.groundMat.name,
+          poeticTitle: ground.groundMat.poeticTitle ?? '',
+          description: ground.groundMat.description ?? '',
+          previewUrl: publicUrl(ground.groundMat.previewUrl ?? ground.groundMat.asset ?? ''),
+          asset: groundAsset(ground.groundMat),
+        },
+        cushion: {
+          id: ground.cushion.id,
+          name: ground.cushion.name,
+          poeticTitle: ground.cushion.poeticTitle ?? '',
+          description: ground.cushion.description ?? '',
+          previewUrl: publicUrl(ground.cushion.previewUrl ?? ground.cushion.asset ?? ''),
+          asset: groundAsset(ground.cushion),
+        },
+        wallpaperDecorations: [],
+        frameDecorations: [],
+      },
+      table: { ...table, asset: publicUrl(table.asset) },
+      tableAssetUrl: publicUrl(table.asset),
+      foregroundCandidates,
+      foregroundSetIds: raw.foregroundSetIds ?? [],
+      defaultForegroundSetId: raw.defaultForegroundSetId,
+      defaultAssembly: {
+        ...assembly,
+        wallSceneryId: frameId,
+        foreground: {
+          left: { instanceId: `default-left-${foreground.left.foregroundId}`, side: 'left', order: 0, ...foreground.left },
+          right: { instanceId: `default-right-${foreground.right.foregroundId}`, side: 'right', order: 0, ...foreground.right },
+        },
+      },
+      defaultOfferings: offerings,
+      preset: raw.preset,
+      lightRig: {
+        ...raw.lightRig,
+        keyColor: parseColor(raw.lightRig.keyColor),
+        ambientColor: parseColor(raw.lightRig.ambientColor),
+      },
+    };
+  }
+  const wall = raw.wall!;
+  const ground = raw.ground!;
+  const floor = ground.floor!;
+  const table = raw.table!;
+  const foregroundConfig = raw.foregroundCandidates!;
+  const rawAssembly = raw.defaultAssembly!;
+  const wallpaper = {
+    ...withAssetUrls(wall.wallpaper),
+    ...(wall.wallpaper.video ? { video: { url: publicUrl(wall.wallpaper.video.asset) } } : {}),
+    id: wall.wallpaper.id,
+    name: wall.wallpaper.name,
+    poeticTitle: wall.wallpaper.poeticTitle ?? '',
+    description: wall.wallpaper.description ?? '',
+    previewUrl: publicUrl(wall.wallpaper.previewUrl ?? wall.wallpaper.assets?.phone ?? ''),
+    fit: wall.wallpaper.fit ?? 'cover',
+  } satisfies SceneThemeViewportAsset;
+  const frame = {
+    ...withAssetUrls(wall.frame),
+    id: wall.frame.id,
+    name: wall.frame.name,
+    poeticTitle: wall.frame.poeticTitle ?? '',
+    description: wall.frame.description ?? '',
+    previewUrl: publicUrl(wall.frame.previewUrl ?? wall.frame.assets?.phone ?? ''),
+    fit: wall.frame.fit ?? 'wall-frame',
+    x: wall.frame.position?.x,
+    y: wall.frame.position?.y,
+    widthRatio: wall.frame.position?.widthRatio,
+    responsiveWidthRatios: wall.frame.responsiveWidthRatios,
+    bottomExtensionRatio: wall.frame.bottomExtensionRatio,
+    alpha: wall.frame.alpha,
+  } satisfies SceneThemeViewportAsset;
+  const groundAsset = (rawAsset: RawAsset & SceneThemeGroundAsset): SceneThemeGroundAsset => ({
+    ...rawAsset,
+    url: publicUrl(rawAsset.asset ?? rawAsset.url),
+    widthRatio: rawAsset.widthRatio,
+    bottomRatio: rawAsset.bottomRatio,
+    previewUrl: publicUrl(rawAsset.previewUrl ?? rawAsset.asset ?? rawAsset.url),
+  });
+  const wallpaperDecorations = wall.wallpaperDecorations.map((item) => ({
+    id: item.id,
+    name: item.name,
+    poeticTitle: item.poeticTitle ?? '',
+    description: item.description ?? '',
+    previewUrl: publicUrl(item.previewUrl ?? item.backAsset?.assets?.phone ?? item.backAsset?.asset ?? ''),
+    backAsset: portraitAsset(item.backAsset ?? item),
+    ...(item.frontAsset ? { frontAsset: portraitAsset(item.frontAsset) } : {}),
+  }));
+  const frameDecorations = wall.frameDecorations.map((item) => ({
+    id: item.id,
+    name: item.name,
+    poeticTitle: item.poeticTitle ?? '',
+    description: item.description ?? '',
+    previewUrl: publicUrl(item.previewUrl ?? item.assets?.phone ?? item.asset ?? ''),
+    asset: {
+      ...withAssetUrls(item),
+      fit: item.fit ?? 'width',
+      alpha: item.alpha,
+      wallParts: item.wallParts,
+    } satisfies SceneThemeViewportAsset,
+  }));
+  const foregroundCandidates: SceneForegroundDefinition[] = (['left', 'right'] as const).flatMap((side) =>
+    Object.entries(foregroundConfig[side]).map(([id, candidate]) => ({
+      ...candidate,
+      id,
+      themeId: raw.themeId,
+      side,
+      previewUrl: publicUrl(candidate.previewUrl ?? candidate.asset),
+      asset: { url: publicUrl(candidate.asset), fit: 'width', widthRatio: candidate.widthRatio ?? 0.34, alpha: 1 },
+    }))
+  );
+  const { frameId, offerings, foreground, ...assembly } = rawAssembly;
+  return {
+    id: raw.themeId,
+    name: raw.name,
+    poeticTitle: raw.poeticTitle,
+    iconText: raw.iconText,
+    desc: raw.desc,
+    tag: raw.tag,
+    wall: {
+      wallpaper,
+      portrait: wall.portrait,
+      scenery: [frame],
+    },
+    components: {
+      wallpaperDecorations,
+      frameDecorations,
+      groundMat: {
+        id: ground.groundMat.id,
+        name: ground.groundMat.name,
+        poeticTitle: ground.groundMat.poeticTitle ?? '',
+        description: ground.groundMat.description ?? '',
+        previewUrl: publicUrl(ground.groundMat.previewUrl ?? ground.groundMat.asset ?? ''),
+        asset: groundAsset(ground.groundMat),
+      },
+      cushion: {
+        id: ground.cushion.id,
+        name: ground.cushion.name,
+        poeticTitle: ground.cushion.poeticTitle ?? '',
+        description: ground.cushion.description ?? '',
+        previewUrl: publicUrl(ground.cushion.previewUrl ?? ground.cushion.asset ?? ''),
+        asset: groundAsset(ground.cushion),
+      },
+    },
+    foregroundCandidates,
+    foregroundSetIds: raw.foregroundSetIds ?? [],
+    defaultForegroundSetId: raw.defaultForegroundSetId,
+    floorImage: {
+      url: publicUrl(floor.asset),
+      bakedLighting: floor.bakedLighting,
+      baseColor: parseColor(floor.baseColor),
+      baseboard: {
+        color: parseColor(floor.baseboard.color),
+        highlight: parseColor(floor.baseboard.highlight),
+      },
+    },
+    table: { ...table, asset: publicUrl(table.asset) },
+    tableAssetUrl: publicUrl(table.asset),
+    defaultAssembly: {
+      ...assembly,
+      wallSceneryId: frameId,
+      foreground: {
+        left: { instanceId: `default-left-${foreground.left.foregroundId}`, side: 'left', order: 0, ...foreground.left },
+        right: { instanceId: `default-right-${foreground.right.foregroundId}`, side: 'right', order: 0, ...foreground.right },
+      },
+    },
+    defaultOfferings: offerings,
+    preset: raw.preset,
+    lightRig: {
+      ...raw.lightRig,
+      keyColor: parseColor(raw.lightRig.keyColor),
+      ambientColor: parseColor(raw.lightRig.ambientColor),
+    },
+  };
+};
+
+export const SCENE_THEME_REGISTRY = registry as Record<SceneThemeId, SceneThemeDefinition>;
+export const SCENE_THEME_OPTIONS = options;
+
+export const loadSceneThemes = (): Promise<void> => {
+  if (loadPromise) return loadPromise;
+  loadPromise = (async () => {
+    const catalogResponse = await fetch('/themes/catalog.json');
+    if (!catalogResponse.ok) throw new Error(`Failed to load theme catalog (${catalogResponse.status})`);
+    const catalog = parseJsonc<ThemeCatalog>(await catalogResponse.text(), '/themes/catalog.json');
+    if (catalog.schemaVersion !== 1 || !Array.isArray(catalog.themes) || catalog.themes.length === 0) {
+      throw new Error('Theme catalog must declare at least one manifest with schemaVersion 1');
+    }
+    const loaded = await Promise.all(catalog.themes.map(async ({ id, manifest }) => {
+      const path = publicUrl(manifest);
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`Failed to load theme manifest ${path} (${response.status})`);
+      const normalized = normalizeTheme(parseJsonc<RawThemeManifest>(await response.text(), path));
+      if (normalized.id !== id) throw new Error(`Theme catalog id ${id} does not match ${path}`);
+      return normalized;
+    }));
+    for (const key of Object.keys(registry)) delete registry[key];
+    options.splice(0, options.length, ...loaded);
+    for (const theme of loaded) registry[theme.id] = theme;
+  })().catch((error) => {
+    loadPromise = null;
+    throw error;
+  });
+  return loadPromise;
+};
+
+export const getSceneTheme = (id: SceneThemeId): SceneThemeDefinition => {
+  const theme = registry[id] ?? registry.classic_dawn ?? options[0];
+  if (!theme) throw new Error('Scene theme manifests have not loaded; call loadSceneThemes() before mounting the app.');
+  return theme;
+};

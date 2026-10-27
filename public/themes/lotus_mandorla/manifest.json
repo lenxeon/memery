@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "themeId": "lotus_mandorla",
+  "name": "宝相庄严",
+  "poeticTitle": "莲台佛境",
+  "iconText": "🪷",
+  "desc": "蓝灰石雕 · 霞光云海 · 莲台石供桌",
+  "tag": "云海石雕",
+  "version": 3,
+  "wall": {
+    "wallpaper": {
+      "id": "sunset_cloud_sea",
+      "name": "霞照云海",
+      "poeticTitle": "云开见山",
+      "description": "蓝紫天幕、暖金霞云与层叠群山；中轴留给动态遗像。",
+      "assets": {
+        "phone": "themes/lotus_mandorla/wallpapers/phone/cloud-sea-poster.png"
+      },
+      "video": { "asset": "themes/lotus_mandorla/wallpapers/phone/cloud-sea.mp4" },
+      "fit": "cover"
+    },
+    "wallpaperDecorations": [],
+    "frame": {
+      "id": "slate_shrine_base",
+      "name": "蓝灰石构",
+      "poeticTitle": "云台立柱",
+      "description": "檐角、莲花承像石柱与低栏为一张透明造景底图；中央空处透出后方云海。",
+      "previewUrl": "themes/lotus_mandorla/wall-scenery/phone/slate-shrine-base.png",
+      "assets": {
+        "phone": "themes/lotus_mandorla/wall-scenery/phone/slate-shrine-base.png"
+      },
+      "fit": "wall-frame",
+      "position": { "x": 0.5, "y": 0, "widthRatio": 1 },
+      "responsiveWidthRatios": { "phone": 1 }
+    },
+    "frameDecorations": [
+      {
+        "id": "slate_mandorla_ring",
+        "name": "蓝灰石雕像座",
+        "poeticTitle": "云台承像",
+        "description": "独立圆形石雕像框，以墙面图集锚点保持动态遗像开口比例。",
+        "previewUrl": "themes/lotus_mandorla/wall-decor/mandorla-ring.png",
+        "asset": "themes/lotus_mandorla/wall-decor/mandorla-ring.png",
+        "wallParts": [
+          {
+            "frame": { "x": 0, "y": 0, "width": 1254, "height": 1254 },
+            "anchor": { "x": 0.5, "y": 0.47, "widthRatio": 0.366 }
+          }
+        ]
+      }
+    ],
+    "portrait": { "scale": 1, "dy": 32, "textDy": 0, "textGap": 0 }
+  },
+  "ground": {
+    "floor": {
+      "id": "slate_lotus_perspective_plate",
+      "name": "青灰莲纹透视石坪",
+      "asset": "themes/lotus_mandorla/floor/slate-lotus-perspective.png",
+      "bakedLighting": true,
+      "baseColor": "#4b5967",
+      "baseboard": { "color": "#313d49", "highlight": "#7f8b96" }
+    },
+    "groundMat": {
+      "id": "copper_lotus_rug",
+      "name": "铜金莲纹长毯",
+      "poeticTitle": "莲华铺席",
+      "description": "与主题一相同浅俯机位的铜金莲纹长毯。",
+      "asset": "themes/lotus_mandorla/mats/copper-lotus-rug.png",
+      "previewUrl": "themes/lotus_mandorla/mats/copper-lotus-rug.png",
+      "widthRatio": 1.2,
+      "bottomRatio": 0.0099 // Compensate the PNG's transparent lower margin to match theme one's visible front edge.
+    },
+    "cushion": {
+      "id": "sandstone_lotus_cushion",
+      "name": "莲纹圆坐垫",
+      "poeticTitle": "莲心安坐",
+      "description": "与主题一相同浅俯机位，沙金织面、蓝灰镶边与莲心刺绣的独立圆坐垫。",
+      "asset": "themes/lotus_mandorla/cushions/sandstone-lotus-cushion.png",
+      "previewUrl": "themes/lotus_mandorla/cushions/sandstone-lotus-cushion.png",
+      "widthRatio": 0.32,
+      "bottomRatio": 0.065
+    }
+  },
+  "table": {
+    "id": "slate_stone_altar",
+    "name": "蓝灰石雕供桌",
+    "asset": "themes/lotus_mandorla/table/slate-altar.png",
+    "structure": "legged",
+    "woodStyle": "walnut",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.12,
+      "widthRatio": 0.88,
+      "minWidthRatio": 0.84,
+      "maxWidthRatio": 0.92,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": { "width": 1536, "height": 1024 },
+      "visibleBounds": { "left": 0.013, "top": 0.233, "right": 0.989, "bottom": 0.904 },
+      "frontEdgeY": 0.34,
+      "backEdgeY": 0.24,
+      "fasciaBottomY": 0.48,
+      "apronBottomY": 0.75,
+      "footBottomY": 0.904,
+      "legCentersX": { "left": 0.078, "right": 0.922 },
+      "legWidth": 0.11,
+      "apronBoundsX": { "left": 0.12, "right": 0.88 }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": { "x": 0.1, "y": 0.24 },
+        "backRight": { "x": 0.9, "y": 0.24 },
+        "frontRight": { "x": 0.986, "y": 0.34 },
+        "frontLeft": { "x": 0.014, "y": 0.34 }
+      },
+      "usableArea": { "uMin": 0.08, "uMax": 0.92, "vMin": 0.08, "vMax": 0.94 },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "blush_peony_rose_left": {
+        "id": "blush_peony_rose_left", "setId": "blush_peony_rose", "name": "粉白芍药·左", "poeticTitle": "春云含露", "description": "芍药、白玫瑰与蓝灰尤加利的柔焦花团。", "plant": "粉色芍药、奶油白玫瑰、尤加利", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/blush_peony_rose/left.png", "widthRatio": 0.34
+      },
+      "ivory_magnolia_left": {
+        "id": "ivory_magnolia_left", "setId": "ivory_magnolia", "name": "白玉兰·左", "poeticTitle": "玉瓣听风", "description": "淡粉花苞与蓝灰枝叶组成的柔焦玉兰枝。", "plant": "白玉兰、淡粉花苞", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/ivory_magnolia/left.png", "widthRatio": 0.34
+      },
+      "blue_hydrangea_left": {
+        "id": "blue_hydrangea_left", "setId": "blue_hydrangea", "name": "蓝白绣球·左", "poeticTitle": "霁色凝芳", "description": "蓝白绣球、奶油色小花与深青蕨叶的柔焦花团。", "plant": "蓝白绣球、细碎白花、蕨叶", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/blue_hydrangea/left.png", "widthRatio": 0.34
+      },
+      "golden_chrysanthemum_left": {
+        "id": "golden_chrysanthemum_left", "setId": "golden_chrysanthemum", "name": "金菊茶梅·左", "poeticTitle": "秋阳入庭", "description": "奶油金菊、淡杏茶梅与青灰叶片的柔焦花团。", "plant": "浅金菊花、杏色茶梅、青灰叶片", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/golden_chrysanthemum/left.png", "widthRatio": 0.34
+      },
+      "pale_orchid_left": {
+        "id": "pale_orchid_left", "setId": "pale_orchid", "name": "月白兰花·左", "poeticTitle": "幽兰映月", "description": "月白淡紫兰花与深青长叶构成的柔焦兰枝。", "plant": "淡紫白蕙兰、深青兰叶", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/pale_orchid/left.png", "widthRatio": 0.34
+      },
+      "ivory_lotus_left": {
+        "id": "ivory_lotus_left", "setId": "ivory_lotus", "name": "粉白莲华·左", "poeticTitle": "莲心生辉", "description": "粉白莲花、莲蓬与青碧莲叶组成的柔焦前景。", "plant": "粉白莲花、莲蓬、莲叶", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/ivory_lotus/left.png", "widthRatio": 0.34
+      }
+    },
+    "right": {
+      "blush_peony_rose_right": {
+        "id": "blush_peony_rose_right", "setId": "blush_peony_rose", "name": "粉白芍药·右", "poeticTitle": "春云含露", "description": "芍药、白玫瑰与蓝灰尤加利的柔焦花团。", "plant": "粉色芍药、奶油白玫瑰、尤加利", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/blush_peony_rose/right.png", "widthRatio": 0.34
+      },
+      "ivory_magnolia_right": {
+        "id": "ivory_magnolia_right", "setId": "ivory_magnolia", "name": "白玉兰·右", "poeticTitle": "玉瓣听风", "description": "淡粉花苞与蓝灰枝叶组成的柔焦玉兰枝。", "plant": "白玉兰、淡粉花苞", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/ivory_magnolia/right.png", "widthRatio": 0.34
+      },
+      "blue_hydrangea_right": {
+        "id": "blue_hydrangea_right", "setId": "blue_hydrangea", "name": "蓝白绣球·右", "poeticTitle": "霁色凝芳", "description": "蓝白绣球、奶油色小花与深青蕨叶的柔焦花团。", "plant": "蓝白绣球、细碎白花、蕨叶", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/blue_hydrangea/right.png", "widthRatio": 0.34
+      },
+      "golden_chrysanthemum_right": {
+        "id": "golden_chrysanthemum_right", "setId": "golden_chrysanthemum", "name": "金菊茶梅·右", "poeticTitle": "秋阳入庭", "description": "奶油金菊、淡杏茶梅与青灰叶片的柔焦花团。", "plant": "浅金菊花、杏色茶梅、青灰叶片", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/golden_chrysanthemum/right.png", "widthRatio": 0.34
+      },
+      "pale_orchid_right": {
+        "id": "pale_orchid_right", "setId": "pale_orchid", "name": "月白兰花·右", "poeticTitle": "幽兰映月", "description": "月白淡紫兰花与深青长叶构成的柔焦兰枝。", "plant": "淡紫白蕙兰、深青兰叶", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/pale_orchid/right.png", "widthRatio": 0.34
+      },
+      "ivory_lotus_right": {
+        "id": "ivory_lotus_right", "setId": "ivory_lotus", "name": "粉白莲华·右", "poeticTitle": "莲心生辉", "description": "粉白莲花、莲蓬与青碧莲叶组成的柔焦前景。", "plant": "粉白莲花、莲蓬、莲叶", "focusTreatment": "50mm f/1.4 强焦外，整组花叶虚化已烘焙进 RGBA PNG；无散景粒子。", "defaultHeightRatio": 0.22, "minHeightRatio": 0.18, "maxHeightRatio": 0.4, "bottomOverflowRatio": 0.12, "asset": "themes/lotus_mandorla/foregrounds/ivory_lotus/right.png", "widthRatio": 0.34
+      }
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "sunset_cloud_sea",
+    "wallpaperDecorationId": "none",
+    "frameId": "slate_shrine_base",
+    "wallDecorationId": "slate_mandorla_ring",
+    "groundMatId": "copper_lotus_rug",
+    "cushionId": "sandstone_lotus_cushion",
+    "offerings": {
+      "vase_left": { "catalogId": "flower_vase", "position": { "u": 0.18, "v": 0.3 }, "scale": 1 },
+      "vase_right": { "catalogId": "flower_vase", "position": { "u": 0.82, "v": 0.3 }, "scale": 1 },
+      "candle_left": { "catalogId": "candle", "position": { "u": 0.36, "v": 0.39 }, "scale": 1 },
+      "candle_right": { "catalogId": "candle", "position": { "u": 0.64, "v": 0.39 }, "scale": 1 },
+      "censer": { "catalogId": "censer", "position": { "u": 0.5, "v": 0.34 }, "scale": 1 },
+      "fruit_left": { "catalogId": "fruit", "position": { "u": 0.27, "v": 0.7 }, "scale": 1 },
+      "fruit_right": { "catalogId": "fruit", "position": { "u": 0.73, "v": 0.7 }, "scale": 1 },
+      "tea_cups": { "catalogId": "tea_cups", "position": { "u": 0.5, "v": 0.83 }, "scale": 1 }
+    },
+    "foreground": {
+      "left": { "foregroundId": "blush_peony_rose_left", "offsetX": 0, "offsetY": 0, "alpha": 1 },
+      "right": { "foregroundId": "blush_peony_rose_right", "offsetX": 0, "offsetY": 0, "alpha": 1 }
+    }
+  },
+  "foregroundSetIds": ["blush_peony_rose", "ivory_magnolia", "blue_hydrangea", "golden_chrysanthemum", "pale_orchid", "ivory_lotus"],
+  "defaultForegroundSetId": "blush_peony_rose",
+  "preset": {
+    "tablecloth": "moonlight_white",
+    "lighting": { "sunAngle": -4, "sunlightIntensity": 0.72, "godRaysIntensity": 0, "godRaysEnabled": false }
+  },
+  "lightRig": {
+    "source": { "x": 0.52, "y": 0.12 },
+    "sunAngle": -4,
+    "sunlightIntensity": 0.72,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#ffd7a5",
+    "ambientColor": "#8795a8",
+    "shadowDirection": { "x": 0.35, "y": 1 }
+  }
+}

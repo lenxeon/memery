@@ -1,3 +1,5 @@
+import type { SceneThemeTableDefinition } from '../../../types';
+
 /**
  * Measured layout for the extracted Ming-style altar-table raster.
  * Coordinates refer to the 2060×763 source image; visible bounds are used as
@@ -60,37 +62,75 @@ export const getMingAltarTableMetrics = (tableWidth: number): MingAltarTableMetr
   };
 };
 
-/**
- * Camera-space landmarks measured from the audited isolated classic-dawn table PNG.
- * Keep these proportions beside the asset spec so its feet stay on the floor when
- * the scene scales the table for phone and tablet canvases.
- */
-export const getRenderMatchAltarTableMetrics = (tableWidth: number): MingAltarTableMetrics => {
-  const imageWidth = 1817;
-  const imageHeight = 866;
-  const visibleLeft = 37;
-  const visibleRight = 1780;
-  const centerX = (visibleLeft + visibleRight) / 2;
-  const frontEdgeY = 184;
-  const visibleTop = 30;
-  const footBottomY = 823;
-  const scale = tableWidth / (visibleRight - visibleLeft);
-  const legWidth = 116 * scale;
-  const legCenters = [(214 - centerX) * scale, (1603 - centerX) * scale];
+/** Convert the manifest's normalized image landmarks into Pixi coordinates. */
+export const getSceneThemeAltarTableMetrics = (
+  table: SceneThemeTableDefinition,
+  tableWidth: number
+): MingAltarTableMetrics => {
+  const { width: imageWidth, height: imageHeight } = table.geometry.sourceSize;
+  const { visibleBounds, frontEdgeY, backEdgeY, fasciaBottomY, apronBottomY, footBottomY } = table.geometry;
+  const visibleWidth = (visibleBounds.right - visibleBounds.left) * imageWidth;
+  const scale = tableWidth / visibleWidth;
+  const px = (ratio: number) => ratio * imageWidth * scale;
+  const py = (ratio: number) => ratio * imageHeight * scale;
+  const centerX = imageWidth * 0.5;
+  const legWidth = table.geometry.legWidth ? px(table.geometry.legWidth) : 0;
+  const leftLegCenter = table.geometry.legCentersX ? (table.geometry.legCentersX.left * imageWidth - centerX) * scale : 0;
+  const rightLegCenter = table.geometry.legCentersX ? (table.geometry.legCentersX.right * imageWidth - centerX) * scale : 0;
+  const apronLeft = table.geometry.apronBoundsX?.left ?? visibleBounds.left;
+  const apronRight = table.geometry.apronBoundsX?.right ?? visibleBounds.right;
   return {
     spriteWidth: imageWidth * scale,
     spriteHeight: imageHeight * scale,
-    spriteY: -frontEdgeY * scale,
-    topExtent: (frontEdgeY - visibleTop) * scale,
-    surfaceDepth: (frontEdgeY - 48) * scale,
-    frontThickness: (236 - frontEdgeY) * scale,
-    apronHeight: (407 - 236) * scale,
-    footDrop: (footBottomY - frontEdgeY) * scale,
+    spriteY: -py(frontEdgeY),
+    topExtent: py(frontEdgeY - visibleBounds.top),
+    surfaceDepth: py(frontEdgeY - backEdgeY),
+    frontThickness: py(fasciaBottomY - frontEdgeY),
+    apronHeight: py(apronBottomY - fasciaBottomY),
+    footDrop: py(footBottomY - frontEdgeY),
     legWidth,
-    leftLegX: legCenters[0] - legWidth / 2,
-    rightLegX: legCenters[1] - legWidth / 2,
-    apronX: (284 - centerX) * scale,
-    apronWidth: (1533 - 284) * scale,
+    leftLegX: leftLegCenter - legWidth / 2,
+    rightLegX: rightLegCenter - legWidth / 2,
+    apronX: (apronLeft * imageWidth - centerX) * scale,
+    apronWidth: px(apronRight - apronLeft),
+  };
+};
+
+/** Map manifest u/v coordinates on the authored desktop quad to the app's stable 560px position unit. */
+export const mapSceneThemeTablePosition = (
+  table: SceneThemeTableDefinition,
+  u: number,
+  v: number
+): { x: number; y: number } => {
+  const { width, height } = table.geometry.sourceSize;
+  const { visibleBounds, frontEdgeY } = table.geometry;
+  const { backLeft, backRight, frontLeft, frontRight } = table.surface.assetQuad;
+  const topX = backLeft.x + (backRight.x - backLeft.x) * u;
+  const topY = backLeft.y + (backRight.y - backLeft.y) * u;
+  const bottomX = frontLeft.x + (frontRight.x - frontLeft.x) * u;
+  const bottomY = frontLeft.y + (frontRight.y - frontLeft.y) * u;
+  const x = topX + (bottomX - topX) * v;
+  const y = topY + (bottomY - topY) * v;
+  const referenceScale = 560 / ((visibleBounds.right - visibleBounds.left) * width);
+  return {
+    x: Math.round((x * width - width * 0.5) * referenceScale),
+    y: Math.round((y * height - frontEdgeY * height) * referenceScale),
+  };
+};
+
+export const getSceneThemeTablePlanBounds = (table: SceneThemeTableDefinition) => {
+  const { uMin, uMax, vMin, vMax } = table.surface.usableArea;
+  const corners = [
+    mapSceneThemeTablePosition(table, uMin, vMin),
+    mapSceneThemeTablePosition(table, uMax, vMin),
+    mapSceneThemeTablePosition(table, uMax, vMax),
+    mapSceneThemeTablePosition(table, uMin, vMax),
+  ];
+  return {
+    xMin: Math.min(...corners.map(({ x }) => x)),
+    xMax: Math.max(...corners.map(({ x }) => x)),
+    yMin: Math.min(...corners.map(({ y }) => y)),
+    yMax: Math.max(...corners.map(({ y }) => y)),
   };
 };
 

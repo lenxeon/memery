@@ -13,7 +13,6 @@ import { AuditCategory, SceneItem, SceneItemId, TableWoodStyle } from '../../../
 import { sound } from '../../../utils/audio';
 import {
   INITIAL_ITEMS,
-  DEFAULT_TABLE_WOOD_STYLE,
   TABLE_WOOD_OPTIONS,
   buildAuditItems,
   buildStandardItems,
@@ -25,6 +24,7 @@ import {
   normalizeAuditPage,
 } from '../../../data/auditCatalog';
 import { AuditStageProps } from './AuditStage';
+import { getSceneTheme } from '../../../pixi/scene/themes';
 
 /** 案台（供案本体）受控状态与写入口 */
 export interface AuditTableState {
@@ -108,10 +108,10 @@ export const useAuditStage = ({ showToast, onPetalTrigger }: UseAuditStageOption
   const auditPanelRef = useRef<HTMLDivElement>(null);
 
   // ── 案台状态 ──
-  const [tableWoodStyle, setTableWoodStyle] = useState<TableWoodStyle>(DEFAULT_TABLE_WOOD_STYLE);
-  const [tableLegWoodStyle, setTableLegWoodStyle] = useState<TableWoodStyle>(DEFAULT_TABLE_WOOD_STYLE);
+  const [tableWoodStyle, setTableWoodStyle] = useState<TableWoodStyle>(() => getSceneTheme('classic_dawn').table?.woodStyle ?? 'walnut');
+  const [tableLegWoodStyle, setTableLegWoodStyle] = useState<TableWoodStyle>(() => getSceneTheme('classic_dawn').table?.woodStyle ?? 'walnut');
   const [tableForward, setTableForward] = useState(0.5);
-  const [showTableRunner, setShowTableRunner] = useState(false);
+  const [showTableRunner, setShowTableRunner] = useState(() => getSceneTheme('classic_dawn').table?.runner ?? false);
 
   const clampForward = useCallback((value: number) => setTableForward(Math.max(-1, Math.min(1, value))), []);
 

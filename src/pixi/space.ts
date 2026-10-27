@@ -17,7 +17,6 @@ import type {
   SceneItemId,
   LightingSettings,
   WallBackgroundStyle,
-  FloorStyle,
   TableclothStyle,
   TableWoodStyle,
   SceneThemeId,
@@ -35,12 +34,6 @@ export interface SpaceTheme {
 export interface SpaceWall {
   /** 墙面风格（建筑壁构样式） */
   style: WallBackgroundStyle;
-}
-
-/** 地坪 */
-export interface SpaceFloor {
-  /** 地坪材质 */
-  style: FloorStyle;
 }
 
 /** 供案（桌体本体） */
@@ -63,8 +56,6 @@ export interface SpaceTable {
 /** 空间整体：墙、地、案 */
 export interface SpaceScene {
   theme: SpaceTheme;
-  /** 主题应用后仍允许用户单独覆盖的地坪选择。 */
-  floor: SpaceFloor;
   table: SpaceTable;
 }
 

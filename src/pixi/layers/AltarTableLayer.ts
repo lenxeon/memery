@@ -6,7 +6,7 @@
 import { Assets, Container, Graphics, Sprite, TilingSprite, Rectangle, BlurFilter, Texture } from 'pixi.js';
 import { TableclothStyle, LightingSettings, TableWoodStyle } from '../../types';
 import { TableMaterial } from './table/TableMaterial';
-import { getMingAltarTableMetrics, getRenderMatchAltarTableMetrics } from './table/MingAltarTableSpec';
+import { getMingAltarTableMetrics, MingAltarTableMetrics } from './table/MingAltarTableSpec';
 import { TexturePipeline } from '../assets/TexturePipeline';
 
 /** 场景点光源（烛火），坐标为舞台全局坐标 */
@@ -84,6 +84,8 @@ export interface AltarTableRenderOptions {
   /** 地坪水平灭点基线 Y（用于台面透视收缩计算），缺省按 tableTopY - 220 估算 */
   horizonY?: number;
   tableAssetUrl?: string;
+  /** Geometry measured from the active theme manifest's normalized table landmarks. */
+  tableMetrics?: MingAltarTableMetrics;
 }
 
 export class AltarTableLayer {
@@ -511,6 +513,7 @@ export class AltarTableLayer {
       topWoodStyle,
       legWoodStyle,
       horizonY,
+      tableMetrics,
     } = options;
 
     let woodStyleChanged = false;
@@ -532,7 +535,7 @@ export class AltarTableLayer {
     const u = tableWidth / 560;
     const halfW = tableWidth * 0.5;
     const measuredMetrics = this.activeTableIsThemeAsset
-      ? getRenderMatchAltarTableMetrics(tableWidth)
+      ? tableMetrics ?? getMingAltarTableMetrics(tableWidth)
       : getMingAltarTableMetrics(tableWidth);
     const mingMetrics = this.mingTableLoaded ? measuredMetrics : null;
 

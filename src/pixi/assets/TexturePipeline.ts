@@ -14,7 +14,7 @@ import {
   getSingingBowlSvg,
   getSingleBouquetSvg,
 } from './PropSvgTemplates';
-import { FlowerType, FruitType, FloorStyle, TableclothStyle, TableWoodStyle } from '../../types';
+import { FlowerType, FruitType, TableclothStyle, TableWoodStyle } from '../../types';
 import { VaseStyle, getVaseItem } from './templates/flowers/vases';
 import { getVaseFlowerSvg } from './templates/FlowerTemplate';
 import { getFruitDishSvg as getFruitDishTemplateSvg } from './templates/FruitDishTemplate';
@@ -41,20 +41,6 @@ export class TexturePipeline {
   private static instance: TexturePipeline | null = null;
   public isLoaded: boolean = false;
   private initPromise: Promise<void> | null = null;
-  private readonly floorReady: Partial<Record<FloorStyle, Promise<void>>> = {};
-
-  // 地板真实材质贴图 (5大古典禅意地板)
-  public woodPlankTexture: Texture | null = null;
-  public marbleTileTexture: Texture | null = null;
-  public floorTextures: Record<FloorStyle, Texture | null> = {
-    hinoki_wood: null,
-    walnut_plank: null,
-    herringbone_wood: null,
-    wood_planks: null,
-    zen_tatami: null,
-    marble_tile: null,
-  };
-
   // 烟雾粒子贴图
   public smokeParticleTexture: Texture | null = null;
 
@@ -160,55 +146,13 @@ export class TexturePipeline {
         this.petalTextures[key as FlowerType] = this.generatePetalTexture(color);
       }
 
-      // 3. 加载地坪贴图 (使用原生 Image 加载转 Texture，最健壮不挂起)
-      this.loadFloorTextures();
-
-      // 4. 并行预热高频道具纹理 (花瓶、香炉、果盘、茶杯、蜡烛)
+      // 3. 并行预热高频道具纹理 (花瓶、香炉、果盘、茶杯、蜡烛)
       await this.preloadAllCommonProps();
 
       this.isLoaded = true;
     } catch (err) {
       console.error('Failed to initialize TexturePipeline:', err);
       this.isLoaded = true; // 即使异常也标记为 true，降级渲染，绝不阻塞画面
-    }
-  }
-
-  public whenFloorReady(style: FloorStyle): Promise<void> {
-    return this.floorReady[style] ?? Promise.resolve();
-  }
-
-  private loadFloorTextures(): void {
-    const urls: Record<string, string> = {
-      hinoki_wood: '/textures/hinoki_wood.jpg',
-      walnut_plank: '/textures/walnut_plank.jpg',
-      herringbone_wood: '/textures/herringbone_wood.jpg',
-      wood_planks: '/textures/herringbone_wood.jpg',
-      zen_tatami: '/textures/zen_tatami.jpg',
-      marble_tile: '/textures/marble_tile.jpg',
-    };
-
-    for (const [key, url] of Object.entries(urls)) {
-      this.floorReady[key as FloorStyle] = new Promise<void>((resolve) => {
-        try {
-          const img = new Image();
-          img.onload = () => {
-            const tex = Texture.from(img);
-            this.floorTextures[key as FloorStyle] = tex;
-            if (key === 'herringbone_wood' || key === 'wood_planks') {
-              this.woodPlankTexture = tex;
-            }
-            if (key === 'marble_tile') {
-              this.marbleTileTexture = tex;
-            }
-            resolve();
-          };
-          img.onerror = () => resolve();
-          img.src = url;
-        } catch (e) {
-          console.warn('Could not load floor texture:', key, e);
-          resolve();
-        }
-      });
     }
   }
 

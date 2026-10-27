@@ -11,28 +11,27 @@ interface SceneAssemblySelection {
   groundMatId: string;
   cushionId: string;
   foreground: {
-    left: SceneForegroundInstance[];
-    right: SceneForegroundInstance[];
+    left: SceneForegroundInstance;
+    right: SceneForegroundInstance;
   };
 }
 ```
 
-单选部件保存一个 id；前景保存实例数组。删除前景时只删除一个 `instanceId`，不能把同素材的全部实例一起清空。
+单选部件保存一个 id；左、右前景分别保存一个实例对象。替换一侧前景只替换对应侧对象。
 
 ## 墙面层级
 
 ```text
 backgroundLayer
   wallpaper
+wallpaperDecorationLayer
+  optional wallpaper decorations (for example, movable window blossoms)
+wallFrameLayer
+  complete wall and window frame
 portraitLayer
-  wallpaperDecoration.backAsset
   memorial portrait + title
-  wallpaperDecoration.frontAsset
-wallFrontLayer
-  wallDecoration
 floorLayer
-  floor material
-  wallScenery (extended architectural frames draw over floor)
+  complete perspective floor image
 tableLayer
   altar table
 groundFrontLayer
@@ -46,11 +45,15 @@ lightsLayer
   foreground.right
 ```
 
+This is the target order defined by the theme manifest. If a frame intentionally crosses the wall/floor seam, clip it to the wall region and keep it behind the memorial portrait.
+
 如果部件需要跟随遗像环缩放，使用 `SceneThemePortraitAsset` 的 `widthInPortraits`、`dxInPortraits` 和 `dyInPortraits`；不要用固定屏幕像素。
 
-墙布等带有完整构图的远景应提供手机 9:16 与 iPad 3:4 两套 PNG，并通过 `SceneThemeViewportAsset.responsiveAssets` 登记。月洞门、格栅等整框造景可使用 `fit: 'wall-frame'`，按设备宽度比例铺开并锚在墙顶；可按整体渲染稿让框架越过墙地交界，与供桌脚落点呼应。比例必须保留足够宽的中间开口，避免侧柱挤压遗像和墙纸。窄横图不得在手机竖屏上直接 `cover` 放大裁切。
+墙布等带有完整构图的远景以 iPhone 16 竖屏为基准制作，并通过 `SceneThemeViewportAsset.responsiveAssets.phone` 登记；其他手机比例沿用经审核的构图等比缩放并在安全区内裁切。月洞门、格栅等整框造景使用 `fit: 'wall-frame'`，按视口宽度比例铺开并锚在墙顶；可按整体渲染稿让框架越过墙地交界，与供桌脚落点呼应。比例必须保留足够宽的中间开口，避免侧柱挤压遗像和墙纸。窄横图不得在手机竖屏上直接 `cover` 放大裁切。
 
 ## 地面部件摆放规格
+
+地坪本身是一张完整、不透明且透视已经画入图像的 PNG。Pixi 直接将它作为普通精灵放置，按地坪视口等比 cover 并裁切边缘；不得再次做网格投影、UV 映射或透视变形。
 
 席垫和蒲团是与整体渲染稿机位匹配的透明 PNG，相机内已包含浅俯视角度与地面透视。Pixi 将它们作为精灵放在地面前层，只根据视口宽度和画布底边锚点缩放、定位；不可对素材再次使用地面透视映射。
 

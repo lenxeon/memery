@@ -3,7 +3,6 @@
  * @description 环境与场景样式抽屉面板，支持时间、背景墙、桌布、音量等实时调节。
  */
 import {
-  FLOOR_STYLE_OPTIONS,
   SCENE_COMPONENT_GROUPS,
   SCENE_FOREGROUND_OPTIONS,
   SCENE_THEME_OPTIONS,
@@ -51,7 +50,7 @@ import {
 } from 'lucide-react';
 import { sound, BGM_TRACKS } from '../../../utils/audio';
 import { resolveSystemTimeOfDay, formatClock, TIME_OF_DAY_LABEL } from '../../../utils/timeOfDay';
-import { BgmTrackId, FloorStyle, AuditCategory } from '../../../types';
+import { BgmTrackId, AuditCategory } from '../../../types';
 import {
   AUDIT_FLOWER_CATALOG,
   AUDIT_VASE_CATALOG,
@@ -77,8 +76,6 @@ export interface AmbiancePanelProps {
   onChangeTableclothStyle?: (style: TableclothStyle) => void;
   tableWoodStyle?: TableWoodStyle;
   onChangeTableWoodStyle?: (style: TableWoodStyle) => void;
-  floorStyle?: FloorStyle;
-  onChangeFloorStyle?: (style: FloorStyle) => void;
   themeId?: SceneThemeId;
   onChangeTheme?: (id: SceneThemeId) => void;
   sceneAssembly?: SceneAssemblySelection | null;
@@ -152,8 +149,6 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
   onChangeTableclothStyle,
   tableWoodStyle = 'walnut',
   onChangeTableWoodStyle,
-  floorStyle = 'marble_tile',
-  onChangeFloorStyle,
   themeId = 'classic_dawn',
   onChangeTheme,
   sceneAssembly,
@@ -216,9 +211,13 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
     return sceneAssembly[keyByPart[part]];
   };
 
-  const foregroundSetIds = SCENE_THEME_OPTIONS.find((option) => option.id === themeId)?.foregroundSetIds ?? [];
+  const selectedTheme = SCENE_THEME_OPTIONS.find((option) => option.id === themeId);
+  const foregroundSetIds = selectedTheme?.foregroundSetIds ?? [];
   const foregroundOptions = SCENE_FOREGROUND_OPTIONS.filter(
     (option) => foregroundSetIds.includes(option.setId)
+  );
+  const visibleComponentGroups = SCENE_COMPONENT_GROUPS.filter((group) =>
+    !selectedTheme?.sceneBackground || group.part === 'groundMat' || group.part === 'cushion'
   );
 
   // 跟随系统模式下，面板内实时显示本机时间与推算时辰
@@ -370,6 +369,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
         </div>
 
         {/* 可换部件目录：墙体部件单选，左右前景各自单选替换。 */}
+        {selectedTheme?.defaultAssembly && (
         <div className="space-y-3 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30 text-xs">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -378,7 +378,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
             </div>
           </div>
 
-          {SCENE_COMPONENT_GROUPS.map((group) => (
+          {visibleComponentGroups.map((group) => (
             <div key={group.part} className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-medium text-amber-100/90">{group.name}</span>
@@ -420,7 +420,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
               </div>
               <div className="flex gap-1.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-1 snap-x snap-mandatory">
                 {foregroundOptions.filter((option) => option.side === side).map((option) => {
-                  const selected = sceneAssembly?.foreground[side].some((item) => item.foregroundId === option.id) ?? false;
+                  const selected = sceneAssembly?.foreground[side].foregroundId === option.id;
                   return (
                     <button
                       key={option.id}
@@ -448,6 +448,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
             </div>
           ))}
         </div>
+        )}
 
         {/* Time of Day Presets */}
         <div className="space-y-2 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30">
@@ -624,6 +625,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
         </div>
 
         {/* Table Adornments (案台雅致装点) */}
+        {selectedTheme?.table && (
         <div className="space-y-2.5 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30 text-xs">
           <div className="flex items-center gap-1.5 font-medium text-amber-200">
             <Sparkles size={14} className="text-amber-400" />
@@ -767,61 +769,7 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
             </button>
           </div>
         </div>
-
-        {/* ── 6. 地面材质与地坪风格 (汉白玉大理石 / 沉香实木地板) ── */}
-        <div className="space-y-2.5 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30 text-xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 font-medium text-amber-200">
-              <Palette size={14} className="text-amber-400" />
-              <span className="font-serif font-semibold">地面材质与地坪风格 (5 款可选)</span>
-            </div>
-            <span className="text-[11px] text-amber-300 font-semibold">
-              {FLOOR_STYLE_OPTIONS.find((o) => o.id === floorStyle)?.name} · {FLOOR_STYLE_OPTIONS.find((o) => o.id === floorStyle)?.poeticTitle}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {FLOOR_STYLE_OPTIONS.map((opt) => {
-              const isSelected = opt.id === floorStyle;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => {
-                    sound.playWoodPlacement();
-                    onChangeFloorStyle?.(opt.id);
-                  }}
-                  className={`flex flex-col p-2 rounded-xl text-left transition-all cursor-pointer border relative ${
-                    isSelected
-                      ? 'bg-amber-950/50 border-amber-400/80 ring-1 ring-amber-400/40 text-amber-100 shadow-xs'
-                      : 'bg-stone-950/60 hover:bg-stone-800/60 border-stone-800 text-stone-400'
-                  }`}
-                >
-                  <div className="flex items-center justify-between w-full mb-1">
-                    <span className="text-base select-none">{opt.iconText}</span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-normal ${
-                      isSelected ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-stone-800 text-stone-500'
-                    }`}>
-                      {opt.tag}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between w-full">
-                    <span className={`text-[11px] truncate font-serif ${isSelected ? 'text-amber-200 font-bold' : 'text-stone-300 font-medium'}`}>
-                      {opt.name}
-                    </span>
-                    {isSelected && <Check size={12} className="text-amber-400 stroke-[3] shrink-0 ml-1" />}
-                  </div>
-                  <div className="text-[9.5px] text-amber-400/90 truncate font-serif mt-0.5">
-                    {opt.poeticTitle}
-                  </div>
-                  <div className="text-[9px] text-stone-500 line-clamp-2 mt-0.5 leading-tight">
-                    {opt.desc}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        )}
 
         {/* Lifecycle & Time Scale (生机周期与岁月流速) */}
         <div className="space-y-2.5 p-3 bg-stone-900/80 rounded-2xl border border-amber-500/30 text-xs">

@@ -13,7 +13,6 @@ import { SceneItem, SceneItemId, FlowerType, FruitType, VaseHitZone } from '../.
 import { AltarLightSource } from './AltarTableLayer';
 import { VaseStyle } from '../assets/templates/flowers/vases';
 import { sound } from '../../utils/audio';
-import { getMingAltarTableSurfaceDepth } from './table/MingAltarTableSpec';
 
 /**
  * 花瓶命中区（容器局部坐标，单位 px，随容器 scale 缩放）。
@@ -82,6 +81,7 @@ export class PropsLayer {
   private currentAltarCenterX = 0;
   private currentAltarTopY = 0;
   private currentAltarWidth = 820;
+  private currentTableSurfaceDepth = 54;
   private currentScaleFactor = 1.0;
   private draggingId: string | null = null;
 
@@ -121,33 +121,19 @@ export class PropsLayer {
     items: Record<SceneItemId, SceneItem>,
     altarCenterX: number,
     altarTopY: number,
-    altarWidth: number
+    altarWidth: number,
+    tableSurfaceDepth: number = (54 * altarWidth) / 560
   ): void {
     this.currentAltarCenterX = altarCenterX;
     this.currentAltarTopY = altarTopY;
     this.currentAltarWidth = altarWidth;
+    this.currentTableSurfaceDepth = tableSurfaceDepth;
     // scaleFactor 随桌宽线性缩放，不再硬钳到 1.0，让道具跟随桌子宽度铺开
     const scaleFactor = Math.min(1.5, Math.max(0.65, altarWidth / 560));
     this.currentScaleFactor = scaleFactor;
 
-    // xOffset 以 560 为基准比例尺，随 scaleFactor 同步放大
-    const spread = scaleFactor;
-    // 台面进深以提取后的明式桌面实测尺寸为准，并与 AltarTableLayer 共用同一套比例。
-    // yOffset 语义为「相对台面前沿的纵深」：0 = 紧贴前沿，负值向案里（后方）退，
-    // 必须落在 [-depthUnits, 0] 带内，否则道具会浮在台面之外的正立面上。
-    const tableDepth = getMingAltarTableSurfaceDepth(altarWidth);
-    const depthUnits = tableDepth / scaleFactor;
-    const defaultLayouts: Record<string, { xOffset: number; yOffset: number }> = {
-      vase_left:    { xOffset: -190 * spread, yOffset: -39 },
-      vase_right:   { xOffset:  190 * spread, yOffset: -39 },
-      candle_left:  { xOffset:  -95 * spread, yOffset: -28 },
-      candle_right: { xOffset:   95 * spread, yOffset: -28 },
-      fruit_left:   { xOffset: -150 * spread, yOffset: -16 },
-      fruit_right:  { xOffset:  150 * spread, yOffset: -16 },
-      censer:       { xOffset:    0,          yOffset: -37 },
-      tea_cups:     { xOffset:    0,          yOffset: -12 },
-      singing_bowl: { xOffset:  -62 * spread, yOffset: -18 },
-    };
+    // Item coordinates are theme-resolved and stay within the active tabletop's measured depth.
+    const depthUnits = tableSurfaceDepth / scaleFactor;
 
     this.latestItems = items;
 
@@ -271,7 +257,7 @@ export class PropsLayer {
               Math.min(this.currentAltarCenterX + boundsX, startContX + dx)
             );
             // 纵向只允许在台面进深带内移动（后沿 -tableDepth ~ 前沿 0）
-            const dragDepth = getMingAltarTableSurfaceDepth(this.currentAltarWidth);
+            const dragDepth = this.currentTableSurfaceDepth;
             const newY = Math.max(
               this.currentAltarTopY - dragDepth,
               Math.min(this.currentAltarTopY, startContY + dy)
@@ -341,7 +327,7 @@ export class PropsLayer {
       }
 
       // 计算相对于供案中心的绝对坐标
-      const def = defaultLayouts[id] || { xOffset: 0, yOffset: -18 };
+      const def = { xOffset: 0, yOffset: -depthUnits * 0.5 };
       const relX = item.position?.x !== undefined ? item.position.x : def.xOffset;
       // 纵向强制收入台面进深带：兼容历史存档里写在台面前沿之外的正值
       const relYRaw = item.position?.y !== undefined ? item.position.y : def.yOffset;

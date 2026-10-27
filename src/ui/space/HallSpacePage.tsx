@@ -20,6 +20,9 @@ import { useHallAmbience, useHallDirectory, useOfferings } from './hooks';
 import { AuditStage, useAuditStage } from './audit';
 import { sound } from '../../utils/audio';
 import { Sparkles } from 'lucide-react';
+import { getSceneThemeTablePlanBounds } from '../../pixi/layers/table/MingAltarTableSpec';
+import { getSceneTheme } from '../../pixi/scene/themes';
+import { TABLE_PLAN_BOUNDS } from '../../utils/tablePlan';
 
 export interface HallSpacePageProps {
   /** 当前登录用户（由应用外壳持有并持久化） */
@@ -69,6 +72,9 @@ export const HallSpacePage: React.FC<HallSpacePageProps> = ({ currentUser, onReq
     showToast,
     onPetalTrigger: triggerPetals,
     audit: audit.info,
+    tableBounds: getSceneTheme(ambience.themeId).table
+      ? getSceneThemeTablePlanBounds(getSceneTheme(ambience.themeId).table!)
+      : TABLE_PLAN_BOUNDS,
   });
 
   candlesToggleRef.current = offerings.toggleAllCandles;
@@ -142,8 +148,6 @@ export const HallSpacePage: React.FC<HallSpacePageProps> = ({ currentUser, onReq
           lighting={ambience.lighting}
           themeId={ambience.themeId}
           sceneAssembly={ambience.sceneAssembly}
-          floorStyle={ambience.floorStyle}
-          useThemeFloor={ambience.useThemeFloor}
           tableclothStyle={ambience.tableclothStyle}
           tableWoodStyle={audit.table.woodStyle}
           tableLegWoodStyle={audit.table.legWoodStyle}

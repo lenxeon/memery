@@ -80,6 +80,8 @@ export interface TablePlanOptions {
   minGap?: number;
   /** 期望的纵深位置（越大越靠案前），默认 -16 */
   preferredDepth?: number;
+  /** Bounds derived from the active theme's measured tabletop quad. */
+  bounds?: { xMin: number; xMax: number; yMin: number; yMax: number };
 }
 
 const footprintOf = (id: string, item: SceneItem): { rx: number; ry: number } => {
@@ -127,6 +129,7 @@ const solve = (occupancy: Occupancy[], options: TablePlanOptions): PlanSpot => {
     depthRadius = FOOTPRINT.flower.ry,
     minGap = 12,
     preferredDepth = -16,
+    bounds = TABLE_PLAN_BOUNDS,
   } = options;
 
   // 案面横向重心：把新贡品补到相对空旷的一侧，避免全堆一边
@@ -135,11 +138,13 @@ const solve = (occupancy: Occupancy[], options: TablePlanOptions): PlanSpot => {
   const lean = Math.sign(centerOfMass);
 
   // 按占地半径收边，避免道具压在案沿上（留出半个身位的安全余量）
-  const xLimit = Math.max(60, TABLE_PLAN_BOUNDS.xMax - radius * 0.8);
+  const xStart = bounds.xMin + radius * 0.8;
+  const xEnd = bounds.xMax - radius * 0.8;
+  const xStep = Math.max(4, (bounds.xMax - bounds.xMin) / 60);
 
   const candidates: Candidate[] = [];
-  for (let y = TABLE_PLAN_BOUNDS.yMin; y <= TABLE_PLAN_BOUNDS.yMax; y += 3) {
-    for (let x = -xLimit; x <= xLimit; x += 8) {
+  for (let y = bounds.yMin; y <= bounds.yMax; y += Math.max(2, (bounds.yMax - bounds.yMin) / 16)) {
+    for (let x = xStart; x <= xEnd; x += xStep) {
       let clearance = Infinity;
       for (const o of occupancy) {
         const kx = o.rx + radius + minGap;
@@ -154,9 +159,11 @@ const solve = (occupancy: Occupancy[], options: TablePlanOptions): PlanSpot => {
 
   const scoreOf = (c: Candidate): number => {
     const clearanceScore = Math.max(-1, Math.min(c.clearance, 1)) * 3.2;
-    const centeringScore = -(Math.abs(c.x) / TABLE_PLAN_BOUNDS.xMax) * 0.9;
-    const depthScore = -(Math.abs(c.y - preferredDepth) / 54) * 1.6;
-    const balanceScore = -(c.x / TABLE_PLAN_BOUNDS.xMax) * lean * 0.8;
+      const horizontalSpan = Math.max(1, Math.max(Math.abs(bounds.xMin), Math.abs(bounds.xMax)));
+      const depthSpan = Math.max(1, bounds.yMax - bounds.yMin);
+      const centeringScore = -(Math.abs(c.x) / horizontalSpan) * 0.9;
+      const depthScore = -(Math.abs(c.y - preferredDepth) / depthSpan) * 1.6;
+      const balanceScore = -(c.x / horizontalSpan) * lean * 0.8;
     return clearanceScore + centeringScore + depthScore + balanceScore;
   };
 

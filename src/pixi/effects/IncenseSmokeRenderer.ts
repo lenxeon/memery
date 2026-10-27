@@ -11,6 +11,7 @@ interface SmokeNode {
   age: number;
   maxAge: number;
   width: number;
+  density: number;
 }
 
 const SMOKE_EMISSION_STEP = 4;
@@ -20,6 +21,21 @@ const SMOKE_STREAMS = [
   { life: 158, speed: 0.53, baseWidth: 0.48, maxWidth: 2.2, sway: 0.50, phase: 0.2 },
   { life: 148, speed: 0.51, baseWidth: 0.44, maxWidth: 1.95, sway: 0.46, phase: 1.1 },
 ] as const;
+
+const smoothNoise = (x: number, y: number, seed: number): number => {
+  const fade = (t: number): number => t * t * (3 - 2 * t);
+  const hash = (ix: number, iy: number): number => {
+    const n = Math.sin(ix * 127.1 + iy * 311.7 + seed * 74.7) * 43758.5453;
+    return (n - Math.floor(n)) * 2 - 1;
+  };
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const fx = fade(x - ix);
+  const fy = fade(y - iy);
+  const top = hash(ix, iy) + (hash(ix + 1, iy) - hash(ix, iy)) * fx;
+  const bottom = hash(ix, iy + 1) + (hash(ix + 1, iy + 1) - hash(ix, iy + 1)) * fx;
+  return top + (bottom - top) * fy;
+};
 
 export class IncenseSmokeRenderer {
   public sprite: Sprite;
@@ -77,20 +93,17 @@ export class IncenseSmokeRenderer {
     const targetLit = isLit && currentHealth > 0.02 ? 1.0 : 0.0;
     this.litTransition += (targetLit - this.litTransition) * (1 - Math.exp(-0.05 * step));
 
-    // 1. 香体长度与保留香脚 (原版标准尺寸：中心香 86px，两侧香 78px)
-    const STUB_CENTER_LEN = 28;
-    const STUB_SIDE_LEN = 25;
-    const BURNABLE_CENTER = 58;
-    const BURNABLE_SIDE = 53;
-
-    const centerLen = STUB_CENTER_LEN + BURNABLE_CENTER * currentHealth;
-    const sideLen = STUB_SIDE_LEN + BURNABLE_SIDE * currentHealth;
+    // 三炷香等高、竖直平行；点燃消耗时同步缩短。
+    const STUB_LENGTH = 26.5;
+    const BURNABLE_LENGTH = 55.5;
+    const INCENSE_FOOT_LENGTH = 8;
+    const stickLength = STUB_LENGTH + BURNABLE_LENGTH * currentHealth;
     const spreadX = 4.0 + 1.8 * currentHealth;
 
     const dynamicEmbers = [
-      { x: this.centerX - spreadX, y: this.burnerBaseY - sideLen, dir: -1 },
-      { x: this.centerX,           y: this.burnerBaseY - centerLen, dir: 0 },
-      { x: this.centerX + spreadX, y: this.burnerBaseY - sideLen, dir: 1 },
+      { x: this.centerX - spreadX, y: this.burnerBaseY - stickLength },
+      { x: this.centerX,           y: this.burnerBaseY - stickLength },
+      { x: this.centerX + spreadX, y: this.burnerBaseY - stickLength },
     ];
 
     const lateFactor = currentHealth > 0.35
@@ -109,20 +122,28 @@ export class IncenseSmokeRenderer {
     for (let i = 0; i < dynamicEmbers.length; i++) {
       const emb = dynamicEmbers[i];
 
-      // 深色木质主干
+      // 浅暖棕香体；三炷香保持等高、平行。
       ctx.beginPath();
-      ctx.moveTo(this.centerX + (i - 1) * 0.85, this.burnerBaseY);
+      ctx.moveTo(emb.x, this.burnerBaseY - INCENSE_FOOT_LENGTH);
       ctx.lineTo(emb.x, emb.y);
-      ctx.lineWidth = 1.4;
-      ctx.strokeStyle = '#382315';
+      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = '#9a7954';
       ctx.stroke();
 
-      // 细微受光侧高光
+      // 香体受光侧的浅色细纹。
       ctx.beginPath();
-      ctx.moveTo(this.centerX + (i - 1) * 0.85 - 0.2, this.burnerBaseY);
-      ctx.lineTo(emb.x - 0.2, emb.y);
+      ctx.moveTo(emb.x - 0.35, this.burnerBaseY - INCENSE_FOOT_LENGTH - 0.5);
+      ctx.lineTo(emb.x - 0.35, emb.y + 1.5);
       ctx.lineWidth = 0.45;
-      ctx.strokeStyle = '#5a3d28';
+      ctx.strokeStyle = '#c5a77d';
+      ctx.stroke();
+
+      // 香脚略细于香体，使用参考图中的红棕色，插入香灰处收住。
+      ctx.beginPath();
+      ctx.moveTo(emb.x, this.burnerBaseY);
+      ctx.lineTo(emb.x, this.burnerBaseY - INCENSE_FOOT_LENGTH);
+      ctx.lineWidth = 1.15;
+      ctx.strokeStyle = '#963c2d';
       ctx.stroke();
 
       // 燃烧顶端的香灰节
@@ -165,15 +186,17 @@ export class IncenseSmokeRenderer {
         const progress = Math.min(1, node.age / node.maxAge);
         const release = Math.pow(Math.min(1, height / 24), 1.5);
         const flowPhase = height * 0.15 - this.time * 2.1 + profile.phase;
-        const sway = Math.sin(height * 0.045 - this.time * 0.55 + profile.phase) * profile.sway;
-        const fineWisp = Math.sin(flowPhase) * 0.12;
-        const drift = wind * 1.2 * progress * progress;
+        const flowNoise = smoothNoise(height * 0.035 + profile.phase * 3, this.time * 0.42, s * 13 + 4);
+        const sway = Math.sin(height * 0.045 - this.time * 0.55 + profile.phase) * profile.sway * 0.55
+          + flowNoise * 0.34;
+        const fineWisp = Math.sin(flowPhase) * 0.08 + smoothNoise(height * 0.11, this.time * 0.8, s * 19 + 11) * 0.055;
+        const drift = wind * 1.8 * progress * progress;
         node.x += (emb.x + (sway + fineWisp) * release + drift - node.x) * follow;
 
         // 上段轻轻散开，宽度中的细微起伏随流上行；透明度负责末端消散。
         const spread = progress * progress * (3 - 2 * progress);
         node.width = (profile.baseWidth + (profile.maxWidth - profile.baseWidth) * spread)
-          * (0.93 + 0.07 * Math.sin(flowPhase));
+          * (0.88 + node.density * 0.12 + 0.08 * flowNoise);
       }
     }
 
@@ -194,6 +217,7 @@ export class IncenseSmokeRenderer {
             age,
             maxAge: profile.life,
             width: profile.baseWidth,
+            density: 0.88 + 0.12 * smoothNoise(this.time * 1.7, s * 2.3, 23),
           });
         }
       }
@@ -203,9 +227,9 @@ export class IncenseSmokeRenderer {
 
     // ── 3. 淡灰烟芯与低透明度外缘，沿高度渐隐 ──
     if (this.litTransition > 0.02) {
-      const baseAlpha = Math.min(0.72, Math.max(0, density) * 0.64) * lateFactor * this.litTransition;
-      const smokeColor = isNightMode ? '223, 226, 227' : '220, 224, 226';
-      const smokeEdgeColor = isNightMode ? '155, 160, 162' : '156, 164, 166';
+      const baseAlpha = Math.min(0.68, Math.max(0, density) * 0.62) * lateFactor * this.litTransition;
+      const smokeColor = isNightMode ? '246, 247, 248' : '244, 245, 246';
+      const smokeEdgeColor = isNightMode ? '196, 201, 204' : '190, 196, 200';
 
       for (let s = 0; s < trails.length; s++) {
         const trail = trails[s];

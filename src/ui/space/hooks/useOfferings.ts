@@ -36,9 +36,11 @@ export interface UseOfferingsOptions {
   onPetalTrigger: () => void;
   /** 审计展台现场快照（审计中的花材/器形由展台固定，点击仅提示） */
   audit: AuditInfo;
+  /** 案面可用范围由当前主题的 JSON 几何换算。 */
+  tableBounds: { xMin: number; xMax: number; yMin: number; yMax: number };
 }
 
-export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit }: UseOfferingsOptions) => {
+export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit, tableBounds }: UseOfferingsOptions) => {
   const [currentFlower, setCurrentFlower] = useState<FlowerType>('peonies');
   const [lastOfferedFlower, setLastOfferedFlower] = useState<FlowerType>('peonies');
 
@@ -319,7 +321,7 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
     const name = FLOWER_DISPLAY_NAMES[flowerType] || '鲜花';
 
     // 按案面平面占用求解相对最优摆位（避开既有陈设，多束时错落排开不重叠）
-    const spot = findOptimalTableSpot(items, { radius: 59, depthRadius: 14, preferredDepth: -14 });
+    const spot = findOptimalTableSpot(items, { radius: 59, depthRadius: 14, preferredDepth: -14, bounds: tableBounds });
 
     const newBouquet = createBouquetItem(flowerType, spot, { id: newId, name: `敬献 · ${name}` });
 
@@ -426,6 +428,7 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
       radius: 59,
       depthRadius: 14,
       preferredDepth: -12,
+      bounds: tableBounds,
     });
 
     setItems((prev) => {
@@ -453,7 +456,7 @@ export const useOfferings = ({ items, setItems, showToast, onPetalTrigger, audit
     const nextName = FRUIT_DISPLAY_NAMES[fruitType];
 
     // 果盘占地略大，取相应的占地半径并摆在中前部
-    const spot = findOptimalTableSpot(items, { radius: 49, depthRadius: 14, preferredDepth: -10 });
+    const spot = findOptimalTableSpot(items, { radius: 49, depthRadius: 14, preferredDepth: -10, bounds: tableBounds });
 
     const newFruitDish: SceneItem = {
       id: newId,

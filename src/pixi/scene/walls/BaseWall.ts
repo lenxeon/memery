@@ -41,6 +41,8 @@ export interface WallTextPlacement {
 export interface BaseWallSpec {
   /** 背景大图（public 下的绝对路径）：装饰框已画在图内，故壁面只剩这一层贴图 */
   backdropUrl?: string;
+  /** Extend wall artwork below the wall/floor seam without shifting its top anchor. */
+  bottomExtensionRatio?: number;
   /** 遗像落位微调 */
   portrait?: WallPortraitPlacement;
   /** 纪念文字落位微调 */
@@ -78,6 +80,7 @@ export const getWallSpec = (
       ?? sceneTheme.wall?.wallpaper?.responsiveAssets?.[deviceProfile]
       ?? sceneTheme.wall?.wallpaper?.url
       ?? sceneTheme.backdropUrl,
+    bottomExtensionRatio: sceneTheme.wall?.scenery?.[0]?.bottomExtensionRatio,
     portrait: {
       dx: portrait?.dx,
       dy: portrait?.dy,

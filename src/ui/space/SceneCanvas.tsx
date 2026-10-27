@@ -16,7 +16,7 @@ import { FloorLayer } from '../../pixi/layers/FloorLayer';
 import { GodRaysLayer } from '../../pixi/layers/GodRaysLayer';
 import { DustMotesLayer } from '../../pixi/layers/DustMotesLayer';
 import { AltarTableLayer } from '../../pixi/layers/AltarTableLayer';
-import { getMingAltarTableMetrics, getRenderMatchAltarTableMetrics } from '../../pixi/layers/table/MingAltarTableSpec';
+import { getSceneThemeAltarTableMetrics } from '../../pixi/layers/table/MingAltarTableSpec';
 import { MemorialPortraitLayer, StageInsets } from '../../pixi/layers/MemorialPortraitLayer';
 import { PropsLayer } from '../../pixi/layers/PropsLayer';
 import { SmokeParticleEmitter } from '../../pixi/effects/SmokeParticleEmitter';
@@ -28,7 +28,6 @@ import {
   MemorialInfo,
   SceneThemeId,
   SceneAssemblySelection,
-  FloorStyle,
   TableclothStyle,
   TableWoodStyle,
   FlowerType,
@@ -36,10 +35,8 @@ import {
 } from '../../pixi/../types';
 import { sound } from '../../pixi/../utils/audio';
 
-/** TEMP_DEBUG: 置为 true 时不渲染背景墙（用于单独查看/截地面），恢复时改回 false */
-const DISABLE_WALL = false;
-/** TEMP_DEBUG: 置为 true 时不渲染供案（含案体照明层），恢复时改回 false */
-const DISABLE_TABLE = false;
+/** TEMP_DEBUG: 仅审计墙纸、完整墙框与地板时临时启用；常规场景保持完整展示。 */
+const DEBUG_WALL_AND_FLOOR_ONLY = false;
 const ENABLE_GOD_RAYS = false;
 const ENABLE_SCENE_SHADOWS = false;
 
@@ -51,9 +48,6 @@ export interface SceneCanvasProps {
   themeId: SceneThemeId;
   /** 墙体、地面陈设与左右前景的独立部件组合。 */
   sceneAssembly?: SceneAssemblySelection | null;
-  floorStyle: FloorStyle;
-  /** 为 false 时用户已手动选择公共地材，不再使用主题自带地材。 */
-  useThemeFloor?: boolean;
   tableclothStyle: TableclothStyle;
   tableWoodStyle?: TableWoodStyle;
   /** 腿足构架独立材质（桌腿/牙板/横枨） */
@@ -86,8 +80,6 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   lighting,
   themeId,
   sceneAssembly,
-  floorStyle,
-  useThemeFloor = true,
   tableclothStyle,
   tableWoodStyle = 'walnut',
   tableLegWoodStyle = 'walnut',
@@ -112,7 +104,6 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   const isReadyRef = useRef<boolean>(false);
   const [sceneLoadState, setSceneLoadState] = useState<'loading' | 'ready' | 'error'>('loading');
   const renderRevisionRef = useRef(0);
-  const floorReadyRef = useRef<Promise<void>>(Promise.resolve());
   const memorialRef = useRef(memorial);
   memorialRef.current = memorial;
 
@@ -170,25 +161,22 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     return { width: Math.round(w), height: Math.round(h) };
   }, []);
 
-  // 供案透视布局几何（宽厚沉稳，台面前沿精准定位，桌裙离地悬空，绝不拖地）
-  // forward ∈ [-1, 1]：前后移动伴随近大远小，前移时贴近镜头、后移时退向纵深
+  // Table placement and measured geometry are read from the selected theme manifest.
   const getTableLayout = useCallback((width: number, height: number, forward: number = 0) => {
-    const centerX = width * 0.5;
-    // 供案宽度按画布比例定义，手机与 iPad 都保持墙面与供桌的主体比例。
-    const depthScale = 1 + forward * 0.07;
+    const table = getSceneTheme(themeId).table ?? getSceneTheme('classic_dawn').table!;
+    const tablePosition = table.position;
+    const centerX = width * tablePosition.x;
+    const depthScale = 1 + forward * tablePosition.forwardScale;
     const compositionWidth = getSceneCompositionWidth(width, height);
-    const tableWidth = Math.max(compositionWidth * 0.84, Math.min(compositionWidth * 0.92, compositionWidth * 0.90 * depthScale));
-    const tableMetrics = themeId === 'classic_dawn'
-      ? getRenderMatchAltarTableMetrics(tableWidth)
-      : getMingAltarTableMetrics(tableWidth);
-    const tableHeight = tableMetrics.topExtent + tableMetrics.footDrop;
-    // 桌面前沿到新素材桌脚底部的垂挂高度，确保足端贴地。
+    const tableWidth = Math.max(
+      compositionWidth * tablePosition.minWidthRatio,
+      Math.min(compositionWidth * tablePosition.maxWidthRatio, compositionWidth * tablePosition.widthRatio * depthScale)
+    );
+    const tableMetrics = getSceneThemeAltarTableMetrics(table, tableWidth);
     const tableHangingHeight = tableMetrics.footDrop;
-    // 底部留出开阔地板透视余量：前移收窄（贴近镜头），后移加宽（退向纵深）
-    // 让供桌落在墙地交界附近，留出窄地面带给席垫与蒲团。
-    const tableBottomOffset = height * 0.125 - forward * 24;
+    const tableBottomOffset = height * tablePosition.bottomRatio - forward * height * tablePosition.forwardOffsetRatio;
     const tableTopY = height - tableBottomOffset - tableHangingHeight;
-    return { centerX, tableTopY, tableWidth, tableHeight };
+    return { centerX, tableTopY, tableWidth, tableMetrics };
   }, [themeId]);
 
   // 重绘全部图层
@@ -197,18 +185,19 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     renderRevisionRef.current += 1;
     const { width, height } = getViewportDimensions();
     viewportSizeRef.current = { width, height };
+    const sceneTheme = getSceneTheme(themeId);
+    const fullSceneBackground = sceneTheme.sceneBackground;
 
     // 0. 远景背景墙（纯 Pixi 坐标系渲染，与供案共用同一 centerX，杜绝 DOM/CSS 布局错位）
-    // TEMP_DEBUG: 临时关闭墙面渲染，仅看地面
-    if (!DISABLE_WALL) {
-      const wallpaperAsset = sceneAssembly
-        ? getSceneComponentOption('wallpaper', sceneAssembly.wallpaperId)?.asset
-        : getSceneTheme(themeId).wall?.wallpaper;
-      const deviceProfile = width < 700 ? 'phone' : 'tablet';
-      const wallpaper = wallpaperAsset?.responsiveAssets?.[deviceProfile] ?? wallpaperAsset?.url;
-      bgLayerRef.current?.render(width, height, lighting, themeId, wallpaper);
-    }
-    if (bgLayerRef.current) bgLayerRef.current.container.visible = !DISABLE_WALL;
+    const wallpaperAsset = fullSceneBackground
+      ? undefined
+      : sceneAssembly
+      ? getSceneComponentOption('wallpaper', sceneAssembly.wallpaperId)?.asset
+      : sceneTheme.wall?.wallpaper;
+    const deviceProfile = width < 700 ? 'phone' : 'tablet';
+    const wallpaper = fullSceneBackground ?? wallpaperAsset?.responsiveAssets?.[deviceProfile] ?? wallpaperAsset?.url;
+    bgLayerRef.current?.render(width, height, themeId, wallpaper, wallpaperAsset?.video?.url, Boolean(fullSceneBackground));
+    if (bgLayerRef.current) bgLayerRef.current.container.visible = true;
 
     // 0b. 遗像与主题锚点先完成布局，地坪即可读取主题自带材质。
     if (portraitLayerRef.current) {
@@ -228,29 +217,50 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       );
     }
 
-    // 0c. 2.5D 透视地坪；主题可提供独享材质，否则使用公共地坪选择。
+    // Debug view keeps only the wall paper/frame composition and the floor image.
+    // The portrait and independently configurable decoration layers stay hidden so
+    // they cannot obscure alignment or asset transparency while reviewing these layers.
+    if (themeLayerRef.current) {
+      const showWallDecorations = !DEBUG_WALL_AND_FLOOR_ONLY;
+      themeLayerRef.current.wallpaperDecorations.visible = showWallDecorations;
+      themeLayerRef.current.portraitBack.visible = showWallDecorations;
+      themeLayerRef.current.wallAssembly.visible = true;
+      themeLayerRef.current.portraitFront.visible = showWallDecorations;
+      themeLayerRef.current.groundMat.visible = showWallDecorations;
+      themeLayerRef.current.ground.visible = showWallDecorations;
+      themeLayerRef.current.foregroundLeft.visible = showWallDecorations;
+      themeLayerRef.current.foregroundRight.visible = showWallDecorations;
+    }
+    if (portraitLayerRef.current) {
+      portraitLayerRef.current.container.visible = !DEBUG_WALL_AND_FLOOR_ONLY && !fullSceneBackground;
+    }
+
+    // 0c. 仅渲染 manifest 指定的主题地板；未加载时显示主题底色。
     const pipeline = TexturePipeline.getInstance();
-    const sceneTheme = getSceneTheme(themeId);
-    floorReadyRef.current = useThemeFloor && sceneTheme.floorMaterial
-      ? Promise.resolve()
-      : pipeline.whenFloorReady(floorStyle);
-    const themeFloorMaterial = useThemeFloor ? sceneTheme.floorMaterial : undefined;
-    floorLayerRef.current?.render(
-      width,
-      height,
-      floorStyle,
-      pipeline.woodPlankTexture,
-      pipeline.marbleTileTexture,
-      lighting,
-      useThemeFloor ? themeLayerRef.current?.getFloorMaterial() : undefined,
-      themeFloorMaterial,
-      sceneTheme.lightRig
-    );
+    const floorImage = themeLayerRef.current?.getFloorImage()?.image ?? null;
+    if (sceneTheme.floorImage) {
+      if (floorLayerRef.current) floorLayerRef.current.container.visible = true;
+      floorLayerRef.current?.render(
+        width,
+        height,
+        lighting,
+        sceneTheme.floorImage,
+        floorImage,
+        sceneTheme.lightRig
+      );
+    } else if (floorLayerRef.current) {
+      floorLayerRef.current.container.visible = false;
+    }
+
+    if (godRaysLayerRef.current) godRaysLayerRef.current.container.visible = !DEBUG_WALL_AND_FLOOR_ONLY && !fullSceneBackground;
+    if (dustLayerRef.current) dustLayerRef.current.container.visible = !DEBUG_WALL_AND_FLOOR_ONLY && !fullSceneBackground;
+    if (pixiEffectsRef.current) {
+      pixiEffectsRef.current.lightsContainer.visible = !DEBUG_WALL_AND_FLOOR_ONLY && !fullSceneBackground;
+      pixiEffectsRef.current.petalsContainer.visible = !DEBUG_WALL_AND_FLOOR_ONLY && !fullSceneBackground;
+    }
 
     // 0d. 丁达尔光束（Pixi 加色混合，随 lightsLayer 视差一同摆动）
-    const raySource = themeId === 'classic_dawn'
-      ? getSceneTheme(themeId).lightRig.source
-      : { x: 0.5, y: 0.12 };
+    const raySource = getSceneTheme(themeId).lightRig.source;
     godRaysLayerRef.current?.render(width, height, lighting, raySource);
 
     // 0e. 光束中的浮尘（与场景共用 Ticker，密度/日照/风力同光照联动）
@@ -263,15 +273,21 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     });
 
     // 1. 供案几何与桌布 (置于用户近前前景，开阔背景纵深)
-    const forward = activeForwardRef.current;
-    const { centerX, tableTopY, tableWidth } = getTableLayout(width, height, forward);
-    // TEMP_DEBUG: 临时关闭供案渲染
-    if (tableLayerRef.current) {
-      tableLayerRef.current.container.visible = !DISABLE_TABLE;
-      tableLayerRef.current.lightContainer.visible = !DISABLE_TABLE;
+    if (!sceneTheme.table) {
+      if (tableLayerRef.current) {
+        tableLayerRef.current.container.visible = false;
+        tableLayerRef.current.lightContainer.visible = false;
+      }
+      if (propsLayerRef.current) propsLayerRef.current.container.visible = false;
+      return;
     }
-    if (DISABLE_TABLE) {
-      // 供品立于案面，隐藏供案时一并隐藏，避免悬空残留
+    const forward = activeForwardRef.current;
+    const { centerX, tableTopY, tableWidth, tableMetrics } = getTableLayout(width, height, forward);
+    if (tableLayerRef.current) {
+      tableLayerRef.current.container.visible = !DEBUG_WALL_AND_FLOOR_ONLY;
+      tableLayerRef.current.lightContainer.visible = !DEBUG_WALL_AND_FLOOR_ONLY;
+    }
+    if (DEBUG_WALL_AND_FLOOR_ONLY) {
       if (propsLayerRef.current) propsLayerRef.current.container.visible = false;
       return;
     }
@@ -286,6 +302,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       topWoodStyle: tableWoodStyle,
       legWoodStyle: tableLegWoodStyle,
       tableAssetUrl: sceneTheme.tableAssetUrl,
+      tableMetrics,
       // 地坪水平灭点基线与 FloorLayer 保持一致 (视口下 38%)
       horizonY: height * 0.62,
     });
@@ -294,8 +311,8 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     if (tableLayerRef.current) tableLayerRef.current.setLighting(lighting);
 
     // 2. 供品与道具 (1:1 同步置于供案台面)
-    propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
-    }, [items, themeId, sceneAssembly, floorStyle, useThemeFloor, tableclothStyle, tableWoodStyle, tableLegWoodStyle, showTableRunner, lighting, stageInsets, getViewportDimensions, getTableLayout]);
+    propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth, tableMetrics.surfaceDepth);
+    }, [items, themeId, sceneAssembly, tableclothStyle, tableWoodStyle, tableLegWoodStyle, showTableRunner, lighting, stageInsets, getViewportDimensions, getTableLayout]);
 
   // 始终持有最新重绘函数（供案拖放时按最新状态即时重绘）
   const renderAllRef = useRef(renderAll);
@@ -352,11 +369,12 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       stage.backgroundLayer.addChild(bgLayer.container);
       stage.backgroundLayer.addChild(themeLayer.wallpaperDecorations);
       stage.portraitLayer.addChild(themeLayer.portraitBack);
+      // The complete wall/window frame sits above its wallpaper decorations but
+      // below the portrait component, matching the shared theme layer contract.
+      stage.portraitLayer.addChild(themeLayer.wallAssembly);
       stage.portraitLayer.addChild(portraitLayer.container);
       stage.portraitLayer.addChild(themeLayer.portraitFront);
       stage.floorLayer.addChild(floorLayer.container);
-      // Frame and wall attachments share one Pixi group so their placement and scale stay aligned.
-      stage.floorLayer.addChild(themeLayer.wallAssembly);
       // The mat extends under the table feet. Keep both in the same parallax group,
       // with the mat inserted first so their alignment stays fixed while the scene moves.
       stage.tableLayer.addChild(themeLayer.groundMat);
@@ -430,6 +448,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       // 注册 Ticker 逐帧物理与动画更新 (只更新粒子物理与微风拂动)
       stage.app?.ticker.add((ticker) => {
         const delta = ticker.deltaTime;
+        if (DEBUG_WALL_AND_FLOOR_ONLY) return;
         propsLayer.update(delta);
         pixiEffects.update(delta);
         godRaysLayerRef.current?.update(delta);
@@ -448,10 +467,10 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
         const loadingRevision = renderRevisionRef.current;
         await Promise.all([
           bgLayer.whenReady(), themeLayer.whenReady(), tableLayer.whenReady(),
-          portraitLayer.whenReady(), propsLayer.whenReady(), floorReadyRef.current,
+          portraitLayer.whenReady(), propsLayer.whenReady(),
         ]);
         if (!isMounted || !stage.app) return;
-        // Apply late floor textures and repeat if asset callbacks or settings
+        // Apply late floor images and repeat if asset callbacks or settings
         // changed the scene while the previous set of loads was settling.
         if (!initialAssetsLaidOut || loadingRevision !== renderRevisionRef.current) {
           initialAssetsLaidOut = true;
@@ -514,8 +533,6 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   }, [
     themeId,
     sceneAssembly,
-    floorStyle,
-    useThemeFloor,
     tableclothStyle,
     tableWoodStyle,
     tableLegWoodStyle,
@@ -536,10 +553,10 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
   // 3. 道具状态轻量同步 (只更新道具，绝不重绘背景和地面)
   useEffect(() => {
-    if (!isReadyRef.current) return;
+    if (!isReadyRef.current || DEBUG_WALL_AND_FLOOR_ONLY) return;
     const { width, height } = viewportSizeRef.current;
-    const { centerX, tableTopY, tableWidth } = getTableLayout(width, height, tableForward);
-    propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth);
+    const { centerX, tableTopY, tableWidth, tableMetrics } = getTableLayout(width, height, tableForward);
+    propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth, tableMetrics.surfaceDepth);
   }, [items, tableForward, getTableLayout]);
 
   // 3b. 遗像牌位轻量同步 (堂号 / 题名 / 像容，不触发全场景重绘)
@@ -550,7 +567,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
   // 4. 落花飘落动效触发
   useEffect(() => {
-    if (petalTrigger !== prevPetalTriggerRef.current && petalTrigger > 0) {
+    if (!DEBUG_WALL_AND_FLOOR_ONLY && petalTrigger !== prevPetalTriggerRef.current && petalTrigger > 0) {
       prevPetalTriggerRef.current = petalTrigger;
       const { width } = viewportSizeRef.current;
       pixiEffectsRef.current?.triggerPetalShower(lastOfferedFlower, 28, width);

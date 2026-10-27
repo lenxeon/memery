@@ -18,9 +18,8 @@
  */
 
 // ── 领域数据：风格选项（UI 面板用于展示与选择） ──
-export { FLOOR_STYLE_OPTIONS } from './scene/floorOptions';
 export { WALL_STYLE_OPTIONS } from './scene/walls/options';
-export { SCENE_THEME_REGISTRY, SCENE_THEME_OPTIONS, getSceneTheme } from './scene/themes';
+export { SCENE_THEME_REGISTRY, SCENE_THEME_OPTIONS, getSceneTheme, loadSceneThemes } from './scene/themes';
 export {
   SCENE_COMPONENT_GROUPS,
   SCENE_FOREGROUND_OPTIONS,
@@ -46,7 +45,6 @@ export type {
   SpaceScene,
   SpaceTheme,
   SpaceWall,
-  SpaceFloor,
   SpaceTable,
   SpaceSpot,
 } from './space';
@@ -68,7 +66,6 @@ export type {
   SceneForegroundInstance,
   SceneForegroundComposition,
   SceneForegroundDefinition,
-  FloorStyle,
   TableclothStyle,
   TableWoodStyle,
   VaseHitZone,

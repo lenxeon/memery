@@ -10,7 +10,7 @@ import type {
   SceneAssemblySelection,
   SceneForegroundInstance,
   SceneForegroundDefinition,
-  SceneThemeFloorMaterial,
+  SceneThemeFloorImage,
   SceneThemeGroundAsset,
   SceneThemeLightRig,
   SceneThemeId,
@@ -88,8 +88,8 @@ export class SceneThemeLayer {
   private assetLoadError: unknown = null;
   private viewport = { width: 0, height: 0 };
   private memorial: MemorialThemeAnchor = { x: 0, y: 0, size: 144 };
-  private floorMaterial: SceneThemeFloorMaterial | null = null;
-  private floorTexture: Texture | null = null;
+  private floorImageSpec: SceneThemeFloorImage | null = null;
+  private floorImageTexture: Texture | null = null;
   private lighting: LightingSettings | null = null;
   private lightRig: SceneThemeLightRig | null = null;
   /** Per-viewport wall bounds; crop architectural PNG spill below the wall/floor seam. */
@@ -168,9 +168,9 @@ export class SceneThemeLayer {
     this.layout();
   }
 
-  public getFloorMaterial(): { spec: SceneThemeFloorMaterial; texture: Texture } | undefined {
-    if (!this.floorMaterial || !this.floorTexture) return undefined;
-    return { spec: this.floorMaterial, texture: this.floorTexture };
+  public getFloorImage(): { spec: SceneThemeFloorImage; image: Texture } | undefined {
+    if (!this.floorImageSpec || !this.floorImageTexture) return undefined;
+    return { spec: this.floorImageSpec, image: this.floorImageTexture };
   }
 
   public async whenReady(): Promise<void> {
@@ -191,8 +191,9 @@ export class SceneThemeLayer {
     this.foregroundLoadToken += 1;
     this.assetLoadError = null;
     const definition = getSceneTheme(themeId);
-    this.floorMaterial = definition.floorMaterial ?? null;
-    this.floorTexture = null;
+    const floorImageSpec = definition.floorImage ?? null;
+    this.floorImageSpec = floorImageSpec;
+    this.floorImageTexture = null;
 
     for (const container of this.contentContainers()) this.clearContainer(container);
     for (const { subTexture } of this.wallAssemblyAssets) subTexture?.destroy(false);
@@ -207,18 +208,17 @@ export class SceneThemeLayer {
     if (selection) this.mountSelection(selection, token, definition.foregroundSetIds);
     else this.mountLegacyLayers(definition.layers, token);
 
-    if (this.floorMaterial) {
-      this.trackAssetLoad(Assets.load(this.floorMaterial.url)
-        .then((texture) => {
-          if (token !== this.loadToken) return;
-          this.floorTexture = texture;
-          this.onAssetReady?.();
-        })
-        .catch((error) => {
-          if (token === this.loadToken) this.assetLoadError = error;
-          console.error(`Failed to load theme floor: ${this.floorMaterial?.url}`, error);
-        }));
-    }
+    if (!floorImageSpec) return;
+    this.trackAssetLoad(Assets.load(floorImageSpec.url)
+      .then((image) => {
+        if (token !== this.loadToken) return;
+        this.floorImageTexture = image;
+        this.onAssetReady?.();
+      })
+      .catch((error) => {
+        if (token === this.loadToken) this.assetLoadError = error;
+        console.error(`Failed to load theme floor image: ${floorImageSpec.url}`, error);
+      }));
   }
 
   private mountSelection(selection: SceneAssemblySelection, token: number, foregroundSetIds?: string[]): void {
@@ -242,7 +242,7 @@ export class SceneThemeLayer {
     if (groundMat) this.groundAssets.push(this.createGroundAsset(groundMat.asset, token, this.groundMat));
     if (cushion) this.groundAssets.push(this.createGroundAsset(cushion.asset, token));
 
-    const instances = [...selection.foreground.left, ...selection.foreground.right]
+    const instances = [selection.foreground.left, selection.foreground.right]
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     for (const instance of instances) {
       const definition = getSceneForeground(instance.foregroundId);
@@ -262,7 +262,7 @@ export class SceneThemeLayer {
     this.foregroundAssets = [];
     if (!selection) return;
 
-    const instances = [...selection.foreground.left, ...selection.foreground.right]
+    const instances = [selection.foreground.left, selection.foreground.right]
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     for (const instance of instances) {
       const definition = getSceneForeground(instance.foregroundId);
@@ -371,18 +371,18 @@ export class SceneThemeLayer {
     const frame = this.wallAssemblyAssets.find(({ role }) => role === 'scenery');
     if (frame?.sprite.texture.width && frame.sprite.texture.height) {
       const profile = this.getDeviceProfile();
-      const compositionWidth = getSceneCompositionWidth(width, height);
-      const wallWidth = profile === 'tablet' ? width : compositionWidth;
+      const wallWidth = width;
       const frameWidthRatio = frame.spec.responsiveWidthRatios?.[profile] ?? frame.spec.widthRatio ?? 1;
       const groupScale = Math.max((wallWidth * frameWidthRatio) / frame.sprite.texture.width, wallBottom / frame.sprite.texture.height);
+      const bottomExtensionRatio = frame.spec.bottomExtensionRatio ?? 0;
       const authoredWidth = frame.sprite.texture.width;
       const authoredHeight = frame.sprite.texture.height;
 
       this.wallAssembly.position.set(width * 0.5, 0);
-      this.wallAssembly.scale.set(groupScale);
-      this.wallSceneryMask.clear().rect(-authoredWidth * 0.5, 0, authoredWidth, authoredHeight).fill({ color: 0xffffff });
+      this.wallAssembly.scale.set(groupScale, groupScale * (1 + bottomExtensionRatio));
+      this.wallSceneryMask.clear().rect(-authoredWidth * 0.5, 0, authoredWidth, authoredHeight * (1 + bottomExtensionRatio)).fill({ color: 0xffffff });
 
-        for (const { role, spec, sprite, anchor: partAnchor, glowIndex } of this.wallAssemblyAssets) {
+      for (const { role, spec, sprite, anchor: partAnchor, glowIndex } of this.wallAssemblyAssets) {
         if (!sprite.texture.width || !sprite.texture.height) continue;
         if (role === 'scenery') {
           // Keep the authored frame PNG's wood color unchanged in the default scene.
@@ -425,7 +425,7 @@ export class SceneThemeLayer {
     for (const { spec, sprite } of this.viewportAssets) {
       if (!sprite.texture.width || !sprite.texture.height) continue;
       const profile = this.getDeviceProfile();
-      const wallWidth = profile === 'tablet' ? width : compositionWidth;
+      const wallWidth = width;
       const sx = wallWidth / sprite.texture.width;
       const sy = height / sprite.texture.height;
       const wallHeight = getFloorTopY(width, height);

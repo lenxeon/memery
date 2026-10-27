@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "themeId": "warm_blessing",
+  "name": "暖意窗光",
+  "poeticTitle": "温光常伴",
+  "iconText": "☀️",
+  "desc": "整张拱窗、山水与地面背景",
+  "tag": "温暖明亮",
+  "version": 11,
+  "sceneBackground": {
+    "mode": "single-background",
+    "asset": "themes/warm_blessing/backgrounds/scene2-full.png"
+  },
+  "wall": null,
+  "ground": {
+    "floor": null,
+    "groundMat": {
+      "id": "warm_ivory_rush_mat",
+      "name": "象牙编席",
+      "poeticTitle": "暖席迎光",
+      "description": "浅麦色编席，低机位平面构图。",
+      "asset": "themes/warm_blessing/mats/ivory-rush-mat.png",
+      "previewUrl": "themes/warm_blessing/mats/ivory-rush-mat.png",
+      "widthRatio": 1.2,
+      "bottomRatio": 0.045
+    },
+    "cushion": {
+      "id": "warm_woven_cushion",
+      "name": "暖棕蒲团",
+      "poeticTitle": "藤编安坐",
+      "description": "蜂蜜棕藤编圆垫，边沿与盘绕纹理清晰。",
+      "asset": "themes/warm_blessing/cushions/woven-cream-cushion.png",
+      "previewUrl": "themes/warm_blessing/cushions/woven-cream-cushion.png",
+      "widthRatio": 0.32,
+      "bottomRatio": 0.065
+    }
+  },
+  "table": {
+    "id": "warm_oak_altar",
+    "name": "浅橡木无腿供桌",
+    "asset": "themes/warm_blessing/table/legless-oak-altar.png",
+    "structure": "legless",
+    "woodStyle": "white_oak",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.125,
+      "widthRatio": 0.9,
+      "minWidthRatio": 0.84,
+      "maxWidthRatio": 0.92,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": {
+        "width": 1536,
+        "height": 1024
+      },
+      "visibleBounds": {
+        "left": 0.01302,
+        "top": 0.33691,
+        "right": 0.98698,
+        "bottom": 0.69434
+      },
+      "frontEdgeY": 0.41504,
+      "backEdgeY": 0.3418,
+      "fasciaBottomY": 0.47656,
+      "apronBottomY": 0.69434,
+      "footBottomY": 0.69434,
+      "apronBoundsX": {
+        "left": 0.048,
+        "right": 0.952
+      }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": {
+          "x": 0.099,
+          "y": 0.3418
+        },
+        "backRight": {
+          "x": 0.901,
+          "y": 0.3418
+        },
+        "frontRight": {
+          "x": 0.986,
+          "y": 0.41504
+        },
+        "frontLeft": {
+          "x": 0.014,
+          "y": 0.41504
+        }
+      },
+      "usableArea": {
+        "uMin": 0.08,
+        "uMax": 0.92,
+        "vMin": 0.08,
+        "vMax": 0.94
+      },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "scene2_full_background",
+    "wallpaperDecorationId": "none",
+    "frameId": "scene2_full_background",
+    "wallDecorationId": "none",
+    "groundMatId": "warm_ivory_rush_mat",
+    "cushionId": "warm_woven_cushion",
+    "offerings": {
+      "vase_left": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.18,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "vase_right": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.82,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "candle_left": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.33,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "candle_right": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.67,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "censer": {
+        "catalogId": "censer",
+        "position": {
+          "u": 0.5,
+          "v": 0.38
+        },
+        "scale": 1
+      },
+      "fruit_left": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.25,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "fruit_right": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.75,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "tea_cups": {
+        "catalogId": "tea_cups",
+        "position": {
+          "u": 0.5,
+          "v": 0.82
+        },
+        "scale": 1
+      }
+    },
+    "foreground": {
+      "left": {
+        "foregroundId": "plum_blossom_left",
+        "offsetX": -0.36,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "foregroundId": "plum_blossom_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "preset": {
+    "tablecloth": "moonlight_white",
+    "lighting": {
+      "sunAngle": 0,
+      "sunlightIntensity": 0.82,
+      "godRaysIntensity": 0,
+      "godRaysEnabled": false
+    }
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.5,
+      "y": 0.12
+    },
+    "sunAngle": 0,
+    "sunlightIntensity": 0.82,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#fff1d5",
+    "ambientColor": "#f6ead2",
+    "shadowDirection": {
+      "x": 0,
+      "y": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "plum_blossom_left": {
+        "id": "plum_blossom_left",
+        "setId": "plum_blossom",
+        "name": "梅枝暖雪·左",
+        "poeticTitle": "春信入庭",
+        "description": "深褐枝条配暖白梅花。",
+        "plant": "梅花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/plum_blossom/left.png",
+        "widthRatio": 0.34
+      }
+    },
+    "right": {
+      "plum_blossom_right": {
+        "id": "plum_blossom_right",
+        "setId": "plum_blossom",
+        "name": "梅枝暖雪·右",
+        "poeticTitle": "春信入庭",
+        "description": "深褐枝条配暖白梅花。",
+        "plant": "梅花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/plum_blossom/right.png",
+        "widthRatio": 0.34
+      }
+    }
+  },
+  "foregroundSetIds": [
+    "plum_blossom"
+  ],
+  "defaultForegroundSetId": "plum_blossom"
+}
