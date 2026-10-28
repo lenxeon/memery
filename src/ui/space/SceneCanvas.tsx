@@ -36,7 +36,7 @@ import {
 import { sound } from '../../pixi/../utils/audio';
 
 /** TEMP_DEBUG: 仅审计墙纸、完整墙框与地板时临时启用；常规场景保持完整展示。 */
-const DEBUG_WALL_AND_FLOOR_ONLY = true;
+const DEBUG_WALL_AND_FLOOR_ONLY = false;
 const ENABLE_GOD_RAYS = false;
 const ENABLE_SCENE_SHADOWS = false;
 
@@ -196,7 +196,15 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       : sceneTheme.wall?.wallpaper;
     const deviceProfile = width < 700 ? 'phone' : 'tablet';
     const wallpaper = fullSceneBackground ?? wallpaperAsset?.responsiveAssets?.[deviceProfile] ?? wallpaperAsset?.url;
-    bgLayerRef.current?.render(width, height, themeId, wallpaper, wallpaperAsset?.video?.url, Boolean(fullSceneBackground));
+    bgLayerRef.current?.render(
+      width,
+      height,
+      themeId,
+      wallpaper,
+      wallpaperAsset?.video?.url,
+      Boolean(fullSceneBackground),
+      Boolean(sceneTheme.wall?.roomOverlay)
+    );
     if (bgLayerRef.current) bgLayerRef.current.container.visible = true;
 
     // 0b. 遗像与主题锚点先完成布局，地坪即可读取主题自带材质。
@@ -217,7 +225,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       );
     }
 
-    // Debug view keeps only the wall paper/frame composition and the floor image.
+    // Debug view keeps only the wall-paper/interior composition, including integrated room overlays.
     // The portrait and independently configurable decoration layers stay hidden so
     // they cannot obscure alignment or asset transparency while reviewing these layers.
     if (themeLayerRef.current) {

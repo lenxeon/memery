@@ -1,6 +1,6 @@
 # 场景主题 JSONC 契约
 
-本文定义应用当前实际读取的主题 catalog 与 `public/themes/<theme-id>/manifest.json`。字段、类型和默认装配以此为准；TypeScript 主题注册表只负责加载、校验和归一化，不维护第二套主题数据。它约束运行时数据，不决定新窗景的美术拆分；窗景素材按[墙地光一体化规范](./window-scene-assets.md)制作。
+本文定义应用当前实际读取的主题 catalog 与 `public/themes/<theme-id>/manifest.json`。字段、类型和默认装配以此为准；TypeScript 主题注册表只负责加载、校验和归一化，不维护第二套主题数据。用户明确要求墙地一体时，所有题材均可采用独立背景画与单张透明室内层；窗景专属构图仍参考[墙地光一体化规范](./window-scene-assets.md)。
 
 ## 文件与启动
 
@@ -11,7 +11,7 @@
 
 ## Manifest 字段
 
-主题有共同的元信息、`preset` 和 `lightRig`。当前支持的模块化运行时主题使用 `wall`、`ground` 等字段。窗景的新设计素材按墙地光一体化规范拆成窗外景物、花枝、室内墙地光层；将这类设计接入运行时前，须先扩展对应契约和渲染层。`sceneBackground` 继续只供既有兼容场景读取。
+主题有共同的元信息、`preset` 和 `lightRig`。常规主题使用 `wall`、`ground.floor` 模块化；用户指定墙地一体时，使用 `wall.wallpaper` 加 `wall.roomOverlay`，并将 `ground.floor` 设为 `null`。该契约已由注册器和 Pixi 渲染层支持。`sceneBackground` 继续只供既有兼容场景读取。
 
 | 字段 | 类型 | 含义 |
 |---|---|---|
@@ -20,7 +20,7 @@
 | `name`, `poeticTitle`, `iconText`, `desc`, `tag` | string | 主题显示信息 |
 | `version` | number | 该主题素材与构图修订号 |
 | `sceneBackground` | object? | 既有兼容场景使用；新配置沿用其既有数据模式 |
-| `wall`, `ground`, `table` | object | 当前模块化主题的墙体、地面和供桌图层 |
+| `wall`, `ground`, `table` | object | 墙体、背景画、可选墙地一体层、地面部件和供桌配置 |
 | `foregroundCandidates` | object | 新主题的左右前景候选，分别以对象键保存 |
 | `defaultAssembly` | object | 新主题的默认部件和供品模板 |
 | `foregroundSetIds` | string[] | 当前主题允许切换的前景组 ID |
@@ -34,12 +34,14 @@
 
 ### 墙面层顺序
 
-由远到近固定为：
+未采用墙地一体时，由远到近固定为：
 
 1. `wall.wallpaper`：不透明壁画底图，不含窗框、花枝或遗像，不负责运行时光照。
 2. `wall.wallpaperDecorations`：窗框后方的花枝等独立装饰，列表项使用透明素材和相对遗像环的 `widthInPortraits`、`dxInPortraits`、`dyInPortraits`，叠在墙纸之上、完整框架之前。
 3. `wall.frame`：完整墙体与窗户/框架的一张 RGBA PNG。拱顶、窗棂、立柱、横档必须作为一个整体；窗格内部用 PNG 的透明 alpha 留空，让下方壁画和独立框后花枝从窗洞中露出。不能用 SVG 包装，也不能把框架拆成多个图层。
 4. `wall.portrait`：动态遗像和纪念文字的缩放与纵向微调。
+
+用户明确指定“背景画 + 其余一张透明 PNG”时，采用两层模式：`wall.wallpaper` 单独提供不透明背景画；`wall.roomOverlay` 提供全画布 RGBA，合并其余墙面、完整框架、地板和统一光影，洞口 alpha 透明。两张图必须同画布尺寸、长宽比和坐标原点，并以相同的完整视口等比 cover 缩放及中心锚点叠放；透明开口露出下层背景画。该模式必须省略 `wall.frame`、将 `ground.floor` 设为 `null`，并将所有要随室内层固定的装饰和烘焙光影合入 `roomOverlay`；动态遗像、桌案、供品和地面可交互陈设仍保持运行时独立。
 
 `wall.wallpaper`、`wall.frame` 可按设备提供 `assets.phone`、`assets.tablet`；路径相对 `public/`。壁画、框后花枝和框架按同一构图坐标系对齐。拱窗主题在最高拱顶上方保留约 20–30 CSS px 的真实墙面（iPhone 16 的 393 CSS px 宽基准），不能用透明留白代替。`frame.position` 的 `x/y/widthRatio` 是相对画布的归一化构图参数；可选 `bottomExtensionRatio`（0–0.15）让壁画和框架共同向下延伸，遮住不同长宽比下的墙地交界。`frameDecorations` 是可选的独立附件，不得用它拆分本应完整绘制的墙体或窗框。
 
@@ -47,8 +49,8 @@
 
 ```jsonc
 {
-  "assets": { "phone": "themes/lotus_mandorla/wallpapers/phone/cloud-sea-poster.png" },
-  "video": { "asset": "themes/lotus_mandorla/wallpapers/phone/cloud-sea.mp4" },
+  "assets": { "phone": "themes/<theme-id>/wallpapers/phone/background-poster.png" },
+  "video": { "asset": "themes/<theme-id>/wallpapers/phone/background.mp4" },
   "fit": "cover"
 }
 ```
@@ -57,8 +59,8 @@
 
 ```jsonc
 {
-  "id": "stone_mandorla_ring",
-  "asset": "themes/lotus_mandorla/wall-decor/mandorla-ring.png",
+  "id": "wall_decoration_atlas",
+  "asset": "themes/<theme-id>/wall-decor/decoration-atlas.png",
   "wallParts": [
     {
       "frame": { "x": 0, "y": 0, "width": 1254, "height": 1254 },
@@ -70,7 +72,7 @@
 
 ### 地面和供桌
 
-- 采用模块化墙地装配的主题中，`ground.floor` 引用完整不透明透视地坪 PNG；地面的单点透视、纹样远近变化和构图需直接生成在图像内，Pixi 将图像作为普通精灵等比 cover 摆入墙地交界下方的地坪区域。这里定义烘焙光照标记、素材未就绪时的底色和踢脚线色，不支持公共地板材质或地面渲染模式切换。窗景一体化素材不单独制作地坪；运行时接入时以扩展后的场景契约为准。
+- 模块化墙地装配的主题中，`ground.floor` 引用完整不透明透视地坪 PNG；单点透视、纹样远近变化和构图直接生成在图像内，Pixi 将其等比 cover 到墙地交界下方。用户指定墙地一体时，`ground.floor` 必须为 `null`，地面透视、材质、统一光影与墙框一同绘入 `wall.roomOverlay`；不单设地坪精灵或重复叠加相同的运行时光影。
 - 地坪 `asset` 必须位于 `themes/<themeId>/` 内并以 `.png` 结尾；`mode`、`tileSize` 等旧地材字段会被加载器拒绝。运行时禁止 `PerspectiveMesh`、UV 映射、单应变换、地面投影、非等比拉伸和重复平铺；适配不同手机长宽比时只进行等比 cover 与边缘裁切。素材缺失时只显示该主题 `baseColor` 并报告加载错误。
 - `ground.groundMat`、`ground.cushion` 各自定义素材、显示宽度比例和画布底边比例。
 - `table.position` 定义桌体水平锚点、离画布底边比例、默认宽度范围以及前后拖动时的缩放和位移；渲染层不得按 `themeId` 写另一套桌位常量。
@@ -169,9 +171,11 @@
 ## 校验清单
 
 - catalog 中每个 ID 唯一；每个 manifest 的 `themeId` 与其一致。
-- 对采用当前模块化运行时结构的主题，按拆分字段校验：省略 `sceneBackground`，提供完整 `wall`、`ground.floor`、`table`、`defaultAssembly` 和 `foregroundCandidates`。窗景墙地光一体素材采用独立的设计规范；接入运行时前需先扩展其数据契约，不能用这条模块化清单要求拆开室内底层。
+- 对采用模块化运行时结构的主题，按拆分字段校验：省略 `sceneBackground`，提供完整 `wall.frame`、`ground.floor`、`table`、`defaultAssembly` 和 `foregroundCandidates`。
+- 对指定墙地一体的主题，必须提供 `wall.wallpaper` 与 `wall.roomOverlay`，省略 `wall.frame`，设置 `ground.floor: null`，并把默认 `frameId` 设为 `none`；`roomOverlay` 必须是主题目录内全画布透明 PNG。
 - 默认装配引用的部件 ID 必须存在；默认前景 ID 必须分别存在于左、右候选对象。
 - `wall.frame` 始终是单个完整素材；不能把墙纸、窗花或遗像合并进框架。
+- `wall.roomOverlay` 仅用于墙地一体方案；它替代独立 `wall.frame` 和 `ground.floor`，不可再拆出同一室内层中的框架或地坪。
 - 可选 `wall.wallpaper.video` 为含 `asset` 字符串的对象；MP4 属于当前主题，静态 PNG 必须保留且与首帧匹配。省略整个 `video` 字段表示静态主题，不使用空路径。
 - 桌面归一化坐标在 `0..1`；默认供品点位位于 `usableArea`。
 - 每次修改主题 JSONC 后，必须逐字段对照本文，并检查 catalog 引用、素材路径、部件引用和供品边界一致。

@@ -2,7 +2,6 @@
   "schemaVersion": 1, // Manifest catalog schema version.
   "themes": [ // Only themes listed here appear in the application theme picker.
     { "id": "classic_dawn", "manifest": "themes/classic_dawn/manifest.json" }, // 晴岚映曜.
-    { "id": "warm_blessing", "manifest": "themes/warm_blessing/manifest.json" }, // 暖意窗光.
-    { "id": "lotus_mandorla", "manifest": "themes/lotus_mandorla/manifest.json" } // 宝相庄严.
+    { "id": "warm_blessing", "manifest": "themes/warm_blessing/manifest.json" } // 暖意窗光.
   ]
 }

@@ -2,7 +2,7 @@
  * @file SceneBackgroundLayer.ts
  * @description PixiJS 背景墙层。
  *
- * 墙纸在最底层单独铺设；完整墙体/窗框由主题层叠在上方，透明窗格露出墙纸。
+ * 墙纸在最底层单独铺设；模块化主题由墙体/窗框透明开口露出墙纸，墙地一体主题使用同尺寸全画布墙纸与 roomOverlay 对齐。
  * 本层不接收光照 tint，避免壁画随运行时光照改变颜色。
  */
 import { Assets, Container, Graphics, Sprite, Texture, VideoSource } from 'pixi.js';
@@ -35,6 +35,7 @@ export class SceneBackgroundLayer {
   private viewport: { w: number; h: number } = { w: 0, h: 0 };
   private backdropUrl: string = '';
   private fullSceneBackdrop = false;
+  private wallpaperFullCanvas = false;
   private backdropBottomExtensionRatio = 0;
   private backdropToken: number = 0;
   private backdropReady: Promise<unknown> = Promise.resolve();
@@ -73,7 +74,8 @@ export class SceneBackgroundLayer {
     wallStyle: WallBackgroundStyle = 'classic_dawn',
     wallpaperOverride?: string,
     wallpaperVideoUrl?: string,
-    fullSceneBackdrop = false
+    fullSceneBackdrop = false,
+    wallpaperFullCanvas = false
   ): void {
     // 1. 室内主墙基底色（无背景大图时即为此色；有图时被完全盖住）
     this.wallBgGraphics.clear();
@@ -82,6 +84,7 @@ export class SceneBackgroundLayer {
     // 2. 壁纸独立于完整墙框素材；两者共用同一构图尺度。
     this.viewport = { w: width, h: height };
     this.fullSceneBackdrop = fullSceneBackdrop;
+    this.wallpaperFullCanvas = wallpaperFullCanvas;
     const deviceProfile = width < 700 ? 'phone' : 'tablet';
     const wallSpec = getWallSpec(wallStyle, wallpaperOverride, deviceProfile);
     this.backdropBottomExtensionRatio = fullSceneBackdrop ? 0 : (wallSpec.bottomExtensionRatio ?? 0);
@@ -232,20 +235,21 @@ export class SceneBackgroundLayer {
     this.layoutBackdropSprite(this.wallBackdropSprite);
   }
 
-  /** Poster and video use the same top-centered cover composition. */
+  /** Poster and video use the same cover composition as the integrated room layer when canvases match. */
   private layoutBackdropSprite(sprite: Sprite): void {
     const tex = sprite.texture;
     const { w, h } = this.viewport;
     if (!tex || !tex.width || !tex.height || w <= 0 || h <= 0) return;
 
-    const wallHeight = this.fullSceneBackdrop ? h : getFloorTopY(w, h);
+    const wallHeight = this.fullSceneBackdrop || this.wallpaperFullCanvas ? h : getFloorTopY(w, h);
     const scale = Math.max(w / tex.width, wallHeight / tex.height);
 
-    sprite.anchor.set(0.5, 0); // 同完整墙框一样，以顶边和中轴为锚
+    const centeredFullCanvas = this.wallpaperFullCanvas && !this.fullSceneBackdrop;
+    sprite.anchor.set(0.5, centeredFullCanvas ? 0.5 : 0);
     sprite.x = w * 0.5;
-    sprite.y = 0;
+    sprite.y = centeredFullCanvas ? h * 0.5 : 0;
     sprite.width = tex.width * scale;
-    sprite.height = tex.height * scale * (1 + this.backdropBottomExtensionRatio);
+    sprite.height = tex.height * scale * (1 + (centeredFullCanvas ? 0 : this.backdropBottomExtensionRatio));
   }
 
   public destroy(): void {

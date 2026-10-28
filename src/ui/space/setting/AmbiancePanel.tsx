@@ -216,9 +216,13 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
   const foregroundOptions = SCENE_FOREGROUND_OPTIONS.filter(
     (option) => foregroundSetIds.includes(option.setId)
   );
-  const visibleComponentGroups = SCENE_COMPONENT_GROUPS.filter((group) =>
-    !selectedTheme?.sceneBackground || group.part === 'groundMat' || group.part === 'cushion'
-  );
+  const visibleComponentGroups = SCENE_COMPONENT_GROUPS.filter((group) => {
+    if (selectedTheme?.sceneBackground) return group.part === 'groundMat' || group.part === 'cushion';
+    if (selectedTheme?.wall?.roomOverlay) {
+      return group.part === 'wallpaper' || group.part === 'groundMat' || group.part === 'cushion';
+    }
+    return true;
+  });
 
   // 跟随系统模式下，面板内实时显示本机时间与推算时辰
   React.useEffect(() => {

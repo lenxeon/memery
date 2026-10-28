@@ -211,10 +211,12 @@ export interface SceneThemeViewportAsset {
   }>;
 }
 
-/** 墙体由可独立替换的层组成；各层不得互相烘焙。 */
+/** 墙体可以使用模块化造景，或以单张墙地一体透明层覆盖墙纸。 */
 export interface SceneThemeWallDefinition {
   /** 最远处的墙纸 / 墙布，只承担底色和浅层纹样。 */
   wallpaper?: SceneThemeViewportAsset;
+  /** 用户指定墙地一体时，完整墙体、框架、地面及统一光影合并为一张全画布 RGBA；开口透明露出 wallpaper。 */
+  roomOverlay?: SceneThemeViewportAsset;
   /** 用户遗像与纪念文字在墙面中的锚点。 */
   portrait?: SceneThemePortraitPlacement;
   /** 贴在墙纸上、位于遗像周围的花枝、云纹、光环；显式分为遗像前后。 */

@@ -52,6 +52,8 @@ export class SceneThemeLayer {
   public wallScenery: Container = new Container();
   /** Frame and attachments share one wall coordinate system and one responsive transform. */
   public wallAssembly: Container = new Container();
+  /** Optional single transparent layer containing the complete wall, frame, floor and baked lighting. */
+  private roomOverlayLayer: Container = new Container();
   private wallLampGlow: Container = new Container();
   private wallLampGlowSprites: Sprite[][] = [];
   public wallDecorations: Container = new Container();
@@ -68,6 +70,7 @@ export class SceneThemeLayer {
   private foregroundLoadToken = 0;
   private viewportAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
   private wallAssemblyAssets: WallAssemblySprite[] = [];
+  private roomOverlayAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
   private portraitBackAssets: AssetSprite<SceneThemePortraitAsset>[] = [];
   private portraitFrontAssets: AssetSprite<SceneThemePortraitAsset>[] = [];
   private groundAssets: GroundSpriteAsset[] = [];
@@ -97,7 +100,7 @@ export class SceneThemeLayer {
       });
     }
 
-    this.wallAssembly.addChild(this.wallScenery, this.wallLampGlow, this.wallDecorations);
+    this.wallAssembly.addChild(this.wallScenery, this.wallLampGlow, this.wallDecorations, this.roomOverlayLayer);
     this.wallScenery.mask = this.wallSceneryMask;
     this.wallScenery.addChild(this.wallSceneryMask);
     const radialGlow = TexturePipeline.getInstance().wallLampGlowTexture;
@@ -142,6 +145,7 @@ export class SceneThemeLayer {
       wallDecorationId: effectiveSelection?.wallDecorationId,
       groundMatId: effectiveSelection?.groundMatId,
       cushionId: effectiveSelection?.cushionId,
+      roomOverlay: definition.wall?.roomOverlay?.url,
     });
     const nextFgKey = JSON.stringify(effectiveSelection?.foreground);
 
@@ -188,13 +192,18 @@ export class SceneThemeLayer {
     this.wallLampGlowSprites.flat().forEach((glow) => { glow.visible = false; });
     this.viewportAssets = [];
     this.wallAssemblyAssets = [];
+    this.roomOverlayAssets = [];
     this.portraitBackAssets = [];
     this.portraitFrontAssets = [];
     this.groundAssets = [];
     this.foregroundAssets = [];
 
-    if (selection) this.mountSelection(selection, token, definition.foregroundSetIds);
+    if (selection) this.mountSelection(selection, token, definition.foregroundSetIds, Boolean(definition.wall?.roomOverlay));
     else this.mountLegacyLayers(definition.layers, token);
+
+    if (definition.wall?.roomOverlay) {
+      this.roomOverlayAssets.push(this.createAsset(this.roomOverlayLayer, definition.wall.roomOverlay, token));
+    }
 
     if (!floorImageSpec) return;
     this.trackAssetLoad(Assets.load(floorImageSpec.url)
@@ -209,10 +218,10 @@ export class SceneThemeLayer {
       }));
   }
 
-  private mountSelection(selection: SceneAssemblySelection, token: number, foregroundSetIds?: string[]): void {
-    const wallpaperDecoration = getSceneComponentOption('wallpaperDecoration', selection.wallpaperDecorationId);
-    const wallScenery = getSceneComponentOption('wallScenery', selection.wallSceneryId);
-    const wallDecoration = getSceneComponentOption('wallDecoration', selection.wallDecorationId);
+  private mountSelection(selection: SceneAssemblySelection, token: number, foregroundSetIds?: string[], integratedRoom = false): void {
+    const wallpaperDecoration = integratedRoom ? undefined : getSceneComponentOption('wallpaperDecoration', selection.wallpaperDecorationId);
+    const wallScenery = integratedRoom ? undefined : getSceneComponentOption('wallScenery', selection.wallSceneryId);
+    const wallDecoration = integratedRoom ? undefined : getSceneComponentOption('wallDecoration', selection.wallDecorationId);
     const groundMat = getSceneComponentOption('groundMat', selection.groundMatId);
     const cushion = getSceneComponentOption('cushion', selection.cushionId);
 
@@ -408,6 +417,14 @@ export class SceneThemeLayer {
       this.wallAssembly.position.set(width * 0.5, 0);
       this.wallAssembly.scale.set(1);
     }
+    for (const { spec, sprite } of this.roomOverlayAssets) {
+      if (!sprite.texture.width || !sprite.texture.height) continue;
+      const scale = Math.max(width / sprite.texture.width, height / sprite.texture.height);
+      sprite.anchor.set(0.5, 0.5);
+      sprite.position.set(0, height * 0.5);
+      sprite.scale.set(scale);
+      sprite.alpha = spec.alpha ?? 1;
+    }
     const compositionWidth = getSceneCompositionWidth(width, height);
 
     for (const { spec, sprite } of this.viewportAssets) {
@@ -500,7 +517,7 @@ export class SceneThemeLayer {
 
   private contentContainers(): Container[] {
     return [this.wallpaperDecorations, this.portraitBack, this.portraitFront, this.wallScenery,
-      this.wallDecorations, this.groundMat, this.ground, this.foregroundLeft, this.foregroundRight];
+      this.wallDecorations, this.roomOverlayLayer, this.groundMat, this.ground, this.foregroundLeft, this.foregroundRight];
   }
 
   private clearContainer(container: Container): void {

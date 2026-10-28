@@ -6,125 +6,28 @@
   "iconText": "🏛️",
   "desc": "支摘槛窗 · 横披纳远岫、冰裂格心透光",
   "tag": "经典圣洁",
-  "version": 8,
+  "version": 9,
   "wall": {
     "wallpaper": {
       "id": "ink_warm_silk",
       "name": "水墨梅山",
       "poeticTitle": "远岫含烟",
-      "description": "以用户提供的整景为构图依据，呈现浅绢天空、如意云纹、蓝灰层叠山峦、松影与湖面；独立于木框和地板。",
+      "description": "独立的山水背景画，呈现浅绢天空、如意云纹、蓝灰层叠山峦、松影与湖面；不含室内墙框和地板。",
       "assets": {
         "phone": "themes/classic_dawn/wallpapers/phone/ink-landscape-clouds-v1.png",
         "tablet": "themes/classic_dawn/wallpapers/tablet/ink-landscape-render-match.png"
       },
       "fit": "cover"
     },
-    "wallpaperDecorations": [
-      {
-        "id": "plum_encircling",
-        "name": "梅枝流芳",
-        "poeticTitle": "春信绕影",
-        "description": "淡色梅枝作为独立后景。",
-        "previewUrl": "themes/classic_dawn/wall-overlays/phone/plum-blossom-branch.png",
-        "backAsset": {
-          "assets": {
-            "phone": "themes/classic_dawn/wall-overlays/phone/plum-blossom-branch.png",
-            "tablet": "themes/classic_dawn/wall-overlays/tablet/plum-blossom-branch.png"
-          },
-          "widthInPortraits": 3.5,
-          "dxInPortraits": -1,
-          "dyInPortraits": -1.15,
-          "alpha": 1
-        },
-        "frontAsset": {
-          "asset": "themes/classic_dawn/wall-overlays/plum-encircling-front.png",
-          "widthInPortraits": 3.5,
-          "dxInPortraits": -1,
-          "dyInPortraits": -1.15,
-          "alpha": 1
-        }
-      }
-    ],
-    "frame": {
-      "id": "moon_gate_rosewood",
-      "name": "浅木月洞",
-      "poeticTitle": "圆门纳景",
-      "description": "提亮后的浅木月洞门、格扇与窗棂作为一个整体，保留木纹和柔和侧影。",
-      "previewUrl": "themes/classic_dawn/wall-scenery/phone/moon-gate-rosewood-render-match.png",
-      "assets": {
-        "phone": "themes/classic_dawn/wall-scenery/phone/moon-gate-rosewood-render-match.png",
-        "tablet": "themes/classic_dawn/wall-scenery/tablet/moon-gate-rosewood-render-match.png"
-      },
-      "fit": "wall-frame",
-      "position": {
-        "x": 0.5,
-        "y": 0,
-        "widthRatio": 1
-      },
-      "responsiveWidthRatios": {
-        "phone": 1,
-        "tablet": 1
-      }
+    "wallpaperDecorations": [],
+    "roomOverlay": {
+      "id": "moon_gate_wall_floor_integrated",
+      "name": "月洞墙地一体层",
+      "description": "整张透明 RGBA 室内层：墙面、木质月洞框、地板与统一光影在同一张图中，洞口透明露出山水背景画。",
+      "asset": "themes/classic_dawn/interior/phone/moon-gate-wall-floor-integrated-v1.png",
+      "fit": "cover"
     },
-    "frameDecorations": [
-      {
-        "id": "palace_fretwork_lamps",
-        "name": "回纹宫灯",
-        "poeticTitle": "暖阁长明",
-        "description": "两侧灯纸独立裁切并锚定到木框面板。",
-        "previewUrl": "themes/classic_dawn/wall-decor/palace-fretwork-lamps.png",
-        "asset": "themes/classic_dawn/wall-decor/palace-fretwork-lamps.png",
-        "fit": "width",
-        "wallParts": [
-          {
-            "frame": {
-              "x": 70,
-              "y": 12,
-              "width": 192,
-              "height": 877
-            },
-            "anchor": {
-              "x": 0.1,
-              "y": 0.32,
-              "widthRatio": 0.07,
-              "centerRegionByProfile": {
-                "phone": {
-                  "left": 32,
-                  "right": 163
-                },
-                "tablet": {
-                  "left": 62,
-                  "right": 257
-                }
-              }
-            }
-          },
-          {
-            "frame": {
-              "x": 530,
-              "y": 12,
-              "width": 190,
-              "height": 877
-            },
-            "anchor": {
-              "x": 0.9,
-              "y": 0.32,
-              "widthRatio": 0.07,
-              "centerRegionByProfile": {
-                "phone": {
-                  "left": 1016,
-                  "right": 1147
-                },
-                "tablet": {
-                  "left": 1791,
-                  "right": 1986
-                }
-              }
-            }
-          }
-        ]
-      }
-    ],
+    "frameDecorations": [],
     "portrait": {
       "scale": 1.02,
       "dy": 6,
@@ -133,17 +36,7 @@
     }
   },
   "ground": {
-    "floor": {
-      "id": "polished_chestnut_plane",
-      "name": "浅枫细纹地板",
-      "asset": "themes/classic_dawn/floor/polished-chestnut-plane-render-match-v2.png",
-      "bakedLighting": true,
-      "baseColor": "#c8b291",
-      "baseboard": {
-        "color": "#8a7155",
-        "highlight": "#d4bb94"
-      }
-    },
+    "floor": null,
     "groundMat": {
       "id": "clear_rush_long_mat",
       "name": "清篾长席",
@@ -455,7 +348,7 @@
   "defaultAssembly": {
     "wallpaperId": "ink_warm_silk",
     "wallpaperDecorationId": "none",
-    "frameId": "moon_gate_rosewood",
+    "frameId": "none",
     "wallDecorationId": "none",
     "groundMatId": "clear_rush_long_mat",
     "cushionId": "woven_round_cushion",

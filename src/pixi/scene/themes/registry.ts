@@ -132,8 +132,9 @@ interface RawThemeManifest {
   wall?: {
     wallpaper: RawAsset;
     wallpaperDecorations: RawAsset[];
-    frame: RawAsset;
+    frame?: RawAsset;
     frameDecorations: RawAsset[];
+    roomOverlay?: RawAsset;
     portrait: NonNullable<SceneThemeDefinition['wall']>['portrait'];
   } | null;
   ground?: {
@@ -208,16 +209,25 @@ const validateThemeManifest = (raw: RawThemeManifest): void => {
     assert(typeof videoPath === 'string' && videoPath.startsWith(`themes/${raw.themeId}/`) && /\.mp4$/i.test(videoPath) && !videoPath.split('/').includes('..'), 'wall.wallpaper.video.asset must reference an MP4 inside the current theme directory');
     assert(typeof wallpaper.assets?.phone === 'string' && /\.png$/i.test(wallpaper.assets.phone), 'video wallpapers require a static assets.phone PNG poster');
   }
-  const bottomExtensionRatio = wall.frame.bottomExtensionRatio;
+  const usesRoomOverlay = Boolean(wall.roomOverlay);
+  if (usesRoomOverlay) {
+    const overlayPath = wall.roomOverlay?.asset;
+    assert(typeof overlayPath === 'string' && overlayPath.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(overlayPath) && !overlayPath.split('/').includes('..'), 'wall.roomOverlay.asset must reference a PNG inside the current theme directory');
+    assert(wall.frame == null && ground.floor == null, 'wall-floor integrated themes must not define a separate wall.frame or ground.floor');
+    assert(wall.wallpaperDecorations.length === 0 && wall.frameDecorations.length === 0, 'wall-floor integrated themes must bake all interior decoration into wall.roomOverlay');
+  } else {
+    assert(Boolean(wall.frame && ground.floor), 'modular themes require wall.frame and ground.floor; use wall.roomOverlay for one integrated wall-and-floor image');
+  }
+  const bottomExtensionRatio = wall.frame?.bottomExtensionRatio;
   assert(bottomExtensionRatio === undefined || (Number.isFinite(bottomExtensionRatio) && bottomExtensionRatio >= 0 && bottomExtensionRatio <= 0.15), 'wall.frame.bottomExtensionRatio must be between 0 and 0.15');
   const floor = ground.floor;
-  assert(Boolean(floor), 'split themes require ground.floor; use null only when a single scene background already contains the floor');
-  const floorSpec = floor!;
-  assert(typeof floorSpec.asset === 'string' && floorSpec.asset.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(floorSpec.asset) && !floorSpec.asset.split('/').includes('..'), 'ground.floor.asset must reference a PNG inside the current theme directory');
-  assert(floorSpec.bakedLighting === undefined || typeof floorSpec.bakedLighting === 'boolean', 'ground.floor.bakedLighting must be a boolean');
-  assert(!('mode' in floorSpec) && !('tileSize' in floorSpec), 'ground.floor no longer supports legacy material modes or tile sizes');
+  if (floor) {
+    assert(typeof floor.asset === 'string' && floor.asset.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(floor.asset) && !floor.asset.split('/').includes('..'), 'ground.floor.asset must reference a PNG inside the current theme directory');
+    assert(floor.bakedLighting === undefined || typeof floor.bakedLighting === 'boolean', 'ground.floor.bakedLighting must be a boolean');
+    assert(!('mode' in floor) && !('tileSize' in floor), 'ground.floor no longer supports legacy material modes or tile sizes');
+  }
   assert(defaultAssembly.wallpaperId === wall.wallpaper.id, 'defaultAssembly.wallpaperId must reference wall.wallpaper.id');
-  assert(defaultAssembly.frameId === wall.frame.id, 'defaultAssembly.frameId must reference wall.frame.id');
+  assert(usesRoomOverlay ? defaultAssembly.frameId === 'none' : defaultAssembly.frameId === wall.frame?.id, 'defaultAssembly.frameId must be "none" for integrated rooms or match wall.frame.id');
   assert(defaultAssembly.wallpaperDecorationId === 'none' || wall.wallpaperDecorations.some(({ id }) => id === defaultAssembly.wallpaperDecorationId), 'defaultAssembly.wallpaperDecorationId must reference a wallpaper decoration or "none"');
   assert(defaultAssembly.wallDecorationId === 'none' || wall.frameDecorations.some(({ id }) => id === defaultAssembly.wallDecorationId), 'defaultAssembly.wallDecorationId must reference a frame decoration or "none"');
   assert(defaultAssembly.groundMatId === ground.groundMat.id, 'defaultAssembly.groundMatId must reference ground.groundMat.id');
@@ -319,7 +329,7 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
   }
   const wall = raw.wall!;
   const ground = raw.ground!;
-  const floor = ground.floor!;
+  const floor = ground.floor;
   const table = raw.table!;
   const foregroundConfig = raw.foregroundCandidates!;
   const rawAssembly = raw.defaultAssembly!;
@@ -333,7 +343,7 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
     previewUrl: publicUrl(wall.wallpaper.previewUrl ?? wall.wallpaper.assets?.phone ?? ''),
     fit: wall.wallpaper.fit ?? 'cover',
   } satisfies SceneThemeViewportAsset;
-  const frame = {
+  const frame = wall.frame ? {
     ...withAssetUrls(wall.frame),
     id: wall.frame.id,
     name: wall.frame.name,
@@ -347,7 +357,12 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
     responsiveWidthRatios: wall.frame.responsiveWidthRatios,
     bottomExtensionRatio: wall.frame.bottomExtensionRatio,
     alpha: wall.frame.alpha,
-  } satisfies SceneThemeViewportAsset;
+  } satisfies SceneThemeViewportAsset : undefined;
+  const roomOverlay = wall.roomOverlay ? {
+    ...withAssetUrls(wall.roomOverlay),
+    fit: wall.roomOverlay.fit ?? 'contain',
+    alpha: wall.roomOverlay.alpha,
+  } satisfies SceneThemeViewportAsset : undefined;
   const groundAsset = (rawAsset: RawAsset & SceneThemeGroundAsset): SceneThemeGroundAsset => ({
     ...rawAsset,
     url: publicUrl(rawAsset.asset ?? rawAsset.url),
@@ -397,8 +412,9 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
     tag: raw.tag,
     wall: {
       wallpaper,
+      ...(roomOverlay ? { roomOverlay } : {}),
       portrait: wall.portrait,
-      scenery: [frame],
+      scenery: frame ? [frame] : [],
     },
     components: {
       wallpaperDecorations,
@@ -423,15 +439,17 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
     foregroundCandidates,
     foregroundSetIds: raw.foregroundSetIds ?? [],
     defaultForegroundSetId: raw.defaultForegroundSetId,
-    floorImage: {
-      url: publicUrl(floor.asset),
-      bakedLighting: floor.bakedLighting,
-      baseColor: parseColor(floor.baseColor),
-      baseboard: {
-        color: parseColor(floor.baseboard.color),
-        highlight: parseColor(floor.baseboard.highlight),
+    ...(floor ? {
+      floorImage: {
+        url: publicUrl(floor.asset),
+        bakedLighting: floor.bakedLighting,
+        baseColor: parseColor(floor.baseColor),
+        baseboard: {
+          color: parseColor(floor.baseboard.color),
+          highlight: parseColor(floor.baseboard.highlight),
+        },
       },
-    },
+    } : {}),
     table: { ...table, asset: publicUrl(table.asset) },
     tableAssetUrl: publicUrl(table.asset),
     defaultAssembly: {
