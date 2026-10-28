@@ -6,7 +6,7 @@
   "iconText": "☀️",
   "desc": "整张拱窗、山水与地面背景",
   "tag": "温暖明亮",
-  "version": 11,
+  "version": 12,
   "sceneBackground": {
     "mode": "single-background",
     "asset": "themes/warm_blessing/backgrounds/scene2-full.png"
@@ -38,16 +38,16 @@
   "table": {
     "id": "warm_oak_altar",
     "name": "浅橡木无腿供桌",
-    "asset": "themes/warm_blessing/table/legless-oak-altar.png",
+    "asset": "themes/warm_blessing/table/legless-oak-altar-v2.png",
     "structure": "legless",
     "woodStyle": "white_oak",
     "runner": false,
     "position": {
       "x": 0.5,
       "bottomRatio": 0.125,
-      "widthRatio": 0.9,
-      "minWidthRatio": 0.84,
-      "maxWidthRatio": 0.92,
+      "widthRatio": 0.95,
+      "minWidthRatio": 0.91,
+      "maxWidthRatio": 0.98,
       "forwardScale": 0.07,
       "forwardOffsetRatio": 0.028
     },
@@ -58,15 +58,15 @@
       },
       "visibleBounds": {
         "left": 0.01302,
-        "top": 0.33691,
+        "top": 0.285,
         "right": 0.98698,
         "bottom": 0.69434
       },
-      "frontEdgeY": 0.41504,
-      "backEdgeY": 0.3418,
-      "fasciaBottomY": 0.47656,
-      "apronBottomY": 0.69434,
-      "footBottomY": 0.69434,
+      "frontEdgeY": 0.41,
+      "backEdgeY": 0.285,
+      "fasciaBottomY": 0.48,
+      "apronBottomY": 0.64,
+      "footBottomY": 0.689,
       "apronBoundsX": {
         "left": 0.048,
         "right": 0.952
@@ -76,26 +76,26 @@
       "assetQuad": {
         "backLeft": {
           "x": 0.099,
-          "y": 0.3418
+          "y": 0.285
         },
         "backRight": {
           "x": 0.901,
-          "y": 0.3418
+          "y": 0.285
         },
         "frontRight": {
           "x": 0.986,
-          "y": 0.41504
+          "y": 0.41
         },
         "frontLeft": {
           "x": 0.014,
-          "y": 0.41504
+          "y": 0.41
         }
       },
       "usableArea": {
-        "uMin": 0.08,
-        "uMax": 0.92,
-        "vMin": 0.08,
-        "vMax": 0.94
+        "uMin": 0.05,
+        "uMax": 0.95,
+        "vMin": 0.05,
+        "vMax": 0.95
       },
       "backScale": 0.85,
       "frontScale": 1

@@ -36,7 +36,7 @@ import {
 import { sound } from '../../pixi/../utils/audio';
 
 /** TEMP_DEBUG: 仅审计墙纸、完整墙框与地板时临时启用；常规场景保持完整展示。 */
-const DEBUG_WALL_AND_FLOOR_ONLY = false;
+const DEBUG_WALL_AND_FLOOR_ONLY = true;
 const ENABLE_GOD_RAYS = false;
 const ENABLE_SCENE_SHADOWS = false;
 

@@ -38,23 +38,11 @@ type WallAssemblySprite = AssetSprite<SceneThemeViewportAsset> & {
   glowIndex?: number;
 };
 
-const ellipseHitArea = (
-  width: number,
-  height: number,
-  centerXRatio: number,
-  centerYRatio: number,
-  radiusXRatio: number,
-  radiusYRatio: number
-): Polygon => {
-  const points: number[] = [];
-  for (let index = 0; index < 32; index += 1) {
-    const angle = (index / 32) * Math.PI * 2;
-    points.push(
-      width * (centerXRatio + Math.cos(angle) * radiusXRatio),
-      height * (centerYRatio + Math.sin(angle) * radiusYRatio)
-    );
-  }
-  return new Polygon(points);
+const foregroundHitArea = (width: number, height: number, side: 'left' | 'right'): Polygon => {
+  const edge: Array<[number, number]> = side === 'left'
+    ? [[0, 0.68], [0.06, 0.68], [0.13, 0.72], [0.17, 0.80], [0.18, 0.90], [0.16, 0.97], [0.14, 1], [0, 1]]
+    : [[0.84, 0.74], [0.91, 0.74], [1, 0.75], [1, 1], [0.86, 1], [0.84, 0.93], [0.82, 0.84]];
+  return new Polygon(edge.flatMap(([x, y]) => [width * x, height * y]));
 };
 
 export class SceneThemeLayer {
@@ -361,9 +349,9 @@ export class SceneThemeLayer {
     const { width, height } = this.viewport;
     if (width <= 0 || height <= 0) return;
 
-    // Keep foreground cycling within the narrow edge zones marked in the scene.
-    this.foregroundLeft.hitArea = ellipseHitArea(width, height, 0.09, 0.805, 0.09, 0.195);
-    this.foregroundRight.hitArea = ellipseHitArea(width, height, 0.92, 0.82, 0.08, 0.18);
+    // Keep taps on the visible side foliage responsive while leaving the central altar clear.
+    this.foregroundLeft.hitArea = foregroundHitArea(width, height, 'left');
+    this.foregroundRight.hitArea = foregroundHitArea(width, height, 'right');
 
     // FloorLayer owns the shared wall/floor boundary. Recompute the clipping mask
     // on every viewport layout so tall phone and shorter tablet screens stay aligned.

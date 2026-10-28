@@ -6,7 +6,7 @@
   "iconText": "🪷",
   "desc": "蓝灰石雕 · 霞光云海 · 莲台石供桌",
   "tag": "云海石雕",
-  "version": 3,
+  "version": 4,
   "wall": {
     "wallpaper": {
       "id": "sunset_cloud_sea",
@@ -62,21 +62,21 @@
     },
     "groundMat": {
       "id": "copper_lotus_rug",
-      "name": "铜金莲纹长毯",
+      "name": "青灰织纹长席",
       "poeticTitle": "莲华铺席",
-      "description": "与主题一相同浅俯机位的铜金莲纹长毯。",
-      "asset": "themes/lotus_mandorla/mats/copper-lotus-rug.png",
-      "previewUrl": "themes/lotus_mandorla/mats/copper-lotus-rug.png",
+      "description": "冷调青灰编织材质；轮廓、画幅、透视与摆放锚点统一沿用窗主题基准。",
+      "asset": "themes/lotus_mandorla/mats/copper-lotus-rug-unified.png",
+      "previewUrl": "themes/lotus_mandorla/mats/copper-lotus-rug-unified.png",
       "widthRatio": 1.2,
-      "bottomRatio": 0.0099 // Compensate the PNG's transparent lower margin to match theme one's visible front edge.
+      "bottomRatio": 0.045
     },
     "cushion": {
       "id": "sandstone_lotus_cushion",
-      "name": "莲纹圆坐垫",
+      "name": "暖灰织纹坐垫",
       "poeticTitle": "莲心安坐",
-      "description": "与主题一相同浅俯机位，沙金织面、蓝灰镶边与莲心刺绣的独立圆坐垫。",
-      "asset": "themes/lotus_mandorla/cushions/sandstone-lotus-cushion.png",
-      "previewUrl": "themes/lotus_mandorla/cushions/sandstone-lotus-cushion.png",
+      "description": "暖灰编织材质；轮廓、画幅、透视与摆放锚点统一沿用窗主题基准。",
+      "asset": "themes/lotus_mandorla/cushions/sandstone-lotus-cushion-unified.png",
+      "previewUrl": "themes/lotus_mandorla/cushions/sandstone-lotus-cushion-unified.png",
       "widthRatio": 0.32,
       "bottomRatio": 0.065
     }

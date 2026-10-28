@@ -6,15 +6,15 @@
   "iconText": "🏛️",
   "desc": "支摘槛窗 · 横披纳远岫、冰裂格心透光",
   "tag": "经典圣洁",
-  "version": 4,
+  "version": 8,
   "wall": {
     "wallpaper": {
       "id": "ink_warm_silk",
       "name": "水墨梅山",
       "poeticTitle": "远岫含烟",
-      "description": "暖绢底色承托层叠墨山、雾谷和水岸。",
+      "description": "以用户提供的整景为构图依据，呈现浅绢天空、如意云纹、蓝灰层叠山峦、松影与湖面；独立于木框和地板。",
       "assets": {
-        "phone": "themes/classic_dawn/wallpapers/phone/ink-landscape-render-match.png",
+        "phone": "themes/classic_dawn/wallpapers/phone/ink-landscape-clouds-v1.png",
         "tablet": "themes/classic_dawn/wallpapers/tablet/ink-landscape-render-match.png"
       },
       "fit": "cover"
@@ -47,9 +47,9 @@
     ],
     "frame": {
       "id": "moon_gate_rosewood",
-      "name": "月洞紫檀",
+      "name": "浅木月洞",
       "poeticTitle": "圆门纳景",
-      "description": "完整月洞门、格扇与窗棂作为一个整体。",
+      "description": "提亮后的浅木月洞门、格扇与窗棂作为一个整体，保留木纹和柔和侧影。",
       "previewUrl": "themes/classic_dawn/wall-scenery/phone/moon-gate-rosewood-render-match.png",
       "assets": {
         "phone": "themes/classic_dawn/wall-scenery/phone/moon-gate-rosewood-render-match.png",
@@ -135,22 +135,22 @@
   "ground": {
     "floor": {
       "id": "polished_chestnut_plane",
-      "name": "暖栗漆面地板",
+      "name": "浅枫细纹地板",
       "asset": "themes/classic_dawn/floor/polished-chestnut-plane-render-match-v2.png",
       "bakedLighting": true,
-      "baseColor": "#805339",
+      "baseColor": "#c8b291",
       "baseboard": {
-        "color": "#6f3d22",
-        "highlight": "#c28a58"
+        "color": "#8a7155",
+        "highlight": "#d4bb94"
       }
     },
     "groundMat": {
       "id": "clear_rush_long_mat",
       "name": "清篾长席",
       "poeticTitle": "清席承步",
-      "description": "低机位下的细篾长席，铺面在桌脚与蒲团下方。",
-      "asset": "themes/classic_dawn/mats/clear-rush-long-mat-clean.png",
-      "previewUrl": "themes/classic_dawn/mats/clear-rush-long-mat-clean.png",
+      "description": "浅麦棕细篾材质；轮廓、画幅、透视与摆放锚点统一沿用窗主题基准。",
+      "asset": "themes/classic_dawn/mats/clear-rush-long-mat-unified.png",
+      "previewUrl": "themes/classic_dawn/mats/clear-rush-long-mat-unified.png",
       "widthRatio": 1.2,
       "bottomRatio": 0.045
     },
@@ -158,9 +158,9 @@
       "id": "woven_round_cushion",
       "name": "藤编蒲团",
       "poeticTitle": "蒲影静坐",
-      "description": "独立的厚实圆形藤编蒲团。",
-      "asset": "themes/classic_dawn/cushions/woven-round-cushion-clean.png",
-      "previewUrl": "themes/classic_dawn/cushions/woven-round-cushion-clean.png",
+      "description": "棕色藤编材质；轮廓、画幅、透视与摆放锚点统一沿用窗主题基准。",
+      "asset": "themes/classic_dawn/cushions/woven-round-cushion-unified.png",
+      "previewUrl": "themes/classic_dawn/cushions/woven-round-cushion-unified.png",
       "widthRatio": 0.32,
       "bottomRatio": 0.065
     }
@@ -168,62 +168,62 @@
   "table": {
     "id": "classic_rosewood_altar",
     "name": "紫檀明式供桌",
-    "asset": "themes/classic_dawn/table/altar-table-render-match.png",
+    "asset": "themes/classic_dawn/table/altar-table-render-match-v2.png",
     "structure": "legged",
     "woodStyle": "walnut",
     "runner": false,
     "position": {
       "x": 0.5,
       "bottomRatio": 0.125,
-      "widthRatio": 0.9,
-      "minWidthRatio": 0.84,
-      "maxWidthRatio": 0.92,
+      "widthRatio": 0.95,
+      "minWidthRatio": 0.91,
+      "maxWidthRatio": 0.98,
       "forwardScale": 0.07,
       "forwardOffsetRatio": 0.028
     },
     "geometry": {
       "sourceSize": {
-        "width": 1817,
+        "width": 1815,
         "height": 866
       },
       "visibleBounds": {
-        "left": 0.02036,
-        "top": 0.03464,
-        "right": 0.97964,
+        "left": 0.01102,
+        "top": 0.05543,
+        "right": 0.98898,
         "bottom": 0.95035
       },
-      "frontEdgeY": 0.21247,
-      "backEdgeY": 0.05543,
-      "fasciaBottomY": 0.27252,
-      "apronBottomY": 0.47021,
+      "frontEdgeY": 0.26,
+      "backEdgeY": 0.08,
+      "fasciaBottomY": 0.325,
+      "apronBottomY": 0.49,
       "footBottomY": 0.95035,
       "legCentersX": {
-        "left": 0.11778,
-        "right": 0.88222
+        "left": 0.107,
+        "right": 0.893
       },
-      "legWidth": 0.06384,
+      "legWidth": 0.056,
       "apronBoundsX": {
-        "left": 0.1563,
-        "right": 0.8437
+        "left": 0.14,
+        "right": 0.86
       }
     },
     "surface": {
       "assetQuad": {
         "backLeft": {
-          "x": 0.07,
-          "y": 0.05543
+          "x": 0.099,
+          "y": 0.08
         },
         "backRight": {
-          "x": 0.93,
-          "y": 0.05543
+          "x": 0.901,
+          "y": 0.08
         },
         "frontRight": {
-          "x": 0.96,
-          "y": 0.21247
+          "x": 0.986,
+          "y": 0.26
         },
         "frontLeft": {
-          "x": 0.04,
-          "y": 0.21247
+          "x": 0.014,
+          "y": 0.26
         }
       },
       "usableArea": {
@@ -454,9 +454,9 @@
   },
   "defaultAssembly": {
     "wallpaperId": "ink_warm_silk",
-    "wallpaperDecorationId": "plum_encircling",
+    "wallpaperDecorationId": "none",
     "frameId": "moon_gate_rosewood",
-    "wallDecorationId": "palace_fretwork_lamps",
+    "wallDecorationId": "none",
     "groundMatId": "clear_rush_long_mat",
     "cushionId": "woven_round_cushion",
     "offerings": {
@@ -561,17 +561,17 @@
   },
   "lightRig": {
     "source": {
-      "x": 0.5,
-      "y": 0.12
+      "x": 0.78,
+      "y": 0.1
     },
     "sunAngle": -20,
     "sunlightIntensity": 0.92,
     "godRaysIntensity": 0,
     "godRaysEnabled": false,
-    "keyColor": "#ffedc2",
-    "ambientColor": "#f2e8dc",
+    "keyColor": "#fff8ec",
+    "ambientColor": "#edf1f3",
     "shadowDirection": {
-      "x": 0,
+      "x": -0.18,
       "y": 1
     }
   }
