@@ -25,7 +25,15 @@ const mountApplication = async (): Promise<void> => {
     );
   } catch (error) {
     console.error('Failed to load scene themes:', error);
-    root.render(<main role="alert" className="p-6 text-red-900">场景主题配置加载失败，请刷新重试。</main>);
+    const detail = error instanceof Error ? error.message : typeof error === 'string' ? error : '设备未返回具体错误';
+    root.render(
+      <main role="alert" className="space-y-4 p-6 text-red-900">
+        <p className="whitespace-pre-wrap break-all">应用启动遇到问题：{detail}</p>
+        <button type="button" className="rounded-lg bg-red-900 px-4 py-2 text-white" onClick={() => window.location.reload()}>
+          重新加载
+        </button>
+      </main>,
+    );
   }
 };
 

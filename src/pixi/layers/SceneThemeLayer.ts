@@ -89,7 +89,7 @@ export class SceneThemeLayer {
   /** Per-viewport wall bounds; crop architectural PNG spill below the wall/floor seam. */
   private wallSceneryMask: Graphics = new Graphics();
 
-  constructor(private readonly onAssetReady?: () => void) {
+  constructor(private readonly onAssetReady?: () => void, private readonly onAssetError?: (error: unknown) => void) {
     for (const [container, side] of [
       [this.foregroundLeft, 'left'],
       [this.foregroundRight, 'right'],
@@ -229,14 +229,17 @@ export class SceneThemeLayer {
     }
 
     if (!floorImageSpec) return;
-    this.trackAssetLoad(loadSceneAsset<Texture>(floorImageSpec.url)
+    this.trackAssetLoad(loadSceneAsset<Texture>(floorImageSpec.url, '地板素材')
       .then((image) => {
         if (token !== this.loadToken) return;
         this.floorImageTexture = image;
         this.onAssetReady?.();
       })
       .catch((error) => {
-        if (token === this.loadToken) this.assetLoadError = error;
+        if (token === this.loadToken) {
+          this.assetLoadError = error;
+          this.onAssetError?.(error);
+        }
         console.error(`Failed to load theme floor image: ${floorImageSpec.url}`, error);
       }));
   }
@@ -322,7 +325,14 @@ export class SceneThemeLayer {
     sprite.visible = false;
     sprite.alpha = spec.alpha ?? 1;
     container.addChild(sprite);
-    this.trackAssetLoad(loadSceneAsset<Texture>(spec.url)
+    const label = container === this.roomOverlayLayer ? '场景墙地层'
+      : container === this.groundMat ? '席垫素材'
+      : container === this.ground ? '坐垫素材'
+      : container === this.foregroundLeft || container === this.foregroundRight ? '前景素材'
+      : container === this.wallScenery ? '墙面造景'
+      : container === this.wallDecorations ? '墙面装饰'
+      : '场景装饰素材';
+    this.trackAssetLoad(loadSceneAsset<Texture>(spec.url, label)
       .then((texture) => {
         const currentToken = container === this.foregroundLeft || container === this.foregroundRight
           ? this.foregroundLoadToken : this.loadToken;
@@ -335,7 +345,10 @@ export class SceneThemeLayer {
       .catch((error) => {
         const currentToken = container === this.foregroundLeft || container === this.foregroundRight
           ? this.foregroundLoadToken : this.loadToken;
-        if (token === currentToken) this.assetLoadError = error;
+        if (token === currentToken) {
+          this.assetLoadError = error;
+          this.onAssetError?.(error);
+        }
         console.error(`Failed to load scene component: ${spec.url}`, error);
       }));
     return { spec, sprite };
@@ -354,7 +367,7 @@ export class SceneThemeLayer {
       return;
     }
 
-    this.trackAssetLoad(loadSceneAsset<Texture>(spec.url)
+    this.trackAssetLoad(loadSceneAsset<Texture>(spec.url, '墙面装饰')
       .then((atlas: Texture) => {
         if (token !== this.loadToken) return;
         spec.wallParts?.forEach(({ frame, anchor }, index) => {
@@ -372,7 +385,10 @@ export class SceneThemeLayer {
         this.onAssetReady?.();
       })
       .catch((error) => {
-        if (token === this.loadToken) this.assetLoadError = error;
+        if (token === this.loadToken) {
+          this.assetLoadError = error;
+          this.onAssetError?.(error);
+        }
         console.error(`Failed to load scene component: ${spec.url}`, error);
       }));
   }

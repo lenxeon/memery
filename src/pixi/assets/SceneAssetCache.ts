@@ -1,4 +1,13 @@
-import { Assets } from 'pixi.js';
+import { Capacitor } from '@capacitor/core';
+import { Assets, loadTextures } from 'pixi.js';
+
+// WKWebView serves bundled files through a custom URL scheme. Decode them in
+// the web view so worker fetches do not depend on custom-scheme support.
+if (Capacitor.getPlatform() === 'ios' && loadTextures.config) {
+  loadTextures.config.preferWorkers = false;
+  loadTextures.config.preferCreateImageBitmap = false;
+  loadTextures.config.crossOrigin = null;
+}
 
 const loadedUrls = new Set<string>();
 const pendingLoads = new Map<string, Promise<unknown>>();
@@ -7,31 +16,45 @@ let desiredUrls = new Set<string>();
 let cleanupTimer: ReturnType<typeof setTimeout> | undefined;
 let cleanupRevision = 0;
 
+// Pixi treats a root-relative URL under capacitor:// as capacitor://themes/...
+// and drops localhost. Resolve it before passing it to Pixi or its unloader.
+const resolveSceneAssetUrl = (url: string): string => new URL(url, document.baseURI).href;
+
+const assetFailure = (label: string, url: string, error: unknown): Error => {
+  const reason = error instanceof Error ? error.message
+    : typeof error === 'string' && error ? error : '设备无法读取或解码该图片';
+  const readableReason = reason.replace(/\[object (?:Event|ErrorEvent)\]/g, '图片请求或解码失败，系统未提供更多信息');
+  return new Error(`${label}加载失败：${url}\n原因：${readableReason}`);
+};
+
 /** Load a scene image through one cache so theme changes can release stale GPU textures. */
-export const loadSceneAsset = <T = unknown>(url: string): Promise<T> => {
-  desiredUrls.add(url);
+export const loadSceneAsset = <T = unknown>(url: string, label = '场景素材'): Promise<T> => {
+  const assetUrl = resolveSceneAssetUrl(url);
+  desiredUrls.add(assetUrl);
   cleanupRevision += 1;
   if (cleanupTimer) {
     clearTimeout(cleanupTimer);
     cleanupTimer = undefined;
   }
 
-  const unloading = unloadingUrls.get(url);
-  if (unloading) return unloading.then(() => loadSceneAsset<T>(url));
+  const unloading = unloadingUrls.get(assetUrl);
+  if (unloading) return unloading.then(() => loadSceneAsset<T>(url, label));
 
-  const cachedLoad = pendingLoads.get(url);
+  const cachedLoad = pendingLoads.get(assetUrl);
   if (cachedLoad) return cachedLoad as Promise<T>;
 
-  loadedUrls.add(url);
-  const pending = Assets.load<T>(url);
-  pendingLoads.set(url, pending);
+  loadedUrls.add(assetUrl);
+  const pending = Assets.load<T>(assetUrl).catch((error: unknown) => {
+    throw assetFailure(label, url, error);
+  });
+  pendingLoads.set(assetUrl, pending);
   void pending.then(
     () => {
-      if (pendingLoads.get(url) === pending) pendingLoads.delete(url);
+      if (pendingLoads.get(assetUrl) === pending) pendingLoads.delete(assetUrl);
     },
     () => {
-      if (pendingLoads.get(url) === pending) pendingLoads.delete(url);
-      loadedUrls.delete(url);
+      if (pendingLoads.get(assetUrl) === pending) pendingLoads.delete(assetUrl);
+      loadedUrls.delete(assetUrl);
     },
   );
   return pending;
@@ -39,7 +62,7 @@ export const loadSceneAsset = <T = unknown>(url: string): Promise<T> => {
 
 /** Keep the active scene's assets and unload everything left over after rapid switches settle. */
 export const releaseUnusedSceneAssets = (activeUrls: Iterable<string>, delayMs = 250): void => {
-  desiredUrls = new Set([...activeUrls].filter(Boolean));
+  desiredUrls = new Set([...activeUrls].filter(Boolean).map(resolveSceneAssetUrl));
   cleanupRevision += 1;
   const revision = cleanupRevision;
   if (cleanupTimer) clearTimeout(cleanupTimer);

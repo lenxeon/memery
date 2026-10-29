@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify scene asset loading
+        run: node --import tsx --test scripts/verify-scene-asset-cache.ts
+
       - name: Build web app
         run: npm run build
 

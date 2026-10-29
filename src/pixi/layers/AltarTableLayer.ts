@@ -163,7 +163,7 @@ export class AltarTableLayer {
   private isDragging: boolean = false;
   private dragStartY: number = 0;
 
-  constructor(private readonly shadowsEnabled = true) {
+  constructor(private readonly shadowsEnabled = true, private readonly onAssetError?: (error: unknown) => void) {
     // 严格按纵深前后层次排列
     this.shadowGraphics.filters = shadowsEnabled ? [this.shadowBlurFilter] : [];
     this.shadowCacheContainer.addChild(this.shadowGraphics);
@@ -275,7 +275,7 @@ export class AltarTableLayer {
     this.mingTableLoaded = false;
     this.mingTableSprite.visible = false;
     this.mingTableSprite.texture = Texture.EMPTY;
-    this.tableAssetReady = loadSceneAsset<Texture>(url).then((texture) => {
+    this.tableAssetReady = loadSceneAsset<Texture>(url, '供桌素材').then((texture) => {
       if (this.destroyed || token !== this.tableAssetLoadToken || this.mingTableSprite.destroyed) return;
       this.mingTableSprite.texture = texture;
       this.mingTableLoaded = true;
@@ -286,7 +286,10 @@ export class AltarTableLayer {
       this.container.tint = 0xffffff;
       if (this.lastRenderOptions) this.render(this.lastRenderOptions);
     }).catch((error) => {
-      if (token === this.tableAssetLoadToken) this.tableAssetError = error;
+      if (!this.destroyed && token === this.tableAssetLoadToken) {
+        this.tableAssetError = error;
+        this.onAssetError?.(error);
+      }
       console.error(`Failed to load theme altar table: ${url}`, error);
     });
   }

@@ -55,7 +55,7 @@ export class SceneBackgroundLayer {
     return this.backdropUrl ? [this.backdropUrl] : [];
   }
 
-  constructor() {
+  constructor(private readonly onAssetError?: (error: unknown) => void) {
     this.wallBackdropSprite.visible = false;
     this.wallVideoSprite.visible = false;
     this.container.addChild(this.wallBgGraphics);
@@ -129,7 +129,7 @@ export class SceneBackgroundLayer {
       const token = ++this.backdropToken;
       sprite.visible = false;
       sprite.texture = Texture.EMPTY;
-      this.backdropReady = loadSceneAsset<Texture>(url)
+      this.backdropReady = loadSceneAsset<Texture>(url, '背景墙纸')
         .then((tex) => {
           if (token !== this.backdropToken || sprite.destroyed) return;
           sprite.texture = tex;
@@ -137,7 +137,10 @@ export class SceneBackgroundLayer {
           this.layoutWallBackdrop();
         })
         .catch((err) => {
-          if (token === this.backdropToken) this.backdropError = err;
+          if (token === this.backdropToken) {
+            this.backdropError = err;
+            this.onAssetError?.(err);
+          }
           console.error('Failed to load wall backdrop:', err);
         });
     } else if (sprite.texture && sprite.texture.width > 0) {

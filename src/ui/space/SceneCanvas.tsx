@@ -104,6 +104,8 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
   const stageRef = useRef<PixiStage | null>(null);
   const isReadyRef = useRef<boolean>(false);
   const [sceneLoadState, setSceneLoadState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [sceneLoadError, setSceneLoadError] = useState('');
+  const [sceneRetryCount, setSceneRetryCount] = useState(0);
   const renderRevisionRef = useRef(0);
   const memorialRef = useRef(memorial);
   memorialRef.current = memorial;
@@ -351,8 +353,17 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     if (!container) return;
 
     let isMounted = true;
+    let loadPhase = '初始化画布';
     const stage = new PixiStage();
     stageRef.current = stage;
+    const reportSceneAssetError = (error: unknown) => {
+      if (!isMounted) return;
+      isReadyRef.current = false;
+      stage.app?.stop();
+      const detail = error instanceof Error ? error.message : typeof error === 'string' ? error : '素材读取失败，设备未返回具体错误';
+      setSceneLoadError(detail);
+      setSceneLoadState('error');
+    };
 
     const initEngine = async () => {
       const { width, height } = getViewportDimensions();
@@ -365,6 +376,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       }
 
       // 初始化纹理管线
+      loadPhase = '准备场景纹理';
       const pipeline = TexturePipeline.getInstance();
       await pipeline.init();
       if (!isMounted) {
@@ -373,12 +385,13 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       }
 
       // 构建分层与特效系统
-      const bgLayer = new SceneBackgroundLayer();
-      const themeLayer = new SceneThemeLayer(() => renderAllRef.current());
+      loadPhase = '创建场景图层';
+      const bgLayer = new SceneBackgroundLayer(reportSceneAssetError);
+      const themeLayer = new SceneThemeLayer(() => renderAllRef.current(), reportSceneAssetError);
       const floorLayer = new FloorLayer(ENABLE_SCENE_SHADOWS);
       const godRaysLayer = ENABLE_GOD_RAYS ? new GodRaysLayer() : null;
       const dustLayer = new DustMotesLayer();
-      const tableLayer = new AltarTableLayer(ENABLE_SCENE_SHADOWS);
+      const tableLayer = new AltarTableLayer(ENABLE_SCENE_SHADOWS, reportSceneAssetError);
       const portraitLayer = new MemorialPortraitLayer();
       const propsLayer = new PropsLayer(pipeline);
 
@@ -481,6 +494,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
       isReadyRef.current = true;
       let initialAssetsLaidOut = false;
+      loadPhase = '读取场景素材';
       while (isMounted && stage.app) {
         renderAllRef.current();
         const loadingRevision = renderRevisionRef.current;
@@ -519,6 +533,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
         }
         if (!isMounted || !stage.app) return;
         if (readyRevision !== renderRevisionRef.current) continue;
+        loadPhase = '绘制场景首帧';
         stage.app.render();
         stage.app.canvas.style.visibility = 'visible';
         stage.app.start();
@@ -529,7 +544,13 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
     void initEngine().catch((error) => {
       console.error('Failed to initialize scene:', error);
-      if (isMounted) setSceneLoadState('error');
+      if (isMounted) {
+        isReadyRef.current = false;
+        stage.app?.stop();
+        const detail = error instanceof Error ? error.message : typeof error === 'string' ? error : '设备未返回具体错误';
+        setSceneLoadError(`${loadPhase}：${detail}`);
+        setSceneLoadState('error');
+      }
     });
 
     const handleResize = () => {
@@ -558,7 +579,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       stage.destroy();
       releaseUnusedSceneAssets([]);
     };
-  }, []);
+  }, [sceneRetryCount]);
 
   // 2. 外部宏观环境状态变化
   useEffect(() => {
@@ -625,8 +646,21 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
     >
       <div ref={containerRef} className="absolute inset-0" />
       {sceneLoadState !== 'ready' && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#f5eee6] text-sm text-[#89745a]" role="status">
-          {sceneLoadState === 'error' ? '场景加载失败，请刷新重试' : '场景加载中…'}
+        <div className="absolute inset-0 flex items-center justify-center bg-[#f5eee6] p-6 text-sm text-[#89745a]" role={sceneLoadState === 'error' ? 'alert' : 'status'}>
+          {sceneLoadState === 'error' ? (
+            <div className="max-w-md space-y-4 text-center">
+              <p className="whitespace-pre-wrap break-all text-left">{sceneLoadError}</p>
+              <button
+                type="button"
+                className="rounded-lg bg-[#78562f] px-4 py-2 text-white"
+                onClick={() => {
+                  setSceneLoadError('');
+                  setSceneLoadState('loading');
+                  setSceneRetryCount((count) => count + 1);
+                }}
+              >重新加载场景</button>
+            </div>
+          ) : '场景加载中…'}
         </div>
       )}
     </div>

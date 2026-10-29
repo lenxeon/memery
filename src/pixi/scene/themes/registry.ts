@@ -496,20 +496,35 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
 export const SCENE_THEME_REGISTRY = registry as Record<SceneThemeId, SceneThemeDefinition>;
 export const SCENE_THEME_OPTIONS = options;
 
+const readThemeFile = async (path: string): Promise<string> => {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.text();
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`主题配置文件读取失败：${path}\n原因：${detail}`);
+  }
+};
+
 export const loadSceneThemes = (): Promise<void> => {
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
-    const catalogResponse = await fetch('/themes/catalog.json');
-    if (!catalogResponse.ok) throw new Error(`Failed to load theme catalog (${catalogResponse.status})`);
-    const catalog = parseJsonc<ThemeCatalog>(await catalogResponse.text(), '/themes/catalog.json');
+    const catalogPath = '/themes/catalog.json';
+    const catalog = parseJsonc<ThemeCatalog>(await readThemeFile(catalogPath), catalogPath);
     if (catalog.schemaVersion !== 1 || !Array.isArray(catalog.themes) || catalog.themes.length === 0) {
-      throw new Error('Theme catalog must declare at least one manifest with schemaVersion 1');
+      throw new Error(`主题目录内容无效：${catalogPath}，需要 schemaVersion 为 1 且至少包含一个主题`);
     }
     const loaded = await Promise.all(catalog.themes.map(async ({ id, manifest }) => {
       const path = publicUrl(manifest);
-      const response = await fetch(path);
-      if (!response.ok) throw new Error(`Failed to load theme manifest ${path} (${response.status})`);
-      const normalized = normalizeTheme(parseJsonc<RawThemeManifest>(await response.text(), path));
+      const source = await readThemeFile(path);
+      let normalized: SceneThemeDefinition;
+      try {
+        normalized = normalizeTheme(parseJsonc<RawThemeManifest>(source, path));
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error(`主题配置文件内容无效：${path}\n原因：${detail}`);
+      }
       if (normalized.id !== id) throw new Error(`Theme catalog id ${id} does not match ${path}`);
       return normalized;
     }));
