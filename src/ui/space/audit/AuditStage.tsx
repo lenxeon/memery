@@ -122,7 +122,7 @@ export const AuditStage: React.FC<AuditStageProps> = ({
       className="fixed z-40 select-none touch-none cursor-move transition-shadow pointer-events-auto"
       style={{
         left: pos ? `${pos.x}px` : '50%',
-        top: pos ? `${pos.y}px` : '88px',
+        top: pos ? `${pos.y}px` : 'calc(88px + env(safe-area-inset-top, 0px))',
         transform: pos ? 'none' : 'translateX(-50%)',
         maxWidth: '96vw',
       }}

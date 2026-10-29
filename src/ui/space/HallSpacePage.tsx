@@ -181,7 +181,7 @@ export const HallSpacePage: React.FC<HallSpacePageProps> = ({ currentUser, onReq
 
       {/* Floating Toast */}
       {toastMessage && (
-        <div className="absolute top-16 z-50 animate-in fade-in slide-in-from-top-3 duration-300 flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900/90 backdrop-blur-md text-amber-100 text-xs shadow-xl border border-amber-500/30 pointer-events-none">
+        <div className="absolute top-[calc(4rem+env(safe-area-inset-top,0px))] z-50 animate-in fade-in slide-in-from-top-3 duration-300 flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900/90 backdrop-blur-md text-amber-100 text-xs shadow-xl border border-amber-500/30 pointer-events-none">
           <Sparkles size={14} className="text-amber-400" />
           <span>{toastMessage}</span>
         </div>

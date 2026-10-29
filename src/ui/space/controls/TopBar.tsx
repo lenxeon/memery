@@ -66,7 +66,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     }`;
 
   return (
-    <header className="relative z-30 w-full max-w-5xl px-4 pt-3 sm:pt-4 flex items-center justify-between pointer-events-auto">
+    <header className="relative z-30 w-full max-w-5xl pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pt-[calc(0.75rem+env(safe-area-inset-top,0px))] sm:pt-[calc(1rem+env(safe-area-inset-top,0px))] flex items-center justify-between pointer-events-auto">
       {/* Left: App Brand, Quick Agreement Link & User Login */}
       <div className="flex items-center gap-2">
         <button
