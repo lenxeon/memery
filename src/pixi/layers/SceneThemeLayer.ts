@@ -3,9 +3,10 @@
  * @description 场景主题的独立部件装配器。墙纸由背景层负责，本层按真实深度装配
  * 墙纸装饰、遗像关系、墙面造景、结构附件、地面陈设与左右镜头前景。
  */
-import { Assets, Container, Graphics, Polygon, Rectangle, Sprite, Texture } from 'pixi.js';
+import { Container, Graphics, Polygon, Rectangle, Sprite, Texture } from 'pixi.js';
 import { getFloorTopY } from './FloorLayer';
 import { TexturePipeline } from '../assets/TexturePipeline';
+import { loadSceneAsset } from '../assets/SceneAssetCache';
 import type {
   SceneAssemblySelection,
   SceneForegroundInstance,
@@ -173,6 +174,21 @@ export class SceneThemeLayer {
     if (this.assetLoadError) throw this.assetLoadError;
   }
 
+  public getSceneAssetUrls(): string[] {
+    const urls = [
+      ...this.viewportAssets.map(({ spec }) => spec.url),
+      ...this.wallAssemblyAssets.map(({ spec }) => spec.url),
+      ...this.roomOverlayAssets.map(({ spec }) => spec.url),
+      ...this.wallpaperOverlayAssets.map(({ spec }) => spec.url),
+      ...this.portraitBackAssets.map(({ spec }) => spec.url),
+      ...this.portraitFrontAssets.map(({ spec }) => spec.url),
+      ...this.groundAssets.map(({ spec }) => spec.url),
+      ...this.foregroundAssets.map(({ spec }) => spec.url),
+    ];
+    if (this.floorImageSpec) urls.push(this.floorImageSpec.url);
+    return [...new Set(urls.filter(Boolean))];
+  }
+
   private trackAssetLoad(pending: Promise<unknown>): void {
     this.pendingAssets.add(pending);
     void pending.then(
@@ -213,7 +229,7 @@ export class SceneThemeLayer {
     }
 
     if (!floorImageSpec) return;
-    this.trackAssetLoad(Assets.load(floorImageSpec.url)
+    this.trackAssetLoad(loadSceneAsset<Texture>(floorImageSpec.url)
       .then((image) => {
         if (token !== this.loadToken) return;
         this.floorImageTexture = image;
@@ -306,7 +322,7 @@ export class SceneThemeLayer {
     sprite.visible = false;
     sprite.alpha = spec.alpha ?? 1;
     container.addChild(sprite);
-    this.trackAssetLoad(Assets.load(spec.url)
+    this.trackAssetLoad(loadSceneAsset<Texture>(spec.url)
       .then((texture) => {
         const currentToken = container === this.foregroundLeft || container === this.foregroundRight
           ? this.foregroundLoadToken : this.loadToken;
@@ -338,7 +354,7 @@ export class SceneThemeLayer {
       return;
     }
 
-    this.trackAssetLoad(Assets.load(spec.url)
+    this.trackAssetLoad(loadSceneAsset<Texture>(spec.url)
       .then((atlas: Texture) => {
         if (token !== this.loadToken) return;
         spec.wallParts?.forEach(({ frame, anchor }, index) => {

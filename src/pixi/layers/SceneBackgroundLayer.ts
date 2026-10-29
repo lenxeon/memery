@@ -5,10 +5,11 @@
  * 墙纸在最底层单独铺设；模块化主题由墙体/窗框透明开口露出墙纸，墙地一体主题使用同尺寸全画布墙纸与 roomOverlay 对齐。
  * 本层不接收光照 tint，避免壁画随运行时光照改变颜色。
  */
-import { Assets, Container, Graphics, Sprite, Texture, VideoSource } from 'pixi.js';
+import { Container, Graphics, Sprite, Texture, VideoSource } from 'pixi.js';
 import { WallBackgroundStyle } from '../../types';
 import { getFloorTopY } from './FloorLayer';
 import { BaseWallSpec, getWallSpec } from '../scene/walls/BaseWall';
+import { loadSceneAsset } from '../assets/SceneAssetCache';
 
 const WALL_BASE_COLOR = 0xf5eee6;
 const WARM_BLESSING_EDGE_COVER_RATIO = 0.04;
@@ -48,6 +49,10 @@ export class SceneBackgroundLayer {
       await pending;
     } while (pending !== this.backdropReady);
     if (this.backdropError) throw this.backdropError;
+  }
+
+  public getSceneAssetUrls(): string[] {
+    return this.backdropUrl ? [this.backdropUrl] : [];
   }
 
   constructor() {
@@ -109,6 +114,7 @@ export class SceneBackgroundLayer {
       this.backdropReady = Promise.resolve();
       this.backdropError = null;
       this.wallBackdropSprite.visible = false;
+      this.wallBackdropSprite.texture = Texture.EMPTY;
       this.backdropUrl = '';
       return;
     }
@@ -122,7 +128,8 @@ export class SceneBackgroundLayer {
       this.backdropError = null;
       const token = ++this.backdropToken;
       sprite.visible = false;
-      this.backdropReady = Assets.load(url)
+      sprite.texture = Texture.EMPTY;
+      this.backdropReady = loadSceneAsset<Texture>(url)
         .then((tex) => {
           if (token !== this.backdropToken || sprite.destroyed) return;
           sprite.texture = tex;

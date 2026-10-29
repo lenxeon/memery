@@ -3,11 +3,12 @@
  * @description PixiJS 明式长案场景层。默认使用透明桌体素材呈现造型与木纹，
  * Pixi 继续负责桌体布局、拖动、场景灯光、桌布覆盖与落地阴影；加载失败时保留旧矢量方案。
  */
-import { Assets, Container, Graphics, Sprite, TilingSprite, Rectangle, BlurFilter, Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, TilingSprite, Rectangle, BlurFilter, Texture } from 'pixi.js';
 import { TableclothStyle, LightingSettings, TableWoodStyle } from '../../types';
 import { TableMaterial } from './table/TableMaterial';
 import { getMingAltarTableMetrics, MingAltarTableMetrics } from './table/MingAltarTableSpec';
 import { TexturePipeline } from '../assets/TexturePipeline';
+import { loadSceneAsset } from '../assets/SceneAssetCache';
 
 /** 场景点光源（烛火），坐标为舞台全局坐标 */
 export interface AltarLightSource {
@@ -268,10 +269,13 @@ export class AltarTableLayer {
       this.mingTableLoaded = false;
       this.activeTableIsThemeAsset = false;
       this.mingTableSprite.visible = false;
+      this.mingTableSprite.texture = Texture.EMPTY;
       return;
     }
     this.mingTableLoaded = false;
-    this.tableAssetReady = Assets.load<Texture>(url).then((texture) => {
+    this.mingTableSprite.visible = false;
+    this.mingTableSprite.texture = Texture.EMPTY;
+    this.tableAssetReady = loadSceneAsset<Texture>(url).then((texture) => {
       if (this.destroyed || token !== this.tableAssetLoadToken || this.mingTableSprite.destroyed) return;
       this.mingTableSprite.texture = texture;
       this.mingTableLoaded = true;
@@ -294,6 +298,10 @@ export class AltarTableLayer {
       await pending;
     } while (pending !== this.tableAssetReady);
     if (this.tableAssetError) throw this.tableAssetError;
+  }
+
+  public getSceneAssetUrls(): string[] {
+    return this.themeTableAssetUrl ? [this.themeTableAssetUrl] : [];
   }
 
   /**

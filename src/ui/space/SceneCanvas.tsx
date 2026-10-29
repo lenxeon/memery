@@ -7,6 +7,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { PixiStage } from '../../pixi/engine/PixiStage';
 import { TexturePipeline } from '../../pixi/assets/TexturePipeline';
+import { releaseUnusedSceneAssets } from '../../pixi/assets/SceneAssetCache';
 import { SceneBackgroundLayer } from '../../pixi/layers/SceneBackgroundLayer';
 import { SceneThemeLayer } from '../../pixi/layers/SceneThemeLayer';
 import { getSceneComponentOption } from '../../pixi/scene/components';
@@ -320,6 +321,16 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
 
     // 2. 供品与道具 (1:1 同步置于供案台面)
     propsLayerRef.current?.syncItems(items, centerX, tableTopY, tableWidth, tableMetrics.surfaceDepth);
+    // Release stale theme images as soon as the active layers switch. The cache
+    // manager cancels cleanup during another switch and waits for stale image
+    // decodes before unloading them.
+    if (bgLayerRef.current && themeLayerRef.current && tableLayerRef.current) {
+      releaseUnusedSceneAssets([
+        ...bgLayerRef.current.getSceneAssetUrls(),
+        ...themeLayerRef.current.getSceneAssetUrls(),
+        ...tableLayerRef.current.getSceneAssetUrls(),
+      ]);
+    }
     }, [items, themeId, sceneAssembly, tableclothStyle, tableWoodStyle, tableLegWoodStyle, showTableRunner, lighting, stageInsets, getViewportDimensions, getTableLayout]);
 
   // 始终持有最新重绘函数（供案拖放时按最新状态即时重绘）
@@ -545,6 +556,7 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
       propsLayerRef.current?.destroy();
       pixiEffectsRef.current?.destroy();
       stage.destroy();
+      releaseUnusedSceneAssets([]);
     };
   }, []);
 
