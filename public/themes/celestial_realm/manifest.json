@@ -1,0 +1,491 @@
+{
+  "schemaVersion": 1,
+  "themeId": "celestial_realm",
+  "name": "琼楼玉阙",
+  "poeticTitle": "琼楼映云海，玉阙寄长念",
+  "iconText": "🏯",
+  "desc": "白玉天宫 · 云桥宫阙 · 青瓷清供",
+  "tag": "天宫云境",
+  "version": 2,
+  "wall": {
+    "wallpaper": {
+      "id": "celestial_cloud_palaces",
+      "name": "天宫云海",
+      "poeticTitle": "云上有归处",
+      "description": "纯背景仅含云海、远山、天宫、云桥与瀑布，不含近处殿柱、地坪、玉屏和陈设。",
+      "assets": {
+        "phone": "themes/celestial_realm/wallpapers/phone/heavenly-palaces.png"
+      },
+      "fit": "cover"
+    },
+    "wallpaperDecorations": [],
+    "roomOverlay": {
+      "id": "celestial_jade_hall",
+      "name": "白玉露台场景层",
+      "description": "开放式白玉云台：保留中央描金玉屏、台阶与哑光白玉地坪；顶部和两侧保持透明，直接显露独立云海背景。地坪只有柔和漫射受光，无物体倒影。",
+      "asset": "themes/celestial_realm/interior/phone/jade-hall-ground.png",
+      "fit": "cover"
+    },
+    "frameDecorations": [],
+    "portrait": {
+      "sceneOpening": {
+        "x": 0.5010430776331056,
+        "y": 0.4907785602048477,
+        "diameterRatio": 0.134012
+      },
+      "textDx": 0,
+      "textDy": 0,
+      "textGap": 0
+    }
+  },
+  "ground": {
+    "floor": null,
+    "groundMat": {
+      "id": "celestial_celadon_cloud_mat",
+      "name": "青玉云纹席",
+      "poeticTitle": "云纹承静念",
+      "description": "浅青灰编织席毯，米白描金云纹与回纹边饰；不含地坪、蒲团和投影。",
+      "asset": "themes/celestial_realm/mats/celadon-cloud-mat.png",
+      "previewUrl": "themes/celestial_realm/mats/celadon-cloud-mat.png",
+      "widthRatio": 0.81,
+      "bottomRatio": 0.084
+    },
+    "cushion": {
+      "id": "celestial_ivory_brocade_cushion",
+      "name": "米白描金锦垫",
+      "poeticTitle": "安坐云间",
+      "description": "独立米白金线织锦圆垫，滚边和圆形顶面采用与场景一致的浅俯角。",
+      "asset": "themes/celestial_realm/cushions/ivory-gold-brocade.png",
+      "previewUrl": "themes/celestial_realm/cushions/ivory-gold-brocade.png",
+      "widthRatio": 0.26,
+      "bottomRatio": 0.103
+    }
+  },
+  "table": {
+    "id": "celestial_jade_gold_altar",
+    "name": "白玉描金供桌",
+    "asset": "themes/celestial_realm/table/jade-gold-altar.png",
+    "structure": "legged",
+    "woodStyle": "white_oak",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.155,
+      "widthRatio": 0.9,
+      "minWidthRatio": 0.87,
+      "maxWidthRatio": 0.93,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": {
+        "width": 1772,
+        "height": 696
+      },
+      "visibleBounds": {
+        "left": 0.013544018058690745,
+        "top": 0.034482758620689655,
+        "right": 0.9864559819413092,
+        "bottom": 0.9655172413793104
+      },
+      "backEdgeY": 0.034482758620689655,
+      "frontEdgeY": 0.28879310344827586,
+      "fasciaBottomY": 0.39080459770114945,
+      "apronBottomY": 0.5660919540229885,
+      "footBottomY": 0.9655172413793104,
+      "legCentersX": {
+        "left": 0.113431151241535,
+        "right": 0.886568848758465
+      },
+      "legWidth": 0.11851015801354402,
+      "apronBoundsX": {
+        "left": 0.033860045146726865,
+        "right": 0.9650112866817155
+      }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": {
+          "x": 0.10214446952595936,
+          "y": 0.034482758620689655
+        },
+        "backRight": {
+          "x": 0.8972911963882618,
+          "y": 0.034482758620689655
+        },
+        "frontRight": {
+          "x": 0.9841986455981941,
+          "y": 0.28879310344827586
+        },
+        "frontLeft": {
+          "x": 0.015237020316027089,
+          "y": 0.28879310344827586
+        }
+      },
+      "usableArea": {
+        "uMin": 0.12,
+        "uMax": 0.88,
+        "vMin": 0.08,
+        "vMax": 0.94
+      },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "celestial_ivory_magnolia_left": {
+        "id": "celestial_ivory_magnolia_left",
+        "setId": "celestial_ivory_magnolia",
+        "name": "玉兰凝露·左",
+        "poeticTitle": "玉兰凝露",
+        "description": "与选定效果图呼应的白玉兰近景。 / Ivory magnolia; 主辅色：米白、灰绿。",
+        "plant": "白玉兰与米白百合、灰绿叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.220266,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/ivory_magnolia/left.png",
+        "widthRatio": 1
+      },
+      "celestial_pale_lotus_left": {
+        "id": "celestial_pale_lotus_left",
+        "setId": "celestial_pale_lotus",
+        "name": "莲影浮云·左",
+        "poeticTitle": "莲影浮云",
+        "description": "粉白莲瓣配圆形小荷叶，轻盈的云上花意。 / Pale lotus; 主辅色：粉白、淡青。",
+        "plant": "浅粉白莲与小型荷叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.223005,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/pale_lotus/left.png",
+        "widthRatio": 1
+      },
+      "celestial_jade_orchid_left": {
+        "id": "celestial_jade_orchid_left",
+        "setId": "celestial_jade_orchid",
+        "name": "兰风清和·左",
+        "poeticTitle": "兰风清和",
+        "description": "弧形兰花花序与细长叶片，清雅疏朗。 / Jade orchid; 主辅色：奶白、浅青绿。",
+        "plant": "奶白蕙兰花序与细长兰叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.248435,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/jade_orchid/left.png",
+        "widthRatio": 1
+      },
+      "celestial_peach_blossom_left": {
+        "id": "celestial_peach_blossom_left",
+        "setId": "celestial_peach_blossom",
+        "name": "桃云含春·左",
+        "poeticTitle": "桃云含春",
+        "description": "疏枝小朵桃花，浅粉与白玉殿阁相映。 / Peach blossom; 主辅色：浅粉、灰褐、嫩绿。",
+        "plant": "淡粉桃花与细灰褐花枝",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.232786,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/peach_blossom/left.png",
+        "widthRatio": 1
+      },
+      "celestial_golden_osmanthus_left": {
+        "id": "celestial_golden_osmanthus_left",
+        "setId": "celestial_golden_osmanthus",
+        "name": "桂月流金·左",
+        "poeticTitle": "桂月流金",
+        "description": "细碎桂花簇与圆叶，呼应殿阁香槟金边。 / Golden osmanthus; 主辅色：淡金、橄榄绿。",
+        "plant": "淡金桂花小簇与柔和橄榄绿叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.206182,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/golden_osmanthus/left.png",
+        "widthRatio": 1
+      },
+      "celestial_snow_camellia_left": {
+        "id": "celestial_snow_camellia_left",
+        "setId": "celestial_snow_camellia",
+        "name": "雪茶映玉·左",
+        "poeticTitle": "雪茶映玉",
+        "description": "重瓣山茶团花与厚实圆叶，花形饱满。 / Snow camellia; 主辅色：米白、墨绿。",
+        "plant": "米白重瓣山茶与圆润深绿叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.212441,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/snow_camellia/left.png",
+        "widthRatio": 1
+      }
+    },
+    "right": {
+      "celestial_ivory_magnolia_right": {
+        "id": "celestial_ivory_magnolia_right",
+        "setId": "celestial_ivory_magnolia",
+        "name": "玉兰凝露·右",
+        "poeticTitle": "玉兰凝露",
+        "description": "与选定效果图呼应的白玉兰近景。 / Ivory magnolia; 主辅色：米白、灰绿。",
+        "plant": "白玉兰与米白百合、灰绿叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.230047,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/ivory_magnolia/right.png",
+        "widthRatio": 1
+      },
+      "celestial_pale_lotus_right": {
+        "id": "celestial_pale_lotus_right",
+        "setId": "celestial_pale_lotus",
+        "name": "莲影浮云·右",
+        "poeticTitle": "莲影浮云",
+        "description": "粉白莲瓣配圆形小荷叶，轻盈的云上花意。 / Pale lotus; 主辅色：粉白、淡青。",
+        "plant": "浅粉白莲与小型荷叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.214397,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/pale_lotus/right.png",
+        "widthRatio": 1
+      },
+      "celestial_jade_orchid_right": {
+        "id": "celestial_jade_orchid_right",
+        "setId": "celestial_jade_orchid",
+        "name": "兰风清和·右",
+        "poeticTitle": "兰风清和",
+        "description": "弧形兰花花序与细长叶片，清雅疏朗。 / Jade orchid; 主辅色：奶白、浅青绿。",
+        "plant": "奶白蕙兰花序与细长兰叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.233568,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/jade_orchid/right.png",
+        "widthRatio": 1
+      },
+      "celestial_peach_blossom_right": {
+        "id": "celestial_peach_blossom_right",
+        "setId": "celestial_peach_blossom",
+        "name": "桃云含春·右",
+        "poeticTitle": "桃云含春",
+        "description": "疏枝小朵桃花，浅粉与白玉殿阁相映。 / Peach blossom; 主辅色：浅粉、灰褐、嫩绿。",
+        "plant": "淡粉桃花与细灰褐花枝",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.236698,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/peach_blossom/right.png",
+        "widthRatio": 1
+      },
+      "celestial_golden_osmanthus_right": {
+        "id": "celestial_golden_osmanthus_right",
+        "setId": "celestial_golden_osmanthus",
+        "name": "桂月流金·右",
+        "poeticTitle": "桂月流金",
+        "description": "细碎桂花簇与圆叶，呼应殿阁香槟金边。 / Golden osmanthus; 主辅色：淡金、橄榄绿。",
+        "plant": "淡金桂花小簇与柔和橄榄绿叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.199139,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/golden_osmanthus/right.png",
+        "widthRatio": 1
+      },
+      "celestial_snow_camellia_right": {
+        "id": "celestial_snow_camellia_right",
+        "setId": "celestial_snow_camellia",
+        "name": "雪茶映玉·右",
+        "poeticTitle": "雪茶映玉",
+        "description": "重瓣山茶团花与厚实圆叶，花形饱满。 / Snow camellia; 主辅色：米白、墨绿。",
+        "plant": "米白重瓣山茶与圆润深绿叶",
+        "focusTreatment": "统一50mm f/1.4等效近摄焦外虚化，花叶整体明显失焦、底缘更柔；虚化已烘焙在RGBA中。",
+        "defaultHeightRatio": 0.197183,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/celestial_realm/foregrounds/snow_camellia/right.png",
+        "widthRatio": 1
+      }
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "celestial_cloud_palaces",
+    "wallpaperDecorationId": "none",
+    "frameId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "celestial_celadon_cloud_mat",
+    "cushionId": "celestial_ivory_brocade_cushion",
+    "offerings": {
+      "vase_left": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.18,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "vase_right": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.82,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "candle_left": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.33,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "candle_right": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.67,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "censer": {
+        "catalogId": "censer",
+        "position": {
+          "u": 0.5,
+          "v": 0.38
+        },
+        "scale": 1
+      },
+      "fruit_left": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.25,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "fruit_right": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.75,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "tea_cups": {
+        "catalogId": "tea_cups",
+        "position": {
+          "u": 0.5,
+          "v": 0.82
+        },
+        "scale": 1
+      }
+    },
+    "foreground": {
+      "left": {
+        "foregroundId": "celestial_ivory_magnolia_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "foregroundId": "celestial_ivory_magnolia_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "foregroundSetIds": [
+    "celestial_ivory_magnolia",
+    "celestial_pale_lotus",
+    "celestial_jade_orchid",
+    "celestial_peach_blossom",
+    "celestial_golden_osmanthus",
+    "celestial_snow_camellia"
+  ],
+  "defaultForegroundSetId": "celestial_ivory_magnolia",
+  "preset": {
+    "tablecloth": "moonlight_white",
+    "lighting": {
+      "sunAngle": -20,
+      "sunlightIntensity": 0.82,
+      "godRaysIntensity": 0,
+      "godRaysEnabled": false
+    }
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.86,
+      "y": 0.16
+    },
+    "sunAngle": -20,
+    "sunlightIntensity": 0.82,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#fff1d8",
+    "ambientColor": "#e8eee9",
+    "shadowDirection": {
+      "x": -0.48,
+      "y": 0.88
+    }
+  }
+}

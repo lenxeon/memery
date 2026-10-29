@@ -12,6 +12,7 @@
  * 程序化矢量壁构（落地罩 / 帷幔 / 圆光罩 / 月洞 / 佛龛）已整体下线，不再渲染。
  */
 import { WallBackgroundStyle } from '../../../types';
+import type { SceneThemePortraitPlacement } from '../../../types';
 import { getSceneTheme } from '../themes';
 
 /* ────────────────────────────────────────────────────────────────
@@ -20,6 +21,7 @@ import { getSceneTheme } from '../themes';
 
 /** 遗像落位微调：一律以「基准位」为原点，单位视口 px */
 export interface WallPortraitPlacement {
+  sceneOpening?: SceneThemePortraitPlacement['sceneOpening'];
   /** 横向微调（正 = 右） */
   dx?: number;
   /** 纵向微调（正 = 下） */
@@ -82,6 +84,7 @@ export const getWallSpec = (
       ?? sceneTheme.backdropUrl,
     bottomExtensionRatio: sceneTheme.wall?.scenery?.[0]?.bottomExtensionRatio,
     portrait: {
+      sceneOpening: portrait?.sceneOpening,
       dx: portrait?.dx,
       dy: portrait?.dy,
       scale: portrait?.scale,

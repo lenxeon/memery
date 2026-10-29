@@ -1,0 +1,92 @@
+[
+  {
+    "themeId": "classic_dawn",
+    "asset": "themes/classic_dawn/table/altar-table-render-match-v2.png",
+    "sourceSize": {
+      "width": 1815,
+      "height": 866
+    },
+    "scale": 0.21033833627023904,
+    "tableWidth": 373.34999999999997,
+    "tableTopY": 619.7506769953578,
+    "spriteOrigin": {
+      "x": 5.617959834758068,
+      "y": 572.3908972007508
+    },
+    "metrics": {
+      "spriteWidth": 381.76408033048386,
+      "spriteHeight": 182.15299921002702,
+      "spriteY": -47.35977979460702,
+      "topExtent": 37.26303904839523,
+      "surfaceDepth": 32.78753985780486,
+      "frontThickness": 11.839944948651755,
+      "apronHeight": 30.055244869654455,
+      "footDrop": 125.74932300464215,
+      "legWidth": 21.378788498507095,
+      "leftLegX": -160.72267781913374,
+      "rightLegX": 139.34388932062663,
+      "apronX": -137.4350689189742,
+      "apronWidth": 274.8701378379484
+    }
+  },
+  {
+    "themeId": "warm_blessing",
+    "asset": "themes/warm_blessing/table/legless-oak-altar-v2.png",
+    "sourceSize": {
+      "width": 1536,
+      "height": 1024
+    },
+    "scale": 0.24956508095815022,
+    "tableWidth": 373.34999999999997,
+    "tableTopY": 674.2002546305803,
+    "spriteOrigin": {
+      "x": 4.834017824140631,
+      "y": 569.4228510411104
+    },
+    "metrics": {
+      "spriteWidth": 383.33196435171874,
+      "spriteHeight": 255.55464290114583,
+      "spriteY": -104.77740358946978,
+      "topExtent": 31.94433036264323,
+      "surfaceDepth": 31.94433036264323,
+      "frontThickness": 17.88882500308021,
+      "apronHeight": 40.88874286418334,
+      "footDrop": 71.29974536941968,
+      "legWidth": 0,
+      "leftLegX": 0,
+      "rightLegX": 0,
+      "apronX": -173.26604788697685,
+      "apronWidth": 346.5320957739537
+    }
+  },
+  {
+    "themeId": "snow_plum_courtyard",
+    "asset": "themes/snow_plum_courtyard/table/carved-timber-altar.png",
+    "sourceSize": {
+      "width": 1836,
+      "height": 856
+    },
+    "scale": 0.20918451931001084,
+    "tableWidth": 369.41999999999996,
+    "tableTopY": 511.39759048679497,
+    "spriteOrigin": {
+      "x": 4.468611273410062,
+      "y": 473.53512053220834
+    },
+    "metrics": {
+      "spriteWidth": 384.0627774531799,
+      "spriteHeight": 179.0619485293693,
+      "spriteY": -37.8624699545866,
+      "topExtent": 24.056256537126643,
+      "surfaceDepth": 16.525627229775488,
+      "frontThickness": 6.484728465991108,
+      "apronHeight": 45.183775844106925,
+      "footDrop": 127.60240951320503,
+      "legWidth": 27.26845719917577,
+      "leftLegX": -141.91119626894996,
+      "rightLegX": 114.6427390697742,
+      "apronX": -114.06664490359441,
+      "apronWidth": 228.13328980718887
+    }
+  }
+]

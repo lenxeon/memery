@@ -1,0 +1,38 @@
+[
+  {
+    "key": "clear_mat",
+    "transparentSafetyBorder": true,
+    "opaqueInteriorPixels": 343373,
+    "saturatedFringePixels": 0,
+    "visibleRgbDifferences": 0,
+    "maxWidthDeltaCssPx": 5.684341886080802e-14,
+    "maxContactEdgeDeltaCssPx": 1.1999986782029737e-8
+  },
+  {
+    "key": "ivory_mat",
+    "transparentSafetyBorder": true,
+    "opaqueInteriorPixels": 343373,
+    "saturatedFringePixels": 0,
+    "visibleRgbDifferences": 0,
+    "maxWidthDeltaCssPx": 5.684341886080802e-14,
+    "maxContactEdgeDeltaCssPx": 1.1999986782029737e-8
+  },
+  {
+    "key": "straw_mat",
+    "transparentSafetyBorder": true,
+    "opaqueInteriorPixels": 697522,
+    "saturatedFringePixels": 0,
+    "visibleRgbDifferences": 0,
+    "maxWidthDeltaCssPx": 1.7788585182643146e-7,
+    "maxContactEdgeDeltaCssPx": 5.893298293813132e-9
+  },
+  {
+    "key": "brocade_cushion",
+    "transparentSafetyBorder": true,
+    "opaqueInteriorPixels": 864028,
+    "saturatedFringePixels": 0,
+    "visibleRgbDifferences": 0,
+    "maxWidthDeltaCssPx": 1.771257132077153e-7,
+    "maxContactEdgeDeltaCssPx": 1.4608372111979406e-7
+  }
+]

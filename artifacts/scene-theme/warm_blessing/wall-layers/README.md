@@ -7,4 +7,4 @@ Four wall layers, in compositing order:
 3. `03-window-blossoms.png` — independently movable blossom branches behind the frame.
 4. `04-wall-window-assembly.png` — one unified wall and window structure. Pane interiors and portrait-ring footprint are transparent; the frame geometry is extracted from the supplied reference by subtraction.
 
-Phone canvas: 1179×1840. iPad canvas: 2048×1967. The structure PNGs are review candidates and are not connected to the live scene yet. Composite previews are for checking layer order.
+These PNGs are older review candidates and are not connected to the live scene. Their previous canvases are not current output specifications. New scene design images use phone-only 1179×2556 px canvases; do not create an iPad variant. See `/Volumes/data/workspace/memery/.agents/skills/memery-scene-theme/SKILL.md`. Composite previews are for checking layer order.

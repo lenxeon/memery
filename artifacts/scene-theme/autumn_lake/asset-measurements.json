@@ -1,0 +1,144 @@
+[
+  {
+    "name": "Wallpaper",
+    "asset": "wallpapers/phone/sunset-lake.png",
+    "width": 1179,
+    "height": 2556,
+    "hasAlpha": false,
+    "zero": 0,
+    "semi": 0,
+    "opaque": 3013524,
+    "visibleBounds": {
+      "left": 0,
+      "top": 0,
+      "right": 1179,
+      "bottom": 2556
+    }
+  },
+  {
+    "name": "Room",
+    "asset": "interior/phone/pavilion-wall-ground.png",
+    "width": 1179,
+    "height": 2556,
+    "hasAlpha": true,
+    "zero": 1040851,
+    "semi": 1969686,
+    "opaque": 2987,
+    "visibleBounds": {
+      "left": 0,
+      "top": 0,
+      "right": 1179,
+      "bottom": 2556
+    }
+  },
+  {
+    "name": "Table",
+    "asset": "table/marble-oak-altar.png",
+    "width": 1622,
+    "height": 698,
+    "hasAlpha": true,
+    "zero": 608868,
+    "semi": 522136,
+    "opaque": 1152,
+    "visibleBounds": {
+      "left": 24,
+      "top": 24,
+      "right": 1598,
+      "bottom": 674
+    },
+    "generatedSize": {
+      "width": 1716,
+      "height": 917
+    },
+    "sourceCrop": {
+      "left": 48,
+      "top": 149,
+      "width": 1622,
+      "height": 698
+    }
+  },
+  {
+    "name": "Mat",
+    "asset": "mats/honey-rush-mat.png",
+    "width": 1848,
+    "height": 464,
+    "hasAlpha": true,
+    "zero": 192015,
+    "semi": 665186,
+    "opaque": 271,
+    "visibleBounds": {
+      "left": 24,
+      "top": 24,
+      "right": 1824,
+      "bottom": 440
+    },
+    "generatedSize": {
+      "width": 1983,
+      "height": 793
+    },
+    "sourceCrop": {
+      "left": 69,
+      "top": 220,
+      "width": 1848,
+      "height": 464
+    }
+  },
+  {
+    "name": "Cushion",
+    "asset": "cushions/ivory-brocade-cushion.png",
+    "width": 1478,
+    "height": 747,
+    "hasAlpha": true,
+    "zero": 281711,
+    "semi": 821605,
+    "opaque": 750,
+    "visibleBounds": {
+      "left": 24,
+      "top": 24,
+      "right": 1454,
+      "bottom": 723
+    },
+    "generatedSize": {
+      "width": 1774,
+      "height": 887
+    },
+    "sourceCrop": {
+      "left": 148,
+      "top": 83,
+      "width": 1478,
+      "height": 747
+    }
+  },
+  {
+    "name": "Left",
+    "asset": "foregrounds/left.png",
+    "width": 1179,
+    "height": 2556,
+    "hasAlpha": true,
+    "zero": 2878502,
+    "semi": 135022,
+    "opaque": 0,
+    "visibleBounds": {
+      "left": 0,
+      "top": 2087,
+      "right": 521,
+      "bottom": 2556
+    }
+  },
+  {
+    "name": "Right",
+    "asset": "foregrounds/right.png",
+    "width": 1179,
+    "height": 2556,
+    "hasAlpha": true,
+    "zero": 2943039,
+    "semi": 70485,
+    "opaque": 0,
+    "visibleBounds": {
+      "left": 697,
+      "top": 2251,
+      "right": 1179,
+      "bottom": 2556
+    }
+  }
+]

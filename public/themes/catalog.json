@@ -2,6 +2,12 @@
   "schemaVersion": 1, // Manifest catalog schema version.
   "themes": [ // Only themes listed here appear in the application theme picker.
     { "id": "classic_dawn", "manifest": "themes/classic_dawn/manifest.json" }, // 晴岚映曜.
-    { "id": "warm_blessing", "manifest": "themes/warm_blessing/manifest.json" } // 暖意窗光.
+    { "id": "warm_blessing", "manifest": "themes/warm_blessing/manifest.json" }, // 暖意窗光.
+    { "id": "lotus_serenity", "manifest": "themes/lotus_serenity/manifest.json" }, // 莲池清境.
+    { "id": "snow_plum_courtyard", "manifest": "themes/snow_plum_courtyard/manifest.json" }, // 雪庭梅映.
+    { "id": "autumn_lake", "manifest": "themes/autumn_lake/manifest.json" }, // 秋湖夕照（场景5）.
+    { "id": "high_mountain_outdoors", "manifest": "themes/high_mountain_outdoors/manifest.json" }, // 云海朝晖（场景6）.
+    { "id": "celestial_realm", "manifest": "themes/celestial_realm/manifest.json" }, // 琼楼玉阙（场景7）.
+    { "id": "moonlit_lotus_lake", "manifest": "themes/moonlit_lotus_lake/manifest.json" } // 月照莲湖.
   ]
 }

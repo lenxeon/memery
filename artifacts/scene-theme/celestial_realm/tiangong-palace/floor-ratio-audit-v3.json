@@ -1,0 +1,45 @@
+{
+  "source": "/Volumes/data/workspace/memery/artifacts/scene-theme/celestial_realm/tiangong-palace/concept-v3.png",
+  "sourceSHA256": "382f5d91ded2860f804b0aa98b55720450e1d666e5295e430b7d2d1a277b341f",
+  "canvas": {
+    "width": 1179,
+    "height": 2556
+  },
+  "measurementMeaning": "Vertical composition allocation from a rear floor boundary to image bottom, including regions occluded by furniture; not visible-floor pixel segmentation.",
+  "method": "Visual estimate of bilateral column-plinth/floor transition from full source and coordinate-grid crop. Center is occluded by altar and a stepped rear platform. The front of a column plinth and rear platform may differ in depth; estimate is not a unique recovered camera boundary.",
+  "observed": {
+    "approximateBoundaryY": 1820,
+    "uncertaintyPx": 15,
+    "floorHeightPx": 736,
+    "floorHeightPercent": 28.794992175273865,
+    "approximateFloorHeightPercentRange": [
+      28.20813771517997,
+      29.381846635367765
+    ]
+  },
+  "target": {
+    "boundaryY": 1870,
+    "floorHeightPx": 686,
+    "floorHeightPercent": 26.838810641627543,
+    "lineColor": "#FF2323",
+    "lineCenterRow": 1870,
+    "lineRows": [
+      1868,
+      1872
+    ]
+  },
+  "difference": {
+    "approximateExcessPercentagePoints": 1.9561815336463229,
+    "suggestedBoundaryDownwardShiftPx": 50,
+    "approximateCssShiftAt393x852": 16.666666666666668,
+    "relativeExtraFloorHeightPercent": 7.288629737609331
+  },
+  "auditPath": "/Volumes/data/workspace/memery/artifacts/scene-theme/celestial_realm/tiangong-palace/floor-ratio-audit-v3.png",
+  "status": "slightly_more_floor_than_target; estimate, not approved",
+  "verification": {
+    "sameDimensions": true,
+    "redTargetLineFullWidth": true,
+    "sourceByteIdentical": true,
+    "outsideAnnotationsUnchanged": true
+  }
+}

@@ -6,7 +6,7 @@
   "iconText": "🏛️",
   "desc": "支摘槛窗 · 横披纳远岫、冰裂格心透光",
   "tag": "经典圣洁",
-  "version": 9,
+  "version": 11,
   "wall": {
     "wallpaper": {
       "id": "ink_warm_silk",
@@ -44,8 +44,8 @@
       "description": "浅麦棕细篾材质；轮廓、画幅、透视与摆放锚点统一沿用窗主题基准。",
       "asset": "themes/classic_dawn/mats/clear-rush-long-mat-unified.png",
       "previewUrl": "themes/classic_dawn/mats/clear-rush-long-mat-unified.png",
-      "widthRatio": 1.2,
-      "bottomRatio": 0.045
+      "widthRatio": 1.20625,
+      "bottomRatio": 0.066621919
     },
     "cushion": {
       "id": "woven_round_cushion",
@@ -61,14 +61,14 @@
   "table": {
     "id": "classic_rosewood_altar",
     "name": "紫檀明式供桌",
-    "asset": "themes/classic_dawn/table/altar-table-render-match-v2.png",
+    "asset": "themes/classic_dawn/table/altar-table-render-match-v3.png",
     "structure": "legged",
     "woodStyle": "walnut",
     "runner": false,
     "position": {
       "x": 0.5,
       "bottomRatio": 0.125,
-      "widthRatio": 0.95,
+      "widthRatio": 0.944929601,
       "minWidthRatio": 0.91,
       "maxWidthRatio": 0.98,
       "forwardScale": 0.07,
@@ -80,16 +80,16 @@
         "height": 866
       },
       "visibleBounds": {
-        "left": 0.01102,
-        "top": 0.05543,
-        "right": 0.98898,
-        "bottom": 0.95035
+        "left": 0.011570247933884297,
+        "top": 0.03233256351039261,
+        "right": 0.9889807162534435,
+        "bottom": 0.9491916859122402
       },
-      "frontEdgeY": 0.26,
-      "backEdgeY": 0.08,
-      "fasciaBottomY": 0.325,
-      "apronBottomY": 0.49,
-      "footBottomY": 0.95035,
+      "frontEdgeY": 0.24595842956120093,
+      "backEdgeY": 0.07274826789838337,
+      "fasciaBottomY": 0.3244803695150115,
+      "apronBottomY": 0.4976905311778291,
+      "footBottomY": 0.9491916859122402,
       "legCentersX": {
         "left": 0.107,
         "right": 0.893
@@ -103,20 +103,20 @@
     "surface": {
       "assetQuad": {
         "backLeft": {
-          "x": 0.099,
-          "y": 0.08
+          "x": 0.13388429752066117,
+          "y": 0.07274826789838337
         },
         "backRight": {
-          "x": 0.901,
-          "y": 0.08
+          "x": 0.8683195592286501,
+          "y": 0.07274826789838337
         },
         "frontRight": {
-          "x": 0.986,
-          "y": 0.26
+          "x": 0.9322314049586777,
+          "y": 0.24595842956120093
         },
         "frontLeft": {
-          "x": 0.014,
-          "y": 0.26
+          "x": 0.06831955922865014,
+          "y": 0.24595842956120093
         }
       },
       "usableArea": {

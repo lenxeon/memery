@@ -1,0 +1,285 @@
+{
+  "themeId": "high_mountain_outdoors",
+  "name": "云海朝晖",
+  "loadedThemeIds": [
+    "classic_dawn",
+    "warm_blessing",
+    "lotus_serenity",
+    "snow_plum_courtyard",
+    "autumn_lake",
+    "high_mountain_outdoors"
+  ],
+  "assets": [
+    {
+      "slot": "wallpaper",
+      "path": "themes/high_mountain_outdoors/wallpapers/phone/sunrise-cloud-sea.png",
+      "size": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "roomOverlay",
+      "path": "themes/high_mountain_outdoors/interior/phone/pine-terrace.png",
+      "size": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "table",
+      "path": "themes/high_mountain_outdoors/table/carved-stone-trestle.png",
+      "size": [
+        1906,
+        658
+      ]
+    },
+    {
+      "slot": "groundMat",
+      "path": "themes/high_mountain_outdoors/mats/indigo-mountain-mat.png",
+      "size": [
+        1770,
+        441
+      ]
+    },
+    {
+      "slot": "cushion",
+      "path": "themes/high_mountain_outdoors/cushions/ivory-brocade.png",
+      "size": [
+        1654,
+        721
+      ]
+    },
+    {
+      "slot": "foregroundLeft",
+      "path": "themes/high_mountain_outdoors/foregrounds/left.png",
+      "size": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "foregroundRight",
+      "path": "themes/high_mountain_outdoors/foregrounds/right.png",
+      "size": [
+        1179,
+        2556
+      ]
+    }
+  ],
+  "assembly": {
+    "wallpaperId": "mountain_sunrise_cloud_sea",
+    "wallpaperDecorationId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "mountain_indigo_mat",
+    "cushionId": "mountain_ivory_cushion",
+    "wallSceneryId": "none",
+    "foreground": {
+      "left": {
+        "instanceId": "default-left-mountain_white_flower_left",
+        "side": "left",
+        "order": 0,
+        "foregroundId": "mountain_white_flower_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "instanceId": "default-right-mountain_white_flower_right",
+        "side": "right",
+        "order": 0,
+        "foregroundId": "mountain_white_flower_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "offerings": [
+    {
+      "item": "vase_left",
+      "catalogId": "flower_vase",
+      "position": {
+        "u": 0.18,
+        "v": 0.35
+      },
+      "scale": 1,
+      "mapped": {
+        "x": -165,
+        "y": -19
+      }
+    },
+    {
+      "item": "vase_right",
+      "catalogId": "flower_vase",
+      "position": {
+        "u": 0.82,
+        "v": 0.35
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 164,
+        "y": -19
+      }
+    },
+    {
+      "item": "candle_left",
+      "catalogId": "candle",
+      "position": {
+        "u": 0.33,
+        "v": 0.54
+      },
+      "scale": 1,
+      "mapped": {
+        "x": -90,
+        "y": -13
+      }
+    },
+    {
+      "item": "candle_right",
+      "catalogId": "candle",
+      "position": {
+        "u": 0.67,
+        "v": 0.54
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 89,
+        "y": -13
+      }
+    },
+    {
+      "item": "censer",
+      "catalogId": "censer",
+      "position": {
+        "u": 0.5,
+        "v": 0.38
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 0,
+        "y": -18
+      }
+    },
+    {
+      "item": "fruit_left",
+      "catalogId": "fruit",
+      "position": {
+        "u": 0.25,
+        "v": 0.74
+      },
+      "scale": 1,
+      "mapped": {
+        "x": -136,
+        "y": -8
+      }
+    },
+    {
+      "item": "fruit_right",
+      "catalogId": "fruit",
+      "position": {
+        "u": 0.75,
+        "v": 0.74
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 135,
+        "y": -8
+      }
+    },
+    {
+      "item": "tea_cups",
+      "catalogId": "tea_cups",
+      "position": {
+        "u": 0.5,
+        "v": 0.82
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 0,
+        "y": -5
+      }
+    }
+  ],
+  "layouts": [
+    {
+      "width": 393,
+      "height": 852,
+      "tableWidth": 361.56,
+      "metrics": {
+        "spriteWidth": 370.9006243272336,
+        "spriteHeight": 128.04439181916038,
+        "spriteY": -23.546157158234664,
+        "topExtent": 18.875844994617868,
+        "surfaceDepth": 18.875844994617868,
+        "frontThickness": 14.983918191603875,
+        "apronHeight": 0,
+        "footDrop": 99.82792249730893,
+        "legWidth": 39.89224973089343,
+        "leftLegX": -143.1256081808396,
+        "rightLegX": 103.42795479009688,
+        "apronX": -180.78,
+        "apronWidth": 361.56
+      },
+      "scale": 0.19459634015069968,
+      "tableTopY": 575.8080775026912,
+      "spriteTop": 552.2619203444565,
+      "surfaceFrontWidth": 361.36540365984933,
+      "surfaceBackWidth": 316.219052744887,
+      "surfaceDepth": 18.875844994617868
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "tableWidth": 344.58535211267605,
+      "metrics": {
+        "spriteWidth": 353.48744947618974,
+        "spriteHeight": 122.0329180248336,
+        "spriteY": -22.440703770524117,
+        "topExtent": 17.989655088767265,
+        "surfaceDepth": 17.989655088767265,
+        "frontThickness": 14.280447853969891,
+        "apronHeight": 0,
+        "footDrop": 95.14116557255265,
+        "legWidth": 38.01937415667309,
+        "leftLegX": -136.40609605967344,
+        "rightLegX": 98.57218226474022,
+        "apronX": -172.29267605633802,
+        "apronWidth": 344.58535211267605
+      },
+      "scale": 0.18546036173986868,
+      "tableTopY": 548.7748344274474,
+      "spriteTop": 526.3341306569233,
+      "surfaceFrontWidth": 344.39989175093615,
+      "surfaceBackWidth": 301.3730878272866,
+      "surfaceDepth": 17.989655088767265
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "tableWidth": 395.5092957746479,
+      "metrics": {
+        "spriteWidth": 405.72697402932124,
+        "spriteHeight": 140.06733940781393,
+        "spriteY": -25.757063933655758,
+        "topExtent": 20.648224806319078,
+        "surfaceDepth": 20.648224806319078,
+        "frontThickness": 16.390858866871845,
+        "apronHeight": 0,
+        "footDrop": 109.20143634682151,
+        "legWidth": 43.63800087933413,
+        "leftLegX": -156.56463242317196,
+        "rightLegX": 113.1394998408102,
+        "apronX": -197.75464788732396,
+        "apronWidth": 395.5092957746479
+      },
+      "scale": 0.21286829697236162,
+      "tableTopY": 629.8745636531785,
+      "spriteTop": 604.1174997195227,
+      "surfaceFrontWidth": 395.29642747767554,
+      "surfaceBackWidth": 345.91098258008765,
+      "surfaceDepth": 20.648224806319078
+    }
+  ],
+  "browserAutomationUsed": false
+}

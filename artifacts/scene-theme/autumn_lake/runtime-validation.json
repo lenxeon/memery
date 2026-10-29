@@ -1,0 +1,51 @@
+{
+  "themes": [
+    {
+      "id": "classic_dawn",
+      "name": "晴岚映曜"
+    },
+    {
+      "id": "warm_blessing",
+      "name": "暖意窗光"
+    },
+    {
+      "id": "lotus_serenity",
+      "name": "莲池清境"
+    },
+    {
+      "id": "snow_plum_courtyard",
+      "name": "雪庭梅映"
+    },
+    {
+      "id": "autumn_lake",
+      "name": "秋湖夕照"
+    }
+  ],
+  "verifiedAssets": 7,
+  "foregroundCandidates": 2,
+  "defaultOfferings": 8,
+  "tableMetrics": {
+    "spriteWidth": 380.685667090216,
+    "spriteHeight": 163.8215756035578,
+    "spriteY": -35.43991105463786,
+    "topExtent": 29.80707750952986,
+    "surfaceDepth": 28.398869123252858,
+    "frontThickness": 15.020889453621342,
+    "apronHeight": 7.275743329097843,
+    "footDrop": 122.74883100381193,
+    "legWidth": 40.838043202033035,
+    "leftLegX": -168.0462007623888,
+    "rightLegX": 126.50405336721727,
+    "apronX": -115.70778907242692,
+    "apronWidth": 231.41557814485384
+  },
+  "requestedManifests": [
+    "/themes/catalog.json",
+    "/themes/classic_dawn/manifest.json",
+    "/themes/warm_blessing/manifest.json",
+    "/themes/lotus_serenity/manifest.json",
+    "/themes/snow_plum_courtyard/manifest.json",
+    "/themes/autumn_lake/manifest.json"
+  ],
+  "validation": "runtime manifest loader, component registry, full-canvas foreground registration, asset references and tabletop positions passed"
+}

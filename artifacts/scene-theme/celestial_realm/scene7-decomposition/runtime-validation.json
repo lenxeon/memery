@@ -1,0 +1,422 @@
+{
+  "themeId": "celestial_realm",
+  "name": "琼楼玉阙",
+  "loadedThemeIds": [
+    "classic_dawn",
+    "warm_blessing",
+    "lotus_serenity",
+    "snow_plum_courtyard",
+    "autumn_lake",
+    "high_mountain_outdoors",
+    "celestial_realm",
+    "moonlit_lotus_lake"
+  ],
+  "assets": [
+    {
+      "slot": "wallpaper",
+      "path": "themes/celestial_realm/wallpapers/phone/heavenly-palaces.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "roomOverlay",
+      "path": "themes/celestial_realm/interior/phone/jade-hall-ground.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "table",
+      "path": "themes/celestial_realm/table/jade-gold-altar.png",
+      "exportSize": [
+        1772,
+        696
+      ]
+    },
+    {
+      "slot": "groundMat",
+      "path": "themes/celestial_realm/mats/celadon-cloud-mat.png",
+      "exportSize": [
+        1973,
+        445
+      ]
+    },
+    {
+      "slot": "cushion",
+      "path": "themes/celestial_realm/cushions/ivory-gold-brocade.png",
+      "exportSize": [
+        1635,
+        764
+      ]
+    },
+    {
+      "slot": "ivory_magnolia_left",
+      "path": "themes/celestial_realm/foregrounds/ivory_magnolia/left.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "ivory_magnolia_right",
+      "path": "themes/celestial_realm/foregrounds/ivory_magnolia/right.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "pale_lotus_left",
+      "path": "themes/celestial_realm/foregrounds/pale_lotus/left.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "pale_lotus_right",
+      "path": "themes/celestial_realm/foregrounds/pale_lotus/right.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "jade_orchid_left",
+      "path": "themes/celestial_realm/foregrounds/jade_orchid/left.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "jade_orchid_right",
+      "path": "themes/celestial_realm/foregrounds/jade_orchid/right.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "peach_blossom_left",
+      "path": "themes/celestial_realm/foregrounds/peach_blossom/left.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "peach_blossom_right",
+      "path": "themes/celestial_realm/foregrounds/peach_blossom/right.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "golden_osmanthus_left",
+      "path": "themes/celestial_realm/foregrounds/golden_osmanthus/left.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "golden_osmanthus_right",
+      "path": "themes/celestial_realm/foregrounds/golden_osmanthus/right.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "snow_camellia_left",
+      "path": "themes/celestial_realm/foregrounds/snow_camellia/left.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    },
+    {
+      "slot": "snow_camellia_right",
+      "path": "themes/celestial_realm/foregrounds/snow_camellia/right.png",
+      "exportSize": [
+        1179,
+        2556
+      ]
+    }
+  ],
+  "foregroundSetIds": [
+    "celestial_ivory_magnolia",
+    "celestial_pale_lotus",
+    "celestial_jade_orchid",
+    "celestial_peach_blossom",
+    "celestial_golden_osmanthus",
+    "celestial_snow_camellia"
+  ],
+  "assembly": {
+    "wallpaperId": "celestial_cloud_palaces",
+    "wallpaperDecorationId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "celestial_celadon_cloud_mat",
+    "cushionId": "celestial_ivory_brocade_cushion",
+    "wallSceneryId": "none",
+    "foreground": {
+      "left": {
+        "instanceId": "default-left-celestial_ivory_magnolia_left",
+        "side": "left",
+        "order": 0,
+        "foregroundId": "celestial_ivory_magnolia_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "instanceId": "default-right-celestial_ivory_magnolia_right",
+        "side": "right",
+        "order": 0,
+        "foregroundId": "celestial_ivory_magnolia_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "offerings": [
+    {
+      "item": "vase_left",
+      "catalogId": "flower_vase",
+      "position": {
+        "u": 0.18,
+        "v": 0.35
+      },
+      "scale": 1,
+      "mapped": {
+        "x": -158,
+        "y": -37
+      }
+    },
+    {
+      "item": "vase_right",
+      "catalogId": "flower_vase",
+      "position": {
+        "u": 0.82,
+        "v": 0.35
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 158,
+        "y": -37
+      }
+    },
+    {
+      "item": "candle_left",
+      "catalogId": "candle",
+      "position": {
+        "u": 0.33,
+        "v": 0.54
+      },
+      "scale": 1,
+      "mapped": {
+        "x": -87,
+        "y": -26
+      }
+    },
+    {
+      "item": "candle_right",
+      "catalogId": "candle",
+      "position": {
+        "u": 0.67,
+        "v": 0.54
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 87,
+        "y": -26
+      }
+    },
+    {
+      "item": "censer",
+      "catalogId": "censer",
+      "position": {
+        "u": 0.5,
+        "v": 0.38
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 0,
+        "y": -36
+      }
+    },
+    {
+      "item": "fruit_left",
+      "catalogId": "fruit",
+      "position": {
+        "u": 0.25,
+        "v": 0.74
+      },
+      "scale": 1,
+      "mapped": {
+        "x": -133,
+        "y": -15
+      }
+    },
+    {
+      "item": "fruit_right",
+      "catalogId": "fruit",
+      "position": {
+        "u": 0.75,
+        "v": 0.74
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 133,
+        "y": -15
+      }
+    },
+    {
+      "item": "tea_cups",
+      "catalogId": "tea_cups",
+      "position": {
+        "u": 0.5,
+        "v": 0.82
+      },
+      "scale": 1,
+      "mapped": {
+        "x": 0,
+        "y": -10
+      }
+    }
+  ],
+  "layouts": [
+    {
+      "width": 393,
+      "height": 852,
+      "tableWidth": 353.7,
+      "metrics": {
+        "spriteWidth": 363.5477958236659,
+        "spriteHeight": 142.79303944315546,
+        "spriteY": -41.237645011600925,
+        "topExtent": 36.31374709976798,
+        "surfaceDepth": 36.31374709976798,
+        "frontThickness": 14.566531322505803,
+        "apronHeight": 25.02981438515081,
+        "footDrop": 96.63149651972158,
+        "legWidth": 43.08410672853828,
+        "leftLegX": -162.07830626450118,
+        "rightLegX": 118.99419953596289,
+        "apronX": -169.46415313225057,
+        "apronWidth": 338.51798143851505
+      },
+      "scale": 0.20516241299303947,
+      "tableTopY": 623.3085034802783,
+      "spriteTop": 582.0708584686774,
+      "surfaceFrontWidth": 352.26386310904877,
+      "surfaceBackWidth": 289.0738399071926,
+      "surfaceDepth": 36.31374709976798,
+      "portrait": {
+        "x": 196.90992950981052,
+        "y": 418.14333329453024,
+        "diameter": 52.666715999999994
+      }
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "tableWidth": 337.0943661971831,
+      "metrics": {
+        "spriteWidth": 346.479824188752,
+        "spriteHeight": 136.0891408777491,
+        "spriteY": -39.30160533969478,
+        "topExtent": 34.60887634391033,
+        "surfaceDepth": 34.60887634391033,
+        "frontThickness": 13.882656612529006,
+        "apronHeight": 23.85470572857096,
+        "footDrop": 92.09480654226986,
+        "legWidth": 41.06137871311395,
+        "leftLegX": -154.4689961112382,
+        "rightLegX": 113.40761739812426,
+        "apronX": -161.5080896049149,
+        "apronWidth": 322.625118460181
+      },
+      "scale": 0.19553037482435215,
+      "tableTopY": 594.0451934577301,
+      "spriteTop": 554.7435881180353,
+      "surfaceFrontWidth": 335.7256535734126,
+      "surfaceBackWidth": 275.5022981275122,
+      "surfaceDepth": 34.60887634391033,
+      "portrait": {
+        "x": 187.8911541124146,
+        "y": 398.50318062455176,
+        "diameter": 50.2545
+      }
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "tableWidth": 386.91126760563384,
+      "metrics": {
+        "spriteWidth": 397.6837390934937,
+        "spriteHeight": 156.2008365739682,
+        "spriteY": -45.10972435541323,
+        "topExtent": 39.72348861148329,
+        "surfaceDepth": 39.72348861148329,
+        "frontThickness": 15.934280742459402,
+        "apronHeight": 27.380031698310514,
+        "footDrop": 105.70487647462502,
+        "legWidth": 47.12956275938696,
+        "leftLegX": -177.29692657102711,
+        "rightLegX": 130.16736381164017,
+        "apronX": -185.376280186922,
+        "apronWidth": 370.30370739518315
+      },
+      "scale": 0.22442648933041406,
+      "tableTopY": 681.8351235253749,
+      "spriteTop": 636.7253991699616,
+      "surfaceFrontWidth": 385.34028218032097,
+      "surfaceBackWidth": 316.2169234665534,
+      "surfaceDepth": 39.72348861148329,
+      "portrait": {
+        "x": 215.4485233822354,
+        "y": 457.4036471161527,
+        "diameter": 57.62515999999999
+      }
+    },
+    {
+      "width": 393,
+      "height": 800,
+      "tableWidth": 332.11267605633805,
+      "metrics": {
+        "spriteWidth": 341.3594326982779,
+        "spriteHeight": 134.0779713081272,
+        "spriteY": -38.72079343812294,
+        "topExtent": 34.097415117153034,
+        "surfaceDepth": 34.097415117153034,
+        "frontThickness": 13.677494199535968,
+        "apronHeight": 23.502173131597004,
+        "footDrop": 90.73379954903436,
+        "legWidth": 40.454560308486656,
+        "leftLegX": -152.18620306525932,
+        "rightLegX": 111.73164275677267,
+        "apronX": -159.1212705467142,
+        "apronWidth": 317.8572595666808
+      },
+      "scale": 0.19264076337374597,
+      "tableTopY": 585.2662004509657,
+      "spriteTop": 546.5454070128428,
+      "surfaceFrontWidth": 330.7641907127218,
+      "surfaceBackWidth": 271.4308355936081,
+      "surfaceDepth": 34.097415117153034,
+      "portrait": {
+        "x": 196.90992950981052,
+        "y": 392.14333329453024,
+        "diameter": 52.666715999999994
+      }
+    }
+  ],
+  "oldPortraitLayoutsPreserved": true,
+  "browserAutomationUsed": false
+}

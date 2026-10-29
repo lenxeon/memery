@@ -1,0 +1,39 @@
+{
+  "themeId": "classic_dawn",
+  "asset": "themes/classic_dawn/table/altar-table-render-match-v3.png",
+  "sourceSize": [
+    1815,
+    866
+  ],
+  "flatTopCorners": {
+    "backLeft": [
+      243,
+      63
+    ],
+    "backRight": [
+      1576,
+      63
+    ],
+    "frontRight": [
+      1692,
+      213
+    ],
+    "frontLeft": [
+      124,
+      213
+    ]
+  },
+  "sourceVisibleBounds": [
+    21,
+    28,
+    1795,
+    822
+  ],
+  "sourceDepthPx": 150,
+  "targetDepthCssPx": 31.4,
+  "widthRatio": 0.944929601,
+  "defaultLengthCssPx": 328.23466666666667,
+  "defaultBackLengthCssPx": 279.04133333333334,
+  "defaultDepthCssPx": 31.4,
+  "sourceCornerUncertaintyPx": 3
+}

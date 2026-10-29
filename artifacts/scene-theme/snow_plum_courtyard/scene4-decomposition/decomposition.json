@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "themeId": "snow_plum_courtyard",
+  "name": "雪庭梅映",
+  "sourceReference": "effect.png",
+  "canvas": {
+    "width": 1179,
+    "height": 2556
+  },
+  "authoringMode": "imagegen-reference-extraction-and-occlusion-reconstruction",
+  "runtimeManifest": "public/themes/snow_plum_courtyard/manifest.json",
+  "sourceWallFloorJunctionRatioApprox": 0.71,
+  "layers": [
+    {
+      "id": "outside_landscape",
+      "runtimeSlot": "wallpaper",
+      "order": 0,
+      "path": "themes/snow_plum_courtyard/wallpapers/phone/outside-landscape.png",
+      "width": 1179,
+      "height": 2556,
+      "mode": "RGB"
+    },
+    {
+      "id": "outside_branches",
+      "runtimeSlot": "wallpaperOverlays",
+      "order": 1,
+      "path": "themes/snow_plum_courtyard/wall-overlays/phone/outside-branches.png",
+      "width": 1179,
+      "height": 2556,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 0,
+        "top": 607,
+        "right": 1179,
+        "bottom": 1313
+      }
+    },
+    {
+      "id": "room_wall_ground_light_window",
+      "runtimeSlot": "roomOverlay",
+      "order": 2,
+      "path": "themes/snow_plum_courtyard/interior/phone/room-wall-ground-light-window.png",
+      "width": 1179,
+      "height": 2556,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 0,
+        "top": 0,
+        "right": 1179,
+        "bottom": 2556
+      }
+    },
+    {
+      "id": "straw_mat",
+      "runtimeSlot": "groundMat",
+      "order": 3,
+      "path": "themes/snow_plum_courtyard/mats/straw-mat.png",
+      "width": 2012,
+      "height": 434,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 9,
+        "top": 9,
+        "right": 2003,
+        "bottom": 425
+      }
+    },
+    {
+      "id": "carved_timber_altar",
+      "runtimeSlot": "table",
+      "order": 4,
+      "path": "themes/snow_plum_courtyard/table/carved-timber-altar-v2.png",
+      "width": 1678,
+      "height": 937,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 19,
+        "top": 52,
+        "right": 1661,
+        "bottom": 857
+      }
+    },
+    {
+      "id": "brocade_cushion",
+      "runtimeSlot": "cushion",
+      "order": 6,
+      "path": "themes/snow_plum_courtyard/cushions/brocade-cushion.png",
+      "width": 1695,
+      "height": 666,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 13,
+        "top": 13,
+        "right": 1682,
+        "bottom": 653
+      }
+    },
+    {
+      "id": "plum_left",
+      "runtimeSlot": "foreground.left",
+      "order": 7,
+      "path": "themes/snow_plum_courtyard/foregrounds/snow_plum_pine/left.png",
+      "width": 1179,
+      "height": 2556,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        255
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 0,
+        "top": 1802,
+        "right": 842,
+        "bottom": 2556
+      },
+      "visibleHeightRatio": 0.29499
+    },
+    {
+      "id": "snow_pine_right",
+      "runtimeSlot": "foreground.right",
+      "order": 8,
+      "path": "themes/snow_plum_courtyard/foregrounds/snow_plum_pine/right.png",
+      "width": 1179,
+      "height": 2556,
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "visibleBoundsAtAlpha16": {
+        "left": 411,
+        "top": 1702,
+        "right": 1179,
+        "bottom": 2556
+      },
+      "visibleHeightRatio": 0.33412
+    }
+  ],
+  "dynamicElements": [
+    "portrait",
+    "memorial text",
+    "flower vases",
+    "candles",
+    "incense/censer",
+    "fruit",
+    "tea cups"
+  ],
+  "foregroundSets": [
+    {
+      "setId": "snow_plum_pine",
+      "source": "theme-local"
+    },
+    {
+      "setId": "plum_blossom",
+      "source": "shared-library"
+    },
+    {
+      "setId": "camellia",
+      "source": "shared-library"
+    },
+    {
+      "setId": "osmanthus",
+      "source": "shared-library"
+    },
+    {
+      "setId": "magnolia",
+      "source": "shared-library"
+    },
+    {
+      "setId": "peach_blossom",
+      "source": "shared-library"
+    }
+  ],
+  "reviewStatus": "awaiting-user-visual-review"
+}

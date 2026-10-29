@@ -1,0 +1,128 @@
+{
+  "reference": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-7d4b6b40-0a05-42a2-9157-54059d4dc6f9.png",
+  "generator": "built-in image_gen",
+  "sets": [
+    {
+      "id": "ivory_magnolia",
+      "name": "玉兰凝露",
+      "en": "Ivory magnolia",
+      "plant": "白玉兰与米白百合、灰绿叶",
+      "colors": "米白、灰绿",
+      "description": "与选定效果图呼应的白玉兰近景。"
+    },
+    {
+      "id": "pale_lotus",
+      "name": "莲影浮云",
+      "en": "Pale lotus",
+      "plant": "浅粉白莲与小型荷叶",
+      "colors": "粉白、淡青",
+      "description": "粉白莲瓣配圆形小荷叶，轻盈的云上花意。"
+    },
+    {
+      "id": "jade_orchid",
+      "name": "兰风清和",
+      "en": "Jade orchid",
+      "plant": "奶白蕙兰花序与细长兰叶",
+      "colors": "奶白、浅青绿",
+      "description": "弧形兰花花序与细长叶片，清雅疏朗。"
+    },
+    {
+      "id": "peach_blossom",
+      "name": "桃云含春",
+      "en": "Peach blossom",
+      "plant": "淡粉桃花与细灰褐花枝",
+      "colors": "浅粉、灰褐、嫩绿",
+      "description": "疏枝小朵桃花，浅粉与白玉殿阁相映。"
+    },
+    {
+      "id": "golden_osmanthus",
+      "name": "桂月流金",
+      "en": "Golden osmanthus",
+      "plant": "淡金桂花小簇与柔和橄榄绿叶",
+      "colors": "淡金、橄榄绿",
+      "description": "细碎桂花簇与圆叶，呼应殿阁香槟金边。"
+    },
+    {
+      "id": "snow_camellia",
+      "name": "雪茶映玉",
+      "en": "Snow camellia",
+      "plant": "米白重瓣山茶与圆润深绿叶",
+      "colors": "米白、墨绿",
+      "description": "重瓣山茶团花与厚实圆叶，花形饱满。"
+    }
+  ],
+  "assets": [
+    {
+      "slot": "wallpaper",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-7c29dfbc-7a9f-47a7-adc5-38fd9398b6d8.png"
+    },
+    {
+      "slot": "roomOverlay",
+      "source": "/Volumes/data/workspace/memery/artifacts/scene-theme/celestial_realm/open-terrace-20261029/open-terrace-layer.png",
+      "selectedRevision": "artifacts/scene-theme/celestial_realm/open-terrace-20261029/open-terrace-layer.png",
+      "generatedSource": "/Users/lenxeon/.codex/generated_images/01a186c3-f413-7450-b3d9-446c4f6b2575/exec-63162e7e-c87f-4e8a-b263-bdf9e5ab77bc.png"
+    },
+    {
+      "slot": "table",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-0c6855f7-5da4-495b-bd5f-aab91e4fb25b.png"
+    },
+    {
+      "slot": "groundMat",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-d0011f8f-bc4c-4b3b-afc8-d9a0510ff3c3.png"
+    },
+    {
+      "slot": "cushion",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-67dfcddd-7b1b-4408-a583-155bf534c7d7.png"
+    },
+    {
+      "slot": "ivory_magnolia_left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-894d79d1-0b15-4114-992f-12e510c5feb3.png"
+    },
+    {
+      "slot": "ivory_magnolia_right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-4a05dbd3-d854-40dc-80b9-91c9fafb3cdf.png"
+    },
+    {
+      "slot": "pale_lotus_left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-233e585c-364f-403b-8c1b-3c38111d352e.png"
+    },
+    {
+      "slot": "pale_lotus_right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-dd3cbec6-885a-45a4-a58f-980a18449b90.png"
+    },
+    {
+      "slot": "jade_orchid_left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-0521bdf3-ab8d-4604-a60b-39b93002aa1b.png"
+    },
+    {
+      "slot": "jade_orchid_right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-c39a5965-6905-4bd3-a30d-c0024687c841.png"
+    },
+    {
+      "slot": "peach_blossom_left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-bd341c3e-19f6-4f3b-931c-cafa5de1a622.png"
+    },
+    {
+      "slot": "peach_blossom_right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-145ba605-34a0-4c49-a8a4-655779a010d9.png"
+    },
+    {
+      "slot": "golden_osmanthus_left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-03a6bed4-ab03-44ac-b1b0-59f6d7fdb156.png"
+    },
+    {
+      "slot": "golden_osmanthus_right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-e519fe33-654c-4fc5-beb5-9f5bd6a1dc57.png"
+    },
+    {
+      "slot": "snow_camellia_left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-7ab93ecf-1b18-4c35-88eb-3af1c1e1ebe5.png"
+    },
+    {
+      "slot": "snow_camellia_right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-61079943-7768-4ea3-be17-9b842da1ad8f.png"
+    }
+  ],
+  "sourceOriginalReference": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-7d4b6b40-0a05-42a2-9157-54059d4dc6f9.png",
+  "effectPreview": "artifacts/scene-theme/celestial_realm/open-terrace-20261029/open-terrace-effect.png"
+}

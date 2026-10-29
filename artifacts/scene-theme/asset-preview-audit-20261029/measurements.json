@@ -1,0 +1,192 @@
+{
+  "designCanvas": {
+    "width": 393,
+    "height": 852
+  },
+  "alphaCutoff": 16,
+  "assets": [
+    {
+      "key": "clear_mat",
+      "path": "themes/classic_dawn/mats/clear-rush-long-mat-unified.png",
+      "before": {
+        "width": 1536,
+        "height": 1024,
+        "boundsAtAlpha16": {
+          "left": 1,
+          "top": 714,
+          "right": 1535,
+          "bottom": 959
+        },
+        "bytes": 977552
+      },
+      "after": {
+        "width": 1544,
+        "height": 255,
+        "bounds": {
+          "left": 5,
+          "top": 5,
+          "right": 1539,
+          "bottom": 250
+        },
+        "bytes": 702251
+      },
+      "removedLowAlphaPixels": 25522,
+      "removedDetachedComponents": 0,
+      "placements": [
+        {
+          "theme": "classic_dawn",
+          "previous": {
+            "widthRatio": 1.2,
+            "bottomRatio": 0.045
+          },
+          "next": {
+            "widthRatio": 1.20625,
+            "bottomRatio": 0.066621919
+          }
+        },
+        {
+          "theme": "lotus_serenity",
+          "previous": {
+            "widthRatio": 1.2,
+            "bottomRatio": 0.045
+          },
+          "next": {
+            "widthRatio": 1.20625,
+            "bottomRatio": 0.066621919
+          }
+        }
+      ],
+      "beforeSha256": "d78e13ab1ac2ad6670037cc25efa7347d0ca0dccae01ffe7b23ef174e5b37ba7",
+      "afterSha256": "b0371a21e419e503f3e204336960f4755d351f86ef8e899923495eddc0ac266b"
+    },
+    {
+      "key": "ivory_mat",
+      "path": "themes/warm_blessing/mats/ivory-rush-mat.png",
+      "before": {
+        "width": 1536,
+        "height": 1024,
+        "boundsAtAlpha16": {
+          "left": 1,
+          "top": 714,
+          "right": 1535,
+          "bottom": 959
+        },
+        "bytes": 1331193
+      },
+      "after": {
+        "width": 1544,
+        "height": 255,
+        "bounds": {
+          "left": 5,
+          "top": 5,
+          "right": 1539,
+          "bottom": 250
+        },
+        "bytes": 864869
+      },
+      "removedLowAlphaPixels": 25522,
+      "removedDetachedComponents": 0,
+      "placements": [
+        {
+          "theme": "warm_blessing",
+          "previous": {
+            "widthRatio": 1.2,
+            "bottomRatio": 0.045
+          },
+          "next": {
+            "widthRatio": 1.20625,
+            "bottomRatio": 0.066621919
+          }
+        }
+      ],
+      "beforeSha256": "86dac58608e4b73d24aaef157e7d75e8db90a8b61ee4a847cb0f993d0fcf2805",
+      "afterSha256": "0c2d8dc73f6a5bdf6575e95f9452c7c2a5cf4af0561e3ebcc0b4bdda8689d00a"
+    },
+    {
+      "key": "straw_mat",
+      "path": "themes/snow_plum_courtyard/mats/straw-mat.png",
+      "before": {
+        "width": 2172,
+        "height": 724,
+        "boundsAtAlpha16": {
+          "left": 89,
+          "top": 164,
+          "right": 2083,
+          "bottom": 580
+        },
+        "bytes": 2154902
+      },
+      "after": {
+        "width": 2012,
+        "height": 434,
+        "bounds": {
+          "left": 9,
+          "top": 9,
+          "right": 2003,
+          "bottom": 425
+        },
+        "bytes": 2168390
+      },
+      "removedLowAlphaPixels": 20459,
+      "removedDetachedComponents": 0,
+      "placements": [
+        {
+          "theme": "snow_plum_courtyard",
+          "previous": {
+            "widthRatio": 0.94,
+            "bottomRatio": 0.092
+          },
+          "next": {
+            "widthRatio": 0.870755064,
+            "bottomRatio": 0.118949751
+          }
+        }
+      ],
+      "beforeSha256": "b22fecf36519c01034c71461e2caa888907066d20a571794a4be3efa660a05c6",
+      "afterSha256": "388a0517b26d3810c77f4954fcd85d4609c244b0def4695f5bbab0c832aef300"
+    },
+    {
+      "key": "brocade_cushion",
+      "path": "themes/snow_plum_courtyard/cushions/brocade-cushion.png",
+      "before": {
+        "width": 1774,
+        "height": 887,
+        "boundsAtAlpha16": {
+          "left": 53,
+          "top": 161,
+          "right": 1722,
+          "bottom": 801
+        },
+        "bytes": 2278620
+      },
+      "after": {
+        "width": 1695,
+        "height": 666,
+        "bounds": {
+          "left": 13,
+          "top": 13,
+          "right": 1682,
+          "bottom": 653
+        },
+        "bytes": 2474553
+      },
+      "removedLowAlphaPixels": 11119,
+      "removedDetachedComponents": 0,
+      "placements": [
+        {
+          "theme": "snow_plum_courtyard",
+          "previous": {
+            "widthRatio": 0.44,
+            "bottomRatio": 0.145
+          },
+          "next": {
+            "widthRatio": 0.420405862,
+            "bottomRatio": 0.1533517
+          }
+        }
+      ],
+      "beforeSha256": "524328caa3301d007ebc208400a55de6535d080d7dc21bcc2ebb0529583647e7",
+      "afterSha256": "69b40463450d1d925cd2dfdea140aff599f6ae7bebde1bdd8c1d172c8aa7d825"
+    }
+  ]
+}

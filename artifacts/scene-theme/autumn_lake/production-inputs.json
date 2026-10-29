@@ -1,0 +1,51 @@
+{
+  "generator": "built-in image_gen",
+  "canvas": {
+    "width": 1179,
+    "height": 2556
+  },
+  "assets": [
+    {
+      "name": "Wallpaper",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-80402729-d82a-4305-b4ae-f99fb453e00e.png",
+      "asset": "wallpapers/phone/sunset-lake.png",
+      "fullCanvas": true
+    },
+    {
+      "name": "Room",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-3f890d28-a591-4950-88b2-ae7c8ad9f52d.png",
+      "asset": "interior/phone/pavilion-wall-ground.png",
+      "fullCanvas": true
+    },
+    {
+      "name": "Table",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-7a4878f9-04f4-4710-80a0-7610ca67786f.png",
+      "asset": "table/marble-oak-altar.png",
+      "fullCanvas": false
+    },
+    {
+      "name": "Mat",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-fd3c664f-9098-464a-aced-962573f011bb.png",
+      "asset": "mats/honey-rush-mat.png",
+      "fullCanvas": false
+    },
+    {
+      "name": "Cushion",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-b0de7563-9bc0-40ec-a69f-09e1513aa7a1.png",
+      "asset": "cushions/ivory-brocade-cushion.png",
+      "fullCanvas": false
+    },
+    {
+      "name": "Left",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-b0ec0f4f-8a4a-403b-97c8-4735f13359b1.png",
+      "asset": "foregrounds/left.png",
+      "fullCanvas": true
+    },
+    {
+      "name": "Right",
+      "source": "/Users/lenxeon/.codex/generated_images/01a18586-5e24-7580-ad0f-49a9ef4c7bec/exec-46dee58c-811e-4871-a284-e5e76aa5852d.png",
+      "asset": "foregrounds/right.png",
+      "fullCanvas": true
+    }
+  ]
+}

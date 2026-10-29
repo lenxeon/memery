@@ -1,0 +1,4 @@
+theme,table_front_css_px,table_depth_css_px,back_front_ratio,depth_front_ratio,left_screen_edge_deg,right_screen_edge_deg,png_front_px,png_back_px,png_depth_px,json_front_px,json_depth_px,geometry_depth_px
+1,329.81051,28.60601,0.85587,0.08673,50.27741,50.27741,1568.0,1342.0,136.0,1764.18,155.88,155.88
+2,371.85197,31.4452,0.83221,0.08456,45.22827,45.22827,1490.0,1240.0,126.0,1492.992,128.0,128.0
+4,335.74115,8.1582,0.89782,0.0243,25.43622,25.43622,1605.0,1441.0,39.0,1751.544,43.0003,79.00024

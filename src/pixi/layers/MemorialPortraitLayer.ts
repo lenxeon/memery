@@ -17,6 +17,7 @@ import { Container, Graphics, Rectangle, Sprite, Text, Texture } from 'pixi.js';
 import { MemorialInfo, TimeOfDay, WallBackgroundStyle } from '../../types';
 import { getFloorTopY } from './FloorLayer';
 import { getWallSpec } from '../scene/walls/BaseWall';
+import { getScenePortraitOpeningLayout } from '../scene/SceneViewportLayout';
 
 /** 金环 SVG 原 viewBox 尺寸——所有缠枝纹顶点均以此坐标系定义 */
 const RING_VIEWBOX = 200;
@@ -177,6 +178,7 @@ export class MemorialPortraitLayer {
 
   /** 悬停缩放与整体位移的载体：children 全部以「相框中心」为原点布局 */
   private root: Container = new Container();
+  private usesSceneOpening = false;
 
   private auraSprite: Sprite;
   private ringSprite: Sprite;
@@ -363,8 +365,15 @@ export class MemorialPortraitLayer {
     const textGap = text.gap ?? 0;
 
     const compact = width < COMPACT_BREAKPOINT;
-    this.ringSize = (compact ? 128 : 144) * scale;
-    this.photoSize = this.ringSize * (compact ? 0.75 : 0.778);
+    const sceneOpening = portrait.sceneOpening
+      ? getScenePortraitOpeningLayout(width, height, portrait.sceneOpening)
+      : undefined;
+    this.usesSceneOpening = Boolean(sceneOpening);
+    this.ringSize = sceneOpening?.diameter ?? (compact ? 128 : 144) * scale;
+    this.photoSize = sceneOpening?.diameter ?? this.ringSize * (compact ? 0.75 : 0.778);
+    this.ringSprite.visible = !sceneOpening;
+    this.auraSprite.visible = !sceneOpening;
+    if (sceneOpening) this.root.scale.set(1);
 
     const titleSize = compact ? 20 : 24;
     const subtitleSize = compact ? 11 : 12;
@@ -382,8 +391,8 @@ export class MemorialPortraitLayer {
     centerY = Math.min(centerY, floorTop - ringR - this.titleBlockHeight - 12);
     centerY = Math.max(centerY, ringR + 12);
 
-    this.centerX = width * 0.5 + (portrait.dx ?? 0);
-    this.centerY = centerY;
+    this.centerX = sceneOpening?.x ?? width * 0.5 + (portrait.dx ?? 0);
+    this.centerY = sceneOpening?.y ?? centerY;
     this.root.position.set(this.centerX, this.centerY);
 
     // 光晕：略大于金环的柔光圆（旧版为 -inset-4 的圆角矩形，这里取正圆更贴合金环）
@@ -465,7 +474,7 @@ export class MemorialPortraitLayer {
     this.hoverCurrent += (this.hoverTarget - this.hoverCurrent) * 0.18;
     const hoverScale = 1 + this.hoverCurrent * 0.02;
     const pressScale = 1 - (this.pressed ? 0.05 : 0);
-    const target = hoverScale * pressScale;
+    const target = this.usesSceneOpening ? 1 : hoverScale * pressScale;
     const cur = this.root.scale.x;
     this.root.scale.set(cur + (target - cur) * 0.2);
 

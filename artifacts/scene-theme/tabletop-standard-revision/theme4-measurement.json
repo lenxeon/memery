@@ -1,0 +1,39 @@
+{
+  "themeId": "snow_plum_courtyard",
+  "asset": "themes/snow_plum_courtyard/table/carved-timber-altar-v2.png",
+  "sourceSize": [
+    1678,
+    937
+  ],
+  "flatTopCorners": {
+    "backLeft": [
+      216,
+      82
+    ],
+    "backRight": [
+      1463,
+      82
+    ],
+    "frontRight": [
+      1569,
+      224
+    ],
+    "frontLeft": [
+      109,
+      224
+    ]
+  },
+  "sourceVisibleBounds": [
+    19,
+    52,
+    1661,
+    857
+  ],
+  "sourceDepthPx": 142,
+  "targetDepthCssPx": 31.4,
+  "widthRatio": 0.923893488,
+  "defaultLengthCssPx": 322.84507042253523,
+  "defaultBackLengthCssPx": 275.7450704225352,
+  "defaultDepthCssPx": 31.4,
+  "sourceCornerUncertaintyPx": 3
+}

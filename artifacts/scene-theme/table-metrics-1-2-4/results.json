@@ -1,0 +1,260 @@
+{
+  "method": "Manual source-pixel corner selection, followed by deterministic numerical measurement. Flat load-bearing top face only; exclude raised end rails and vertical fascia.",
+  "cameraNote": "Screen edge slant is directly measurable. True camera pitch and physical tabletop dimensions cannot be uniquely recovered from these uncalibrated PNGs. No camera-angle assumption was imposed.",
+  "referenceCanvas": {
+    "width": 393,
+    "height": 852
+  },
+  "forward": 0,
+  "results": [
+    {
+      "themeNumber": 1,
+      "themeId": "classic_dawn",
+      "name": "晴岚映曜",
+      "corners": [
+        [
+          237,
+          78
+        ],
+        [
+          1579,
+          78
+        ],
+        [
+          1692,
+          214
+        ],
+        [
+          124,
+          214
+        ]
+      ],
+      "manifestSnapshot": "../tabletop-standard-revision/reference/classic-dawn-manifest-before.json",
+      "asset": "themes/classic_dawn/table/altar-table-render-match-v2.png",
+      "sha256": "8724314bccca4a501f3d79404980e5b10ed32d374b69032284e57270e94bde04",
+      "sourceSize": [
+        1815,
+        866
+      ],
+      "measuredPng": {
+        "frontLengthPx": 1568.0,
+        "backLengthPx": 1342.0,
+        "projectedDepthPx": 136.0,
+        "backFrontRatio": 0.8558673469387755,
+        "depthFrontRatio": 0.08673469387755102,
+        "projectedAreaPx2": 197880.0,
+        "leftDepthEdgeScreenAngleDeg": 50.277406082907206,
+        "rightDepthEdgeScreenAngleDeg": 50.277406082907206
+      },
+      "defaultScreen393x852": {
+        "frontLengthCssPx": 329.8105112717348,
+        "backLengthCssPx": 282.2740472746608,
+        "projectedDepthCssPx": 28.60601373275251,
+        "projectedAreaCssPx2": 8754.649643691975,
+        "visibleTableWidthCssPx": 373.34999999999997,
+        "sourceToScreenScale": 0.21033833627023904
+      },
+      "uncertainty": {
+        "cornersPlusMinusSourcePx": 3,
+        "depthRatioConservativeRange": [
+          0.08259212198221093,
+          0.09090909090909091
+        ]
+      },
+      "jsonDeclared": {
+        "corners": [
+          [
+            179.685,
+            69.28
+          ],
+          [
+            1635.315,
+            69.28
+          ],
+          [
+            1789.59,
+            225.16
+          ],
+          [
+            25.41,
+            225.16
+          ]
+        ],
+        "frontLengthPx": 1764.1799999999998,
+        "backLengthPx": 1455.63,
+        "projectedDepthPx": 155.88,
+        "backFrontRatio": 0.8251028806584364,
+        "depthFrontRatio": 0.08835833078257321,
+        "geometryDepthPx": 155.88
+      },
+      "trueCameraPitchDeg": null,
+      "truePhysicalLengthAndDepth": null
+    },
+    {
+      "themeNumber": 2,
+      "themeId": "warm_blessing",
+      "name": "暖意窗光",
+      "corners": [
+        [
+          148,
+          294
+        ],
+        [
+          1388,
+          294
+        ],
+        [
+          1513,
+          420
+        ],
+        [
+          23,
+          420
+        ]
+      ],
+      "asset": "themes/warm_blessing/table/legless-oak-altar-v2.png",
+      "sha256": "637aebf806f963e8d963bb7af77cd7286e484f469ca184819c75e648ff9164a3",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "measuredPng": {
+        "frontLengthPx": 1490.0,
+        "backLengthPx": 1240.0,
+        "projectedDepthPx": 126.0,
+        "backFrontRatio": 0.8322147651006712,
+        "depthFrontRatio": 0.08456375838926175,
+        "projectedAreaPx2": 171990.0,
+        "leftDepthEdgeScreenAngleDeg": 45.228268830153425,
+        "rightDepthEdgeScreenAngleDeg": 45.228268830153425
+      },
+      "defaultScreen393x852": {
+        "frontLengthCssPx": 371.8519706276438,
+        "backLengthCssPx": 309.46070038810626,
+        "projectedDepthCssPx": 31.445200200726926,
+        "projectedAreaCssPx2": 10712.006669691133,
+        "visibleTableWidthCssPx": 373.34999999999997,
+        "sourceToScreenScale": 0.24956508095815022
+      },
+      "uncertainty": {
+        "cornersPlusMinusSourcePx": 3,
+        "depthRatioConservativeRange": [
+          0.08021390374331551,
+          0.0889487870619946
+        ]
+      },
+      "jsonDeclared": {
+        "corners": [
+          [
+            152.06400000000002,
+            291.84
+          ],
+          [
+            1383.9360000000001,
+            291.84
+          ],
+          [
+            1514.496,
+            419.84
+          ],
+          [
+            21.504,
+            419.84
+          ]
+        ],
+        "frontLengthPx": 1492.9920000000002,
+        "backLengthPx": 1231.872,
+        "projectedDepthPx": 127.99999999999997,
+        "backFrontRatio": 0.8251028806584362,
+        "depthFrontRatio": 0.0857338820301783,
+        "geometryDepthPx": 128.0
+      },
+      "trueCameraPitchDeg": null,
+      "truePhysicalLengthAndDepth": null
+    },
+    {
+      "themeNumber": 4,
+      "themeId": "snow_plum_courtyard",
+      "name": "雪庭梅映",
+      "corners": [
+        [
+          199,
+          99
+        ],
+        [
+          1640,
+          99
+        ],
+        [
+          1722,
+          138
+        ],
+        [
+          117,
+          138
+        ]
+      ],
+      "manifestSnapshot": "../tabletop-standard-revision/reference/snow-plum-manifest-before.json",
+      "assetSnapshot": "../tabletop-standard-revision/reference/snow-plum-table-before.png",
+      "asset": "themes/snow_plum_courtyard/table/carved-timber-altar.png",
+      "sha256": "013634c07900676e8f940db4d2c256be9a5358c6a179b19335df823f70a472c9",
+      "sourceSize": [
+        1836,
+        856
+      ],
+      "measuredPng": {
+        "frontLengthPx": 1605.0,
+        "backLengthPx": 1441.0,
+        "projectedDepthPx": 39.0,
+        "backFrontRatio": 0.8978193146417446,
+        "depthFrontRatio": 0.024299065420560748,
+        "projectedAreaPx2": 59397.0,
+        "leftDepthEdgeScreenAngleDeg": 25.43621638041735,
+        "rightDepthEdgeScreenAngleDeg": 25.43621638041735
+      },
+      "defaultScreen393x852": {
+        "frontLengthCssPx": 335.7411534925674,
+        "backLengthCssPx": 301.4348923257256,
+        "projectedDepthCssPx": 8.158196253090422,
+        "projectedAreaCssPx2": 2599.1036147768846,
+        "visibleTableWidthCssPx": 369.41999999999996,
+        "sourceToScreenScale": 0.20918451931001084
+      },
+      "uncertainty": {
+        "cornersPlusMinusSourcePx": 3,
+        "depthRatioConservativeRange": [
+          0.020484171322160148,
+          0.028142589118198873
+        ]
+      },
+      "jsonDeclared": {
+        "corners": [
+          [
+            187.272,
+            102.00010400000001
+          ],
+          [
+            1648.728,
+            102.00010400000001
+          ],
+          [
+            1793.772,
+            145.000408
+          ],
+          [
+            42.228,
+            145.000408
+          ]
+        ],
+        "frontLengthPx": 1751.5439999999999,
+        "backLengthPx": 1461.4560000000001,
+        "projectedDepthPx": 43.00030399999998,
+        "backFrontRatio": 0.8343815513626835,
+        "depthFrontRatio": 0.02454994222240491,
+        "geometryDepthPx": 79.00023999999999
+      },
+      "trueCameraPitchDeg": null,
+      "truePhysicalLengthAndDepth": null
+    }
+  ]
+}

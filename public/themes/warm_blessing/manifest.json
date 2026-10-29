@@ -6,7 +6,7 @@
   "iconText": "☀️",
   "desc": "整张拱窗、山水与地面背景",
   "tag": "温暖明亮",
-  "version": 12,
+  "version": 13,
   "sceneBackground": {
     "mode": "single-background",
     "asset": "themes/warm_blessing/backgrounds/scene2-full.png"
@@ -21,8 +21,8 @@
       "description": "浅麦色编席，低机位平面构图。",
       "asset": "themes/warm_blessing/mats/ivory-rush-mat.png",
       "previewUrl": "themes/warm_blessing/mats/ivory-rush-mat.png",
-      "widthRatio": 1.2,
-      "bottomRatio": 0.045
+      "widthRatio": 1.20625,
+      "bottomRatio": 0.066621919
     },
     "cushion": {
       "id": "warm_woven_cushion",

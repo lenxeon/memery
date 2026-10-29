@@ -15,6 +15,8 @@ import type {
 export type SceneThemeId = string;
 
 export interface SceneThemePortraitPlacement {
+  /** Circle inside an authored full-canvas room frame; coordinates share its cover transform. */
+  sceneOpening?: { x: number; y: number; diameterRatio: number };
   dx?: number;
   dy?: number;
   scale?: number;
@@ -46,7 +48,7 @@ export interface SceneThemeGroundAsset {
   /** Rendered width relative to the viewport. Assets use the scene's camera angle and are not re-projected. */
   widthRatio: number;
   bottom?: number;
-  /** 距画布底边的比例锚点，适配手机和 iPad 的不同高度。 */
+  /** 距画布底边的比例锚点，适配不同高度的手机视口。 */
   bottomRatio?: number;
   alpha?: number;
 }
@@ -215,6 +217,8 @@ export interface SceneThemeViewportAsset {
 export interface SceneThemeWallDefinition {
   /** 最远处的墙纸 / 墙布，只承担底色和浅层纹样。 */
   wallpaper?: SceneThemeViewportAsset;
+  /** 墙地一体主题的窗外透明花枝，与背景、室内层同画布、同原点。 */
+  wallpaperOverlays?: SceneThemeViewportAsset[];
   /** 用户指定墙地一体时，完整墙体、框架、地面及统一光影合并为一张全画布 RGBA；开口透明露出 wallpaper。 */
   roomOverlay?: SceneThemeViewportAsset;
   /** 用户遗像与纪念文字在墙面中的锚点。 */
@@ -257,6 +261,8 @@ export interface SceneForegroundDefinition {
   maxHeightRatio: number;
   /** Portion of the sprite height that continues below the viewport edge. */
   bottomOverflowRatio?: number;
+  /** 全幅前景按源画布等比适配，不按高度边界重新缩放植物。 */
+  referenceCanvas?: { width: number; height: number };
   side: SceneForegroundSide;
   previewUrl: string;
   asset: SceneThemeViewportAsset;

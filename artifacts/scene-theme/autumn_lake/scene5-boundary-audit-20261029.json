@@ -1,0 +1,40 @@
+{
+  "scene": 5,
+  "status": "awaiting_user_composition_audit",
+  "originalPath": "/Volumes/data/workspace/memery/ui/场景5效果图-参考原图.png",
+  "auditPath": "/Volumes/data/workspace/memery/ui/场景5效果图-墙地分界审计.png",
+  "sourceSize": {
+    "width": 852,
+    "height": 1846
+  },
+  "standardCanvas": {
+    "width": 1179,
+    "height": 2556
+  },
+  "boundary": {
+    "meaning": "target_wall_ground_boundary",
+    "standardY": 1870,
+    "sourceCenterY": 1351,
+    "fromTopRatio": 0.7316118935837246,
+    "color": "#FF2323",
+    "thickness": 5,
+    "paintedRows": [
+      1349,
+      1353
+    ]
+  },
+  "observedWallGroundBoundary": {
+    "approximateY": 1167,
+    "method": "visual_estimate_from_visible_wall_base",
+    "confidence": "approximate; table and columns partially occlude the boundary",
+    "approximateOffsetFromTargetPx": -184
+  },
+  "sourceSHA256": "0c18a49046980275fe9187dc5469847dc2da526ef78309eec5bd6ed1535aab52",
+  "verification": {
+    "sameDimensions": true,
+    "fullWidthLine": true,
+    "pixelsOutsideLineUnchanged": true,
+    "originalByteIdentical": true
+  },
+  "nextStep": "Wait for user audit. Correct composition if required, then generate aligned scene layers and register scene 5."
+}

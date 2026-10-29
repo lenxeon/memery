@@ -1,0 +1,30 @@
+{
+  "mode": "built-in imagegen",
+  "adopted": false,
+  "reason": "Candidates retained alpha noise and changed mat proportions; original object geometry and textures were retained during deterministic export.",
+  "jobs": [
+    {
+      "key": "clear_mat",
+      "target": "public/themes/classic_dawn/mats/clear-rush-long-mat-unified.png",
+      "reference": "public/themes/autumn_lake/mats/honey-rush-mat.png",
+      "prompt": "Use case: background-extraction. Edit target IMAGE 1, the pale wheat-brown fine rush floor mat; IMAGE 2 is a supporting reference for TIGHT SPRITE FRAMING ONLY, do not copy its coarse straw material. Repair IMAGE 1 into a clean production PNG game sprite. Preserve the exact fine regular woven texture, pale wheat-brown color, rounded bound border, thin construction, frontal symmetrical long trapezoid and shallow camera of IMAGE 1. Remove ALL of the brown translucent floor/gradient/halo surrounding the mat, remove shadows, loose pixels and all background. Every pixel outside the mat silhouette must have alpha=0; mat interior opaque. Reframe tightly with a small EVEN transparent safety margin (about 2 percent) on all four sides. The mat must fill the image in both directions; use a very WIDE SHORT landscape canvas, width about 4.6 times height, not a 3:2 canvas with a mat at the bottom. Keep a front facing shallow 15-degree camera: rear/front width around .72-.75, surface depth/front width around .19. Neutral material lighting only. ONE mat, no cushion, no floor, no other objects, text, colored fringes, glow or checkerboard."
+    },
+    {
+      "key": "ivory_mat",
+      "target": "public/themes/warm_blessing/mats/ivory-rush-mat.png",
+      "reference": "public/themes/autumn_lake/mats/honey-rush-mat.png",
+      "prompt": "Use case: background-extraction. Edit target IMAGE 1, the ivory fine woven rush floor mat; IMAGE 2 is a supporting reference for TIGHT SPRITE FRAMING ONLY, do not copy its coarse straw material or darker color. Repair IMAGE 1 into a clean production PNG game sprite. Preserve its exact ivory/light wheat finely woven material, regular fine strand pattern, rounded bound border, thin construction and symmetric long trapezoid. Remove ALL brown translucent floor/gradient/halo and shadows around the mat and remove stray pixels. All pixels outside mat silhouette must be truly alpha=0; interior opaque. Reframe tightly with a small EVEN transparent safety margin about 2 percent on each side, very WIDE SHORT landscape canvas around 4.6:1 width:height. Mat must occupy nearly full image height and width, never sit at the bottom of a mostly empty tall canvas. Match frontal shallow 15-degree camera, rear/front width .72-.75, top depth/front width about .19. Neutral material lighting only. ONE mat, no cushion, floor, objects, text, colored fringes, glow or checkerboard."
+    },
+    {
+      "key": "straw_mat",
+      "target": "public/themes/snow_plum_courtyard/mats/straw-mat.png",
+      "reference": "public/themes/autumn_lake/mats/honey-rush-mat.png",
+      "prompt": "Use case: background-extraction. Edit target IMAGE 1, the warm honey straw floor mat with diamond and floral woven motifs; IMAGE 2 is a supporting reference for clean silhouette and tight even framing ONLY. Keep the distinctive geometric diamond-floral woven straw motifs, material, honey-tan color and thin bound edge of IMAGE 1. Clean all red/yellow/white fringe contamination and ALL isolated opaque stray pixels. Outside the single mat silhouette every pixel must be true alpha=0. Preserve fine natural fibers at the edge, no hard colored outlining. Correct the surplus top/bottom empty canvas by centering the whole complete object on a tightly framed very WIDE SHORT landscape canvas, around 4.6:1 width:height, with even 2 percent transparent margins. Frontal centered shallow camera about 15 degrees, symmetrical long low trapezoid, rear/front width about .72-.75 and top depth/front width about .19, no tilt or yaw. All four corners visible. Neutral lighting, fully opaque mat surface. No mat shadow, floor, glow, backdrop gradient, cushion, other objects, text or checkerboard. Do not simplify or replace its woven ornament."
+    },
+    {
+      "key": "brocade_cushion",
+      "target": "public/themes/snow_plum_courtyard/cushions/brocade-cushion.png",
+      "prompt": "Use case: background-extraction. IMAGE 1 is the edit target. Repair this single cream brocade and honey-brown braided rattan meditation cushion PNG. Preserve the recognizable cream subtle floral brocade top, honey-brown woven sides, complete round shape, same fine braid scale, neutral material lighting and shallow frontal centered 15-degree camera. Top surface is a flattened ellipse with short/long axis .26-.29; side wall thickness separate about .13-.16 of diameter. DO NOT change this into an all-fabric cushion. Remove all stray opaque dots, red/white/yellow fringe and edge contamination. Every pixel outside the cushion silhouette alpha=0; cushion opaque. Reframe to a tight short landscape canvas width about 2.4 times height with small EVEN transparent margins of about 2 percent on all sides. Complete silhouette centered horizontally AND vertically, all borders visible, no wasted top/bottom space. Clean soft antialiased edge, no halo, drop shadow, floor, mat, backdrop, glow, text, grid or other objects."
+    }
+  ]
+}

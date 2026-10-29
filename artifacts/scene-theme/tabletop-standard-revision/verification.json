@@ -1,0 +1,144 @@
+{
+  "referenceCanvas": {
+    "width": 393,
+    "height": 852
+  },
+  "forward": 0,
+  "results": [
+    {
+      "themeId": "classic_dawn",
+      "asset": "themes/classic_dawn/table/altar-table-render-match-v3.png",
+      "sourceSize": [
+        1815,
+        866
+      ],
+      "flatTopCorners": {
+        "backLeft": [
+          243,
+          63
+        ],
+        "backRight": [
+          1576,
+          63
+        ],
+        "frontRight": [
+          1692,
+          213
+        ],
+        "frontLeft": [
+          124,
+          213
+        ]
+      },
+      "sourceVisibleBounds": [
+        21,
+        28,
+        1795,
+        822
+      ],
+      "sourceDepthPx": 150,
+      "targetDepthCssPx": 31.4,
+      "widthRatio": 0.944929601,
+      "defaultLengthCssPx": 328.23466666666667,
+      "defaultBackLengthCssPx": 279.04133333333334,
+      "defaultDepthCssPx": 31.4,
+      "sourceCornerUncertaintyPx": 3,
+      "actualDefaultLengthCssPx": 328.2346665426291,
+      "actualDefaultBackLengthCssPx": 279.04133322788556,
+      "actualDefaultDepthCssPx": 31.39999998813416,
+      "depthLengthRatio": 0.09566326530612244,
+      "backFrontRatio": 0.8501275510204082,
+      "scale": 0.20933333325422773,
+      "tableWidth": 371.357333193,
+      "spriteOriginY": 573.4280000650248,
+      "metrics": {
+        "spriteWidth": 379.93999985642336,
+        "spriteHeight": 181.28266659816123,
+        "spriteY": -44.58799998315051,
+        "topExtent": 38.72666665203213,
+        "surfaceDepth": 31.39999998813416,
+        "frontThickness": 14.23466666128748,
+        "apronHeight": 31.39999998813416,
+        "footDrop": 127.48399995182469,
+        "legWidth": 21.27663999195971,
+        "leftLegX": -159.95473993955423,
+        "rightLegX": 138.67809994759452,
+        "apronX": -136.7783999483124,
+        "apronWidth": 273.5567998966248
+      },
+      "assetSha256": "bc9b4b8065537f20631d23a79d692dc5f3e7e4813c8a28a8cebb5409b8c88c75",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    {
+      "themeId": "snow_plum_courtyard",
+      "asset": "themes/snow_plum_courtyard/table/carved-timber-altar-v2.png",
+      "sourceSize": [
+        1678,
+        937
+      ],
+      "flatTopCorners": {
+        "backLeft": [
+          216,
+          82
+        ],
+        "backRight": [
+          1463,
+          82
+        ],
+        "frontRight": [
+          1569,
+          224
+        ],
+        "frontLeft": [
+          109,
+          224
+        ]
+      },
+      "sourceVisibleBounds": [
+        19,
+        52,
+        1661,
+        857
+      ],
+      "sourceDepthPx": 142,
+      "targetDepthCssPx": 31.4,
+      "widthRatio": 0.923893488,
+      "defaultLengthCssPx": 322.84507042253523,
+      "defaultBackLengthCssPx": 275.7450704225352,
+      "defaultDepthCssPx": 31.4,
+      "sourceCornerUncertaintyPx": 3,
+      "actualDefaultLengthCssPx": 322.84507036823396,
+      "actualDefaultBackLengthCssPx": 275.745070376156,
+      "actualDefaultDepthCssPx": 31.399999994718637,
+      "depthLengthRatio": 0.09726027397260271,
+      "backFrontRatio": 0.8541095890410959,
+      "scale": 0.22112676052618763,
+      "tableWidth": 363.090140784,
+      "spriteOriginY": 449.49436622905716,
+      "metrics": {
+        "spriteWidth": 371.05070416294285,
+        "spriteHeight": 207.1957746130378,
+        "spriteY": -49.532394357866025,
+        "topExtent": 38.03380281050427,
+        "surfaceDepth": 31.399999994718637,
+        "frontThickness": 10.614084505257004,
+        "apronHeight": 40.02394365523997,
+        "footDrop": 139.97323941307675,
+        "legWidth": 23.005143658102455,
+        "leftLegX": -138.7729633569406,
+        "rightLegX": 115.76781969883814,
+        "apronX": -111.31521124888285,
+        "apronWidth": 222.63042249776575
+      },
+      "assetSha256": "b66a7947c72b21cb6765a0285f3b7276561f8ebeb57543748c08010590af66d7",
+      "alphaRange": [
+        0,
+        255
+      ]
+    }
+  ],
+  "theme3TableUnchanged": true
+}

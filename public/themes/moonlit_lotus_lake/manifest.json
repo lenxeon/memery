@@ -1,0 +1,459 @@
+{
+  "schemaVersion": 1,
+  "themeId": "moonlit_lotus_lake",
+  "name": "月照莲湖",
+  "poeticTitle": "月映莲灯，长念如初",
+  "iconText": "🌙",
+  "desc": "月夜莲湖 · 灯影曲桥 · 石岸雅庭",
+  "tag": "月夜静谧",
+  "version": 1,
+  "wall": {
+    "wallpaper": {
+      "id": "moonlit_lotus_water",
+      "name": "月照莲湖",
+      "poeticTitle": "月满莲灯",
+      "description": "月色、远山、湖面、拱桥、亭阁与莲灯的完整湖景。",
+      "assets": {
+        "phone": "themes/moonlit_lotus_lake/wallpapers/phone/lake-background.png"
+      },
+      "fit": "cover"
+    },
+    "wallpaperOverlays": [
+      {
+        "id": "moonlit_tree_and_lantern",
+        "name": "树影竹韵",
+        "description": "全画布透明近岸树枝、竹叶与灯笼，位于湖景之上、石岸层之后。",
+        "asset": "themes/moonlit_lotus_lake/wall-overlays/phone/tree-lantern-shore.png",
+        "fit": "cover"
+      },
+      {
+        "id": "moonlit_portrait_frame",
+        "name": "乌木金纹相框",
+        "description": "与场景设计画布对齐的独立透明相框，动态照片由软件另行绘制。",
+        "asset": "themes/moonlit_lotus_lake/portrait/phone/wooden-portrait-frame.png",
+        "fit": "cover"
+      }
+    ],
+    "wallpaperDecorations": [],
+    "roomOverlay": {
+      "id": "moonlit_stone_terrace",
+      "name": "石岸地面",
+      "description": "石岸、石板地面及统一光影；湖景区域透明，相框作为独立素材。",
+      "asset": "themes/moonlit_lotus_lake/interior/phone/terrace-ground.png",
+      "fit": "cover"
+    },
+    "frameDecorations": [],
+    "portrait": {
+      "sceneOpening": {
+        "x": 0.5046948356807511,
+        "y": 0.502979414951246,
+        "diameterRatio": 0.15258215962441316
+      },
+      "textDx": 0,
+      "textDy": -135,
+      "textGap": 0
+    }
+  },
+  "ground": {
+    "floor": null,
+    "groundMat": {
+      "id": "moonlit_black_gold_mat",
+      "name": "乌金回纹席",
+      "poeticTitle": "静席映灯",
+      "description": "黑色编织席面与金色回纹边饰，独立透明素材。",
+      "asset": "themes/moonlit_lotus_lake/mats/black-gold-mat.png",
+      "previewUrl": "themes/moonlit_lotus_lake/mats/black-gold-mat.png",
+      "widthRatio": 0.99,
+      "bottomRatio": 0.032
+    },
+    "cushion": {
+      "id": "moonlit_ivory_cushion",
+      "name": "锦面圆蒲团",
+      "poeticTitle": "锦垫安坐",
+      "description": "米白暗花织锦与细金边，独立透明素材。",
+      "asset": "themes/moonlit_lotus_lake/cushions/ivory-brocade-cushion.png",
+      "previewUrl": "themes/moonlit_lotus_lake/cushions/ivory-brocade-cushion.png",
+      "widthRatio": 0.43,
+      "bottomRatio": 0.092
+    }
+  },
+  "table": {
+    "id": "moonlit_marble_mahogany_altar",
+    "name": "白石红木供桌",
+    "asset": "themes/moonlit_lotus_lake/table/marble-mahogany-altar.png",
+    "structure": "legged",
+    "woodStyle": "walnut",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.235,
+      "widthRatio": 0.84,
+      "minWidthRatio": 0.84,
+      "maxWidthRatio": 0.9,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": {
+        "width": 1536,
+        "height": 1024
+      },
+      "visibleBounds": {
+        "left": 0.013020833333333334,
+        "top": 0.0869140625,
+        "right": 0.9876302083333334,
+        "bottom": 0.9267578125
+      },
+      "backEdgeY": 0.0869140625,
+      "frontEdgeY": 0.2294921875,
+      "fasciaBottomY": 0.263671875,
+      "apronBottomY": 0.419921875,
+      "footBottomY": 0.9267578125,
+      "legCentersX": {
+        "left": 0.068359375,
+        "right": 0.931640625
+      },
+      "legWidth": 0.06510416666666667,
+      "apronBoundsX": {
+        "left": 0.1,
+        "right": 0.9
+      }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": {
+          "x": 0.09895833333333333,
+          "y": 0.0869140625
+        },
+        "backRight": {
+          "x": 0.9010416666666666,
+          "y": 0.0869140625
+        },
+        "frontRight": {
+          "x": 0.986328125,
+          "y": 0.2294921875
+        },
+        "frontLeft": {
+          "x": 0.013671875,
+          "y": 0.2294921875
+        }
+      },
+      "usableArea": {
+        "uMin": 0.08,
+        "uMax": 0.92,
+        "vMin": 0.08,
+        "vMax": 0.94
+      },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "plum_blossom_left": {
+        "id": "plum_blossom_left",
+        "setId": "plum_blossom",
+        "name": "梅枝暖雪·左",
+        "poeticTitle": "春信入庭",
+        "description": "深褐枝条配暖白梅花。",
+        "plant": "梅花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/plum_blossom/left.png",
+        "widthRatio": 0.34
+      },
+      "camellia_left": {
+        "id": "camellia_left",
+        "setId": "camellia",
+        "name": "山茶含春·左",
+        "poeticTitle": "清影含光",
+        "description": "木本山茶与米白花瓣。",
+        "plant": "山茶花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/camellia/left.png",
+        "widthRatio": 0.34
+      },
+      "osmanthus_left": {
+        "id": "osmanthus_left",
+        "setId": "osmanthus",
+        "name": "桂影秋香·左",
+        "poeticTitle": "清影含光",
+        "description": "细枝与金桂点缀暖色花叶。",
+        "plant": "桂花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/osmanthus/left.png",
+        "widthRatio": 0.34
+      },
+      "magnolia_left": {
+        "id": "magnolia_left",
+        "setId": "magnolia",
+        "name": "玉兰初绽·左",
+        "poeticTitle": "清影含光",
+        "description": "木本玉兰配象牙白花朵。",
+        "plant": "玉兰",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/magnolia/left.png",
+        "widthRatio": 0.34
+      },
+      "peach_blossom_left": {
+        "id": "peach_blossom_left",
+        "setId": "peach_blossom",
+        "name": "桃枝浅绯·左",
+        "poeticTitle": "春信入庭",
+        "description": "棕褐枝条与浅粉花朵。",
+        "plant": "桃花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/peach_blossom/left.png",
+        "widthRatio": 0.34
+      },
+      "wintersweet_left": {
+        "id": "wintersweet_left",
+        "setId": "wintersweet",
+        "name": "腊梅疏影·左",
+        "poeticTitle": "清影含光",
+        "description": "细木枝与淡金腊梅。",
+        "plant": "腊梅",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/wintersweet/left.png",
+        "widthRatio": 0.34
+      }
+    },
+    "right": {
+      "plum_blossom_right": {
+        "id": "plum_blossom_right",
+        "setId": "plum_blossom",
+        "name": "梅枝暖雪·右",
+        "poeticTitle": "春信入庭",
+        "description": "深褐枝条配暖白梅花。",
+        "plant": "梅花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/plum_blossom/right.png",
+        "widthRatio": 0.34
+      },
+      "camellia_right": {
+        "id": "camellia_right",
+        "setId": "camellia",
+        "name": "山茶含春·右",
+        "poeticTitle": "清影含光",
+        "description": "木本山茶与米白花瓣。",
+        "plant": "山茶花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/camellia/right.png",
+        "widthRatio": 0.34
+      },
+      "osmanthus_right": {
+        "id": "osmanthus_right",
+        "setId": "osmanthus",
+        "name": "桂影秋香·右",
+        "poeticTitle": "清影含光",
+        "description": "细枝与金桂点缀暖色花叶。",
+        "plant": "桂花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/osmanthus/right.png",
+        "widthRatio": 0.34
+      },
+      "magnolia_right": {
+        "id": "magnolia_right",
+        "setId": "magnolia",
+        "name": "玉兰初绽·右",
+        "poeticTitle": "清影含光",
+        "description": "木本玉兰配象牙白花朵。",
+        "plant": "玉兰",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/magnolia/right.png",
+        "widthRatio": 0.34
+      },
+      "peach_blossom_right": {
+        "id": "peach_blossom_right",
+        "setId": "peach_blossom",
+        "name": "桃枝浅绯·右",
+        "poeticTitle": "春信入庭",
+        "description": "棕褐枝条与浅粉花朵。",
+        "plant": "桃花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/peach_blossom/right.png",
+        "widthRatio": 0.34
+      },
+      "wintersweet_right": {
+        "id": "wintersweet_right",
+        "setId": "wintersweet",
+        "name": "腊梅疏影·右",
+        "poeticTitle": "清影含光",
+        "description": "细木枝与淡金腊梅。",
+        "plant": "腊梅",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/wintersweet/right.png",
+        "widthRatio": 0.34
+      }
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "moonlit_lotus_water",
+    "wallpaperDecorationId": "none",
+    "frameId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "moonlit_black_gold_mat",
+    "cushionId": "moonlit_ivory_cushion",
+    "offerings": {
+      "vase_left": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.18,
+          "v": 0.7
+        },
+        "scale": 1
+      },
+      "vase_right": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.82,
+          "v": 0.7
+        },
+        "scale": 1
+      },
+      "candle_left": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.33,
+          "v": 0.78
+        },
+        "scale": 1
+      },
+      "candle_right": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.67,
+          "v": 0.78
+        },
+        "scale": 1
+      },
+      "censer": {
+        "catalogId": "censer",
+        "position": {
+          "u": 0.5,
+          "v": 0.72
+        },
+        "scale": 1
+      },
+      "fruit_left": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.25,
+          "v": 0.86
+        },
+        "scale": 1
+      },
+      "fruit_right": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.75,
+          "v": 0.86
+        },
+        "scale": 1
+      },
+      "tea_cups": {
+        "catalogId": "tea_cups",
+        "position": {
+          "u": 0.5,
+          "v": 0.91
+        },
+        "scale": 1
+      }
+    },
+    "foreground": {
+      "left": {
+        "foregroundId": "plum_blossom_left",
+        "offsetX": -0.36,
+        "offsetY": 0,
+        "alpha": 0
+      },
+      "right": {
+        "foregroundId": "plum_blossom_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 0
+      }
+    }
+  },
+  "foregroundSetIds": [
+    "plum_blossom",
+    "camellia",
+    "osmanthus",
+    "magnolia",
+    "peach_blossom",
+    "wintersweet"
+  ],
+  "defaultForegroundSetId": "plum_blossom",
+  "preset": {
+    "tablecloth": "autumn_gold",
+    "lighting": {
+      "sunAngle": -18,
+      "sunlightIntensity": 0.55,
+      "godRaysIntensity": 0,
+      "godRaysEnabled": false
+    }
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.23,
+      "y": 0.12
+    },
+    "sunAngle": -18,
+    "sunlightIntensity": 0.55,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#ffd7a0",
+    "ambientColor": "#72829c",
+    "shadowDirection": {
+      "x": 0.35,
+      "y": 0.94
+    }
+  }
+}

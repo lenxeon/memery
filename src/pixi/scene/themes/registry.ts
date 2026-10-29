@@ -131,6 +131,7 @@ interface RawThemeManifest {
   sceneBackground?: { mode: 'single-background'; asset: string };
   wall?: {
     wallpaper: RawAsset;
+    wallpaperOverlays?: RawAsset[];
     wallpaperDecorations: RawAsset[];
     frame?: RawAsset;
     frameDecorations: RawAsset[];
@@ -204,12 +205,22 @@ const validateThemeManifest = (raw: RawThemeManifest): void => {
   const defaultAssembly = raw.defaultAssembly!;
   const foregroundCandidates = raw.foregroundCandidates!;
   const wallpaper = wall.wallpaper;
+  assert(!wall.wallpaperOverlays?.length || Boolean(wall.roomOverlay), 'wall.wallpaperOverlays require wall.roomOverlay to share full-canvas coordinates');
+  for (const overlay of wall.wallpaperOverlays ?? []) {
+    assert(typeof overlay.asset === 'string' && overlay.asset.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(overlay.asset) && !overlay.asset.split('/').includes('..'), 'wall.wallpaperOverlays must reference full-canvas PNGs inside the current theme directory');
+  }
   if (wallpaper.video !== undefined) {
     const videoPath = wallpaper.video?.asset;
     assert(typeof videoPath === 'string' && videoPath.startsWith(`themes/${raw.themeId}/`) && /\.mp4$/i.test(videoPath) && !videoPath.split('/').includes('..'), 'wall.wallpaper.video.asset must reference an MP4 inside the current theme directory');
     assert(typeof wallpaper.assets?.phone === 'string' && /\.png$/i.test(wallpaper.assets.phone), 'video wallpapers require a static assets.phone PNG poster');
   }
   const usesRoomOverlay = Boolean(wall.roomOverlay);
+  const sceneOpening = wall.portrait.sceneOpening;
+  if (sceneOpening) {
+    assert(usesRoomOverlay, 'wall.portrait.sceneOpening requires wall.roomOverlay');
+    assert([sceneOpening.x, sceneOpening.y, sceneOpening.diameterRatio].every(Number.isFinite), 'sceneOpening coordinates must be finite numbers');
+    assert(sceneOpening.x >= 0 && sceneOpening.x <= 1 && sceneOpening.y >= 0 && sceneOpening.y <= 1 && sceneOpening.diameterRatio > 0 && sceneOpening.diameterRatio <= 1, 'sceneOpening coordinates must be normalized to 0..1, with positive diameterRatio');
+  }
   if (usesRoomOverlay) {
     const overlayPath = wall.roomOverlay?.asset;
     assert(typeof overlayPath === 'string' && overlayPath.startsWith(`themes/${raw.themeId}/`) && /\.png$/i.test(overlayPath) && !overlayPath.split('/').includes('..'), 'wall.roomOverlay.asset must reference a PNG inside the current theme directory');
@@ -240,6 +251,11 @@ const validateThemeManifest = (raw: RawThemeManifest): void => {
   for (const side of ['left', 'right'] as const) {
     const selected = defaultAssembly.foreground[side].foregroundId;
     assert(Boolean(foregroundCandidates[side][selected]), `default foreground ${side}.${selected} is missing from its candidate object`);
+    for (const candidate of Object.values(foregroundCandidates[side])) {
+      if (candidate.referenceCanvas) {
+        assert(candidate.referenceCanvas.width === 1179 && candidate.referenceCanvas.height === 2556, 'foreground referenceCanvas must use the 1179x2556 design canvas');
+      }
+    }
   }
   const { usableArea } = table.surface;
   for (const [itemId, offering] of Object.entries(defaultAssembly.offerings ?? {})) {
@@ -412,6 +428,13 @@ const normalizeTheme = (raw: RawThemeManifest): SceneThemeDefinition => {
     tag: raw.tag,
     wall: {
       wallpaper,
+      wallpaperOverlays: (wall.wallpaperOverlays ?? []).map((overlay) => ({
+        ...withAssetUrls(overlay),
+        id: overlay.id,
+        name: overlay.name,
+        fit: 'cover' as const,
+        alpha: overlay.alpha,
+      })),
       ...(roomOverlay ? { roomOverlay } : {}),
       portrait: wall.portrait,
       scenery: frame ? [frame] : [],

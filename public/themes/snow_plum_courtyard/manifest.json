@@ -1,0 +1,456 @@
+{
+  "schemaVersion": 1,
+  "themeId": "snow_plum_courtyard",
+  "name": "雪庭梅映",
+  "poeticTitle": "雪落庭前，梅映长念",
+  "iconText": "❄️",
+  "desc": "雪山庭院 · 梅松映窗 · 暖木厅堂",
+  "tag": "冬日晴雪",
+  "version": 3,
+  "wall": {
+    "wallpaper": {
+      "id": "snow_courtyard_landscape",
+      "name": "雪庭远山",
+      "poeticTitle": "远岫含雪",
+      "description": "独立不透明雪山与庭院底景，窗外梅松另层叠放。",
+      "assets": {
+        "phone": "themes/snow_plum_courtyard/wallpapers/phone/outside-landscape.png"
+      },
+      "fit": "cover"
+    },
+    "wallpaperOverlays": [
+      {
+        "id": "snow_window_branches",
+        "name": "窗外梅松",
+        "description": "全幅透明梅枝与雪松，位于背景画之上、室内窗框之后。",
+        "asset": "themes/snow_plum_courtyard/wall-overlays/phone/outside-branches.png",
+        "fit": "cover"
+      }
+    ],
+    "wallpaperDecorations": [],
+    "roomOverlay": {
+      "id": "snow_timber_room",
+      "name": "暖木窗厅墙地一体层",
+      "description": "木梁、完整窗格、墙面、踢脚线与日照地板；开口透明，桌案与陈设独立。",
+      "asset": "themes/snow_plum_courtyard/interior/phone/room-wall-ground-light-window.png",
+      "fit": "cover"
+    },
+    "frameDecorations": [],
+    "portrait": {
+      "scale": 1.1,
+      "dy": 0,
+      "textDy": 0,
+      "textGap": 0
+    }
+  },
+  "ground": {
+    "floor": null,
+    "groundMat": {
+      "id": "snow_straw_mat",
+      "name": "暖篾花纹席",
+      "poeticTitle": "席暖候归",
+      "description": "独立浅麦色编织席面，浅俯透视，不含蒲团与地板。",
+      "asset": "themes/snow_plum_courtyard/mats/straw-mat.png",
+      "previewUrl": "themes/snow_plum_courtyard/mats/straw-mat.png",
+      "widthRatio": 0.870755064,
+      "bottomRatio": 0.118949751
+    },
+    "cushion": {
+      "id": "snow_brocade_cushion",
+      "name": "锦面藤编蒲团",
+      "poeticTitle": "安坐听雪",
+      "description": "奶油色暗花锦面与蜂蜜色藤编侧壁，独立透明素材。",
+      "asset": "themes/snow_plum_courtyard/cushions/brocade-cushion.png",
+      "previewUrl": "themes/snow_plum_courtyard/cushions/brocade-cushion.png",
+      "widthRatio": 0.420405862,
+      "bottomRatio": 0.1533517
+    }
+  },
+  "table": {
+    "id": "snow_carved_timber_altar",
+    "name": "暖木雕花供桌",
+    "asset": "themes/snow_plum_courtyard/table/carved-timber-altar-v2.png",
+    "structure": "legged",
+    "woodStyle": "walnut",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.25,
+      "widthRatio": 0.923893488,
+      "minWidthRatio": 0.9,
+      "maxWidthRatio": 0.97,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": {
+        "width": 1678,
+        "height": 937
+      },
+      "visibleBounds": {
+        "left": 0.01132300357568534,
+        "top": 0.05549626467449306,
+        "right": 0.9898688915375446,
+        "bottom": 0.9146211312700107
+      },
+      "frontEdgeY": 0.2390608324439701,
+      "backEdgeY": 0.08751334044823907,
+      "fasciaBottomY": 0.2902881536819637,
+      "apronBottomY": 0.4834578441835646,
+      "footBottomY": 0.9146211312700107,
+      "legCentersX": {
+        "left": 0.157,
+        "right": 0.843
+      },
+      "legWidth": 0.062,
+      "apronBoundsX": {
+        "left": 0.2,
+        "right": 0.8
+      }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": {
+          "x": 0.12872467222884387,
+          "y": 0.08751334044823907
+        },
+        "backRight": {
+          "x": 0.8718712753277712,
+          "y": 0.08751334044823907
+        },
+        "frontRight": {
+          "x": 0.935041716328963,
+          "y": 0.2390608324439701
+        },
+        "frontLeft": {
+          "x": 0.06495828367103695,
+          "y": 0.2390608324439701
+        }
+      },
+      "usableArea": {
+        "uMin": 0.08,
+        "uMax": 0.92,
+        "vMin": 0.08,
+        "vMax": 0.94
+      },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "plum_blossom_left": {
+        "id": "plum_blossom_left",
+        "setId": "plum_blossom",
+        "name": "梅枝暖雪·左",
+        "poeticTitle": "春信入庭",
+        "description": "深褐枝条配暖白梅花。",
+        "plant": "梅花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/plum_blossom/left.png",
+        "widthRatio": 0.34
+      },
+      "camellia_left": {
+        "id": "camellia_left",
+        "setId": "camellia",
+        "name": "山茶含春·左",
+        "poeticTitle": "清影含光",
+        "description": "木本山茶与米白花瓣。",
+        "plant": "山茶花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/camellia/left.png",
+        "widthRatio": 0.34
+      },
+      "osmanthus_left": {
+        "id": "osmanthus_left",
+        "setId": "osmanthus",
+        "name": "桂影秋香·左",
+        "poeticTitle": "清影含光",
+        "description": "细枝与金桂点缀暖色花叶。",
+        "plant": "桂花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/osmanthus/left.png",
+        "widthRatio": 0.34
+      },
+      "magnolia_left": {
+        "id": "magnolia_left",
+        "setId": "magnolia",
+        "name": "玉兰初绽·左",
+        "poeticTitle": "清影含光",
+        "description": "木本玉兰配象牙白花朵。",
+        "plant": "玉兰",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/magnolia/left.png",
+        "widthRatio": 0.34
+      },
+      "peach_blossom_left": {
+        "id": "peach_blossom_left",
+        "setId": "peach_blossom",
+        "name": "桃枝浅绯·左",
+        "poeticTitle": "春信入庭",
+        "description": "棕褐枝条与浅粉花朵。",
+        "plant": "桃花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.4,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/peach_blossom/left.png",
+        "widthRatio": 0.34
+      },
+      "snow_plum_pine_left": {
+        "id": "snow_plum_pine_left",
+        "setId": "snow_plum_pine",
+        "name": "梅雪映庭·左",
+        "poeticTitle": "梅红松雪",
+        "description": "左侧红白梅枝，右侧覆雪松枝，保持场景4近景构图。",
+        "plant": "红白梅花",
+        "focusTreatment": "50mm f/1.4 近摄焦外效果已烘焙进 RGBA PNG。",
+        "defaultHeightRatio": 0.29499,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/snow_plum_courtyard/foregrounds/snow_plum_pine/left.png",
+        "widthRatio": 1
+      }
+    },
+    "right": {
+      "plum_blossom_right": {
+        "id": "plum_blossom_right",
+        "setId": "plum_blossom",
+        "name": "梅枝暖雪·右",
+        "poeticTitle": "春信入庭",
+        "description": "深褐枝条配暖白梅花。",
+        "plant": "梅花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/plum_blossom/right.png",
+        "widthRatio": 0.34
+      },
+      "camellia_right": {
+        "id": "camellia_right",
+        "setId": "camellia",
+        "name": "山茶含春·右",
+        "poeticTitle": "清影含光",
+        "description": "木本山茶与米白花瓣。",
+        "plant": "山茶花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/camellia/right.png",
+        "widthRatio": 0.34
+      },
+      "osmanthus_right": {
+        "id": "osmanthus_right",
+        "setId": "osmanthus",
+        "name": "桂影秋香·右",
+        "poeticTitle": "清影含光",
+        "description": "细枝与金桂点缀暖色花叶。",
+        "plant": "桂花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/osmanthus/right.png",
+        "widthRatio": 0.34
+      },
+      "magnolia_right": {
+        "id": "magnolia_right",
+        "setId": "magnolia",
+        "name": "玉兰初绽·右",
+        "poeticTitle": "清影含光",
+        "description": "木本玉兰配象牙白花朵。",
+        "plant": "玉兰",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/magnolia/right.png",
+        "widthRatio": 0.34
+      },
+      "peach_blossom_right": {
+        "id": "peach_blossom_right",
+        "setId": "peach_blossom",
+        "name": "桃枝浅绯·右",
+        "poeticTitle": "春信入庭",
+        "description": "棕褐枝条与浅粉花朵。",
+        "plant": "桃花",
+        "focusTreatment": "焦外虚化已烘焙进透明 PNG。",
+        "defaultHeightRatio": 0.296,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0.12,
+        "asset": "scene-assets/foregrounds/peach_blossom/right.png",
+        "widthRatio": 0.34
+      },
+      "snow_plum_pine_right": {
+        "id": "snow_plum_pine_right",
+        "setId": "snow_plum_pine",
+        "name": "梅雪映庭·右",
+        "poeticTitle": "梅红松雪",
+        "description": "左侧红白梅枝，右侧覆雪松枝，保持场景4近景构图。",
+        "plant": "覆雪松枝",
+        "focusTreatment": "50mm f/1.4 近摄焦外效果已烘焙进 RGBA PNG。",
+        "defaultHeightRatio": 0.33412,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/snow_plum_courtyard/foregrounds/snow_plum_pine/right.png",
+        "widthRatio": 1
+      }
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "snow_courtyard_landscape",
+    "wallpaperDecorationId": "none",
+    "frameId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "snow_straw_mat",
+    "cushionId": "snow_brocade_cushion",
+    "offerings": {
+      "vase_left": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.18,
+          "v": 0.7
+        },
+        "scale": 1
+      },
+      "vase_right": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.82,
+          "v": 0.7
+        },
+        "scale": 1
+      },
+      "candle_left": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.33,
+          "v": 0.78
+        },
+        "scale": 1
+      },
+      "candle_right": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.67,
+          "v": 0.78
+        },
+        "scale": 1
+      },
+      "censer": {
+        "catalogId": "censer",
+        "position": {
+          "u": 0.5,
+          "v": 0.72
+        },
+        "scale": 1
+      },
+      "fruit_left": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.25,
+          "v": 0.86
+        },
+        "scale": 1
+      },
+      "fruit_right": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.75,
+          "v": 0.86
+        },
+        "scale": 1
+      },
+      "tea_cups": {
+        "catalogId": "tea_cups",
+        "position": {
+          "u": 0.5,
+          "v": 0.91
+        },
+        "scale": 1
+      }
+    },
+    "foreground": {
+      "left": {
+        "foregroundId": "snow_plum_pine_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "foregroundId": "snow_plum_pine_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "foregroundSetIds": [
+    "snow_plum_pine",
+    "plum_blossom",
+    "camellia",
+    "osmanthus",
+    "magnolia",
+    "peach_blossom"
+  ],
+  "defaultForegroundSetId": "snow_plum_pine",
+  "preset": {
+    "tablecloth": "autumn_gold",
+    "lighting": {
+      "sunAngle": -28,
+      "sunlightIntensity": 0.86,
+      "godRaysIntensity": 0,
+      "godRaysEnabled": false
+    }
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.08,
+      "y": 0.19
+    },
+    "sunAngle": -28,
+    "sunlightIntensity": 0.86,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#fff1dc",
+    "ambientColor": "#e9eff4",
+    "shadowDirection": {
+      "x": 0.55,
+      "y": 0.84
+    }
+  }
+}

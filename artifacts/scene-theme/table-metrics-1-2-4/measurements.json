@@ -1,0 +1,89 @@
+{
+  "canvas": {
+    "width": 393,
+    "height": 852
+  },
+  "forward": 0,
+  "method": "Manual source-pixel corner selection, followed by deterministic numerical measurement. Flat load-bearing top face only; exclude raised end rails and vertical fascia.",
+  "cornerUncertaintyPx": 3,
+  "pointOrder": [
+    "backLeft",
+    "backRight",
+    "frontRight",
+    "frontLeft"
+  ],
+  "samples": [
+    {
+      "themeNumber": 1,
+      "themeId": "classic_dawn",
+      "name": "晴岚映曜",
+      "corners": [
+        [
+          237,
+          78
+        ],
+        [
+          1579,
+          78
+        ],
+        [
+          1692,
+          214
+        ],
+        [
+          124,
+          214
+        ]
+      ],
+      "manifestSnapshot": "../tabletop-standard-revision/reference/classic-dawn-manifest-before.json"
+    },
+    {
+      "themeNumber": 2,
+      "themeId": "warm_blessing",
+      "name": "暖意窗光",
+      "corners": [
+        [
+          148,
+          294
+        ],
+        [
+          1388,
+          294
+        ],
+        [
+          1513,
+          420
+        ],
+        [
+          23,
+          420
+        ]
+      ]
+    },
+    {
+      "themeNumber": 4,
+      "themeId": "snow_plum_courtyard",
+      "name": "雪庭梅映",
+      "corners": [
+        [
+          199,
+          99
+        ],
+        [
+          1640,
+          99
+        ],
+        [
+          1722,
+          138
+        ],
+        [
+          117,
+          138
+        ]
+      ],
+      "manifestSnapshot": "../tabletop-standard-revision/reference/snow-plum-manifest-before.json",
+      "assetSnapshot": "../tabletop-standard-revision/reference/snow-plum-table-before.png"
+    }
+  ]
+}

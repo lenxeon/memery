@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "themeId": "autumn_lake",
+  "name": "秋湖夕照",
+  "poeticTitle": "夕照长湖，秋光寄念",
+  "iconText": "🌅",
+  "desc": "夕照秋湖 · 红枫亭阁 · 浅石暖木",
+  "tag": "秋日暖光",
+  "version": 1,
+  "wall": {
+    "wallpaper": {
+      "id": "autumn_sunset_lake",
+      "name": "夕照秋湖",
+      "poeticTitle": "落日映长念",
+      "description": "全画布不透明湖山夕照，保留远山、落日、金色倒影与飞鹤；不含亭阁和陈设。",
+      "assets": {
+        "phone": "themes/autumn_lake/wallpapers/phone/sunset-lake.png"
+      },
+      "fit": "cover"
+    },
+    "wallpaperDecorations": [],
+    "roomOverlay": {
+      "id": "autumn_pavilion_room",
+      "name": "枫影亭阁墙地一体层",
+      "description": "完整亭阁、木格栅、固定枫枝、浅石墙面与地板；窗洞透明，统一夕照和阴影已合入。",
+      "asset": "themes/autumn_lake/interior/phone/pavilion-wall-ground.png",
+      "fit": "cover"
+    },
+    "frameDecorations": [],
+    "portrait": {
+      "scale": 1.1,
+      "dy": 0,
+      "textDy": 0,
+      "textGap": 0
+    }
+  },
+  "ground": {
+    "floor": null,
+    "groundMat": {
+      "id": "autumn_honey_rush_mat",
+      "name": "金篾编席",
+      "poeticTitle": "席暖秋光",
+      "description": "独立草编长席，保留细密编织与包边，不含蒲团及地板。",
+      "asset": "themes/autumn_lake/mats/honey-rush-mat.png",
+      "previewUrl": "themes/autumn_lake/mats/honey-rush-mat.png",
+      "widthRatio": 1.01,
+      "bottomRatio": 0.08
+    },
+    "cushion": {
+      "id": "autumn_ivory_brocade_cushion",
+      "name": "象牙锦面蒲团",
+      "poeticTitle": "安坐寄念",
+      "description": "米白暗花锦面圆垫，保留柔软侧壁与滚边，独立透明素材。",
+      "asset": "themes/autumn_lake/cushions/ivory-brocade-cushion.png",
+      "previewUrl": "themes/autumn_lake/cushions/ivory-brocade-cushion.png",
+      "widthRatio": 0.355,
+      "bottomRatio": 0.11
+    }
+  },
+  "table": {
+    "id": "autumn_marble_oak_altar",
+    "name": "浅石暖木供桌",
+    "asset": "themes/autumn_lake/table/marble-oak-altar.png",
+    "structure": "legged",
+    "woodStyle": "white_oak",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.28,
+      "widthRatio": 0.94,
+      "minWidthRatio": 0.91,
+      "maxWidthRatio": 0.97,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": {
+        "width": 1622,
+        "height": 698
+      },
+      "visibleBounds": {
+        "left": 0.014796547472256474,
+        "top": 0.034383954154727794,
+        "right": 0.9852034525277436,
+        "bottom": 0.9656160458452722
+      },
+      "frontEdgeY": 0.2163323782234957,
+      "backEdgeY": 0.04297994269340974,
+      "fasciaBottomY": 0.30802292263610315,
+      "apronBottomY": 0.3524355300859599,
+      "footBottomY": 0.9656160458452722,
+      "legCentersX": {
+        "left": 0.11220715166461159,
+        "right": 0.8859432799013564
+      },
+      "legWidth": 0.10727496917385944,
+      "apronBoundsX": {
+        "left": 0.1960542540073983,
+        "right": 0.8039457459926017
+      }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": {
+          "x": 0.09556103575832306,
+          "y": 0.04297994269340974
+        },
+        "backRight": {
+          "x": 0.905055487053021,
+          "y": 0.04297994269340974
+        },
+        "frontRight": {
+          "x": 0.9839704069050554,
+          "y": 0.2163323782234957
+        },
+        "frontLeft": {
+          "x": 0.015413070283600493,
+          "y": 0.2163323782234957
+        }
+      },
+      "usableArea": {
+        "uMin": 0.12,
+        "uMax": 0.88,
+        "vMin": 0.08,
+        "vMax": 0.94
+      },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "autumn_white_blossom_left": {
+        "id": "autumn_white_blossom_left",
+        "setId": "autumn_white_blossom",
+        "name": "夕照白花·左",
+        "poeticTitle": "花影寄念",
+        "description": "与效果图同画布对齐的底缘白花近景，中央保持透明。",
+        "plant": "米白花枝与柔和绿叶",
+        "focusTreatment": "近景焦外柔化烘焙在透明 PNG 中。",
+        "defaultHeightRatio": 0.184,
+        "minHeightRatio": 0.1,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/autumn_lake/foregrounds/left.png",
+        "widthRatio": 1
+      }
+    },
+    "right": {
+      "autumn_white_blossom_right": {
+        "id": "autumn_white_blossom_right",
+        "setId": "autumn_white_blossom",
+        "name": "夕照白花·右",
+        "poeticTitle": "花影寄念",
+        "description": "与效果图同画布对齐的底缘白花近景，中央保持透明。",
+        "plant": "米白花枝与柔和绿叶",
+        "focusTreatment": "近景焦外柔化烘焙在透明 PNG 中。",
+        "defaultHeightRatio": 0.12,
+        "minHeightRatio": 0.1,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/autumn_lake/foregrounds/right.png",
+        "widthRatio": 1
+      }
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "autumn_sunset_lake",
+    "wallpaperDecorationId": "none",
+    "frameId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "autumn_honey_rush_mat",
+    "cushionId": "autumn_ivory_brocade_cushion",
+    "offerings": {
+      "vase_left": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.18,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "vase_right": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.82,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "candle_left": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.33,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "candle_right": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.67,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "censer": {
+        "catalogId": "censer",
+        "position": {
+          "u": 0.5,
+          "v": 0.38
+        },
+        "scale": 1
+      },
+      "fruit_left": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.25,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "fruit_right": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.75,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "tea_cups": {
+        "catalogId": "tea_cups",
+        "position": {
+          "u": 0.5,
+          "v": 0.82
+        },
+        "scale": 1
+      }
+    },
+    "foreground": {
+      "left": {
+        "foregroundId": "autumn_white_blossom_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "foregroundId": "autumn_white_blossom_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "foregroundSetIds": [
+    "autumn_white_blossom"
+  ],
+  "defaultForegroundSetId": "autumn_white_blossom",
+  "preset": {
+    "tablecloth": "moonlight_white",
+    "lighting": {
+      "sunAngle": -20,
+      "sunlightIntensity": 0.78,
+      "godRaysIntensity": 0,
+      "godRaysEnabled": false
+    }
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.76,
+      "y": 0.323
+    },
+    "sunAngle": -20,
+    "sunlightIntensity": 0.78,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#ffe0b0",
+    "ambientColor": "#eed3bf",
+    "shadowDirection": {
+      "x": -0.55,
+      "y": 0.83
+    }
+  }
+}

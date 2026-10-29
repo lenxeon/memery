@@ -1,0 +1,45 @@
+{
+  "sourceSize": [
+    1774,
+    887
+  ],
+  "corners": {
+    "backLeft": [
+      279,
+      374
+    ],
+    "backRight": [
+      1494,
+      374
+    ],
+    "frontRight": [
+      1741,
+      695
+    ],
+    "frontLeft": [
+      31,
+      695
+    ]
+  },
+  "frontEdgePx": 1710,
+  "backEdgePx": 1215,
+  "depthProjectionPx": 321,
+  "backToFrontRatio": 0.7105263157894737,
+  "depthToFrontRatio": 0.18771929824561404,
+  "limits": {
+    "backToFront": [
+      0.69,
+      0.75
+    ],
+    "depthToFront": [
+      0.17,
+      0.21
+    ]
+  },
+  "result": {
+    "backToFront": "pass",
+    "depthToFront": "pass"
+  },
+  "cameraTiltDegrees": null,
+  "method": "PNG outline/flat plane: manual corner estimates, excluding front thickness; uncertainty approximately ±5 px. Common vanishing point and aesthetic match require the composited floor and user review."
+}

@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "themeId": "high_mountain_outdoors",
+  "name": "云海朝晖",
+  "poeticTitle": "云海迎朝晖，松风寄长念",
+  "iconText": "🌄",
+  "desc": "日出云海 · 苍松石台 · 白花清供",
+  "tag": "山巅晨光",
+  "version": 1,
+  "wall": {
+    "wallpaper": {
+      "id": "mountain_sunrise_cloud_sea",
+      "name": "日出云海",
+      "poeticTitle": "朝霞照远山",
+      "description": "只含晨空、霞云、层叠群峰与云海的全幅不透明背景，不含近松、地坪与陈设。",
+      "assets": {
+        "phone": "themes/high_mountain_outdoors/wallpapers/phone/sunrise-cloud-sea.png"
+      },
+      "fit": "cover"
+    },
+    "wallpaperDecorations": [],
+    "roomOverlay": {
+      "id": "mountain_pine_terrace",
+      "name": "山松石台场景层",
+      "description": "左右固定古松、岩石与低灌木，浅雕石台后沿及完整石铺地坪；云海开口透明，朝晖受光与地坪阴影已合入。",
+      "asset": "themes/high_mountain_outdoors/interior/phone/pine-terrace.png",
+      "fit": "cover"
+    },
+    "frameDecorations": [],
+    "portrait": {
+      "scale": 1.1,
+      "dy": 0,
+      "textDy": 0,
+      "textGap": 0
+    }
+  },
+  "ground": {
+    "floor": null,
+    "groundMat": {
+      "id": "mountain_indigo_mat",
+      "name": "靛蓝山纹席",
+      "poeticTitle": "山纹承静念",
+      "description": "独立靛蓝编织席毯，米白山峦绣线，浅俯视；不含地坪、蒲团与投影。",
+      "asset": "themes/high_mountain_outdoors/mats/indigo-mountain-mat.png",
+      "previewUrl": "themes/high_mountain_outdoors/mats/indigo-mountain-mat.png",
+      "widthRatio": 0.9,
+      "bottomRatio": 0.11
+    },
+    "cushion": {
+      "id": "mountain_ivory_cushion",
+      "name": "米白云锦蒲团",
+      "poeticTitle": "安坐听松风",
+      "description": "独立米白灰绿暗花织锦圆垫，浅俯视椭圆顶面与滚边；不含席毯、地坪和投影。",
+      "asset": "themes/high_mountain_outdoors/cushions/ivory-brocade.png",
+      "previewUrl": "themes/high_mountain_outdoors/cushions/ivory-brocade.png",
+      "widthRatio": 0.31,
+      "bottomRatio": 0.145
+    }
+  },
+  "table": {
+    "id": "mountain_stone_trestle_altar",
+    "name": "雕石暖木供桌",
+    "asset": "themes/high_mountain_outdoors/table/carved-stone-trestle.png",
+    "structure": "legged",
+    "woodStyle": "walnut",
+    "runner": false,
+    "position": {
+      "x": 0.5,
+      "bottomRatio": 0.207,
+      "widthRatio": 0.92,
+      "minWidthRatio": 0.89,
+      "maxWidthRatio": 0.95,
+      "forwardScale": 0.07,
+      "forwardOffsetRatio": 0.028
+    },
+    "geometry": {
+      "sourceSize": {
+        "width": 1906,
+        "height": 658
+      },
+      "visibleBounds": {
+        "left": 0.012591815320041973,
+        "top": 0.0364741641337386,
+        "right": 0.9874081846799581,
+        "bottom": 0.9635258358662614
+      },
+      "backEdgeY": 0.0364741641337386,
+      "frontEdgeY": 0.1838905775075988,
+      "fasciaBottomY": 0.3009118541033435,
+      "apronBottomY": 0.3009118541033435,
+      "footBottomY": 0.9635258358662614,
+      "legCentersX": {
+        "left": 0.16789087093389296,
+        "right": 0.8326337880377754
+      },
+      "legWidth": 0.10755508919202518,
+      "apronBoundsX": {
+        "left": 0.012591815320041973,
+        "right": 0.9874081846799581
+      }
+    },
+    "surface": {
+      "assetQuad": {
+        "backLeft": {
+          "x": 0.07292759706190975,
+          "y": 0.0364741641337386
+        },
+        "backRight": {
+          "x": 0.925498426023085,
+          "y": 0.0364741641337386
+        },
+        "frontRight": {
+          "x": 0.9868835257082896,
+          "y": 0.1838905775075988
+        },
+        "frontLeft": {
+          "x": 0.012591815320041973,
+          "y": 0.1838905775075988
+        }
+      },
+      "usableArea": {
+        "uMin": 0.12,
+        "uMax": 0.88,
+        "vMin": 0.08,
+        "vMax": 0.94
+      },
+      "backScale": 0.85,
+      "frontScale": 1
+    }
+  },
+  "foregroundCandidates": {
+    "left": {
+      "mountain_white_flower_left": {
+        "id": "mountain_white_flower_left",
+        "setId": "mountain_white_flower",
+        "name": "朝晖白花·左",
+        "poeticTitle": "花影寄长念",
+        "description": "同画布对齐的单侧底角白花近景，中轴保持透明，可安全移动。",
+        "plant": "米白菊形小花、少量百合与柔和灰绿叶",
+        "focusTreatment": "50mm f/1.4 等效近摄虚焦已烘焙到 PNG，无运行时模糊滤镜。",
+        "defaultHeightRatio": 0.1976,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/high_mountain_outdoors/foregrounds/left.png",
+        "widthRatio": 1
+      }
+    },
+    "right": {
+      "mountain_white_flower_right": {
+        "id": "mountain_white_flower_right",
+        "setId": "mountain_white_flower",
+        "name": "朝晖白花·右",
+        "poeticTitle": "花影寄长念",
+        "description": "同画布对齐的单侧底角白花近景，中轴保持透明，可安全移动。",
+        "plant": "米白菊形小花、少量百合与柔和灰绿叶",
+        "focusTreatment": "50mm f/1.4 等效近摄虚焦已烘焙到 PNG，无运行时模糊滤镜。",
+        "defaultHeightRatio": 0.2011,
+        "minHeightRatio": 0.18,
+        "maxHeightRatio": 0.4,
+        "bottomOverflowRatio": 0,
+        "referenceCanvas": {
+          "width": 1179,
+          "height": 2556
+        },
+        "asset": "themes/high_mountain_outdoors/foregrounds/right.png",
+        "widthRatio": 1
+      }
+    }
+  },
+  "defaultAssembly": {
+    "wallpaperId": "mountain_sunrise_cloud_sea",
+    "wallpaperDecorationId": "none",
+    "frameId": "none",
+    "wallDecorationId": "none",
+    "groundMatId": "mountain_indigo_mat",
+    "cushionId": "mountain_ivory_cushion",
+    "offerings": {
+      "vase_left": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.18,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "vase_right": {
+        "catalogId": "flower_vase",
+        "position": {
+          "u": 0.82,
+          "v": 0.35
+        },
+        "scale": 1
+      },
+      "candle_left": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.33,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "candle_right": {
+        "catalogId": "candle",
+        "position": {
+          "u": 0.67,
+          "v": 0.54
+        },
+        "scale": 1
+      },
+      "censer": {
+        "catalogId": "censer",
+        "position": {
+          "u": 0.5,
+          "v": 0.38
+        },
+        "scale": 1
+      },
+      "fruit_left": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.25,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "fruit_right": {
+        "catalogId": "fruit",
+        "position": {
+          "u": 0.75,
+          "v": 0.74
+        },
+        "scale": 1
+      },
+      "tea_cups": {
+        "catalogId": "tea_cups",
+        "position": {
+          "u": 0.5,
+          "v": 0.82
+        },
+        "scale": 1
+      }
+    },
+    "foreground": {
+      "left": {
+        "foregroundId": "mountain_white_flower_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      },
+      "right": {
+        "foregroundId": "mountain_white_flower_right",
+        "offsetX": 0,
+        "offsetY": 0,
+        "alpha": 1
+      }
+    }
+  },
+  "foregroundSetIds": [
+    "mountain_white_flower"
+  ],
+  "defaultForegroundSetId": "mountain_white_flower",
+  "preset": {
+    "tablecloth": "moonlight_white",
+    "lighting": {
+      "sunAngle": -22,
+      "sunlightIntensity": 0.82,
+      "godRaysIntensity": 0,
+      "godRaysEnabled": false
+    }
+  },
+  "lightRig": {
+    "source": {
+      "x": 0.77,
+      "y": 0.27
+    },
+    "sunAngle": -22,
+    "sunlightIntensity": 0.82,
+    "godRaysIntensity": 0,
+    "godRaysEnabled": false,
+    "keyColor": "#ffe2b9",
+    "ambientColor": "#e7ddd4",
+    "shadowDirection": {
+      "x": -0.55,
+      "y": 0.83
+    }
+  }
+}

@@ -54,6 +54,7 @@ export class SceneThemeLayer {
   public wallAssembly: Container = new Container();
   /** Optional single transparent layer containing the complete wall, frame, floor and baked lighting. */
   private roomOverlayLayer: Container = new Container();
+  private wallpaperOverlayLayer: Container = new Container();
   private wallLampGlow: Container = new Container();
   private wallLampGlowSprites: Sprite[][] = [];
   public wallDecorations: Container = new Container();
@@ -71,6 +72,7 @@ export class SceneThemeLayer {
   private viewportAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
   private wallAssemblyAssets: WallAssemblySprite[] = [];
   private roomOverlayAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
+  private wallpaperOverlayAssets: AssetSprite<SceneThemeViewportAsset>[] = [];
   private portraitBackAssets: AssetSprite<SceneThemePortraitAsset>[] = [];
   private portraitFrontAssets: AssetSprite<SceneThemePortraitAsset>[] = [];
   private groundAssets: GroundSpriteAsset[] = [];
@@ -100,7 +102,7 @@ export class SceneThemeLayer {
       });
     }
 
-    this.wallAssembly.addChild(this.wallScenery, this.wallLampGlow, this.wallDecorations, this.roomOverlayLayer);
+    this.wallAssembly.addChild(this.wallpaperOverlayLayer, this.wallScenery, this.wallLampGlow, this.wallDecorations, this.roomOverlayLayer);
     this.wallScenery.mask = this.wallSceneryMask;
     this.wallScenery.addChild(this.wallSceneryMask);
     const radialGlow = TexturePipeline.getInstance().wallLampGlowTexture;
@@ -146,6 +148,7 @@ export class SceneThemeLayer {
       groundMatId: effectiveSelection?.groundMatId,
       cushionId: effectiveSelection?.cushionId,
       roomOverlay: definition.wall?.roomOverlay?.url,
+      wallpaperOverlays: definition.wall?.wallpaperOverlays,
     });
     const nextFgKey = JSON.stringify(effectiveSelection?.foreground);
 
@@ -193,6 +196,7 @@ export class SceneThemeLayer {
     this.viewportAssets = [];
     this.wallAssemblyAssets = [];
     this.roomOverlayAssets = [];
+    this.wallpaperOverlayAssets = [];
     this.portraitBackAssets = [];
     this.portraitFrontAssets = [];
     this.groundAssets = [];
@@ -201,6 +205,9 @@ export class SceneThemeLayer {
     if (selection) this.mountSelection(selection, token, definition.foregroundSetIds, Boolean(definition.wall?.roomOverlay));
     else this.mountLegacyLayers(definition.layers, token);
 
+    for (const overlay of definition.wall?.wallpaperOverlays ?? []) {
+      this.wallpaperOverlayAssets.push(this.createAsset(this.wallpaperOverlayLayer, overlay, token));
+    }
     if (definition.wall?.roomOverlay) {
       this.roomOverlayAssets.push(this.createAsset(this.roomOverlayLayer, definition.wall.roomOverlay, token));
     }
@@ -417,7 +424,7 @@ export class SceneThemeLayer {
       this.wallAssembly.position.set(width * 0.5, 0);
       this.wallAssembly.scale.set(1);
     }
-    for (const { spec, sprite } of this.roomOverlayAssets) {
+    for (const { spec, sprite } of [...this.wallpaperOverlayAssets, ...this.roomOverlayAssets]) {
       if (!sprite.texture.width || !sprite.texture.height) continue;
       const scale = Math.max(width / sprite.texture.width, height / sprite.texture.height);
       sprite.anchor.set(0.5, 0.5);
@@ -462,6 +469,18 @@ export class SceneThemeLayer {
 
     for (const { spec, sprite, instance, definition } of this.foregroundAssets) {
       if (!sprite.texture.width || !sprite.texture.height) continue;
+      if (definition.referenceCanvas) {
+        const { width: sourceWidth, height: sourceHeight } = definition.referenceCanvas;
+        const scale = Math.max(width / sourceWidth, height / sourceHeight);
+        sprite.anchor.set(0.5);
+        sprite.position.set(
+          width * (0.5 + Math.min(0.04, Math.max(-0.04, instance.offsetX ?? 0))),
+          height * (0.5 + Math.min(0.04, Math.max(-0.04, instance.offsetY ?? 0))),
+        );
+        sprite.scale.set(scale);
+        sprite.alpha = (spec.alpha ?? 1) * (instance.alpha ?? 1);
+        continue;
+      }
       const minHeight = Math.max(0, definition.minHeightRatio);
       const maxHeight = Math.max(minHeight, definition.maxHeightRatio);
       const requestedHeight = definition.defaultHeightRatio * (instance.scale ?? 1);
@@ -517,7 +536,7 @@ export class SceneThemeLayer {
 
   private contentContainers(): Container[] {
     return [this.wallpaperDecorations, this.portraitBack, this.portraitFront, this.wallScenery,
-      this.wallDecorations, this.roomOverlayLayer, this.groundMat, this.ground, this.foregroundLeft, this.foregroundRight];
+      this.wallDecorations, this.wallpaperOverlayLayer, this.roomOverlayLayer, this.groundMat, this.ground, this.foregroundLeft, this.foregroundRight];
   }
 
   private clearContainer(container: Container): void {

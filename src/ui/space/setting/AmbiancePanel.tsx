@@ -402,7 +402,9 @@ export const AmbiancePanel: React.FC<AmbiancePanelProps> = ({
                       }`}
                     >
                       <div
-                        className="h-14 bg-[#e9ddc8] bg-cover bg-center"
+                        className={`h-14 bg-[#e9ddc8] bg-center bg-no-repeat ${
+                          group.part === 'groundMat' || group.part === 'cushion' ? 'bg-contain' : 'bg-cover'
+                        }`}
                         style={{ backgroundImage: `url(${option.previewUrl})` }}
                       />
                       <div className="px-1.5 py-1">

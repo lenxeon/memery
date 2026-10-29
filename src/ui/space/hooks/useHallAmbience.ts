@@ -186,13 +186,17 @@ export const useHallAmbience = ({
       const themeDefault = getSceneTheme(themeId).defaultAssembly;
       const next = current ? cloneAssembly(current) : themeDefault ? cloneAssembly(themeDefault) : createDefaultSceneAssembly(undefined, themeId);
       const previous = next.foreground[side];
+      const previousDefinition = SCENE_FOREGROUND_OPTIONS.find((option) => option.id === previous?.foregroundId);
+      const definition = SCENE_FOREGROUND_OPTIONS.find((option) => option.id === foregroundId);
+      const layoutChanged = Boolean(previousDefinition?.referenceCanvas) !== Boolean(definition?.referenceCanvas);
+      const defaultOffsetX = definition?.referenceCanvas || side === 'right' ? 0 : -0.36;
       next.foreground[side] = {
         instanceId: `${side}-${foregroundId}`,
         foregroundId,
         side,
         order: 0,
-        ...(previous?.offsetX !== undefined ? { offsetX: previous.offsetX } : {}),
-        ...(previous?.offsetY !== undefined ? { offsetY: previous.offsetY } : {}),
+        offsetX: layoutChanged ? defaultOffsetX : previous?.offsetX,
+        offsetY: layoutChanged ? 0 : previous?.offsetY,
       };
       return next;
     });

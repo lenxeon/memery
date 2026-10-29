@@ -1,0 +1,46 @@
+{
+  "sourceSize": [
+    1774,
+    887
+  ],
+  "corners": {
+    "backLeft": [
+      274,
+      208
+    ],
+    "backRight": [
+      1500,
+      208
+    ],
+    "frontRight": [
+      1749,
+      734
+    ],
+    "frontLeft": [
+      25,
+      734
+    ]
+  },
+  "method": "Manually select plane edges using alpha boundary; estimate front top edge excluding thickness. Source coordinates, origin upper left. Corner uncertainty about ±5 px.",
+  "frontEdgePx": 1724,
+  "backEdgePx": 1226,
+  "depthProjectionPx": 526,
+  "backToFrontRatio": 0.7111368909512761,
+  "depthToFrontRatio": 0.3051044083526682,
+  "limits": {
+    "backToFront": [
+      0.69,
+      0.75
+    ],
+    "depthToFront": [
+      0.17,
+      0.21
+    ]
+  },
+  "result": {
+    "backToFront": "pass",
+    "depthToFront": "fail"
+  },
+  "cameraTiltDegrees": null,
+  "caveat": "Camera tilt cannot be uniquely recovered from an uncalibrated PNG without physical aspect ratio and camera calibration. Common vanishing point must be checked after composing with the actual floor."
+}

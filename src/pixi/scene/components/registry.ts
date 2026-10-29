@@ -142,7 +142,7 @@ const defaultForeground = (side: SceneForegroundSide, foregroundId: string): Sce
   foregroundId,
   side,
   order: 0,
-  offsetX: side === 'left' ? -0.36 : 0,
+  offsetX: getSceneForeground(foregroundId)?.referenceCanvas ? 0 : side === 'left' ? -0.36 : 0,
 });
 
 /** Read the selected theme's JSON assembly; optional set id only changes its foreground pair. */
@@ -158,8 +158,8 @@ export const createDefaultSceneAssembly = (
   return {
     ...base,
     foreground: {
-      left: defaultForeground('left', leftId),
-      right: defaultForeground('right', rightId),
+      left: foregroundSetId ? defaultForeground('left', leftId) : { ...base.foreground.left },
+      right: foregroundSetId ? defaultForeground('right', rightId) : { ...base.foreground.right },
     },
   };
 };

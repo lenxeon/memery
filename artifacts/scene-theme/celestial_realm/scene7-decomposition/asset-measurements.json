@@ -1,0 +1,544 @@
+{
+  "referenceCanvas": [
+    1179,
+    2556
+  ],
+  "referenceSHA256": "81738bf1fe02e88e8d030637dd5b7e6570a19f2999eb4ba389bb2d220d466f4d",
+  "assets": [
+    {
+      "slot": "wallpaper",
+      "path": "themes/celestial_realm/wallpapers/phone/heavenly-palaces.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-7c29dfbc-7a9f-47a7-adc5-38fd9398b6d8.png",
+      "sourceSHA256": "b43ba4720234aa014bb456f78690b4dae8cd3f0ba30a6f8fecb0840fafaeebbd",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGB",
+      "visibleBoundsAlpha24": [
+        0,
+        0,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 1,
+      "alphaRange": [
+        255,
+        255
+      ],
+      "transparentPixels": 0,
+      "totalPixels": 3013524
+    },
+    {
+      "slot": "roomOverlay",
+      "path": "themes/celestial_realm/interior/phone/jade-hall-ground.png",
+      "source": "/Volumes/data/workspace/memery/artifacts/scene-theme/celestial_realm/open-terrace-20261029/open-terrace-layer.png",
+      "sourceSHA256": "4f10805f441de42e275911a73834ec405b63a1cedc9a13085cdd101fb1e0cb0c",
+      "nativeSize": [
+        1179,
+        2556
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        1114,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.5641627543035994,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 1782543,
+      "totalPixels": 3013524,
+      "selectedRevision": "artifacts/scene-theme/celestial_realm/open-terrace-20261029/open-terrace-layer.png",
+      "generatedSource": "/Users/lenxeon/.codex/generated_images/01a186c3-f413-7450-b3d9-446c4f6b2575/exec-63162e7e-c87f-4e8a-b263-bdf9e5ab77bc.png",
+      "alphaNoiseCutoff": 16,
+      "removedLowAlphaPixels": 12259
+    },
+    {
+      "slot": "table",
+      "path": "themes/celestial_realm/table/jade-gold-altar.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-0c6855f7-5da4-495b-bd5f-aab91e4fb25b.png",
+      "sourceSHA256": "8b88b5f413ae7fce5637cd6bb430c3834572532b708581b88d7d47efdc27dbde",
+      "nativeSize": [
+        1774,
+        887
+      ],
+      "exportSize": [
+        1772,
+        696
+      ],
+      "exportCrop": [
+        1,
+        104,
+        1773,
+        800
+      ],
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        24,
+        24,
+        1748,
+        672
+      ],
+      "visibleHeightRatio": 0.9310344827586207,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 501574,
+      "totalPixels": 1233312
+    },
+    {
+      "slot": "groundMat",
+      "path": "themes/celestial_realm/mats/celadon-cloud-mat.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-d0011f8f-bc4c-4b3b-afc8-d9a0510ff3c3.png",
+      "sourceSHA256": "b904159e2048ca3ed6643f615a70f8eb1881dca1a68ae9580cab20364c6df748",
+      "nativeSize": [
+        1983,
+        793
+      ],
+      "exportSize": [
+        1973,
+        445
+      ],
+      "exportCrop": [
+        5,
+        226,
+        1978,
+        671
+      ],
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        24,
+        24,
+        1949,
+        421
+      ],
+      "visibleHeightRatio": 0.8921348314606742,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 201107,
+      "totalPixels": 877985
+    },
+    {
+      "slot": "cushion",
+      "path": "themes/celestial_realm/cushions/ivory-gold-brocade.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-67dfcddd-7b1b-4408-a583-155bf534c7d7.png",
+      "sourceSHA256": "a3a1c467eab8d2312571bb183905dc97c67580c2e3cb9fb4dcebe5eeffd8ac03",
+      "nativeSize": [
+        1774,
+        887
+      ],
+      "exportSize": [
+        1635,
+        764
+      ],
+      "exportCrop": [
+        70,
+        101,
+        1705,
+        865
+      ],
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        24,
+        24,
+        1611,
+        740
+      ],
+      "visibleHeightRatio": 0.93717277486911,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 292241,
+      "totalPixels": 1249140
+    },
+    {
+      "slot": "ivory_magnolia_left",
+      "path": "themes/celestial_realm/foregrounds/ivory_magnolia/left.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-894d79d1-0b15-4114-992f-12e510c5feb3.png",
+      "sourceSHA256": "ecff78caa214df0c4ecf865dd132e63ca3569105f134dfc0485e04109edc8647",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        1993,
+        539,
+        2556
+      ],
+      "visibleHeightRatio": 0.2202660406885759,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2800328,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "ivory_magnolia_right",
+      "path": "themes/celestial_realm/foregrounds/ivory_magnolia/right.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-4a05dbd3-d854-40dc-80b9-91c9fafb3cdf.png",
+      "sourceSHA256": "e6f48c526c55fd8dfb94b01ab9e18a47605ad142ad667f7c3585bd93395dd589",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        706,
+        1968,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.2300469483568075,
+      "alphaRange": [
+        0,
+        254
+      ],
+      "transparentPixels": 2832539,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "pale_lotus_left",
+      "path": "themes/celestial_realm/foregrounds/pale_lotus/left.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-233e585c-364f-403b-8c1b-3c38111d352e.png",
+      "sourceSHA256": "58c58551eb54fc3d442a47daeb960639bce4abe31156821f2cafad22d8ebf402",
+      "nativeSize": [
+        853,
+        1844
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        1986,
+        443,
+        2556
+      ],
+      "visibleHeightRatio": 0.22300469483568075,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2832095,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "pale_lotus_right",
+      "path": "themes/celestial_realm/foregrounds/pale_lotus/right.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-dd3cbec6-885a-45a4-a58f-980a18449b90.png",
+      "sourceSHA256": "8df0c3b4e66afc5451cdb95d01555ea1f0ab618a138d37e9c497217458ad8a1a",
+      "nativeSize": [
+        853,
+        1844
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        727,
+        2008,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.21439749608763695,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2825880,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "jade_orchid_left",
+      "path": "themes/celestial_realm/foregrounds/jade_orchid/left.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-0521bdf3-ab8d-4604-a60b-39b93002aa1b.png",
+      "sourceSHA256": "bc555278fbaeee9dac85f770c7444ae308e84093124c8e950687df3abfa31a64",
+      "nativeSize": [
+        853,
+        1844
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        1921,
+        517,
+        2556
+      ],
+      "visibleHeightRatio": 0.24843505477308295,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2814248,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "jade_orchid_right",
+      "path": "themes/celestial_realm/foregrounds/jade_orchid/right.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-c39a5965-6905-4bd3-a30d-c0024687c841.png",
+      "sourceSHA256": "dc7b0576a3658526314c8c9ed9b0bc75c9309041d131cfd5a1ec2ff7b2079c52",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        693,
+        1959,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.2335680751173709,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2837388,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "peach_blossom_left",
+      "path": "themes/celestial_realm/foregrounds/peach_blossom/left.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-bd341c3e-19f6-4f3b-931c-cafa5de1a622.png",
+      "sourceSHA256": "da16cb14f4a9407d9281eae7b6b979757eeb9220c2567cf160f25cafee1a355d",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        1961,
+        521,
+        2556
+      ],
+      "visibleHeightRatio": 0.23278560250391236,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2827385,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 1
+    },
+    {
+      "slot": "peach_blossom_right",
+      "path": "themes/celestial_realm/foregrounds/peach_blossom/right.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-145ba605-34a0-4c49-a8a4-655779a010d9.png",
+      "sourceSHA256": "0b043329ccf741c08a4a738317a73aec5512ea6745679df27d39210dfbbbea5a",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        734,
+        1951,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.236697965571205,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2850528,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "golden_osmanthus_left",
+      "path": "themes/celestial_realm/foregrounds/golden_osmanthus/left.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-03a6bed4-ab03-44ac-b1b0-59f6d7fdb156.png",
+      "sourceSHA256": "96a4a47b0ec8c1ac0ee4c65a4267325d292e1b79091ac4c7c90466c4827d91ea",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        2029,
+        455,
+        2556
+      ],
+      "visibleHeightRatio": 0.20618153364632238,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2855508,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "golden_osmanthus_right",
+      "path": "themes/celestial_realm/foregrounds/golden_osmanthus/right.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-e519fe33-654c-4fc5-beb5-9f5bd6a1dc57.png",
+      "sourceSHA256": "94cfb57aa80f3ff0976798b462fd9f14dea4864d15e5c6ad37e6c49fc5166f47",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        729,
+        2047,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.1991392801251956,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2866035,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 1
+    },
+    {
+      "slot": "snow_camellia_left",
+      "path": "themes/celestial_realm/foregrounds/snow_camellia/left.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-7ab93ecf-1b18-4c35-88eb-3af1c1e1ebe5.png",
+      "sourceSHA256": "a3e027a4f5b41f560deacdcf2bcde5670037053b31276186eb5914fd879e22a0",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        2013,
+        451,
+        2556
+      ],
+      "visibleHeightRatio": 0.21244131455399062,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2846799,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 0
+    },
+    {
+      "slot": "snow_camellia_right",
+      "path": "themes/celestial_realm/foregrounds/snow_camellia/right.png",
+      "source": "/Users/lenxeon/.codex/generated_images/01a185a9-e66a-7ec1-acaf-01fb951998fa/exec-61079943-7768-4ea3-be17-9b842da1ad8f.png",
+      "sourceSHA256": "3fa2ecf82938adfddb82da8472b02fe7b16ff7c0b4ae5a190f00ffc9425d33e0",
+      "nativeSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        708,
+        2052,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.19718309859154928,
+      "alphaRange": [
+        0,
+        254
+      ],
+      "transparentPixels": 2848579,
+      "totalPixels": 3013524,
+      "centralAlphaMax": 1
+    }
+  ],
+  "openTerraceRevision": {
+    "sourceOriginalReferenceSHA256": "81738bf1fe02e88e8d030637dd5b7e6570a19f2999eb4ba389bb2d220d466f4d",
+    "effectPreview": "artifacts/scene-theme/celestial_realm/open-terrace-20261029/open-terrace-effect.png",
+    "effectPreviewSHA256": "2a5a4af2d3c6268ce3daaa89e8f233fd4baa2a9223dce3110292d12e431f3f5f",
+    "wallpaperSHA256": "452d2c238620c1e615a196b26440a79027ac05b24300f2d4f666b7ad3dad7669",
+    "roomOverlaySHA256": "4f10805f441de42e275911a73834ec405b63a1cedc9a13085cdd101fb1e0cb0c",
+    "removedLowAlphaPixels": 12259,
+    "alphaCutoff": 16,
+    "groundFinish": "matte, no object reflections",
+    "architecture": "open sky at top and sides; no columns, bases, or overhead frame"
+  }
+}

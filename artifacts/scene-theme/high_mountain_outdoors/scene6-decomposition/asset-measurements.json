@@ -1,0 +1,227 @@
+{
+  "referenceCanvas": [
+    1179,
+    2556
+  ],
+  "sourceSha256": "1312ac85d0ff68b8099b6ac093a1ff7411c8c1dee15a7f931b2fc67d6099c6e0",
+  "assets": [
+    {
+      "slot": "wallpaper",
+      "path": "themes/high_mountain_outdoors/wallpapers/phone/sunrise-cloud-sea.png",
+      "generatedSource": "exec-a5e0d19e-a0f7-4647-b7e6-474ee16843b2.png",
+      "sourceSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGB",
+      "visibleBoundsAlpha24": [
+        0,
+        0,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 1.0,
+      "alphaRange": [
+        255,
+        255
+      ],
+      "transparentPixels": 0,
+      "solidPixels": 3013524,
+      "totalPixels": 3013524
+    },
+    {
+      "slot": "roomOverlay",
+      "path": "themes/high_mountain_outdoors/interior/phone/pine-terrace.png",
+      "generatedSource": "exec-3e92f881-b1b0-4beb-87cd-7d22e6f018f5.png",
+      "sourceSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        1050,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.5892018779342723,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 1838260,
+      "solidPixels": 213,
+      "totalPixels": 3013524
+    },
+    {
+      "slot": "table",
+      "path": "themes/high_mountain_outdoors/table/carved-stone-trestle.png",
+      "generatedSource": "exec-2336e531-2162-4211-9da8-9d94ddb929d8.png",
+      "sourceSize": [
+        1983,
+        793
+      ],
+      "exportSize": [
+        1906,
+        658
+      ],
+      "exportCrop": [
+        39,
+        104,
+        1945,
+        762
+      ],
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        24,
+        24,
+        1882,
+        634
+      ],
+      "visibleHeightRatio": 0.9270516717325228,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 705408,
+      "solidPixels": 1290,
+      "totalPixels": 1254148
+    },
+    {
+      "slot": "groundMat",
+      "path": "themes/high_mountain_outdoors/mats/indigo-mountain-mat.png",
+      "generatedSource": "exec-426ed4db-680b-4644-8602-26f6e6381f23.png",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "exportSize": [
+        1770,
+        441
+      ],
+      "exportCrop": [
+        2,
+        257,
+        1772,
+        698
+      ],
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        24,
+        24,
+        1746,
+        417
+      ],
+      "visibleHeightRatio": 0.891156462585034,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 181224,
+      "solidPixels": 588,
+      "totalPixels": 780570
+    },
+    {
+      "slot": "cushion",
+      "path": "themes/high_mountain_outdoors/cushions/ivory-brocade.png",
+      "generatedSource": "exec-16019b25-e8e9-4935-bec1-6bf5a0cfc6ad.png",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "exportSize": [
+        1654,
+        721
+      ],
+      "exportCrop": [
+        61,
+        127,
+        1715,
+        848
+      ],
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        24,
+        24,
+        1630,
+        697
+      ],
+      "visibleHeightRatio": 0.9334257975034674,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 286289,
+      "solidPixels": 884,
+      "totalPixels": 1192534
+    },
+    {
+      "slot": "foregroundLeft",
+      "path": "themes/high_mountain_outdoors/foregrounds/left.png",
+      "generatedSource": "exec-fc67412c-21c1-443a-837c-55cf52838893.png",
+      "sourceSize": [
+        852,
+        1846
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        0,
+        2051,
+        412,
+        2556
+      ],
+      "visibleHeightRatio": 0.19757433489827855,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2872091,
+      "solidPixels": 165,
+      "totalPixels": 3013524
+    },
+    {
+      "slot": "foregroundRight",
+      "path": "themes/high_mountain_outdoors/foregrounds/right.png",
+      "generatedSource": "exec-7aae5343-6978-452a-803b-05ef640e9140.png",
+      "sourceSize": [
+        853,
+        1844
+      ],
+      "exportSize": [
+        1179,
+        2556
+      ],
+      "exportCrop": null,
+      "mode": "RGBA",
+      "visibleBoundsAlpha24": [
+        737,
+        2042,
+        1179,
+        2556
+      ],
+      "visibleHeightRatio": 0.20109546165884193,
+      "alphaRange": [
+        0,
+        255
+      ],
+      "transparentPixels": 2863737,
+      "solidPixels": 3,
+      "totalPixels": 3013524
+    }
+  ]
+}
