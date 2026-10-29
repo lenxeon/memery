@@ -491,7 +491,21 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
           tableLayer.setCandleLights(propsLayer.getCandleLightSources());
         }
         const readyRevision = renderRevisionRef.current;
-        await stage.app.renderer.prepare.upload(stage.app.stage);
+        // Pixi falls back to CanvasRenderer when WebGL is unavailable. The prepare
+        // extension is registered only for WebGL/WebGPU, so it is not present on
+        // that renderer. Pre-upload is only a first-frame optimization; it must
+        // never prevent the scene from rendering on iOS WKWebView.
+        const app = stage.app;
+        const rendererWithPrepare = app.renderer as typeof app.renderer & {
+          prepare?: { upload?: (target: typeof app.stage) => Promise<unknown> };
+        };
+        if (typeof rendererWithPrepare.prepare?.upload === 'function') {
+          try {
+            await rendererWithPrepare.prepare.upload(app.stage);
+          } catch (error) {
+            console.warn('Scene GPU pre-upload failed; continuing with normal rendering:', error);
+          }
+        }
         if (!isMounted || !stage.app) return;
         if (readyRevision !== renderRevisionRef.current) continue;
         stage.app.render();
